@@ -28,7 +28,7 @@ The aim of this program is to implement most of the known algorithms for decidin
 + Specification by a regular expression:\
   `<variable> = "<regexp>"`\
    Syntax of regexps:\
-    e := e + e | e e | e* | !e | (e) | e & e | [<carac>] | 1 | 0 where 0 = ∅, 1 = ε, ! = complement, & = ∩, [d] = a + b + c + d.
+    e := e + e | e e | e* | !e | (e) | e & e | [d] | 1 | 0 where 0 = ∅, 1 = ε, ! = complement, & = ∩, [d] = a + b + c + d.
 + Specification by an automaton:\
   `<variable> = link(<variable_name_of_automaton>)`\
   Creates a link with the NFA in the automata variable A (A becomes protected).
