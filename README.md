@@ -1,2 +1,4 @@
+
 # mescal
-Membership and separation for classes of languages
+
+***Me***mbership and ***s***eparation for ***c***l***a***sses of ***l***anguages
