@@ -1,5 +1,7 @@
 #include "printing.h"
 
+#define _GNU_SOURCE
+
 bool external_viewer = false;
 
 /**********************/
@@ -7,7 +9,7 @@ bool external_viewer = false;
 /**********************/
 
 // Print d'un sommet, version noms contenus dans un deq
-void list_print_state(void* p, FILE* out)
+void list_print_state(void *p, FILE *out)
 {
     if (isempty_vertices(p))
     {
@@ -23,11 +25,14 @@ void list_print_state(void* p, FILE* out)
     }
 }
 
-static void print_expo(uint n, FILE* out) {
-    if (n != 0) {
+static void print_expo(uint n, FILE *out)
+{
+    if (n != 0)
+    {
         uint d = n % 10;
         print_expo(n / 10, out);
-        switch (d) {
+        switch (d)
+        {
         case 0:
             fprintf(out, "0");
             break;
@@ -65,37 +70,46 @@ static void print_expo(uint n, FILE* out) {
 }
 
 // Print d'un sommet, version cayley graph
-static void cayley_print_state_label(void* p, FILE* out)
+static void cayley_print_state_label(void *p, FILE *out)
 {
     fprintf(out, "<");
-    if (isempty_vertices(p)) {
+    if (isempty_vertices(p))
+    {
         fprintf(out, "1");
     }
-    else {
+    else
+    {
         uint n = 1;
         fprintf(out, "%c", lefread_vertices(p, 0) + 'a');
-        for (uint i = 1; i < size_vertices(p);i++) {
-            if (lefread_vertices(p, i) != lefread_vertices(p, i - 1)) {
-                if (n > 1) {
+        for (uint i = 1; i < size_vertices(p); i++)
+        {
+            if (lefread_vertices(p, i) != lefread_vertices(p, i - 1))
+            {
+                if (n > 1)
+                {
                     fprintf(out, "<SUP>");
                     print_expo(n, out);
                     fprintf(out, "</SUP>");
-                    while (n != 0) {
+                    while (n != 0)
+                    {
                         n = n / 10;
                     }
                 }
                 fprintf(out, "%c", lefread_vertices(p, i) + 'a');
                 n = 1;
             }
-            else {
+            else
+            {
                 n++;
             }
         }
-        if (n > 1) {
+        if (n > 1)
+        {
             fprintf(out, "<SUP>");
             print_expo(n, out);
             fprintf(out, "</SUP>");
-            while (n != 0) {
+            while (n != 0)
+            {
                 n = n / 10;
             }
         }
@@ -104,12 +118,8 @@ static void cayley_print_state_label(void* p, FILE* out)
 }
 
 // Print d'un sommet, version cayley graph
-void cayley_print_state(void* p, FILE* out)
+void cayley_print_state(void *p, FILE *out)
 {
-
-
-
-
     if (isempty_vertices(p))
     {
         fprintf(out, "1");
@@ -129,28 +139,28 @@ void cayley_print_state(void* p, FILE* out)
 /* Print des arêtes d'un graphe */
 /********************************/
 
-void simple_gedges_print(p_graph G, FILE* out)
+void simple_gedges_print(p_graph G, FILE *out)
 {
     p_stack theedges = graph_to_edges(G);
 
     for (uint i = 0; i < size_stack(theedges); i++)
     { // Boucle sur les états de départ
         fprintf(out, "\"%d\" -> \"%d\" [label = \"1\"];\n", ((p_edge)read_stack(theedges, i))->in,
-            ((p_edge)read_stack(theedges, i))->out);
+                ((p_edge)read_stack(theedges, i))->out);
     }
 }
 
-void simple_lgedges_print(p_stack theedges, FILE* out)
+void simple_lgedges_print(p_stack theedges, FILE *out)
 {
     for (uint i = 0; i < size_stack(theedges); i++)
     { // Boucle sur les états de départ
         fprintf(out, "\"%d\" -> \"%d\" [label = <", ((p_multi_edge)read_stack(theedges, i))->in,
-            ((p_multi_edge)read_stack(theedges, i))->out);
+                ((p_multi_edge)read_stack(theedges, i))->out);
         if (((p_multi_edge)read_stack(theedges, i))->eps)
         {
             // printf("eps\n");
             if (!isempty_vertices(((p_multi_edge)read_stack(theedges,
-                i))->lab) ||
+                                                            i))->lab) ||
                 !isempty_vertices(((p_multi_edge)read_stack(theedges, i))->lab_i))
             {
                 fprintf(out, "1,");
@@ -164,26 +174,26 @@ void simple_lgedges_print(p_stack theedges, FILE* out)
         {
             // printf("normal\n");
             for (uint j = 0; j < size_vertices(((p_multi_edge)read_stack(theedges, i))->lab) - 1;
-                j++)
+                 j++)
             {
                 fprintf(out, "%c,",
-                    lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab, j) + 'a');
+                        lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab, j) + 'a');
             }
             if (!isempty_vertices(((p_multi_edge)read_stack(theedges, i))->lab_i))
             {
                 fprintf(out, "%c,",
-                    lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab,
-                        size_vertices(((p_multi_edge)read_stack(theedges,
-                            i))->lab) - 1) +
-                    'a');
+                        lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab,
+                                         size_vertices(((p_multi_edge)read_stack(theedges,
+                                                                                 i))->lab) - 1) +
+                        'a');
             }
             else
             {
                 fprintf(out, "%c>];\n",
-                    lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab,
-                        size_vertices(((p_multi_edge)read_stack(theedges,
-                            i))->lab) - 1) +
-                    'a');
+                        lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab,
+                                         size_vertices(((p_multi_edge)read_stack(theedges,
+                                                                                 i))->lab) - 1) +
+                        'a');
             }
         }
 
@@ -191,22 +201,22 @@ void simple_lgedges_print(p_stack theedges, FILE* out)
         {
             // printf("test\n");
             for (uint j = 0; j < size_vertices(((p_multi_edge)read_stack(theedges, i))->lab_i) - 1;
-                j++)
+                 j++)
             {
                 // printf("j: %d\n", j);
                 fprintf(out, "%c<SUP>-1</SUP>,",
-                    lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab_i, j) + 'a');
+                        lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab_i, j) + 'a');
             }
             fprintf(out, "%c<SUP>-1</SUP>>];\n",
-                lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab_i,
-                    size_vertices(((p_multi_edge)read_stack(theedges,
-                        i))->lab_i) - 1) +
-                'a');
+                    lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab_i,
+                                     size_vertices(((p_multi_edge)read_stack(theedges,
+                                                                             i))->lab_i) - 1) +
+                    'a');
         }
     }
 }
 
-void named_lgedges_print(p_stack theedges, p_nfa A, FILE* out)
+void named_lgedges_print(p_stack theedges, p_nfa A, FILE *out)
 {
     for (uint i = 0; i < size_stack(theedges); i++)
     { // Boucle sur les états de départ
@@ -221,7 +231,7 @@ void named_lgedges_print(p_stack theedges, p_nfa A, FILE* out)
         {
             // printf("eps\n");
             if (!isempty_vertices(((p_multi_edge)read_stack(theedges,
-                i))->lab) ||
+                                                            i))->lab) ||
                 !isempty_vertices(((p_multi_edge)read_stack(theedges, i))->lab_i))
             {
                 fprintf(out, "1,");
@@ -235,24 +245,26 @@ void named_lgedges_print(p_stack theedges, p_nfa A, FILE* out)
         {
             // printf("normal\n");
             for (uint j = 0; j < size_vertices(((p_multi_edge)read_stack(theedges, i))->lab) - 1;
-                j++)
+                 j++)
             {
                 fprintf(out, "%c,",
-                    lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab, j) + 'a');
+                        lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab, j) + 'a');
             }
             if (!isempty_vertices(((p_multi_edge)read_stack(theedges, i))->lab_i))
             {
                 fprintf(out, "%c,",
-                    lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab,
-                        size_vertices(((p_multi_edge)read_stack(theedges,
-                            i))->lab) - 1) +
-                    'a');
+                        lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab,
+                                         size_vertices(((p_multi_edge)read_stack(theedges,
+                                                                                 i))->lab) - 1) +
+                        'a');
             }
             else
             {
                 fprintf(out, "%c>];\n",
-                    lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab,
-                        size_vertices(((p_multi_edge)read_stack(theedges, i))->lab) - 1) + 'a');
+                        lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab,
+                                         size_vertices(((p_multi_edge)read_stack(theedges,
+                                                                                 i))->lab) - 1) +
+                        'a');
             }
         }
 
@@ -260,22 +272,22 @@ void named_lgedges_print(p_stack theedges, p_nfa A, FILE* out)
         {
             // printf("test\n");
             for (uint j = 0; j < size_vertices(((p_multi_edge)read_stack(theedges, i))->lab_i) - 1;
-                j++)
+                 j++)
             {
                 // printf("j: %d\n", j);
                 fprintf(out, "%c<SUP>-1</SUP>,",
-                    lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab_i, j) + 'a');
+                        lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab_i, j) + 'a');
             }
             fprintf(out, "%c<SUP>-1</SUP>>];\n",
-                lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab_i,
-                    size_vertices(((p_multi_edge)read_stack(theedges,
-                        i))->lab_i) - 1) +
-                'a');
+                    lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab_i,
+                                     size_vertices(((p_multi_edge)read_stack(theedges,
+                                                                             i))->lab_i) - 1) +
+                    'a');
         }
     }
 }
 
-void named_gedges_print(p_graph G, void** names, void (*f) (void*, FILE*), FILE* out)
+void named_gedges_print(p_graph G, void **names, void (*f) (void *, FILE *), FILE *out)
 {
     p_stack theedges = graph_to_edges(G);
     for (uint i = 0; i < size_stack(theedges); i++)
@@ -288,7 +300,8 @@ void named_gedges_print(p_graph G, void** names, void (*f) (void*, FILE*), FILE*
     }
 }
 
-// void named_lgedges_print(p_lgraph G, void **names, void (*f)(void *, FILE *), FILE *out)
+// void named_lgedges_print(p_lgraph G, void **names, void (*f)(void *, FILE *),
+// FILE *out)
 // {
 // p_stack theedges = lgraph_to_multi_edges(0, G);
 // for (uint i = 0; i < size_stack(theedges); i++)
@@ -298,16 +311,19 @@ void named_gedges_print(p_graph G, void** names, void (*f) (void*, FILE*), FILE*
 // fprintf(out, "\" -> \"");
 // (*f)(names[((p_multi_edge)read_stack(theedges, i))->out], out);
 // fprintf(out, "\" [label = \"");
-// for (uint j = 0; j < size_vertices(((p_multi_edge)read_stack(theedges, i))->lab) - 1; j++)
+// for (uint j = 0; j < size_vertices(((p_multi_edge)read_stack(theedges,
+// i))->lab) - 1; j++)
 // {
-// fprintf(out, "%c,", lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab, j) + 'a');
+// fprintf(out, "%c,", lefread_vertices(((p_multi_edge)read_stack(theedges,
+// i))->lab, j) + 'a');
 // }
-// fprintf(out, "%c\"];\n", lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab,
+// fprintf(out, "%c\"];\n", lefread_vertices(((p_multi_edge)read_stack(theedges,
+// i))->lab,
 // size_vertices(((p_multi_edge)read_stack(theedges, i))->lab) - 1) + 'a');
 // }
 // }
 
-void named_dgedges_print(p_dgraph G, void** names, void (*f) (void*, FILE*), FILE* out)
+void named_dgedges_print(p_dgraph G, void **names, void (*f) (void *, FILE *), FILE *out)
 {
     p_stack theedges = dgraph_to_multi_edges(G);
     for (uint i = 0; i < size_stack(theedges); i++)
@@ -320,12 +336,12 @@ void named_dgedges_print(p_dgraph G, void** names, void (*f) (void*, FILE*), FIL
         for (uint j = 0; j < size_vertices(((p_multi_edge)read_stack(theedges, i))->lab) - 1; j++)
         {
             fprintf(out, "%c,",
-                lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab, j) + 'a');
+                    lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab, j) + 'a');
         }
         fprintf(out, "%c>];\n",
-            lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab,
-                size_vertices(((p_multi_edge)read_stack(theedges,
-                    i))->lab) - 1) + 'a');
+                lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab,
+                                 size_vertices(((p_multi_edge)read_stack(theedges,
+                                                                         i))->lab) - 1) + 'a');
     }
 }
 
@@ -345,16 +361,16 @@ static void sort_spe_states(p_nfa A, p_vertices inionly, p_vertices finonly, p_v
         // printf("Deq size: %d\n",getsize_vertices(A->initials));
         if (j >= size_vertices(A->finals) ||
             (i < size_vertices(A->initials) && (lefread_vertices(A->initials,
-                i) < lefread_vertices(A->finals,
-                    j))))
+                                                                 i) < lefread_vertices(A->finals,
+                                                                                       j))))
         {
             // printf("Test %d\n", lefread_vertices(A->initials, i));
             rigins_vertices(lefread_vertices(A->initials, i), inionly);
             i++;
         }
         else if (i < size_vertices(A->initials) && lefread_vertices(A->initials,
-            i) ==
-            lefread_vertices(A->finals, j))
+                                                                    i) ==
+                 lefread_vertices(A->finals, j))
         {
             rigins_vertices(lefread_vertices(A->initials, i), mixed);
             i++;
@@ -368,7 +384,7 @@ static void sort_spe_states(p_nfa A, p_vertices inionly, p_vertices finonly, p_v
     }
 }
 
-void nfa_print(p_nfa A, FILE* out)
+void nfa_print(p_nfa A, FILE *out)
 {
     // if (A->names == NULL)
     // {
@@ -383,10 +399,11 @@ void nfa_print(p_nfa A, FILE* out)
     fprintf(out, "edge [fontname=\"Helvetica,Arial,sans-serif\"]\n");
     fprintf(out, "rankdir=LR;\n");
 
-    // Tri des états initiaux/finaux (on isole ceux qui sont les deux en même temps)
+    // Tri des états initiaux/finaux (on isole ceux qui sont les deux en même
+    // temps)
     p_vertices inionly = create_vertices();
     p_vertices finonly = create_vertices();
-    p_vertices mixed = create_vertices();
+    p_vertices mixed   = create_vertices();
     sort_spe_states(A, inionly, finonly, mixed);
 
     // États initiaux (coloriés en bleu-vert)
@@ -499,7 +516,8 @@ void nfa_print(p_nfa A, FILE* out)
 // fprintf(out, "edge [fontname=\"Helvetica,Arial,sans-serif\"]\n");
 // fprintf(out, "rankdir=LR;\n");
 
-//// Tri des états initiaux/finaux (on isole ceux qui sont les deux en même temps)
+//// Tri des états initiaux/finaux (on isole ceux qui sont les deux en même
+// temps)
 // p_vertices inionly = create_vertices();
 // p_vertices finonly = create_vertices();
 // p_vertices mixed = create_vertices();
@@ -530,7 +548,8 @@ void nfa_print(p_nfa A, FILE* out)
 //// États initiaux et finaux en même temps
 // if (!isempty_vertices(mixed))
 // {
-// fprintf(out, "node [fillcolor=\"blue:green\",style=filled,shape = doublecircle];");
+// fprintf(out, "node [fillcolor=\"blue:green\",style=filled,shape =
+// doublecircle];");
 // for (uint i = 0; i < size_vertices(mixed); i++)
 // {
 // fprintf(out, " \"%d\"", lefread_vertices(mixed, i));
@@ -577,7 +596,8 @@ void nfa_print(p_nfa A, FILE* out)
 // fprintf(out, "edge [fontname=\"Helvetica,Arial,sans-serif\"]\n");
 // fprintf(out, "rankdir=LR;\n");
 
-//// Tri des états initiaux/finaux (on isole ceux qui sont les deux en même temps)
+//// Tri des états initiaux/finaux (on isole ceux qui sont les deux en même
+// temps)
 // p_vertices inionly = create_vertices();
 // p_vertices finonly = create_vertices();
 // p_vertices mixed = create_vertices();
@@ -612,7 +632,8 @@ void nfa_print(p_nfa A, FILE* out)
 //// États initiaux et finaux en même temps
 // if (!isempty_vertices(mixed))
 // {
-// fprintf(out, "node [fillcolor=\"blue:green\",style=filled,shape = doublecircle];");
+// fprintf(out, "node [fillcolor=\"blue:green\",style=filled,shape =
+// doublecircle];");
 // for (uint i = 0; i < size_vertices(mixed); i++)
 // {
 // fprintf(out, " \"");
@@ -651,7 +672,7 @@ void nfa_print(p_nfa A, FILE* out)
 /* Print d'un Cayley graph */
 /***************************/
 
-void cayley_print(p_cayley M, FILE* out)
+void cayley_print(p_cayley M, FILE *out)
 {
     fprintf(out, "digraph {\n");
     fprintf(out, "gradientangle=90\n");
@@ -665,13 +686,14 @@ void cayley_print(p_cayley M, FILE* out)
     for (uint i = 0; i < M->trans->size_graph; i++)
     {
         fprintf(out, " %d ", i);
-        if (M->accept_array[i]) {
+        if (M->accept_array[i])
+        {
             fprintf(out, "[style=solid,shape = doublecircle,label =");
         }
-        else {
+        else
+        {
             fprintf(out, "[style=solid,shape = circle,label =");
         }
-
 
         cayley_print_state_label(M->names[i], out);
         fprintf(out, "];\n");
@@ -680,23 +702,24 @@ void cayley_print(p_cayley M, FILE* out)
     p_stack theedges = dgraph_to_multi_edges(M->trans);
     for (uint i = 0; i < size_stack(theedges); i++)
     { // Boucle sur les états de départ
-        fprintf(out, " %d -> %d ", ((p_multi_edge)read_stack(theedges, i))->in, ((p_multi_edge)read_stack(theedges, i))->out);
+        fprintf(out, " %d -> %d ", ((p_multi_edge)read_stack(theedges, i))->in,
+                ((p_multi_edge)read_stack(theedges, i))->out);
         fprintf(out, "[label = <");
         for (uint j = 0; j < size_vertices(((p_multi_edge)read_stack(theedges, i))->lab) - 1; j++)
         {
             fprintf(out, "%c,",
-                lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab, j) + 'a');
+                    lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab, j) + 'a');
         }
         fprintf(out, "%c>];\n",
-            lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab,
-                size_vertices(((p_multi_edge)read_stack(theedges,
-                    i))->lab) - 1) + 'a');
+                lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab,
+                                 size_vertices(((p_multi_edge)read_stack(theedges,
+                                                                         i))->lab) - 1) + 'a');
     }
     fprintf(out, "}\n");
 }
 
 // Print du graphe gauche
-void cayley_left_print(p_cayley M, FILE* out)
+void cayley_left_print(p_cayley M, FILE *out)
 {
     if (M->leftgraph == NULL)
     {
@@ -715,13 +738,14 @@ void cayley_left_print(p_cayley M, FILE* out)
     for (uint i = 0; i < M->trans->size_graph; i++)
     {
         fprintf(out, " %d ", i);
-        if (M->accept_array[i]) {
+        if (M->accept_array[i])
+        {
             fprintf(out, "[style=solid,shape = doublecircle,label =");
         }
-        else {
+        else
+        {
             fprintf(out, "[style=solid,shape = circle,label =");
         }
-
 
         cayley_print_state_label(M->names[i], out);
         fprintf(out, "];\n");
@@ -730,65 +754,69 @@ void cayley_left_print(p_cayley M, FILE* out)
     p_stack theedges = dgraph_to_multi_edges(M->leftgraph);
     for (uint i = 0; i < size_stack(theedges); i++)
     { // Boucle sur les états de départ
-        fprintf(out, " %d -> %d ", ((p_multi_edge)read_stack(theedges, i))->in, ((p_multi_edge)read_stack(theedges, i))->out);
+        fprintf(out, " %d -> %d ", ((p_multi_edge)read_stack(theedges, i))->in,
+                ((p_multi_edge)read_stack(theedges, i))->out);
         fprintf(out, "[label = <");
         for (uint j = 0; j < size_vertices(((p_multi_edge)read_stack(theedges, i))->lab) - 1; j++)
         {
             fprintf(out, "%c,",
-                lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab, j) + 'a');
+                    lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab, j) + 'a');
         }
         fprintf(out, "%c>];\n",
-            lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab,
-                size_vertices(((p_multi_edge)read_stack(theedges,
-                    i))->lab) - 1) + 'a');
+                lefread_vertices(((p_multi_edge)read_stack(theedges, i))->lab,
+                                 size_vertices(((p_multi_edge)read_stack(theedges,
+                                                                         i))->lab) - 1) + 'a');
     }
     fprintf(out, "}\n");
 
-
     // for (uint i = 0; i < size_vertices(M->accept_list); i++)
     // {
-    //     fprintf(out, " \"");
-    //     cayley_print_state(M->names[lefread_vertices(M->accept_list, i)], out);
-    //     fprintf(out, "\"");
+    // fprintf(out, " \"");
+    // cayley_print_state(M->names[lefread_vertices(M->accept_list, i)], out);
+    // fprintf(out, "\"");
     // }
     // fprintf(out, ";\n");
 
     // fprintf(out, "node [style=solid,shape = circle];\n");
-    // named_dgedges_print(M->leftgraph, (void**)M->names, &cayley_print_state, out);
+    // named_dgedges_print(M->leftgraph, (void**)M->names, &cayley_print_state,
+    // out);
     // fprintf(out, "}\n");
 }
-
 
 /**************************/
 /* Affichage sur le shell */
 /**************************/
 
 // Affichage d'un NFA
-void view_nfa(nfa* nfa) {
+void view_nfa(nfa *thenfa)
+{
     char tmp_filename[] = "/tmp/nfa-XXX.dot";
-    int d = mkostemps(tmp_filename, 4, O_APPEND);
+    int d               = mkostemps(tmp_filename, 4, O_APPEND);
     char png_filename[1 + strlen(tmp_filename)];
 
     strcpy(png_filename, tmp_filename);
     strcpy(png_filename + strlen(tmp_filename) - 3, "png");
 
-    FILE* f_tmp = fdopen(d, "w");
+    FILE *f_tmp = fdopen(d, "w");
 
-    nfa_print(nfa, f_tmp);
+    nfa_print(thenfa, f_tmp);
 
     fclose(f_tmp);
 
-    // char *command = multiple_strcat("dot -Tpng ", tmp_filename, "| ./imgcat -W
+    // char *command = multiple_strcat("dot -Tpng ", tmp_filename, "| ./imgcat
+    // -W
     // auto ", NULL);
-    char* command;
+    char *command;
 
-    if (!external_viewer) {
+    if (!external_viewer)
+    {
         command =
             multiple_strcat("dot -Tpng ", tmp_filename, "| ./imgcat -W auto", NULL);
     }
-    else {
+    else
+    {
         command = multiple_strcat("dot -Tpng ", tmp_filename, " -o ", png_filename,
-            "&& open ", png_filename, NULL);
+                                  "&& open ", png_filename, NULL);
     }
     printf("%s\n", command);
     system(command);
@@ -796,21 +824,22 @@ void view_nfa(nfa* nfa) {
     free(command);
 }
 
-void view_cayley(cayley* cayley) {
+void view_cayley(cayley *thecayley)
+{
     char tmp_filename[] = "/tmp/cay-XXX.dot";
-    int d = mkostemps(tmp_filename, 4, O_APPEND);
+    int d               = mkostemps(tmp_filename, 4, O_APPEND);
     // char png_filename[1 + strlen(tmp_filename)];
 
     // strcpy(png_filename, tmp_filename);
     // strcpy(png_filename + strlen(tmp_filename) - 3, "png");
 
-    FILE* f_tmp = fdopen(d, "w");
+    FILE *f_tmp = fdopen(d, "w");
 
-    cayley_print(cayley, f_tmp);
+    cayley_print(thecayley, f_tmp);
 
     fclose(f_tmp);
 
-    char* command =
+    char *command =
         multiple_strcat("dot -Tpng ", tmp_filename, "| ./imgcat -W auto ", NULL);
     // " -o ", png_filename,
     // " && open ", png_filename, NULL);
@@ -818,25 +847,25 @@ void view_cayley(cayley* cayley) {
     free(command);
 }
 
-void view_left_cayley(cayley* cayley) {
+void view_left_cayley(cayley *thecayley)
+{
     char tmp_filename[] = "/tmp/cay-XXX.dot";
-    int d = mkostemps(tmp_filename, 4, O_APPEND);
+    int d               = mkostemps(tmp_filename, 4, O_APPEND);
     // char png_filename[1 + strlen(tmp_filename)];
 
     // strcpy(png_filename, tmp_filename);
     // strcpy(png_filename + strlen(tmp_filename) - 3, "png");
 
-    FILE* f_tmp = fdopen(d, "w");
+    FILE *f_tmp = fdopen(d, "w");
 
-    cayley_left_print(cayley, f_tmp);
+    cayley_left_print(thecayley, f_tmp);
 
     fclose(f_tmp);
 
-    char* command =
+    char *command =
         multiple_strcat("dot -Tpng ", tmp_filename, "| ./imgcat -W auto ", NULL);
 
     // " -o ", png_filename, " && open ", png_filename,
     system(command);
     free(command);
 }
-

@@ -8,7 +8,7 @@
 /* Membership - Pol */
 /********************/
 
-bool is_jsat_mono(p_cayley M, FILE* out)
+bool is_jsat_mono(p_cayley M, FILE *out)
 {
     if (M->order == NULL)
     {
@@ -16,8 +16,10 @@ bool is_jsat_mono(p_cayley M, FILE* out)
         return false;
     }
 
-    if (out) {
-        fprintf(out, "#### Checking if the ordered monoid M satisfies the equation 1 ≤ s for all s ∊ M.\n");
+    if (out)
+    {
+        fprintf(out,
+                "#### Checking if the ordered monoid M satisfies the equation 1 ≤ s for all s ∊ M.\n");
         fprintf(out, "#### The ordering :\n");
         cayley_print_order(M, out);
     }
@@ -27,10 +29,11 @@ bool is_jsat_mono(p_cayley M, FILE* out)
         if (out)
         {
             fprintf(out, "#### The monoid does not satisfy the equation 1 ≤ s for "
-                "all s ∊ M\n");
+                         "all s ∊ M\n");
             uint i = 0;
             while (i < size_vertices(M->order[ONE]) &&
-                lefread_vertices(M->order[ONE], i) == i) {
+                   lefread_vertices(M->order[ONE], i) == i)
+            {
                 i++;
             }
             fprintf(out, "#### For instance, 1 ≰ ");
@@ -39,31 +42,33 @@ bool is_jsat_mono(p_cayley M, FILE* out)
         }
         return false;
     }
-    if (out) {
+    if (out)
+    {
         fprintf(out, "#### The monoid satisfies the equation 1 ≤ s for all s ∊ M.\n");
     }
     return true;
 }
 
-bool is_ejsat_mono(p_cayley M, FILE* out)
+bool is_ejsat_mono(p_cayley M, FILE *out)
 {
-
-
     if (M->order == NULL)
     {
         printf("Error. The order is not computed.\n");
         return false;
     }
 
-    if (out) {
-        fprintf(out, "#### Checking if the ordered monoid M satisfies the equation 1 ≤ e for all e ∊ E(M).\n");
+    if (out)
+    {
+        fprintf(out,
+                "#### Checking if the ordered monoid M satisfies the equation 1 ≤ e for all e ∊ E(M).\n");
         fprintf(out, "#### The ordering :\n");
         cayley_print_order(M, out);
     }
 
     uint i = 0;
     uint j = 0;
-    while (i < size_vertices(M->idem_list)) {
+    while (i < size_vertices(M->idem_list))
+    {
         if (j >= size_vertices(M->order[ONE]) ||
             lefread_vertices(M->order[ONE], j) >
             lefread_vertices(M->idem_list, i))
@@ -71,7 +76,7 @@ bool is_ejsat_mono(p_cayley M, FILE* out)
             if (out)
             {
                 fprintf(out, "#### The monoid does not satisfy the equation 1 ≤ e for "
-                    "all idempotents e.\n");
+                             "all idempotents e.\n");
                 fprintf(out, "#### For instance, 1 ≰ ");
                 cayley_print_name(M, lefread_vertices(M->idem_list, i), out);
                 fprintf(out, ".\n");
@@ -79,7 +84,7 @@ bool is_ejsat_mono(p_cayley M, FILE* out)
             return false;
         }
         else if (lefread_vertices(M->order[ONE], j) <
-            lefread_vertices(M->idem_list, i))
+                 lefread_vertices(M->idem_list, i))
         {
             j++;
         }
@@ -89,13 +94,14 @@ bool is_ejsat_mono(p_cayley M, FILE* out)
             j++;
         }
     }
-    if (out) {
+    if (out)
+    {
         fprintf(out, "#### The monoid satisfies the equation 1 ≦ e for all idempotents e.\n");
     }
     return true;
 }
 
-bool is_jsat_submono(p_green_sub S, char* name, FILE* out)
+bool is_jsat_submono(p_green_sub S, char *name, FILE *out)
 {
     p_cayley M = S->original;
     if (M->order == NULL)
@@ -108,19 +114,24 @@ bool is_jsat_submono(p_green_sub S, char* name, FILE* out)
         return false;
     }
 
-    if (out) {
-        fprintf(out, "#### Checking whether the %s satisfies the equation 1 ≤ s for all s. Displaying the %s.\n", name, name);
+    if (out)
+    {
+        fprintf(out,
+                "#### Checking whether the %s satisfies the equation 1 ≤ s for all s. Displaying the %s.\n",
+                name, name);
         print_full_green_sub(S, false, stdout);
         submono_print_order(S, out);
     }
 
-    if (S->mono_in_sub == NULL) {
+    if (S->mono_in_sub == NULL)
+    {
         return is_jsat_mono(M, out);
     }
 
     uint i = 0;
     uint j = 0;
-    while (i < S->size) {
+    while (i < S->size)
+    {
         if (j >= size_vertices(M->order[S->sub_to_mono[S->neut]]) ||
             lefread_vertices(M->order[S->sub_to_mono[S->neut]], j) >
             S->sub_to_mono[i])
@@ -139,7 +150,7 @@ bool is_jsat_submono(p_green_sub S, char* name, FILE* out)
             return false;
         }
         else if (lefread_vertices(M->order[S->sub_to_mono[S->neut]], j) <
-            S->sub_to_mono[i])
+                 S->sub_to_mono[i])
         {
             j++;
         }
@@ -158,19 +169,24 @@ bool is_jsat_submono(p_green_sub S, char* name, FILE* out)
 
 // Equation 1 <= s pour un ensemble de C-orbites
 // (la chaîne de caractère sert à afficher le nom de la classe C)
-bool is_jsat_orbmono(p_orbits L, char* class, FILE* out)
+bool is_jsat_orbmono(p_orbits L, char *class, FILE *out)
 {
-
-    if (out) {
-        fprintf(out, "#### Checking whether the %s-orbits satisfy the equation 1 ≤ s for all s.\n", class);
+    if (out)
+    {
+        fprintf(out, "#### Checking whether the %s-orbits satisfy the equation 1 ≤ s for all s.\n",
+                class);
         fprintf(out, "#### The list of all idempotents:\n");
         cayley_print_idems(L->sub->original, out);
     }
     char nameorb[100];
 
-    if (L->oneonly) {
-        if (out) {
-            fprintf(out, "#### All %s-orbits are sub-semigroups of the %s-orbit of 1. Checking only the latter.\n", class, class);
+    if (L->oneonly)
+    {
+        if (out)
+        {
+            fprintf(out,
+                    "#### All %s-orbits are sub-semigroups of the %s-orbit of 1. Checking only the latter.\n",
+                    class, class);
             print_sep_line(100, out);
         }
         sprintf(nameorb, "%s-orbit of 1", class);
@@ -202,13 +218,14 @@ bool is_jsat_orbmono(p_orbits L, char* class, FILE* out)
 
 // Membership in UPol(BPol(C)) (les C-orbites du monoide doivent être passées en
 // entrée)
-bool is_upbp_mono(p_orbits L, char* class, FILE* out)
+bool is_upbp_mono(p_orbits L, char *class, FILE *out)
 {
-
     p_cayley M = L->sub->original;
-    p_green G = L->sub->originalrels;
-    if (out) {
-        fprintf(out, "#### Checking if the morphism satisfies the equation (esete)ʷ⁺¹ = (esete)ʷete(esete)ʷ\n");
+    p_green G  = L->sub->originalrels;
+    if (out)
+    {
+        fprintf(out,
+                "#### Checking if the morphism satisfies the equation (esete)ʷ⁺¹ = (esete)ʷete(esete)ʷ\n");
         fprintf(out, "     for all s, t ∊ M and e ∊ E(M) such that (e,s) is an %s-pair.\n", class);
     }
 
@@ -218,8 +235,8 @@ bool is_upbp_mono(p_orbits L, char* class, FILE* out)
         uint e = lefread_vertices(M->idem_list, i);
 
         // Calcul de l'ensemble eMe restreint aux éléments réguliers
-        p_vertices eM = compute_r_ideal(M, e, G->regular_array);
-        p_vertices Me = compute_l_ideal(M, e, G->regular_array);
+        p_vertices eM  = compute_r_ideal(M, e, G->regular_array);
+        p_vertices Me  = compute_l_ideal(M, e, G->regular_array);
         p_vertices eMe = make_inter_sorted_vertices(eM, Me);
         delete_vertices(Me);
         delete_vertices(eM);
@@ -233,7 +250,7 @@ bool is_upbp_mono(p_orbits L, char* class, FILE* out)
             // satisfait esete J ete
             for (uint l = 0; l < size_vertices(eMe); l++)
             {
-                uint ete = lefread_vertices(eMe, l);
+                uint ete   = lefread_vertices(eMe, l);
                 uint esete = cayley_mult(M, ese, ete);
                 if (G->JCL->numcl[esete] == G->JCL->numcl[ete] &&
                     M->idem_array[esete])
@@ -243,7 +260,7 @@ bool is_upbp_mono(p_orbits L, char* class, FILE* out)
                         if (out)
                         {
                             fprintf(out, "#### This morphism does not satisfy the equation "
-                                "(esete)ʷ⁺¹ = (esete)ʷete(esete)ʷ\n");
+                                         "(esete)ʷ⁺¹ = (esete)ʷete(esete)ʷ\n");
                             fprintf(
                                 out,
                                 "     for all %s-pairs (e,s) ∊ M² and all elements t ∊ M.\n",
@@ -266,9 +283,9 @@ bool is_upbp_mono(p_orbits L, char* class, FILE* out)
     if (out)
     {
         fprintf(out, "#### This morphism satisfies the equation (esete)ʷ⁺¹ = "
-            "(esete)ʷete(esete)ʷ\n");
+                     "(esete)ʷete(esete)ʷ\n");
         fprintf(out, "     for all %s-pairs (e,s) ∊ M² and all elements t ∊ M.\n",
-            class);
+                class);
     }
     return true;
 }
@@ -278,9 +295,10 @@ bool is_upbp_mono(p_orbits L, char* class, FILE* out)
 /*********************/
 
 // J-triviality (PT)
-bool is_jtrivial_mono(p_cayley M, p_green G, FILE* out)
+bool is_jtrivial_mono(p_cayley M, p_green G, FILE *out)
 {
-    if (out) {
+    if (out)
+    {
         fprintf(stdout, "#### Checking if the monoid is J-trivial.\n");
     }
     // Si il y a autant d'éléments que de J-classes, le monoide est HJ-trivial
@@ -317,7 +335,7 @@ bool is_jtrivial_mono(p_cayley M, p_green G, FILE* out)
     return false;
 }
 
-bool is_jtrivial_submono(p_cayley M, p_green_sub S, FILE* out)
+bool is_jtrivial_submono(p_cayley M, p_green_sub S, FILE *out)
 {
     // Si il y a autant d'éléments que de J-classes, le monoide est J-trivial
     if (S->rels->JCL->size_set == S->rels->JCL->size_par)
@@ -354,9 +372,10 @@ bool is_jtrivial_submono(p_cayley M, p_green_sub S, FILE* out)
 }
 
 // Block-group
-bool is_blockg_mono(p_cayley M, p_green G, FILE* out)
+bool is_blockg_mono(p_cayley M, p_green G, FILE *out)
 {
-    if (out) {
+    if (out)
+    {
         fprintf(stdout, "#### Checking if the monoid is a block group.\n");
     }
     uint ridem[G->RCL->size_par];
@@ -372,7 +391,7 @@ bool is_blockg_mono(p_cayley M, p_green G, FILE* out)
 
     for (uint i = 1; i < size_vertices(M->idem_list); i++)
     {
-        uint e = lefread_vertices(M->idem_list, i);
+        uint e  = lefread_vertices(M->idem_list, i);
         uint cr = G->RCL->numcl[e];
         if (ridem[cr] != ONE)
         {
@@ -427,77 +446,75 @@ bool is_blockg_mono(p_cayley M, p_green G, FILE* out)
 
 // static p_nfa auto_from_rclass(p_cayley M, p_green G, uint e) {
 
-//     // Création du nouveau NFA
-//     p_nfa A;
-//     MALLOC(A, 1);
-//     A->initials = create_vertices();
-//     A->finals = create_vertices();
-//     rigins_vertices(e, A->initials);
-//     A->trans = create_lgraph_noedges(size_vertices(G->RCL->cl[e]), 1);
-//     A->etrans = NULL;
-//     A->itrans = NULL;
-//     A->ntype == NUMBER;
-//     nfa_init_names(A);
-//     for (uint i = 0; i < size_vertices(G->RCL->cl[e]); i++)
-//     {
-//         uint s = lefread_vertices(G->RCL->cl[e], i);
-//         ((uint*)A->names)[i] = s;
-//         if (s == e) {
-//             rigins_vertices(i, A->initials);
-//         }
-//         for (uint a = 0; a < A->trans->size_alpha; a++)
-//         {
-//             if (G->RCL->numcl[e] == G->RCL->numcl[M->trans->edges[s][a]]) {
+//// Création du nouveau NFA
+// p_nfa A;
+// MALLOC(A, 1);
+// A->initials = create_vertices();
+// A->finals = create_vertices();
+// rigins_vertices(e, A->initials);
+// A->trans = create_lgraph_noedges(size_vertices(G->RCL->cl[e]), 1);
+// A->etrans = NULL;
+// A->itrans = NULL;
+// A->ntype == NUMBER;
+// nfa_init_names(A);
+// for (uint i = 0; i < size_vertices(G->RCL->cl[e]); i++)
+// {
+// uint s = lefread_vertices(G->RCL->cl[e], i);
+// ((uint*)A->names)[i] = s;
+// if (s == e) {
+// rigins_vertices(i, A->initials);
+// }
+// for (uint a = 0; a < A->trans->size_alpha; a++)
+// {
+// if (G->RCL->numcl[e] == G->RCL->numcl[M->trans->edges[s][a]]) {
 
-//             }
-//         }
-//     }
-
-
-//     return A;
+// }
+// }
 // }
 
 
+// return A;
+// }
+
 // Mod
-bool is_bpolmod_mono(p_cayley M, p_green G, FILE* out)
+bool is_bpolmod_mono(p_cayley M, p_green G, FILE *out)
 {
-    if (out) {
-        fprintf(stdout, "#### Checking if the morphism satisfies the equation (qr)ʷst(st)ʷ = (qr)ʷqt(st)ʷ\n");
+    if (out)
+    {
+        fprintf(stdout,
+                "#### Checking if the morphism satisfies the equation (qr)ʷst(st)ʷ = (qr)ʷqt(st)ʷ\n");
         fprintf(stdout, "     for all q,r,s,t ∊ M such that (q,s) is a MOD-pair.\n");
     }
 
     // Calcul des MOD-paires
-    p_nfa A = cayley_to_dfa(M);
-    p_nfa U = nfa_proj_unary(A);
+    p_nfa A      = cayley_to_dfa(M);
+    p_nfa U      = nfa_proj_unary(A);
     delete_nfa(A);
     p_parti SCCS = nfa_inv_ext(U);
     p_parti FOLD = nfa_stal_fold(U, SCCS);
     delete_parti(SCCS);
-    p_nfa B = nfa_dyck_ext(U, FOLD);
+    p_nfa B      = nfa_dyck_ext(U, FOLD);
     delete_nfa(U);
     nfa_delete_names(B);
-    p_nfa INTER = nfa_intersect(B, B, true);
+    p_nfa INTERSECT = nfa_intersect(B, B, true);
     delete_nfa(B);
 
-    // // Pour tout idempotent e
+    //// Pour tout idempotent e
     // for (uint i = 0; i < size_vertices(M->idem_list); i++) {
-    //     uint e = lefread_vertices(M->idem_list, i);
+    // uint e = lefread_vertices(M->idem_list, i);
 
-    //     // Pour tout idempotent f
-    //     for (uint j = 0; j < size_vertices(M->idem_list); j++) {
-    //         uint f = lefread_vertices(M->idem_list, j);
-
-
-    //     }
+    //// Pour tout idempotent f
+    // for (uint j = 0; j < size_vertices(M->idem_list); j++) {
+    // uint f = lefread_vertices(M->idem_list, j);
 
     // }
 
+    // }
 
-
-    for (uint p = 0; p < INTER->trans->size_graph; p++)
+    for (uint p = 0; p < INTERSECT->trans->size_graph; p++)
     {
-        uint c = ((uint**)INTER->names)[p][0];
-        uint d = ((uint**)INTER->names)[p][1];
+        uint c = ((uint **)INTERSECT->names)[p][0];
+        uint d = ((uint **)INTERSECT->names)[p][1];
         // printf("c: %d, d: %d\n", c, d);
 
         for (uint i = 0; i < size_vertices(FOLD->cl[c]); i++)
@@ -511,7 +528,7 @@ bool is_bpolmod_mono(p_cayley M, p_green G, FILE* out)
                 // Boucle sur les r tels que q J r
                 for (uint j = 0; j < size_vertices(G->JCL->cl[G->JCL->numcl[q]]); j++)
                 {
-                    uint r = lefread_vertices(G->JCL->cl[G->JCL->numcl[q]], j);
+                    uint r  = lefread_vertices(G->JCL->cl[G->JCL->numcl[q]], j);
                     uint qr = cayley_mult(M, q, r);
                     // Il suffit de tester les qr idempotents et tels que qr J q
                     if (M->idem_array[qr] && G->JCL->numcl[qr] == G->JCL->numcl[q])
@@ -526,11 +543,12 @@ bool is_bpolmod_mono(p_cayley M, p_green G, FILE* out)
                             {
                                 // Boucle sur les t tels que s J t
                                 for (uint l = 0;
-                                    l < size_vertices(G->JCL->cl[G->JCL->numcl[s]]); l++)
+                                     l < size_vertices(G->JCL->cl[G->JCL->numcl[s]]); l++)
                                 {
-                                    uint t = lefread_vertices(G->JCL->cl[G->JCL->numcl[s]], l);
+                                    uint t  = lefread_vertices(G->JCL->cl[G->JCL->numcl[s]], l);
                                     uint st = cayley_mult(M, s, t);
-                                    // Il suffit de tester les st idempotents et tels que st J t
+                                    // Il suffit de tester les st idempotents et
+                                    // tels que st J t
                                     if (M->idem_array[st] &&
                                         G->JCL->numcl[st] == G->JCL->numcl[s])
                                     {
@@ -540,11 +558,11 @@ bool is_bpolmod_mono(p_cayley M, p_green G, FILE* out)
                                             if (out)
                                             {
                                                 fprintf(out,
-                                                    "#### This morphism does not satisfy the "
-                                                    "equation (qr)ʷst(st)ʷ = (qr)ʷqt(st)ʷ for "
-                                                    "all MOD-pairs (q,s).\n");
+                                                        "#### This morphism does not satisfy the "
+                                                        "equation (qr)ʷst(st)ʷ = (qr)ʷqt(st)ʷ for "
+                                                        "all MOD-pairs (q,s).\n");
                                                 fprintf(out,
-                                                    "#### For instance, it fails for q = ");
+                                                        "#### For instance, it fails for q = ");
                                                 cayley_print_name(M, q, out);
                                                 fprintf(out, ", r = ");
                                                 cayley_print_name(M, r, out);
@@ -565,34 +583,36 @@ bool is_bpolmod_mono(p_cayley M, p_green G, FILE* out)
             }
         }
     }
-    delete_nfa(INTER);
+    delete_nfa(INTERSECT);
     delete_parti(FOLD);
     if (out)
     {
         fprintf(out, "#### This morphism satisfies the equation (qr)ʷst(st)ʷ = "
-            "(qr)ʷqt(st)ʷ for all MOD-pairs (q,s).\n");
+                     "(qr)ʷqt(st)ʷ for all MOD-pairs (q,s).\n");
     }
     return true;
 }
 
 // Knast
-bool is_knast_mono(p_cayley M, p_green G, FILE* out)
+bool is_knast_mono(p_cayley M, p_green G, FILE *out)
 {
-    if (out) {
+    if (out)
+    {
         fprintf(stdout, "#### Checking if the morphism satisfies Knast's equation.\n");
     }
-    if (cayley_neutstrict(M, G)) {
-        if (out) {
-            fprintf(stdout, "#### Since the neutral element 1 has a nonempty antecedent, Knast's equation holds if and only if\n");
+    if (cayley_neutstrict(M, G))
+    {
+        if (out)
+        {
+            fprintf(stdout,
+                    "#### Since the neutral element 1 has a nonempty antecedent, Knast's equation holds if and only if\n");
             fprintf(stdout, "     the monoid is J-trivial.\n");
         }
         return is_jtrivial_mono(M, G, stdout);
     }
 
-
-
-
-    // Tableau qui mémorise les idempotents e déjà traités (il arrive que certains
+    // Tableau qui mémorise les idempotents e déjà traités (il arrive que
+    // certains
     // soient traités simultanément)
     bool edone[M->trans->size_graph];
     for (uint i = 1; i < size_vertices(M->idem_list); i++)
@@ -612,7 +632,8 @@ bool is_knast_mono(p_cayley M, p_green G, FILE* out)
             // cayley_print_name(M, e, out);
             // fprintf(out, "\n");
             // Il faut maintenant considérer tous les idempotents f.
-            // L'équation étant symmétrique, il suffit de considérer les f tels que e
+            // L'équation étant symmétrique, il suffit de considérer les f tels
+            // que e
             // <= f
 
             // Tableau qui mémorise les idempotents f déjà traités pour ce e (il
@@ -623,8 +644,10 @@ bool is_knast_mono(p_cayley M, p_green G, FILE* out)
                 fdone[lefread_vertices(M->idem_list, j)] = false;
             }
 
-            // Calcul des ensembles eM et Me (on ne garde que les éléments réguliers
-            // dans ces ensembles) On marque les idempotents e' dans eM et Me: ils
+            // Calcul des ensembles eM et Me (on ne garde que les éléments
+            // réguliers
+            // dans ces ensembles) On marque les idempotents e' dans eM et Me:
+            // ils
             // sont traités automatiquement en même temps que e
             p_vertices eM = compute_r_ideal(M, e, G->regular_array);
             for (uint p = 0; p < size_vertices(eM); p++)
@@ -639,8 +662,10 @@ bool is_knast_mono(p_cayley M, p_green G, FILE* out)
                 fdone[lefread_vertices(Me, p)] = true;
             }
 
-            // On commence par considérer le cas f = e: on doit vérifier (esete)^w =
-            // (esete)^w ese et (esete)^w = ete(esete)^w pour tous s,t On calcule eMe
+            // On commence par considérer le cas f = e: on doit vérifier
+            // (esete)^w =
+            // (esete)^w ese et (esete)^w = ete(esete)^w pour tous s,t On
+            // calcule eMe
             p_vertices eMe = make_inter_sorted_vertices(eM, Me);
 
             // Boucles sur les éléments ese
@@ -651,11 +676,13 @@ bool is_knast_mono(p_cayley M, p_green G, FILE* out)
                 for (uint l = k; l < size_vertices(eMe); l++)
                 {
                     uint ete = lefread_vertices(eMe, l);
-                    // Il suffit de considérer les éléments ete tels que ese J ete
+                    // Il suffit de considérer les éléments ete tels que ese J
+                    // ete
                     if (G->JCL->numcl[ese] == G->JCL->numcl[ete])
                     {
                         uint esete = cayley_mult(M, ese, ete);
-                        // Il suffit de considérer les cas où esete J ese et esete est
+                        // Il suffit de considérer les cas où esete J ese et
+                        // esete est
                         // idempotent
                         if (M->idem_array[esete] &&
                             G->JCL->numcl[ese] == G->JCL->numcl[esete])
@@ -665,9 +692,9 @@ bool is_knast_mono(p_cayley M, p_green G, FILE* out)
                                 if (out)
                                 {
                                     fprintf(out, "#### This semigroup does not satisfy Knast's "
-                                        "equation.\n");
+                                                 "equation.\n");
                                     fprintf(out,
-                                        "#### For instance, it fails for e = f = s = t = ");
+                                            "#### For instance, it fails for e = f = s = t = ");
                                     cayley_print_name(M, e, out);
                                     fprintf(out, ", q = ");
                                     cayley_print_name(M, ese, out);
@@ -682,9 +709,9 @@ bool is_knast_mono(p_cayley M, p_green G, FILE* out)
                                 if (out)
                                 {
                                     fprintf(out, "#### This semigroup does not satisfy Knast's "
-                                        "equation.\n");
+                                                 "equation.\n");
                                     fprintf(out,
-                                        "#### For instance, it fails for e = f = q = r = ");
+                                            "#### For instance, it fails for e = f = q = r = ");
                                     cayley_print_name(M, e, out);
                                     fprintf(out, ", s = ");
                                     cayley_print_name(M, ese, out);
@@ -710,9 +737,12 @@ bool is_knast_mono(p_cayley M, p_green G, FILE* out)
                     // fprintf(out, "f: ");
                     // cayley_print_name(M, f, out);
                     // fprintf(out, "\n");
-                    // Calcul des ensembles fM et Mf (on ne garde que les éléments
-                    // réguliers dans ces ensembles) On marque les idempotents f' dans fM
-                    // et Mf: ils sont traités automatiquement en même temps que f
+                    // Calcul des ensembles fM et Mf (on ne garde que les
+                    // éléments
+                    // réguliers dans ces ensembles) On marque les idempotents
+                    // f' dans fM
+                    // et Mf: ils sont traités automatiquement en même temps que
+                    // f
                     p_vertices fM = compute_r_ideal(M, f, G->regular_array);
                     for (uint p = 0; p < size_vertices(fM); p++)
                     {
@@ -747,7 +777,8 @@ bool is_knast_mono(p_cayley M, p_green G, FILE* out)
                             if (G->JCL->numcl[eqf] == G->JCL->numcl[fre])
                             {
                                 uint eqfre = cayley_mult(M, eqf, fre);
-                                // Il suffit de considérer les cas où eqfre J eqf et eqfre est
+                                // Il suffit de considérer les cas où eqfre J
+                                // eqf et eqfre est
                                 // idempotent
                                 if (M->idem_array[eqfre] &&
                                     G->JCL->numcl[eqf] == G->JCL->numcl[eqfre])
@@ -767,30 +798,33 @@ bool is_knast_mono(p_cayley M, p_green G, FILE* out)
                                             // fprintf(out, "t: ");
                                             // cayley_print_name(M, fte, out);
                                             // fprintf(out, "\n");
-                                            // Il suffit de considérer les cas où eqf J fre
+                                            // Il suffit de considérer les cas
+                                            // où eqf J fre
                                             if (G->JCL->numcl[esf] == G->JCL->numcl[fte])
                                             {
                                                 uint esfte = cayley_mult(M, esf, fte);
                                                 // fprintf(out, "esfte: ");
-                                                // cayley_print_name(M, esfte, out);
+                                                // cayley_print_name(M, esfte,
+                                                // out);
                                                 // fprintf(out, "\n");
-                                                // Il suffit de considérer les cas où esfte J esf et
+                                                // Il suffit de considérer les
+                                                // cas où esfte J esf et
                                                 // esfte est idempotent
                                                 if (M->idem_array[esfte] &&
                                                     G->JCL->numcl[esf] == G->JCL->numcl[esfte])
                                                 {
                                                     if (cayley_mult(M, eqfre, esfte) !=
                                                         cayley_mult_gen(M, 4, eqfre, eqf, fte,
-                                                            esfte))
+                                                                        esfte))
                                                     {
                                                         if (out)
                                                         {
                                                             fprintf(out,
-                                                                "#### This semigroup does not "
-                                                                "satisfy Knast's equation.\n");
+                                                                    "#### This semigroup does not "
+                                                                    "satisfy Knast's equation.\n");
                                                             fprintf(out,
-                                                                "#### For instance, the equality "
-                                                                "fails for e = ");
+                                                                    "#### For instance, the equality "
+                                                                    "fails for e = ");
                                                             cayley_print_name(M, e, out);
                                                             fprintf(out, ", f = ");
                                                             cayley_print_name(M, f, out);
@@ -830,29 +864,34 @@ bool is_knast_mono(p_cayley M, p_green G, FILE* out)
 }
 
 // Knast on the MOD-kernel
-bool is_qknast_mono(p_green_sub mker, FILE* out)
+bool is_qknast_mono(p_green_sub mker, FILE *out)
 {
     p_cayley M = mker->original;
-    p_green G = mker->originalrels;
-    if (out) {
-        fprintf(stdout, "#### Checking whether the strict MOD-kernel of the morphism satisfies Knast's equation:\n");
-        fprintf(stdout, "     for all q,r,s,t ∊ S and all e,f ∊ E(S), we must have (eqfre)ʷ(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ.\n");
-
+    p_green G  = mker->originalrels;
+    if (out)
+    {
+        fprintf(stdout,
+                "#### Checking whether the strict MOD-kernel of the morphism satisfies Knast's equation:\n");
+        fprintf(stdout,
+                "     for all q,r,s,t ∊ S and all e,f ∊ E(S), we must have (eqfre)ʷ(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ.\n");
     }
 
-    if (M->neutlet) {
-        if (out) {
-            fprintf(stdout, "#### Since a letter maps to the neutral element 1 has a nonempty antecedent, the equation holds\n");
+    if (M->neutlet)
+    {
+        if (out)
+        {
+            fprintf(stdout,
+                    "#### Since a letter maps to the neutral element 1 has a nonempty antecedent, the equation holds\n");
             fprintf(stdout, "      if and only if the monoid is J-trivial.\n");
         }
         return is_jtrivial_mono(M, G, stdout);
     }
 
-    if (out) {
+    if (out)
+    {
         fprintf(out, "#### Displaying the MOD-kernel.\n");
         print_full_green_sub(mker, false, stdout);
     }
-
 
     // Tableau qui marque les éléments du MOD-kernel qui sont réguliers dans
     // celui-ci
@@ -863,7 +902,8 @@ bool is_qknast_mono(p_green_sub mker, FILE* out)
             mker->mono_in_sub[s] && mker->rels->regular_array[mker->mono_to_sub[s]];
     }
 
-    // Tableau qui mémorise les idempotents e déjà traités (il arrive que certains
+    // Tableau qui mémorise les idempotents e déjà traités (il arrive que
+    // certains
     // soient traités simultanément)
     bool edone[M->trans->size_graph];
     for (uint i = 1; i < size_vertices(M->idem_list); i++)
@@ -880,7 +920,8 @@ bool is_qknast_mono(p_green_sub mker, FILE* out)
         if (!edone[e])
         {
             // Il faut maintenant considérer tous les idempotents f.
-            // L'équation étant symmétrique, il suffit de considérer les f tels que e
+            // L'équation étant symmétrique, il suffit de considérer les f tels
+            // que e
             // <= f
 
             // Tableau qui mémorise les idempotents f déjà traités pour ce e (il
@@ -891,8 +932,10 @@ bool is_qknast_mono(p_green_sub mker, FILE* out)
                 fdone[lefread_vertices(M->idem_list, j)] = false;
             }
 
-            // Calcul des ensembles eM et Me (on ne garde que les éléments réguliers
-            // dans ces ensembles) On marque les idempotents e' dans eM et Me: ils
+            // Calcul des ensembles eM et Me (on ne garde que les éléments
+            // réguliers
+            // dans ces ensembles) On marque les idempotents e' dans eM et Me:
+            // ils
             // sont traités automatiquement en même temps que e
             p_vertices eM = compute_r_ideal(M, e, reginker);
             for (uint p = 0; p < size_vertices(eM); p++)
@@ -907,8 +950,10 @@ bool is_qknast_mono(p_green_sub mker, FILE* out)
                 fdone[lefread_vertices(Me, p)] = true;
             }
 
-            // On commence par considérer le cas f = e: on doit vérifier (esete)^w =
-            // (esete)^w ese et (esete)^w = ete(esete)^w pour tous s,t On calcule eMe
+            // On commence par considérer le cas f = e: on doit vérifier
+            // (esete)^w =
+            // (esete)^w ese et (esete)^w = ete(esete)^w pour tous s,t On
+            // calcule eMe
             p_vertices eMe = make_inter_sorted_vertices(eM, Me);
 
             // Boucles sur les éléments ese
@@ -919,13 +964,15 @@ bool is_qknast_mono(p_green_sub mker, FILE* out)
                 for (uint l = k; l < size_vertices(eMe); l++)
                 {
                     uint ete = lefread_vertices(eMe, l);
-                    // Il suffit de considérer les éléments ete tels que ese J ete (dans
+                    // Il suffit de considérer les éléments ete tels que ese J
+                    // ete (dans
                     // le MOD-kernel)
                     if (mker->rels->JCL->numcl[mker->mono_to_sub[ese]] ==
                         mker->rels->JCL->numcl[mker->mono_to_sub[ete]])
                     {
                         uint esete = cayley_mult(M, ese, ete);
-                        // Il suffit de considérer les cas où esete J ese  (dans le
+                        // Il suffit de considérer les cas où esete J ese  (dans
+                        // le
                         // MOD-kernel) et esete est idempotent
                         if (M->idem_array[esete] &&
                             mker->rels->JCL->numcl[mker->mono_to_sub[ese]] ==
@@ -936,9 +983,9 @@ bool is_qknast_mono(p_green_sub mker, FILE* out)
                                 if (out)
                                 {
                                     fprintf(out, "#### This semigroup does not satisfy Knast's "
-                                        "equation.\n");
+                                                 "equation.\n");
                                     fprintf(out,
-                                        "#### For instance, it fails for e = f = s = t = ");
+                                            "#### For instance, it fails for e = f = s = t = ");
                                     cayley_print_name(M, e, out);
                                     fprintf(out, ", q = ");
                                     cayley_print_name(M, ese, out);
@@ -953,9 +1000,9 @@ bool is_qknast_mono(p_green_sub mker, FILE* out)
                                 if (out)
                                 {
                                     fprintf(out, "#### This semigroup does not satisfy Knast's "
-                                        "equation.\n");
+                                                 "equation.\n");
                                     fprintf(out,
-                                        "#### For instance, it fails for e = f = q = r = ");
+                                            "#### For instance, it fails for e = f = q = r = ");
                                     cayley_print_name(M, e, out);
                                     fprintf(out, ", s = ");
                                     cayley_print_name(M, ese, out);
@@ -978,9 +1025,11 @@ bool is_qknast_mono(p_green_sub mker, FILE* out)
                 uint f = lefread_vertices(M->idem_list, j);
                 if (!fdone[f])
                 {
-                    // Calcul des ensembles fM et Mf (on ne garde que les éléments
+                    // Calcul des ensembles fM et Mf (on ne garde que les
+                    // éléments
                     // réguliers du MOD-kernel dans ces ensembles) On marque les
-                    // idempotents f' dans fM et Mf: ils sont traités automatiquement en
+                    // idempotents f' dans fM et Mf: ils sont traités
+                    // automatiquement en
                     // même temps que f
                     p_vertices fM = compute_r_ideal(M, f, reginker);
                     for (uint p = 0; p < size_vertices(fM); p++)
@@ -1006,13 +1055,15 @@ bool is_qknast_mono(p_green_sub mker, FILE* out)
                         for (uint l = 0; l < size_vertices(fMe); l++)
                         {
                             uint fre = lefread_vertices(fMe, l);
-                            // Il suffit de considérer les cas où eqf J fre (dans le
+                            // Il suffit de considérer les cas où eqf J fre
+                            // (dans le
                             // MOD-kernel)
                             if (mker->rels->JCL->numcl[mker->mono_to_sub[eqf]] ==
                                 mker->rels->JCL->numcl[mker->mono_to_sub[fre]])
                             {
                                 uint eqfre = cayley_mult(M, eqf, fre);
-                                // Il suffit de considérer les cas où eqfre J eqf et eqfre est
+                                // Il suffit de considérer les cas où eqfre J
+                                // eqf et eqfre est
                                 // idempotent
                                 if (M->idem_array[eqfre] &&
                                     mker->rels->JCL->numcl[mker->mono_to_sub[eqf]] ==
@@ -1027,13 +1078,15 @@ bool is_qknast_mono(p_green_sub mker, FILE* out)
                                         for (uint n = 0; n < size_vertices(fMe); n++)
                                         {
                                             uint fte = lefread_vertices(fMe, n);
-                                            // Il suffit de considérer les cas où eqf J fre (dans le
+                                            // Il suffit de considérer les cas
+                                            // où eqf J fre (dans le
                                             // MOD-kenrel)
                                             if (mker->rels->JCL->numcl[mker->mono_to_sub[esf]] ==
                                                 mker->rels->JCL->numcl[mker->mono_to_sub[fte]])
                                             {
                                                 uint esfte = cayley_mult(M, esf, fte);
-                                                // Il suffit de considérer les cas où esfte J esf et
+                                                // Il suffit de considérer les
+                                                // cas où esfte J esf et
                                                 // esfte est idempotent
                                                 if (M->idem_array[esfte] &&
                                                     mker->rels->JCL->numcl[mker->mono_to_sub[esf]]
@@ -1043,16 +1096,16 @@ bool is_qknast_mono(p_green_sub mker, FILE* out)
                                                 {
                                                     if (cayley_mult(M, eqfre, esfte) !=
                                                         cayley_mult_gen(M, 4, eqfre, eqf, fte,
-                                                            esfte))
+                                                                        esfte))
                                                     {
                                                         if (out)
                                                         {
                                                             fprintf(out,
-                                                                "#### This semigroup does not "
-                                                                "satisfy Knast's equation.\n");
+                                                                    "#### This semigroup does not "
+                                                                    "satisfy Knast's equation.\n");
                                                             fprintf(out,
-                                                                "#### For instance, the equality "
-                                                                "fails for e = ");
+                                                                    "#### For instance, the equality "
+                                                                    "fails for e = ");
                                                             cayley_print_name(M, e, out);
                                                             fprintf(out, ", f = ");
                                                             cayley_print_name(M, f, out);
@@ -1092,11 +1145,14 @@ bool is_qknast_mono(p_green_sub mker, FILE* out)
 }
 
 // Knast for at-sets
-bool is_knast_at_mono(p_cayley M, p_green G, FILE* out)
+bool is_knast_at_mono(p_cayley M, p_green G, FILE *out)
 {
-    if (out) {
-        fprintf(out, "#### Checking if the morphism satisfies the equation (eqfre)ʷ(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ for all\n");
-        fprintf(out, "     q,r,s,t ∊ M and e, f ∊ E(M) such that {q,e,f}, {r,e,f}, {s,e,f} and {t,e,f} are AT-sets.\n");
+    if (out)
+    {
+        fprintf(out,
+                "#### Checking if the morphism satisfies the equation (eqfre)ʷ(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ for all\n");
+        fprintf(out,
+                "     q,r,s,t ∊ M and e, f ∊ E(M) such that {q,e,f}, {r,e,f}, {s,e,f} and {t,e,f} are AT-sets.\n");
     }
 
     // Boucles sur tous les idempotents e
@@ -1104,19 +1160,21 @@ bool is_knast_at_mono(p_cayley M, p_green G, FILE* out)
     {
         uint e = lefread_vertices(M->idem_list, i);
         // Il faut maintenant considérer tous les idempotents f.
-        // L'équation étant symmétrique, il suffit de considérer les f tels que e <=
+        // L'équation étant symmétrique, il suffit de considérer les f tels que
+        // e <=
         // f
 
         // On commence par considérer le cas f = e: on doit vérifier (esete)^w =
         // (esete)^w ese et (esete)^w = ete(esete)^w
 
         // On calcule l'alphabet maximum de e
-        bool* ealph = compute_maxalph_scc(M, G->RCL, e);
+        bool *ealph = compute_maxalph_scc(M, G->RCL, e);
 
-        // On calcule maintenant la restriction de eMe aux élément réguliers qui ont
+        // On calcule maintenant la restriction de eMe aux élément réguliers qui
+        // ont
         // un antécédent d'alphabet ealph
-        p_vertices eM = compute_r_ideal_alph(M, e, ealph, G->regular_array);
-        p_vertices Me = compute_l_ideal_alph(M, e, ealph, G->regular_array);
+        p_vertices eM  = compute_r_ideal_alph(M, e, ealph, G->regular_array);
+        p_vertices Me  = compute_l_ideal_alph(M, e, ealph, G->regular_array);
         // On calcule eMe
         p_vertices eMe = make_inter_sorted_vertices(eM, Me);
 
@@ -1137,7 +1195,8 @@ bool is_knast_at_mono(p_cayley M, p_green G, FILE* out)
                 if (G->JCL->numcl[ese] == G->JCL->numcl[ete])
                 {
                     uint esete = cayley_mult(M, ese, ete);
-                    // Il suffit de considérer les cas où esete J ese et esete est
+                    // Il suffit de considérer les cas où esete J ese et esete
+                    // est
                     // idempotent
                     if (M->idem_array[esete] &&
                         G->JCL->numcl[ese] == G->JCL->numcl[esete])
@@ -1151,9 +1210,9 @@ bool is_knast_at_mono(p_cayley M, p_green G, FILE* out)
                                     "#### This morphism does not satisfy (eqfre)ʷ(esfte)ʷ = "
                                     "(eqfre)ʷqft(esfte) for all q,r,s,t ∊ M and e,f ∊ E(M)\n");
                                 fprintf(out, "     such that {q,e,f} {r,e,f}, {s,e,f} and "
-                                    "{t,e,f} are AT-sets.\n");
+                                             "{t,e,f} are AT-sets.\n");
                                 fprintf(out,
-                                    "#### For instance, it fails for e = f = s = t = ");
+                                        "#### For instance, it fails for e = f = s = t = ");
                                 cayley_print_name(M, e, out);
                                 fprintf(out, ", q = ");
                                 cayley_print_name(M, ese, out);
@@ -1161,7 +1220,7 @@ bool is_knast_at_mono(p_cayley M, p_green G, FILE* out)
                                 cayley_print_name(M, ete, out);
                                 fprintf(out, ".\n");
                                 fprintf(out, "#### These elements form AT-sets since they all "
-                                    "have an antecedent with the alphabet ");
+                                             "have an antecedent with the alphabet ");
                                 print_booltab_alph(ealph, M->trans->size_alpha, out);
                             }
                             return false;
@@ -1175,9 +1234,9 @@ bool is_knast_at_mono(p_cayley M, p_green G, FILE* out)
                                     "#### This morphism does not satisfy (eqfre)ʷ(esfte)ʷ = "
                                     "(eqfre)ʷqft(esfte) for all q,r,s,t ∊ M and e,f ∊ E(M)\n");
                                 fprintf(out, "     such that {q,e,f} {r,e,f}, {s,e,f} and "
-                                    "{t,e,f} are AT-sets.\n");
+                                             "{t,e,f} are AT-sets.\n");
                                 fprintf(out,
-                                    "#### For instance, it fails for e = f = q = r = ");
+                                        "#### For instance, it fails for e = f = q = r = ");
                                 cayley_print_name(M, e, out);
                                 fprintf(out, ", s = ");
                                 cayley_print_name(M, ese, out);
@@ -1185,7 +1244,7 @@ bool is_knast_at_mono(p_cayley M, p_green G, FILE* out)
                                 cayley_print_name(M, ete, out);
                                 fprintf(out, ".\n");
                                 fprintf(out, "#### These elements form AT-sets since they all "
-                                    "have an antecedent with the alphabet ");
+                                             "have an antecedent with the alphabet ");
                                 print_booltab_alph(ealph, M->trans->size_alpha, out);
                             }
                             return false;
@@ -1204,15 +1263,16 @@ bool is_knast_at_mono(p_cayley M, p_green G, FILE* out)
             uint f = lefread_vertices(M->idem_list, j);
 
             // On calcule l'alphabet commun maximal de e et f
-            bool* efalph = compute_maxalph_com_scc(M, G->RCL, e, f);
+            bool *efalph = compute_maxalph_com_scc(M, G->RCL, e, f);
             if (efalph)
             {
-                // On calcule maintenant la restriction de eMf et fMe aux élément
+                // On calcule maintenant la restriction de eMf et fMe aux
+                // élément
                 // réguliers qui ont un antécédent d'alphabet efalph
                 eM = compute_r_ideal_alph(M, e, efalph, G->regular_array);
                 Me = compute_l_ideal_alph(M, e, efalph, G->regular_array);
-                p_vertices fM = compute_r_ideal_alph(M, f, efalph, G->regular_array);
-                p_vertices Mf = compute_l_ideal_alph(M, f, efalph, G->regular_array);
+                p_vertices fM  = compute_r_ideal_alph(M, f, efalph, G->regular_array);
+                p_vertices Mf  = compute_l_ideal_alph(M, f, efalph, G->regular_array);
                 p_vertices eMf = make_inter_sorted_vertices(eM, Mf);
                 p_vertices fMe = make_inter_sorted_vertices(fM, Me);
                 delete_vertices(eM);
@@ -1246,7 +1306,8 @@ bool is_knast_at_mono(p_cayley M, p_green G, FILE* out)
                             // fprintf(out, " eqfre: ");
                             // cayley_print_name(M, eqfre, out);
                             // fprintf(out, "\n");
-                            // Il suffit de considérer les cas où eqfre J eqf et eqfre est
+                            // Il suffit de considérer les cas où eqfre J eqf et
+                            // eqfre est
                             // idempotent
                             if (M->idem_array[eqfre] &&
                                 G->JCL->numcl[eqf] == G->JCL->numcl[eqfre])
@@ -1266,11 +1327,13 @@ bool is_knast_at_mono(p_cayley M, p_green G, FILE* out)
                                         // fprintf(out, " t: ");
                                         // cayley_print_name(M, fte, out);
                                         // fprintf(out, "\n");
-                                        // Il suffit de considérer les cas où eqf J fre
+                                        // Il suffit de considérer les cas où
+                                        // eqf J fre
                                         if (G->JCL->numcl[esf] == G->JCL->numcl[fte])
                                         {
                                             uint esfte = cayley_mult(M, esf, fte);
-                                            // Il suffit de considérer les cas où esfte J esf et esfte
+                                            // Il suffit de considérer les cas
+                                            // où esfte J esf et esfte
                                             // est idempotent
                                             if (M->idem_array[esfte] &&
                                                 G->JCL->numcl[esf] == G->JCL->numcl[esfte])
@@ -1281,14 +1344,14 @@ bool is_knast_at_mono(p_cayley M, p_green G, FILE* out)
                                                     if (out)
                                                     {
                                                         fprintf(out,
-                                                            "#### This morphism does not satisfy "
-                                                            "(eqfre)ʷ(esfte)ʷ = (eqfre)ʷqft(esfte) for "
-                                                            "all q,r,s,t ∊ M and e,f ∊ E(M)\n");
+                                                                "#### This morphism does not satisfy "
+                                                                "(eqfre)ʷ(esfte)ʷ = (eqfre)ʷqft(esfte) for "
+                                                                "all q,r,s,t ∊ M and e,f ∊ E(M)\n");
                                                         fprintf(out,
-                                                            "     such that {q,e,f} {r,e,f}, "
-                                                            "{s,e,f} and {t,e,f} are AT-sets.\n");
+                                                                "     such that {q,e,f} {r,e,f}, "
+                                                                "{s,e,f} and {t,e,f} are AT-sets.\n");
                                                         fprintf(out,
-                                                            "#### For instance, it fails for e = ");
+                                                                "#### For instance, it fails for e = ");
                                                         cayley_print_name(M, e, out);
                                                         fprintf(out, ", f = ");
                                                         cayley_print_name(M, f, out);
@@ -1306,8 +1369,8 @@ bool is_knast_at_mono(p_cayley M, p_green G, FILE* out)
                                                             "#### These elements form AT-sets since they "
                                                             "all have an antecedent with the alphabet ");
                                                         print_booltab_alph(efalph,
-                                                            M->trans->size_alpha,
-                                                            out);
+                                                                           M->trans->size_alpha,
+                                                                           out);
                                                     }
                                                     return false;
                                                 }
@@ -1328,7 +1391,7 @@ bool is_knast_at_mono(p_cayley M, p_green G, FILE* out)
     if (out)
     {
         fprintf(out, "#### This morphism does satisfies (eqfre)ʷ(esfte)ʷ = "
-            "(eqfre)ʷqft(esfte) for all q,r,s,t ∊ M and e,f ∊ E(M)\n");
+                     "(eqfre)ʷqft(esfte) for all q,r,s,t ∊ M and e,f ∊ E(M)\n");
         fprintf(
             out,
             "     such that {q,e,f} {r,e,f}, {s,e,f} and {t,e,f} are AT-sets.\n");
@@ -1336,13 +1399,12 @@ bool is_knast_at_mono(p_cayley M, p_green G, FILE* out)
     return true;
 }
 
-
 /********************/
 /* Pol - Separation */
 /********************/
 
 // Pol(ST) of A from B
-bool decid_polst_sep(p_nfa A, p_nfa B, bool details, FILE* out)
+bool decid_polst_sep(p_nfa A, p_nfa B, bool details, FILE *out)
 {
     // Gestion des cas triviaux
     if (isempty_vertices(A->finals))
@@ -1366,7 +1428,7 @@ bool decid_polst_sep(p_nfa A, p_nfa B, bool details, FILE* out)
         if (out && details)
         {
             fprintf(out,
-                "#### These two inputs refer to the same nonempty language.\n");
+                    "#### These two inputs refer to the same nonempty language.\n");
         }
         return false;
     }
@@ -1384,27 +1446,27 @@ bool decid_polst_sep(p_nfa A, p_nfa B, bool details, FILE* out)
             out,
             "####          Each original transition induces an ε-transition.\n");
         fprintf(out, "####          These ε-transitions are then eliminated to "
-            "simplify the computations.\n");
+                     "simplify the computations.\n");
         view_nfa(BEPS);
     }
 
     // Phase 2
-    p_nfa INTER = nfa_intersect(A, BEPS, true);
+    p_nfa INTERSECT = nfa_intersect(A, BEPS, true);
     delete_nfa(BEPS);
     if (out && details)
     {
         print_sep_line(100, out);
         fprintf(out, "#### Phase 2: Intersecting the resulting NFA with that of "
-            "the first input language.\n");
-        view_nfa(INTER);
+                     "the first input language.\n");
+        view_nfa(INTERSECT);
     }
-    if (isempty_vertices(INTER->finals))
+    if (isempty_vertices(INTERSECT->finals))
     {
         if (out && details)
         {
             fprintf(out, "#### This NFA recognizes the empty language\n");
         }
-        delete_nfa(INTER);
+        delete_nfa(INTERSECT);
         return true;
     }
     else
@@ -1414,13 +1476,13 @@ bool decid_polst_sep(p_nfa A, p_nfa B, bool details, FILE* out)
             fprintf(out, "#### This NFA recognizes a nonempty language\n");
         }
 
-        delete_nfa(INTER);
+        delete_nfa(INTERSECT);
         return false;
     }
 }
 
 // Pol(MOD)-separation of A from B
-bool decid_polmod_sep(p_nfa A, p_nfa B, bool details, FILE* out)
+bool decid_polmod_sep(p_nfa A, p_nfa B, bool details, FILE *out)
 {
     // Gestion des cas triviaux
     if (isempty_vertices(A->finals))
@@ -1444,21 +1506,21 @@ bool decid_polmod_sep(p_nfa A, p_nfa B, bool details, FILE* out)
         if (out && details)
         {
             fprintf(out,
-                "#### These two inputs refer to the same nonempty language.\n");
+                    "#### These two inputs refer to the same nonempty language.\n");
         }
         return false;
     }
 
     // Phase 1
-    p_nfa BPROJ = nfa_proj_unary(B);
-    p_parti SCCS = nfa_inv_ext(BPROJ);
-    p_parti FOLD = nfa_stal_fold(BPROJ, SCCS);
+    p_nfa BPROJ    = nfa_proj_unary(B);
+    p_parti SCCS   = nfa_inv_ext(BPROJ);
+    p_parti FOLD   = nfa_stal_fold(BPROJ, SCCS);
     delete_parti(SCCS);
-    p_nfa BEPS = nfa_merge_states(B, FOLD);
+    p_nfa BEPS     = nfa_merge_states(B, FOLD);
     p_nfa BPROJEPS = nfa_dyck_ext(BPROJ, FOLD);
     delete_parti(FOLD);
     delete_nfa(BPROJ);
-    BEPS->etrans = BPROJEPS->etrans;
+    BEPS->etrans     = BPROJEPS->etrans;
     BPROJEPS->etrans = NULL;
     delete_nfa(BPROJEPS);
     nfa_remove_inv(BEPS);
@@ -1470,31 +1532,31 @@ bool decid_polmod_sep(p_nfa A, p_nfa B, bool details, FILE* out)
             out,
             "#### Phase 1: Building ε-transitions in the second input language.\n");
         fprintf(out, "####          An ε-transition is added for each pair of "
-            "states inducing\n");
+                     "states inducing\n");
         fprintf(out,
-            "####          a language which is not MOD-separable from {ε}\n");
+                "####          a language which is not MOD-separable from {ε}\n");
         fprintf(out, "####          These ε-transitions are then eliminated to "
-            "simplify the computations.\n");
+                     "simplify the computations.\n");
         view_nfa(BEPS);
     }
 
     // Phase 2
-    p_nfa INTER = nfa_intersect(A, BEPS, true);
+    p_nfa INTERSECT = nfa_intersect(A, BEPS, true);
     delete_nfa(BEPS);
     if (out && details)
     {
         print_sep_line(100, out);
         fprintf(out, "#### Phase 2: Intersecting the resulting NFA with that of "
-            "the first input language.\n");
-        view_nfa(INTER);
+                     "the first input language.\n");
+        view_nfa(INTERSECT);
     }
-    if (isempty_vertices(INTER->finals))
+    if (isempty_vertices(INTERSECT->finals))
     {
         if (out && details)
         {
             fprintf(out, "#### This NFA recognizes the empty language\n");
         }
-        delete_nfa(INTER);
+        delete_nfa(INTERSECT);
         return true;
     }
     else
@@ -1504,13 +1566,13 @@ bool decid_polmod_sep(p_nfa A, p_nfa B, bool details, FILE* out)
             fprintf(out, "#### This NFA recognizes a nonempty language\n");
         }
 
-        delete_nfa(INTER);
+        delete_nfa(INTERSECT);
         return false;
     }
 }
 
 // Pol(GR)-separation of A from B
-bool decid_polgr_sep(p_nfa A, p_nfa B, bool details, FILE* out)
+bool decid_polgr_sep(p_nfa A, p_nfa B, bool details, FILE *out)
 {
     // Gestion des cas triviaux
     if (isempty_vertices(A->finals))
@@ -1534,7 +1596,7 @@ bool decid_polgr_sep(p_nfa A, p_nfa B, bool details, FILE* out)
         if (out && details)
         {
             fprintf(out,
-                "#### These two inputs refer to the same nonempty language.\n");
+                    "#### These two inputs refer to the same nonempty language.\n");
         }
         return false;
     }
@@ -1543,7 +1605,7 @@ bool decid_polgr_sep(p_nfa A, p_nfa B, bool details, FILE* out)
     p_parti SCCS = nfa_inv_ext(B);
     p_parti FOLD = nfa_stal_fold(B, SCCS);
     delete_parti(SCCS);
-    p_nfa BEPS = nfa_dyck_ext(B, FOLD);
+    p_nfa BEPS   = nfa_dyck_ext(B, FOLD);
     nfa_remove_inv(B);
     delete_parti(FOLD);
     nfa_remove_inv(BEPS);
@@ -1555,31 +1617,31 @@ bool decid_polgr_sep(p_nfa A, p_nfa B, bool details, FILE* out)
             out,
             "#### Phase 1: Building ε-transitions in the second input language.\n");
         fprintf(out, "####          An ε-transition is added for each pair of "
-            "states inducing\n");
+                     "states inducing\n");
         fprintf(out,
-            "####          a language which is not GR-separable from {ε}\n");
+                "####          a language which is not GR-separable from {ε}\n");
         fprintf(out, "####          These ε-transitions are then eliminated to "
-            "simplify the computations.\n");
+                     "simplify the computations.\n");
         view_nfa(BEPS);
     }
 
     // Phase 2
-    p_nfa INTER = nfa_intersect(A, BEPS, true);
+    p_nfa INTERSECT = nfa_intersect(A, BEPS, true);
     delete_nfa(BEPS);
     if (out && details)
     {
         print_sep_line(100, out);
         fprintf(out, "#### Phase 2: Intersecting the resulting NFA with that of "
-            "the first input language.\n");
-        view_nfa(INTER);
+                     "the first input language.\n");
+        view_nfa(INTERSECT);
     }
-    if (isempty_vertices(INTER->finals))
+    if (isempty_vertices(INTERSECT->finals))
     {
         if (out && details)
         {
             fprintf(out, "#### This NFA recognizes the empty language\n");
         }
-        delete_nfa(INTER);
+        delete_nfa(INTERSECT);
         return true;
     }
     else
@@ -1589,7 +1651,7 @@ bool decid_polgr_sep(p_nfa A, p_nfa B, bool details, FILE* out)
             fprintf(out, "#### This NFA recognizes a nonempty language\n");
         }
 
-        delete_nfa(INTER);
+        delete_nfa(INTERSECT);
         return false;
     }
 }
@@ -1597,18 +1659,20 @@ bool decid_polgr_sep(p_nfa A, p_nfa B, bool details, FILE* out)
 // Calcul des BPol(G)-orbites à partir du G-kernel (G = GR ou G = MOD)
 p_orbits get_bpgorbs(p_cayley M, p_green G, p_green_sub ker)
 {
-    // Calcul de la table de multiplication de M (nécessaire pour ne pas recalculer
+    // Calcul de la table de multiplication de M (nécessaire pour ne pas
+    // recalculer
     // plein de fois la même chose).
     compute_mult(M);
 
     // Initialisation de la structure qui contiendra les orbites
     p_orbits res = init_orbits(init_submono(M, G));
     res->nb_idems = size_vertices(M->idem_list);
-    res->oneonly = false;
+    res->oneonly  = false;
     MALLOC(res->orbits, res->nb_idems);
 
-    // On créé un tableau permettant de récupérer rapidemment le numéro d'un idempotent
-    uint* num_idem;
+    // On créé un tableau permettant de récupérer rapidemment le numéro d'un
+    // idempotent
+    uint *num_idem;
     MALLOC(num_idem, M->trans->size_graph);
     for (uint i = 0; i < size_vertices(M->idem_list); i++)
     {
@@ -1618,35 +1682,42 @@ p_orbits get_bpgorbs(p_cayley M, p_green G, p_green_sub ker)
     // Calcul des orbites: on fait une boucle sur toutes les R-classes
     for (uint c = 0; c < G->RCL->size_par; c++)
     {
-        // On va calculer les BPol(G)-orbites de tous les idempotents dans la R-classe c
-        // On va d'abord tester si il existe bien un idempotent dans c: les éléments dans
+        // On va calculer les BPol(G)-orbites de tous les idempotents dans la
+        // R-classe c
+        // On va d'abord tester si il existe bien un idempotent dans c: les
+        // éléments dans
         // c sont-ils réguliers ?
         if (G->regular_array[lefread_vertices(G->RCL->cl[c], 0)])
         {
-            // Pour calculer les BPol(G)-orbites, on a besoin des Pol(G)-paires de la forme (q,r) telles
-            // q R c et r est dans cM. On va les calculer avec un parcours en largeur du graphe de Cayley
+            // Pour calculer les BPol(G)-orbites, on a besoin des Pol(G)-paires
+            // de la forme (q,r) telles
+            // q R c et r est dans cM. On va les calculer avec un parcours en
+            // largeur du graphe de Cayley
 
             // On calcule l'ensemble cM
             p_vertices cM = compute_r_ideal(M, lefread_vertices(G->RCL->cl[c], 0), NULL);
-            uint* inv_cM;
+            uint *inv_cM;
 
-            // Un tableau qui associe à chaque élément dans cM son numéro dans la liste ci-dessus
+            // Un tableau qui associe à chaque élément dans cM son numéro dans
+            // la liste ci-dessus
             MALLOC(inv_cM, M->trans->size_graph);
             for (uint j = 0; j < size_vertices(cM); j++)
             {
                 inv_cM[lefread_vertices(cM, j)] = j;
             }
 
-            // Un tableau qui associe à chaque élément dans c son numéro dans la R-classe
-            uint* inv_c;
+            // Un tableau qui associe à chaque élément dans c son numéro dans la
+            // R-classe
+            uint *inv_c;
             MALLOC(inv_c, M->trans->size_graph);
             for (uint j = 0; j < size_vertices(G->RCL->cl[c]); j++)
             {
                 inv_c[lefread_vertices(G->RCL->cl[c], j)] = j;
             }
 
-            // On créé un tableau (de taille cM x c) pour mémoriser les paires visitées dans le parcours en largeur
-            bool** visited;
+            // On créé un tableau (de taille cM x c) pour mémoriser les paires
+            // visitées dans le parcours en largeur
+            bool **visited;
             MALLOC(visited, size_vertices(cM));
             for (uint q = 0; q < size_vertices(cM); q++)
             {
@@ -1662,7 +1733,7 @@ p_orbits get_bpgorbs(p_cayley M, p_green G, p_green_sub ker)
             for (uint s = 0; s < ker->size; s++)
             {
                 if (G->JCL->numcl[lefread_vertices(G->RCL->cl[c],
-                    0)] == G->JCL->numcl[ker->sub_to_mono[s]])
+                                                   0)] == G->JCL->numcl[ker->sub_to_mono[s]])
                 {
                     rigins_vertices(s, jc_inker);
                 }
@@ -1672,19 +1743,22 @@ p_orbits get_bpgorbs(p_cayley M, p_green G, p_green_sub ker)
             p_vertices topstack = create_vertices();
             p_vertices botstack = create_vertices();
 
-            // On part d'une paire (q,q) avec q dans c (on prend q le premier élément dans c)
+            // On part d'une paire (q,q) avec q dans c (on prend q le premier
+            // élément dans c)
             visited[inv_cM[lefread_vertices(G->RCL->cl[c], 0)]][0] = true;
             rigins_vertices(lefread_vertices(G->RCL->cl[c], 0), topstack);
             rigins_vertices(lefread_vertices(G->RCL->cl[c], 0), botstack);
             // Parcours en largeur
-            while (!isempty_vertices(topstack)) {
+            while (!isempty_vertices(topstack))
+            {
                 uint q = rigpull_vertices(topstack);
                 uint r = rigpull_vertices(botstack);
 
                 // Pour toute lettre a on prend la paire (qa,ra)
                 for (uint a = 0; a < M->trans->size_alpha; a++)
                 {
-                    // On ne s'intéresse à cette paire que si ra R e et qu'on ne l'a pas déjà visitée
+                    // On ne s'intéresse à cette paire que si ra R e et qu'on ne
+                    // l'a pas déjà visitée
                     if (G->RCL->numcl[M->trans->edges[r][a]] == c &&
                         !visited[inv_cM[M->trans->edges[q][a]]][inv_c[M->trans->edges[r][a]]])
                     {
@@ -1694,12 +1768,14 @@ p_orbits get_bpgorbs(p_cayley M, p_green G, p_green_sub ker)
                     }
                 }
 
-                // Pour tout élement s du kernel tel que s J e on prend la paire (q,rs)
+                // Pour tout élement s du kernel tel que s J e on prend la paire
+                // (q,rs)
                 for (uint j = 0; j < size_vertices(jc_inker); j++)
                 {
                     uint rs = cayley_mult(M, r, ker->sub_to_mono[lefread_vertices(jc_inker, j)]);
 
-                    // On ne s'intéresse à cette paire que si rs R e et qu'on ne l'a pas déjà visitée
+                    // On ne s'intéresse à cette paire que si rs R e et qu'on ne
+                    // l'a pas déjà visitée
                     if (G->RCL->numcl[rs] == c && !visited[inv_cM[q]][inv_c[rs]])
                     {
                         visited[inv_cM[q]][inv_c[rs]] = true;
@@ -1723,9 +1799,10 @@ p_orbits get_bpgorbs(p_cayley M, p_green G, p_green_sub ker)
                     uint j = num_idem[e];
 
                     // On initialise l'orbite de e
-                    res->orbits[j] = init_submono(M, G);
+                    res->orbits[j]       = init_submono(M, G);
                     // MALLOC(res->orbits[j], 1);
-                    res->orbits[j]->size = 0; // On calculera la taille plus tard
+                    res->orbits[j]->size = 0; // On calculera la taille plus
+                                              // tard
                     MALLOC(res->orbits[j]->mono_in_sub, M->trans->size_graph);
                     MALLOC(res->orbits[j]->mono_to_sub, M->trans->size_graph);
                     for (uint s = 0; s < M->trans->size_graph; s++)
@@ -1734,8 +1811,9 @@ p_orbits get_bpgorbs(p_cayley M, p_green G, p_green_sub ker)
                     }
 
                     // Calcul de l'orbite de e
-                    // si (e,ese) est une co-Pol(G)-paire, alors ese est dans la BPol(G)-orbite de e
-                    p_vertices Me = compute_l_ideal(M, e, NULL);
+                    // si (e,ese) est une co-Pol(G)-paire, alors ese est dans la
+                    // BPol(G)-orbite de e
+                    p_vertices Me  = compute_l_ideal(M, e, NULL);
                     p_vertices eMe = make_inter_sorted_vertices(cM, Me);
                     delete_vertices(Me);
 
@@ -1822,18 +1900,20 @@ p_orbits get_bpgorbs(p_cayley M, p_green G, p_green_sub ker)
 // il suffit alors de calculer les BPol(G)-orbites).
 p_orbits get_bpgporbs(p_cayley M, p_green G, p_orbits orbs)
 {
-    // Calcul de la table de multiplication de M (nécessaire pour ne pas recalculer
+    // Calcul de la table de multiplication de M (nécessaire pour ne pas
+    // recalculer
     // plein de fois la même chose).
     compute_mult(M);
 
     // Initialisation de la structure qui contiendra les orbites
     p_orbits res = init_orbits(init_submono(M, G));
     res->nb_idems = size_vertices(M->idem_list);
-    res->oneonly = false;
+    res->oneonly  = false;
     MALLOC(res->orbits, res->nb_idems);
 
-    // On créé un tableau permettant de récupérer rapidemment le numéro d'un idempotent
-    uint* num_idem;
+    // On créé un tableau permettant de récupérer rapidemment le numéro d'un
+    // idempotent
+    uint *num_idem;
     MALLOC(num_idem, M->trans->size_graph);
     for (uint i = 0; i < size_vertices(M->idem_list); i++)
     {
@@ -1845,35 +1925,42 @@ p_orbits get_bpgporbs(p_cayley M, p_green G, p_orbits orbs)
     {
         // printf("yeah?\n");
 
-        // On va calculer les BPol(G)-orbites de tous les idempotents dans la R-classe c
-        // On va d'abord tester si il existe bien un idempotent dans c: les éléments dans
+        // On va calculer les BPol(G)-orbites de tous les idempotents dans la
+        // R-classe c
+        // On va d'abord tester si il existe bien un idempotent dans c: les
+        // éléments dans
         // c sont-ils réguliers ?
         if (G->regular_array[lefread_vertices(G->RCL->cl[c], 0)])
         {
-            // Pour calculer les BPol(G)-orbites, on a besoin des Pol(G)-paires de la forme (q,r) telles
-            // q R c et r est dans cM. On va les calculer avec un parcours en largeur du graphe de Cayley
+            // Pour calculer les BPol(G)-orbites, on a besoin des Pol(G)-paires
+            // de la forme (q,r) telles
+            // q R c et r est dans cM. On va les calculer avec un parcours en
+            // largeur du graphe de Cayley
 
             // On calcule l'ensemble cM
             p_vertices cM = compute_r_ideal(M, lefread_vertices(G->RCL->cl[c], 0), NULL);
-            uint* inv_cM;
+            uint *inv_cM;
 
-            // Un tableau qui associe à chaque élément dans cM son numéro dans la liste ci-dessus
+            // Un tableau qui associe à chaque élément dans cM son numéro dans
+            // la liste ci-dessus
             MALLOC(inv_cM, M->trans->size_graph);
             for (uint j = 0; j < size_vertices(cM); j++)
             {
                 inv_cM[lefread_vertices(cM, j)] = j;
             }
 
-            // Un tableau qui associe à chaque élément dans c son numéro dans la R-classe
-            uint* inv_c;
+            // Un tableau qui associe à chaque élément dans c son numéro dans la
+            // R-classe
+            uint *inv_c;
             MALLOC(inv_c, M->trans->size_graph);
             for (uint j = 0; j < size_vertices(G->RCL->cl[c]); j++)
             {
                 inv_c[lefread_vertices(G->RCL->cl[c], j)] = j;
             }
 
-            // On créé un tableau (de taille cM x c) pour mémoriser les paires visitées dans le parcours en largeur
-            bool** visited;
+            // On créé un tableau (de taille cM x c) pour mémoriser les paires
+            // visitées dans le parcours en largeur
+            bool **visited;
             MALLOC(visited, size_vertices(cM));
             for (uint q = 0; q < size_vertices(cM); q++)
             {
@@ -1884,8 +1971,9 @@ p_orbits get_bpgporbs(p_cayley M, p_green G, p_orbits orbs)
                 }
             }
 
-            // Pour chaque idempotent f, on calcule les éléments de la GP-orbite de f qui sont J-équivalents à c
-            p_vertices* jc_inorb;
+            // Pour chaque idempotent f, on calcule les éléments de la GP-orbite
+            // de f qui sont J-équivalents à c
+            p_vertices *jc_inorb;
             MALLOC(jc_inorb, size_vertices(M->idem_list));
             for (uint j = 0; j < size_vertices(M->idem_list); j++)
             {
@@ -1893,7 +1981,7 @@ p_orbits get_bpgporbs(p_cayley M, p_green G, p_orbits orbs)
                 for (uint s = 0; s < orbs->orbits[j]->size; s++)
                 {
                     if (G->JCL->numcl[lefread_vertices(G->RCL->cl[c],
-                        0)] ==
+                                                       0)] ==
                         G->JCL->numcl[orbs->orbits[j]->sub_to_mono[s]])
                     {
                         rigins_vertices(s, jc_inorb[j]);
@@ -1905,19 +1993,22 @@ p_orbits get_bpgporbs(p_cayley M, p_green G, p_orbits orbs)
             p_vertices topstack = create_vertices();
             p_vertices botstack = create_vertices();
 
-            // On part d'une paire (q,q) avec q dans c (on prend q le premier élément dans c)
+            // On part d'une paire (q,q) avec q dans c (on prend q le premier
+            // élément dans c)
             visited[inv_cM[lefread_vertices(G->RCL->cl[c], 0)]][0] = true;
             rigins_vertices(lefread_vertices(G->RCL->cl[c], 0), topstack);
             rigins_vertices(lefread_vertices(G->RCL->cl[c], 0), botstack);
             // Parcours en largeur
-            while (!isempty_vertices(topstack)) {
+            while (!isempty_vertices(topstack))
+            {
                 uint q = rigpull_vertices(topstack);
                 uint r = rigpull_vertices(botstack);
 
                 // Pour toute lettre a on prend la paire (qa,ra)
                 for (uint a = 0; a < M->trans->size_alpha; a++)
                 {
-                    // On ne s'intéresse à cette paire que si ra R e et qu'on ne l'a pas déjà visitée
+                    // On ne s'intéresse à cette paire que si ra R e et qu'on ne
+                    // l'a pas déjà visitée
                     if (G->RCL->numcl[M->trans->edges[r][a]] == c &&
                         !visited[inv_cM[M->trans->edges[q][a]]][inv_c[M->trans->edges[r][a]]])
                     {
@@ -1930,14 +2021,15 @@ p_orbits get_bpgporbs(p_cayley M, p_green G, p_orbits orbs)
                 // Pour chaque idempotent f
                 for (uint j = 0; j < size_vertices(M->idem_list); j++)
                 {
-                    // Pour chaque élément s dans l'orbite G⁺ de cet idempotent f tel que s J c on prend la paire
+                    // Pour chaque élément s dans l'orbite G⁺ de cet idempotent
+                    // f tel que s J c on prend la paire
                     // (qf,rs)
                     for (uint k = 0; k < size_vertices(jc_inorb[j]); k++)
                     {
                         uint qf = cayley_mult(M, q, lefread_vertices(M->idem_list, j));
                         uint rs = cayley_mult(M, r,
-                            orbs->orbits[j]->sub_to_mono[lefread_vertices(
-                                jc_inorb[j], k)]);
+                                              orbs->orbits[j]->sub_to_mono[lefread_vertices(
+                                                                               jc_inorb[j], k)]);
                         if (G->RCL->numcl[rs] == c && !visited[inv_cM[qf]][inv_c[rs]])
                         {
                             visited[inv_cM[qf]][inv_c[rs]] = true;
@@ -1967,9 +2059,10 @@ p_orbits get_bpgporbs(p_cayley M, p_green G, p_orbits orbs)
                     uint j = num_idem[e];
 
                     // On initialise l'orbite de e
-                    res->orbits[j] = init_submono(M, G);
+                    res->orbits[j]       = init_submono(M, G);
                     // MALLOC(res->orbits[j], 1);
-                    res->orbits[j]->size = 0; // On calculera la taille plus tard
+                    res->orbits[j]->size = 0; // On calculera la taille plus
+                                              // tard
                     MALLOC(res->orbits[j]->mono_in_sub, M->trans->size_graph);
                     MALLOC(res->orbits[j]->mono_to_sub, M->trans->size_graph);
                     for (uint s = 0; s < M->trans->size_graph; s++)
@@ -1978,8 +2071,9 @@ p_orbits get_bpgporbs(p_cayley M, p_green G, p_orbits orbs)
                     }
 
                     // Calcul de l'orbite de e
-                    // si (e,ese) est une co-Pol(G)-paire, alors ese est dans la BPol(G)-orbite de e
-                    p_vertices Me = compute_l_ideal(M, e, NULL);
+                    // si (e,ese) est une co-Pol(G)-paire, alors ese est dans la
+                    // BPol(G)-orbite de e
+                    p_vertices Me  = compute_l_ideal(M, e, NULL);
                     p_vertices eMe = make_inter_sorted_vertices(cM, Me);
                     delete_vertices(Me);
 
@@ -2061,185 +2155,184 @@ p_orbits get_bpgporbs(p_cayley M, p_green G, p_orbits orbs)
     return res;
 }
 
-
 /***********************/
 /* BPol(G) - Separation */
 /***********************/
 
-// // BPol(GR)-separation of A from B (bugged TODO)
+//// BPol(GR)-separation of A from B (bugged TODO)
 // bool decid_bpolgr_sep(p_nfa A, p_nfa B, bool details, FILE* out)
 // {
-//     // Gestion des cas triviaux
-//     if (isempty_vertices(A->finals))
-//     {
-//         if (out && details)
-//         {
-//             fprintf(out, "#### The first input language is empty.\n");
-//         }
-//         return true;
-//     }
-//     if (isempty_vertices(B->finals))
-//     {
-//         if (out && details)
-//         {
-//             fprintf(out, "#### The second input language is empty.\n");
-//         }
-//         return true;
-//     }
-//     if (A == B)
-//     {
-//         if (out && details)
-//         {
-//             fprintf(out,
-//                 "#### These two inputs refer to the same nonempty language.\n");
-//         }
-//         return false;
-//     }
+//// Gestion des cas triviaux
+// if (isempty_vertices(A->finals))
+// {
+// if (out && details)
+// {
+// fprintf(out, "#### The first input language is empty.\n");
+// }
+// return true;
+// }
+// if (isempty_vertices(B->finals))
+// {
+// if (out && details)
+// {
+// fprintf(out, "#### The second input language is empty.\n");
+// }
+// return true;
+// }
+// if (A == B)
+// {
+// if (out && details)
+// {
+// fprintf(out,
+// "#### These two inputs refer to the same nonempty language.\n");
+// }
+// return false;
+// }
 
-//     // Calcul du NFA intersecté de départ
-//     p_parti SCCSA = nfa_inv_ext(A);
-//     delete_parti(SCCSA);
-//     nfa_dyck_ext(A, NULL);
-//     nfa_remove_inv(A);
-//     p_parti SCCSB = nfa_inv_ext(B);
-//     delete_parti(SCCSB);
-//     nfa_dyck_ext(B, NULL);
-//     nfa_remove_inv(B);
-//     p_nfa INTER = nfa_intersect(A, B, true);
-//     delete_graph(A->etrans);
-//     delete_graph(B->etrans);
-//     A->etrans = NULL;
-//     B->etrans = NULL;
+//// Calcul du NFA intersecté de départ
+// p_parti SCCSA = nfa_inv_ext(A);
+// delete_parti(SCCSA);
+// nfa_dyck_ext(A, NULL);
+// nfa_remove_inv(A);
+// p_parti SCCSB = nfa_inv_ext(B);
+// delete_parti(SCCSB);
+// nfa_dyck_ext(B, NULL);
+// nfa_remove_inv(B);
+// p_nfa INTERSECT = nfa_intersect(A, B, true);
+// delete_graph(A->etrans);
+// delete_graph(B->etrans);
+// A->etrans = NULL;
+// B->etrans = NULL;
 
-//     // Début du point fixe
-//     bool modified = true;
-//     while (modified) {
-//         // On n'a pas encore fait de modification
-//         modified = false;
+//// Début du point fixe
+// bool modified = true;
+// while (modified) {
+//// On n'a pas encore fait de modification
+// modified = false;
 
-//         // Calcul des deux intersections
-//         p_nfa TRIPA = nfa_intersect(A, INTER, true);
-//         p_nfa TRIPB = nfa_intersect(B, INTER, true);
+//// Calcul des deux intersections
+// p_nfa TRIPA = nfa_intersect(A, INTERSECT, true);
+// p_nfa TRIPB = nfa_intersect(B, INTERSECT, true);
 
-//         // Tableaux qui stockeront les numéros des états intéressants dans TRIPA,
-//         // TRIPB triplets (qa,qa,qb) dans TRIPA ppour goala et (qb,qa,qb) dans TRIPB
-//         // pou goalb
-//         uint goala[INTER->etrans->size];
-//         uint goalb[INTER->etrans->size];
+//// Tableaux qui stockeront les numéros des états intéressants dans TRIPA,
+//// TRIPB triplets (qa,qa,qb) dans TRIPA ppour goala et (qb,qa,qb) dans TRIPB
+//// pou goalb
+// uint goala[INTERSECT->etrans->size];
+// uint goalb[INTERSECT->etrans->size];
 
-//         // Initialisation, on met un numéro fictif pour marquer les triplets qui
-//         // n'étaient pas accessibles dans la construction
-//         for (uint p = 0; p < INTER->etrans->size; p++)
-//         {
-//             goala[p] = TRIPA->trans->size_graph;
-//             goalb[p] = TRIPB->trans->size_graph;
-//         }
+//// Initialisation, on met un numéro fictif pour marquer les triplets qui
+//// n'étaient pas accessibles dans la construction
+// for (uint p = 0; p < INTERSECT->etrans->size; p++)
+// {
+// goala[p] = TRIPA->trans->size_graph;
+// goalb[p] = TRIPB->trans->size_graph;
+// }
 
-//         // On remplit maintenant goala et goalb
-//         for (uint t = 0; t < TRIPA->trans->size_graph; t++)
-//         {
-//             // Récupération du nom de l'état t dans TRIPA
-//             // Numéro d'état provenant de A
-//             uint qa = ((uint**)TRIPA->names)[t][0];
-//             // Numéro d'état provenant de INTER
-//             uint qi = ((uint**)TRIPA->names)[t][1];
+//// On remplit maintenant goala et goalb
+// for (uint t = 0; t < TRIPA->trans->size_graph; t++)
+// {
+//// Récupération du nom de l'état t dans TRIPA
+//// Numéro d'état provenant de A
+// uint qa = ((uint**)TRIPA->names)[t][0];
+//// Numéro d'état provenant de INTERSECT
+// uint qi = ((uint**)TRIPA->names)[t][1];
 
-//             // Récupération du nom de l'état qi dans INTER
-//             // Numéro d'état provenant de A
-//             uint pia = ((uint**)INTER->names)[qi][0];
-//             if (pia == qa)
-//             {
-//                 goala[qi] = t;
-//             }
-//         }
+//// Récupération du nom de l'état qi dans INTERSECT
+//// Numéro d'état provenant de A
+// uint pia = ((uint**)INTERSECT->names)[qi][0];
+// if (pia == qa)
+// {
+// goala[qi] = t;
+// }
+// }
 
-//         for (uint t = 0; t < TRIPB->trans->size_graph; t++)
-//         {
-//             // Récupération du nom de l'état t dans TRIPA
-//             // Numéro d'état provenant de B
-//             uint qb = ((uint**)TRIPB->names)[t][0];
-//             // Numéro d'état provenant de INTER
-//             uint qi = ((uint**)TRIPB->names)[t][1];
+// for (uint t = 0; t < TRIPB->trans->size_graph; t++)
+// {
+//// Récupération du nom de l'état t dans TRIPA
+//// Numéro d'état provenant de B
+// uint qb = ((uint**)TRIPB->names)[t][0];
+//// Numéro d'état provenant de INTERSECT
+// uint qi = ((uint**)TRIPB->names)[t][1];
 
-//             // Récupération du nom de l'état p dans INTER
-//             // Numéro d'état provenant de B
-//             uint qib = ((uint**)INTER->names)[qi][1];
-//             if (qib == qb)
-//             {
-//                 goalb[qi] = t;
-//             }
-//         }
+//// Récupération du nom de l'état p dans INTERSECT
+//// Numéro d'état provenant de B
+// uint qib = ((uint**)INTERSECT->names)[qi][1];
+// if (qib == qb)
+// {
+// goalb[qi] = t;
+// }
+// }
 
-//         // Calcul de GT-separation dans TRIP A et TRIP B
+//// Calcul de GT-separation dans TRIP A et TRIP B
 
-//         SCCSA = nfa_inv_ext(TRIPA);
-//         p_parti FOLDA = nfa_stal_fold(TRIPA, SCCSA);
-//         delete_parti(SCCSA);
-//         p_nfa ETRIPA = nfa_dyck_ext(TRIPA, FOLDA);
-//         nfa_remove_inv(TRIPA);
-//         delete_parti(FOLDA);
-//         nfa_remove_inv(ETRIPA);
+// SCCSA = nfa_inv_ext(TRIPA);
+// p_parti FOLDA = nfa_stal_fold(TRIPA, SCCSA);
+// delete_parti(SCCSA);
+// p_nfa ETRIPA = nfa_dyck_ext(TRIPA, FOLDA);
+// nfa_remove_inv(TRIPA);
+// delete_parti(FOLDA);
+// nfa_remove_inv(ETRIPA);
 
-//         SCCSB = nfa_inv_ext(TRIPB);
-//         p_parti FOLDB = nfa_stal_fold(TRIPB, SCCSB);
-//         delete_parti(SCCSB);
-//         p_nfa ETRIPB = nfa_dyck_ext(TRIPB, FOLDB);
-//         nfa_remove_inv(TRIPB);
-//         delete_parti(FOLDB);
-//         nfa_remove_inv(ETRIPB);
+// SCCSB = nfa_inv_ext(TRIPB);
+// p_parti FOLDB = nfa_stal_fold(TRIPB, SCCSB);
+// delete_parti(SCCSB);
+// p_nfa ETRIPB = nfa_dyck_ext(TRIPB, FOLDB);
+// nfa_remove_inv(TRIPB);
+// delete_parti(FOLDB);
+// nfa_remove_inv(ETRIPB);
 
-//         delete_nfa(TRIPA); // TRIP A et TRIPB ne sont plus nécessaires.
-//         delete_nfa(TRIPB);
+// delete_nfa(TRIPA); // TRIP A et TRIPB ne sont plus nécessaires.
+// delete_nfa(TRIPB);
 
-//         // Calcul des nouvelles paires non-BPOL(G)-sep dans INTER
-//         for (uint q = 0; q < INTER->etrans->size; q++)
-//         {
-//             uint tempsize = size_vertices(INTER->etrans->edges[q]);
-//             if (tempsize != 0)
-//             {
-//                 uint tqa = goala[q];
-//                 uint tqb = goalb[q];
-//                 if (tqa != TRIPA->trans->size_graph &&
-//                     tqb != TRIPB->trans->size_graph)
-//                 {
-//                     for (uint i = 0; i < tempsize; i++)
-//                     {
-//                         uint r = lefpull_vertices(INTER->etrans->edges[q]);
-//                         uint tra = goala[r];
-//                         uint trb = goalb[r];
-//                         if (tra != TRIPA->trans->size_graph &&
-//                             trb != TRIPB->trans->size_graph &&
-//                             mem_vertices_sorted(tra, ETRIPA->etrans->edges[tqa]) &&
-//                             mem_vertices_sorted(trb, ETRIPB->etrans->edges[tqb]))
-//                         {
-//                             rigins_vertices(r, INTER->etrans->edges[q]);
-//                         }
-//                         else
-//                         {
-//                             modified = true;
-//                         }
-//                     }
-//                 }
-//                 else
-//                 {
-//                     makeempty_vertices(INTER->etrans->edges[q]);
-//                     modified = true;
-//                 }
-//             }
-//         }
-//         delete_nfa(ETRIPA);
-//         delete_nfa(ETRIPB);
-//     }
+//// Calcul des nouvelles paires non-BPOL(G)-sep dans INTERSECT
+// for (uint q = 0; q < INTERSECT->etrans->size; q++)
+// {
+// uint tempsize = size_vertices(INTERSECT->etrans->edges[q]);
+// if (tempsize != 0)
+// {
+// uint tqa = goala[q];
+// uint tqb = goalb[q];
+// if (tqa != TRIPA->trans->size_graph &&
+// tqb != TRIPB->trans->size_graph)
+// {
+// for (uint i = 0; i < tempsize; i++)
+// {
+// uint r = lefpull_vertices(INTERSECT->etrans->edges[q]);
+// uint tra = goala[r];
+// uint trb = goalb[r];
+// if (tra != TRIPA->trans->size_graph &&
+// trb != TRIPB->trans->size_graph &&
+// mem_vertices_sorted(tra, ETRIPA->etrans->edges[tqa]) &&
+// mem_vertices_sorted(trb, ETRIPB->etrans->edges[tqb]))
+// {
+// rigins_vertices(r, INTERSECT->etrans->edges[q]);
+// }
+// else
+// {
+// modified = true;
+// }
+// }
+// }
+// else
+// {
+// makeempty_vertices(INTERSECT->etrans->edges[q]);
+// modified = true;
+// }
+// }
+// }
+// delete_nfa(ETRIPA);
+// delete_nfa(ETRIPB);
+// }
 
-//     nfa_trim(INTER);
-//     bool result = true;
-//     if (nfa_is_empty(INTER))
-//     {
-//         result = false;
-//     }
-//     delete_nfa(INTER);
+// nfa_trim(INTERSECT);
+// bool result = true;
+// if (nfa_is_empty(INTERSECT))
+// {
+// result = false;
+// }
+// delete_nfa(INTERSECT);
 
-//     return result;
+// return result;
 // }
 
 // bool nfa_bpolg_separ(p_nfa A, p_nfa B, p_graph (*gext)(p_nfa))
@@ -2256,7 +2349,8 @@ p_orbits get_bpgporbs(p_cayley M, p_green G, p_orbits orbs)
 // B->itrans = NULL;
 
 //// Intersection de A et B et de l'association entre les anciens états et
-// les nouveaux p_nfa INTER = nfa_intersect(A, B, true); nfa_trim(INTER); //
+// les nouveaux p_nfa INTERSECT = nfa_intersect(A, B, true);
+// nfa_trim(INTERSECT); //
 // Suppression des états non-coaccessibles delete_graph(A->etrans); // Les
 // transitions epsilon dans A et B ne sont maintenant plus utiles
 // delete_graph(B->etrans);
@@ -2270,18 +2364,18 @@ p_orbits get_bpgporbs(p_cayley M, p_green G, p_orbits orbs)
 // modified = false;
 
 //// Calcul des deux intersections
-// p_nfa TRIPA = nfa_intersect(A, INTER, true);
-// p_nfa TRIPB = nfa_intersect(B, INTER, true);
+// p_nfa TRIPA = nfa_intersect(A, INTERSECT, true);
+// p_nfa TRIPB = nfa_intersect(B, INTERSECT, true);
 
 //// Tableaux qui stockeront les numéros des triplets intéressants dans
 // TRIPA, TRIPB
 //// (qa,qa,qb) dans TRIPA et (qb,qa,qb) dans TRIPB
-// uint goala[INTER->etrans->size];
-// uint goalb[INTER->etrans->size];
+// uint goala[INTERSECT->etrans->size];
+// uint goalb[INTERSECT->etrans->size];
 
 //// Initialisation, on met un numéro fictif pour détecter les triplets
 // qui n'étaient pas accessibles dans la construction for (uint p = 0; p
-// < INTER->etrans->size; p++)
+// < INTERSECT->etrans->size; p++)
 // {
 // goala[p] = TRIPA->trans->size_graph + 1;
 // goalb[p] = TRIPB->trans->size_graph + 1;
@@ -2293,8 +2387,8 @@ p_orbits get_bpgporbs(p_cayley M, p_green G, p_orbits orbs)
 //// Récupération du nom de l'état t dans TRIPA
 //// Numéro d'état provenant de A
 // uint qa = ((uint *)TRIPA->names[t])[0];
-//// Numéro d'état provenant de INTER
-// uint pi = ((uint *)TRIPA->names[t])[1];
+//// Numéro d'état provenant deIINTERSECT // uint pi = ((uint
+// *)TRIPA->names[t])[1];
 
 //// Récupération du nom de l'état p dans INTER
 //// Numéro d'état provenant de A

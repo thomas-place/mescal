@@ -67,7 +67,7 @@ uint size_stack(p_stack p)
 void *read_stack(p_stack p, uint i)
 {
     CHECK_NULL(2, p, "The stack", p->array, "The array used to implement the stack");
-    if (i < 0 || p->size_stack <= i)
+    if (p->size_stack <= i)
     {
         fprintf(stderr, "Error, tried to read a non-valid index insider a stack");
         exit(EXIT_FAILURE);
@@ -109,7 +109,7 @@ void push(void *val, p_stack p)
 /* Tri */
 
 // Tri entre les indices i et j-1 (inclus)
-static void aux_quick_sort_stack(p_stack p, uint i, uint j, int (*comp)(void *, void *))
+static void aux_quick_sort_stack(p_stack p, uint i, uint j, int (*comp) (void *, void *))
 {
     if (i >= j - 1)
     { // Il y a moins d'un élément
@@ -118,12 +118,12 @@ static void aux_quick_sort_stack(p_stack p, uint i, uint j, int (*comp)(void *, 
     else
     {
         void *pivot = p->array[i];
-        uint l = j;
+        uint l      = j;
 
         for (uint k = j - 1; i < k; k--)
         {
             // If current element is greater than the pivot
-            if ((*comp)(pivot, p->array[k]) == 1)
+            if ((*comp) (pivot, p->array[k]) == 1)
             {
                 l--;
                 void *temp = p->array[l];
@@ -133,13 +133,13 @@ static void aux_quick_sort_stack(p_stack p, uint i, uint j, int (*comp)(void *, 
         }
         void *temp = p->array[l - 1];
         p->array[l - 1] = p->array[i];
-        p->array[i] = temp;
+        p->array[i]     = temp;
         aux_quick_sort_stack(p, i, l - 1, comp);
         aux_quick_sort_stack(p, l + 1, j, comp);
     }
 }
 
-void quick_sort_stack(p_stack p, int (*comp)(void *, void *))
+void quick_sort_stack(p_stack p, int (*comp) (void *, void *))
 {
     aux_quick_sort_stack(p, 0, size_stack(p), comp);
 }

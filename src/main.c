@@ -12,8 +12,6 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-#define HISTFILE "./.maga_history"
-
 extern const char* keywords_strarray[];
 extern uint keywords_count;
 
@@ -86,16 +84,16 @@ int main(int argc, char* argv[])
     int err = read_history(histfile);
     if (err)
     {
-        DEBUG("No history file, %d.\n", err);
+        WARNING("No history file, %d.\n", err);
     }
 
     keywords_add_all_keys();
 
-    print_title_box_shift(10, 1, 1, true, stdout, 2, "🌮 Holà compañeros! 🌮", "🌵 Welcome to the MeSCal program! 🌵");
+    print_title_box_shift(10, 1, 1, true, stdout, 2, "🌮 Holà compañeros! 🌮",
+        "🌵 Welcome to the Mescal program! 🌵");
 
     shell_parse();
 
-    fprintf(stdout, "Bye!\n");
     write_history(histfile);
-    exit(0);
+    return EXIT_SUCCESS;
 }

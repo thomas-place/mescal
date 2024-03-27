@@ -7,7 +7,7 @@ YACC=bison
 YFLAGS=-d -v -t #-Wcounterexamples
 
 # Math, big numbers and SDL2 fonts
-LDLIBS=-ll  -lreadline # -lm -lgmp -lSDL2_ttf -lSDL2_mixer
+LDLIBS=-ll  -lreadline -lm # -lgmp -lSDL2_ttf -lSDL2_mixer
 
 # The DEBUG_LEVEL (OFF, CRITICAL, ERROR, WARNING, INFO, TRACE)
 # is set by default to WARNING in macros_error.h.
@@ -18,21 +18,25 @@ LDLIBS=-ll  -lreadline # -lm -lgmp -lSDL2_ttf -lSDL2_mixer
 # clang 14.0.3 does implement the C23 feature __VA_OPTS__ but issues a spurious
 # warning. The -Wno-gnu-zero-variadic-macro-arguments disables this warning.
 # This flag is ignored by gcc (which implements __VA_OPTS__ without any warning).
-override CFLAGS += -std=gnu2x -MMD -Wall -pedantic -Wextra -Wshadow -Wpointer-arith	\
--Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -Wno-gnu-zero-variadic-macro-arguments
-
-INC=-I/opt/homebrew/Cellar/json-c/0.17/include/json-c
-LIB=-I/opt/homebrew/Cellar/json-c/0.17/lib
 
 # For MacOS (assuming recent homebrew)
 ifeq ($(shell uname -s), Darwin)
-	CPPFLAGS+=-I/opt/homebrew/include
-	LDFLAGS+=-L/opt/homebrew/lib
+override CFLAGS += -std=gnu2x -MMD -Wall -pedantic -Wextra -Wshadow -Wpointer-arith	\
+-Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -Wno-gnu-zero-variadic-macro-arguments
+	CPPFLAGS += -I/opt/homebrew/include -I/opt/homebrew/include/json-c
+	LDFLAGS += -L/opt/homebrew/lib -L/opt/homebrew/lib
 endif
 
+ifeq ($(shell uname -s), Linux)
+override CFLAGS += -std=gnu2x -MMD -Wall -pedantic -Wextra -Wshadow -Wpointer-arith	\
+-Wcast-qual -Wstrict-prototypes -Wmissing-prototypes
+	CPPFLAGS += -I/usr/include -I/usr/include/json-c
+endif
+
+
 LDLIBS += $(shell sdl2-config --libs)
+LDLIBS += -ljson-c
 LDFLAGS += $(shell sdl2-config --cflags)
-LDFLAGS+= -ljson-c
 
 SOURCES := $(wildcard *.c)
 OBJECTS := $(SOURCES:%.c=%.o)

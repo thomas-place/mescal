@@ -9,43 +9,42 @@
 /***************************************************************/
 
 // Affiche le nom du ième état d'un NFA
-void nfa_print_name(p_nfa A, uint i, FILE* out)
+void nfa_print_name(p_nfa A, uint i, FILE *out)
 {
     switch (A->ntype)
     {
     case NUMBER:
-        fprintf(out, "%d", ((uint*)A->names)[i]);
+        fprintf(out, "%d", ((uint *)A->names)[i]);
         break;
-    case PAIR:
-    {
+    case PAIR: {
         // printf("start\n");
         // printf("size: %d i: %d\n", A->trans->size_graph, i);
         // ((uint **)A->names)[i];
-        fprintf(out, "(%d,%d)", ((uint**)A->names)[i][0], ((uint**)A->names)[i][1]);
+        fprintf(out, "(%d,%d)", ((uint **)A->names)[i][0], ((uint **)A->names)[i][1]);
         // printf("yo\n");
         break;
     }
     case TUPLE:
         fprintf(out, "(");
-        for (uint j = 1; j < ((uint**)A->names)[i][0]; j++)
+        for (uint j = 1; j < ((uint **)A->names)[i][0]; j++)
         {
-            fprintf(out, "%d,", ((uint**)A->names)[i][j]);
+            fprintf(out, "%d,", ((uint **)A->names)[i][j]);
         }
-        fprintf(out, "%d)", ((uint**)A->names)[i][((uint**)A->names)[i][0]]);
+        fprintf(out, "%d)", ((uint **)A->names)[i][((uint **)A->names)[i][0]]);
         break;
     case SET:
-        if (((uint**)A->names)[i][0] == 0)
+        if (((uint **)A->names)[i][0] == 0)
         {
             fprintf(out, "∅");
         }
         else
         {
             fprintf(out, "{");
-            for (uint j = 1; j < ((uint**)A->names)[i][0]; j++)
+            for (uint j = 1; j < ((uint **)A->names)[i][0]; j++)
             {
-                fprintf(out, "%d,", ((uint**)A->names)[i][j]);
+                fprintf(out, "%d,", ((uint **)A->names)[i][j]);
             }
-            fprintf(out, "%d}", ((uint**)A->names)[i][((uint**)A->names)[i][0]]);
+            fprintf(out, "%d}", ((uint **)A->names)[i][((uint **)A->names)[i][0]]);
         }
         break;
     default:
@@ -61,18 +60,16 @@ void nfa_init_names(p_nfa A)
     case NONAME:
         A->names = NULL;
         break;
-    case NUMBER:
-    {
-        uint* temp;
+    case NUMBER: {
+        uint *temp;
         MALLOC(temp, A->trans->size_graph);
         A->names = temp;
         break;
     }
     case PAIR:
     case TUPLE:
-    case SET:
-    {
-        uint** ttemp;
+    case SET: {
+        uint **ttemp;
         MALLOC(ttemp, A->trans->size_graph);
         A->names = ttemp;
         break;
@@ -87,7 +84,6 @@ void nfa_init_names(p_nfa A)
 // doivent être compatibles entre A et B
 void nfa_copy_name(p_nfa A, uint i, p_nfa B, uint j)
 {
-
     switch (A->ntype)
     {
     case NONAME:
@@ -97,12 +93,12 @@ void nfa_copy_name(p_nfa A, uint i, p_nfa B, uint j)
     case NUMBER:
         if (B->ntype == NONAME)
         {
-            ((uint*)A->names)[i] = j;
+            ((uint *)A->names)[i] = j;
             return;
         }
         else if (B->ntype == NUMBER)
         {
-            ((uint*)A->names)[i] = ((uint*)B->names)[j];
+            ((uint *)A->names)[i] = ((uint *)B->names)[j];
             return;
         }
         else
@@ -114,11 +110,11 @@ void nfa_copy_name(p_nfa A, uint i, p_nfa B, uint j)
     case PAIR:
         if (B->ntype == PAIR)
         {
-            uint* pair;
+            uint *pair;
             MALLOC(pair, 2);
-            pair[0] = ((uint**)B->names)[j][0];
-            pair[1] = ((uint**)B->names)[j][1];
-            ((uint**)A->names)[i] = pair;
+            pair[0]                = ((uint **)B->names)[j][0];
+            pair[1]                = ((uint **)B->names)[j][1];
+            ((uint **)A->names)[i] = pair;
             return;
         }
         else
@@ -130,14 +126,14 @@ void nfa_copy_name(p_nfa A, uint i, p_nfa B, uint j)
     case TUPLE:
         if (B->ntype == TUPLE)
         {
-            uint* tuple;
-            MALLOC(tuple, ((uint**)B->names)[j][0] + 1);
-            tuple[0] = ((uint**)B->names)[j][0];
+            uint *tuple;
+            MALLOC(tuple, ((uint **)B->names)[j][0] + 1);
+            tuple[0] = ((uint **)B->names)[j][0];
             for (uint k = 1; k <= tuple[0]; k++)
             {
-                tuple[k] = ((uint**)B->names)[j][k];
+                tuple[k] = ((uint **)B->names)[j][k];
             }
-            ((uint**)A->names)[i] = tuple;
+            ((uint **)A->names)[i] = tuple;
             return;
         }
         else
@@ -149,14 +145,14 @@ void nfa_copy_name(p_nfa A, uint i, p_nfa B, uint j)
     case SET:
         if (B->ntype == SET)
         {
-            uint* set;
-            MALLOC(set, ((uint**)B->names)[j][0] + 1);
-            set[0] = ((uint**)B->names)[j][0];
+            uint *set;
+            MALLOC(set, ((uint **)B->names)[j][0] + 1);
+            set[0] = ((uint **)B->names)[j][0];
             for (uint k = 1; k <= set[0]; k++)
             {
-                set[k] = ((uint**)B->names)[j][k];
+                set[k] = ((uint **)B->names)[j][k];
             }
-            ((uint**)A->names)[i] = set;
+            ((uint **)A->names)[i] = set;
             return;
         }
         else
@@ -183,9 +179,9 @@ void nfa_delete_names(p_nfa A)
     case PAIR:
     case TUPLE:
     case SET:
-        for (uint i = 0; i < 0; i++)
+        for (uint i = 0; i < A->trans->size_graph; i++)
         {
-            free(((uint**)A->names)[i]);
+            free(((uint **)A->names)[i]);
         }
         free(A->names);
         break;
@@ -200,7 +196,8 @@ void nfa_delete_names(p_nfa A)
 /* Initialisation et suppression */
 /*********************************/
 
-static p_graph create_dummy_eps(uint size) {
+static p_graph create_dummy_eps(uint size)
+{
     p_graph res = create_graph_noedges(size);
     for (uint q = 0; q < size; q++)
     { // Crée une self-loop epsilon sur chaque état (ignorée à l'affichage)
@@ -229,12 +226,12 @@ p_nfa create_emptylang(uint size_alpha)
     p_nfa A;
     MALLOC(A, 1);
     A->initials = create_vertices();
-    A->finals = create_vertices();
-    A->trans = create_lgraph_noedges(0, size_alpha);
-    A->etrans = NULL;
-    A->itrans = NULL;
-    A->ntype = NONAME;
-    A->names = NULL;
+    A->finals   = create_vertices();
+    A->trans    = create_lgraph_noedges(0, size_alpha);
+    A->etrans   = NULL;
+    A->itrans   = NULL;
+    A->ntype    = NONAME;
+    A->names    = NULL;
     return A;
 }
 
@@ -250,13 +247,13 @@ p_nfa create_sing_epsilon(uint size_alpha)
     MALLOC(A, 1);
     A->initials = create_vertices();
     lefins_vertices(0, A->initials);
-    A->finals = create_vertices();
+    A->finals   = create_vertices();
     lefins_vertices(0, A->finals);
-    A->trans = create_lgraph_noedges(1, size_alpha);
-    A->etrans = NULL;
-    A->itrans = NULL;
-    A->ntype = NONAME;
-    A->names = NULL;
+    A->trans    = create_lgraph_noedges(1, size_alpha);
+    A->etrans   = NULL;
+    A->itrans   = NULL;
+    A->ntype    = NONAME;
+    A->names    = NULL;
     return A;
 }
 
@@ -272,17 +269,17 @@ p_nfa create_freemonolang(uint size_alpha)
     MALLOC(A, 1);
     A->initials = create_vertices();
     lefins_vertices(0, A->initials);
-    A->finals = create_vertices();
+    A->finals   = create_vertices();
     lefins_vertices(0, A->finals);
-    A->trans = create_lgraph_noedges(1, size_alpha);
+    A->trans    = create_lgraph_noedges(1, size_alpha);
     for (uint a = 0; a < size_alpha; a++)
     {
         rigins_vertices(0, A->trans->edges[0][a]);
     }
     A->etrans = NULL;
     A->itrans = NULL;
-    A->names = NULL;
-    A->ntype = NONAME;
+    A->names  = NULL;
+    A->ntype  = NONAME;
     return A;
 }
 
@@ -298,9 +295,9 @@ p_nfa create_freesemilang(uint size_alpha)
     MALLOC(A, 1);
     A->initials = create_vertices();
     lefins_vertices(0, A->initials);
-    A->finals = create_vertices();
+    A->finals   = create_vertices();
     lefins_vertices(1, A->finals);
-    A->trans = create_lgraph_noedges(2, size_alpha);
+    A->trans    = create_lgraph_noedges(2, size_alpha);
     for (uint a = 0; a < size_alpha; a++)
     {
         rigins_vertices(1, A->trans->edges[0][a]);
@@ -308,12 +305,13 @@ p_nfa create_freesemilang(uint size_alpha)
     }
     A->etrans = NULL;
     A->itrans = NULL;
-    A->names = NULL;
-    A->ntype = NONAME;
+    A->names  = NULL;
+    A->ntype  = NONAME;
     return A;
 }
 
-// Création d'un automate qui reconnait un singleton dont le mot contient une seule lettre
+// Création d'un automate qui reconnait un singleton dont le mot contient une
+// seule lettre
 p_nfa create_sing_letter(uint size_alpha, uint letter)
 {
     if (size_alpha <= letter)
@@ -325,19 +323,19 @@ p_nfa create_sing_letter(uint size_alpha, uint letter)
     MALLOC(A, 1);
     A->initials = create_vertices();
     lefins_vertices(0, A->initials);
-    A->finals = create_vertices();
+    A->finals   = create_vertices();
     lefins_vertices(1, A->finals);
-    A->trans = create_lgraph_noedges(2, size_alpha);
+    A->trans    = create_lgraph_noedges(2, size_alpha);
     lefins_vertices(1, A->trans->edges[0][letter]);
-    A->etrans = NULL;
-    A->itrans = NULL;
-    A->names = NULL;
-    A->ntype = NONAME;
+    A->etrans   = NULL;
+    A->itrans   = NULL;
+    A->names    = NULL;
+    A->ntype    = NONAME;
     return A;
 }
 
 // Création d'un automate qui reconnait un singleton
-p_nfa create_sing(uint size_alpha, uint* word, uint length)
+p_nfa create_sing(uint size_alpha, uint *word, uint length)
 {
     for (uint i = 0; i < length; i++)
     {
@@ -352,39 +350,40 @@ p_nfa create_sing(uint size_alpha, uint* word, uint length)
     MALLOC(A, 1);
     A->initials = create_vertices();
     lefins_vertices(0, A->initials);
-    A->finals = create_vertices();
+    A->finals   = create_vertices();
     lefins_vertices(length, A->finals);
-    A->trans = create_lgraph_noedges(length + 1, size_alpha);
+    A->trans    = create_lgraph_noedges(length + 1, size_alpha);
     for (uint i = 0; i < length; i++)
     {
         lefins_vertices(i + 1, A->trans->edges[i][word[i]]);
     }
     A->etrans = NULL;
     A->itrans = NULL;
-    A->ntype = NONAME;
-    A->names = NULL;
+    A->ntype  = NONAME;
+    A->names  = NULL;
     return A;
 }
 
-// // Supprime les noms des états dans un NFA (si il y en a)
+//// Supprime les noms des états dans un NFA (si il y en a)
 // void delete_names_nfa(p_nfa A)
 // {
-//     if (A->names != NULL)
-//     {
-//         if (A->delete_name == NULL)
-//         {
-//             fprintf(stderr, "NFA error: the name deletion function should not be NULL when there are names\n");
-//             exit(EXIT_FAILURE);
-//         }
-//         for (uint q = 0; q < A->trans->size_graph; q++)
-//         {
-//             (*A->delete_name)(A->names[q]);
-//         }
-//         A->delete_name = NULL;
-//         A->print_name = NULL;
-//         A->names = NULL;
-//         A->copy_name = NULL;
-//     }
+// if (A->names != NULL)
+// {
+// if (A->delete_name == NULL)
+// {
+// fprintf(stderr, "NFA error: the name deletion function should not be NULL
+// when there are names\n");
+// exit(EXIT_FAILURE);
+// }
+// for (uint q = 0; q < A->trans->size_graph; q++)
+// {
+// (*A->delete_name)(A->names[q]);
+// }
+// A->delete_name = NULL;
+// A->print_name = NULL;
+// A->names = NULL;
+// A->copy_name = NULL;
+// }
 // }
 
 // Désallocation d'un NFA (la fonction sert à supprimer la liste de noms)
@@ -403,7 +402,8 @@ void delete_nfa(p_nfa A)
     free(A);
 }
 
-// Recopie du NFA B sur le NFA A (les anciens éléments de A sont supprimés, B est libéré)
+// Recopie du NFA B sur le NFA A (les anciens éléments de A sont supprimés, B
+// est libéré)
 void overwrite_nfa(p_nfa A, p_nfa B)
 {
     if (A == NULL || B == NULL)
@@ -411,165 +411,179 @@ void overwrite_nfa(p_nfa A, p_nfa B)
         return;
     }
     nfa_delete_names(A);
-    A->ntype = B->ntype;
-    A->names = B->names;
+    A->ntype    = B->ntype;
+    A->names    = B->names;
     delete_vertices(A->initials);
     A->initials = B->initials;
     delete_vertices(A->finals);
-    A->finals = B->finals;
+    A->finals   = B->finals;
     delete_graph(A->etrans);
-    A->etrans = B->etrans;
+    A->etrans   = B->etrans;
     delete_lgraph(A->trans);
-    A->trans = B->trans;
+    A->trans    = B->trans;
     delete_lgraph(A->itrans);
-    A->itrans = B->itrans;
+    A->itrans   = B->itrans;
     free(B);
 }
 
 // Génération d'un NFA aléatoire
-p_nfa nfa_random(uint size_alpha, uint min_size, uint max_size) {
+p_nfa nfa_random(uint size_alpha, uint min_size, uint max_size)
+{
     min_size = max(1, min_size);
     uint sizea = max(1, size_alpha);
 
-    uint size = min_size + (rand() % (1 + max_size - min_size));
+    uint size  = min_size + (rand() % (1 + max_size - min_size));
 
     p_nfa A;
     MALLOC(A, 1);
     A->initials = create_vertices();
     rigins_vertices(0, A->initials);
-    A->finals = create_vertices();
-    if (!(rand() % 4)) {
+    A->finals   = create_vertices();
+    if (!(rand() % 4))
+    {
         rigins_vertices(0, A->finals);
     }
-    for (uint i = 1; i < size; i++) {
-        if (!(rand() % 4)) {
+    for (uint i = 1; i < size; i++)
+    {
+        if (!(rand() % 4))
+        {
             rigins_vertices(i, A->finals);
         }
-        if (!(rand() % 10)) {
+        if (!(rand() % 10))
+        {
             rigins_vertices(i, A->initials);
         }
     }
-    if (isempty_vertices(A->finals)) {
+    if (isempty_vertices(A->finals))
+    {
         rigins_vertices(size - 1, A->finals);
     }
     A->trans = create_lgraph_noedges(size, sizea);
-    for (uint q = 0; q < size;q++)
+    for (uint q = 0; q < size; q++)
     {
         for (uint a = 0; a < sizea; a++)
         {
-            if (rand() % 8 == 0) {
+            if (rand() % 8 == 0)
+            {
                 rigins_vertices(q, A->trans->edges[q][a]);
             }
 
             uint count = 0;
-            for (uint r = q + 1; r < size;r++) {
-                if (rand() % (2 + count++) == 0) {
+            for (uint r = q + 1; r < size; r++)
+            {
+                if (rand() % (2 + count++) == 0)
+                {
                     rigins_vertices(r, A->trans->edges[q][a]);
                 }
-
             }
-            for (uint r = 0; r < q;r++) {
-                if (rand() % (2 + count++) == 0) {
+            for (uint r = 0; r < q; r++)
+            {
+                if (rand() % (2 + count++) == 0)
+                {
                     rigins_vertices(r, A->trans->edges[q][a]);
                 }
-
             }
-
         }
-
     }
     A->etrans = NULL;
     A->itrans = NULL;
-    A->names = NULL;
-    A->ntype = NONAME;
+    A->names  = NULL;
+    A->ntype  = NONAME;
     return A;
-
 }
 
 // Génération d'un DFA aléatoire
-p_nfa dfa_random(uint size_alpha, uint min_size, uint max_size) {
+p_nfa dfa_random(uint size_alpha, uint min_size, uint max_size)
+{
     min_size = max(1, min_size);
     uint sizea = max(1, size_alpha);
 
-    uint size = min_size + (rand() % (1 + max_size - min_size));
+    uint size  = min_size + (rand() % (1 + max_size - min_size));
 
     p_nfa A;
     MALLOC(A, 1);
     A->initials = create_vertices();
     rigins_vertices(0, A->initials);
-    A->finals = create_vertices();
+    A->finals   = create_vertices();
     int cf = 0;
-    for (int i = size - 1; i >= 0; i--) {
-        if (!(rand() % (2 + cf++))) {
+    for (int i = size - 1; i >= 0; i--)
+    {
+        if (!(rand() % (2 + cf++)))
+        {
             rigins_vertices(i, A->finals);
         }
     }
-    if (isempty_vertices(A->finals)) {
+    if (isempty_vertices(A->finals))
+    {
         rigins_vertices(size - 1, A->finals);
     }
     A->trans = create_lgraph_noedges(size, sizea);
-    for (uint q = 0; q < size;q++)
+    for (uint q = 0; q < size; q++)
     {
         for (uint a = 0; a < sizea; a++)
         {
-
-
             uint count = 0;
-            uint r = (q + 1) % size;;
-            while (count == 0) {
-                if (r >= q && rand() % 2 == 0) {
+            uint r     = (q + 1) % size;
+            ;
+            while (count == 0)
+            {
+                if (r >= q && rand() % 2 == 0)
+                {
                     rigins_vertices(r, A->trans->edges[q][a]);
                     count = 1;
                 }
-                else if (rand() % 8 == 0) {
+                else if (rand() % 8 == 0)
+                {
                     rigins_vertices(r, A->trans->edges[q][a]);
                     count = 1;
                 }
-                else {
+                else
+                {
                     r = (r + 1) % size;
                 }
             }
-
         }
-
     }
     A->etrans = NULL;
     A->itrans = NULL;
-    A->names = NULL;
-    A->ntype = NONAME;
+    A->names  = NULL;
+    A->ntype  = NONAME;
     return A;
-
 }
-
 
 /***********************************/
 /* Opérations simples sur les NFAs */
 /***********************************/
 
 // Copie d'un NFA
-p_nfa nfa_copy(p_nfa A) {
-
+p_nfa nfa_copy(p_nfa A)
+{
     p_nfa B;
     MALLOC(B, 1);
 
     // Copie du graphe des transitions.
     B->trans = create_lgraph_noedges(A->trans->size_graph, A->trans->size_alpha);
-    for (uint q = 0; q < B->trans->size_graph; q++) {
-        for (uint a = 0; a < B->trans->size_alpha;a++) {
-            for (uint i = 0; i < size_vertices(A->trans->edges[q][a]);i++) {
+    for (uint q = 0; q < B->trans->size_graph; q++)
+    {
+        for (uint a = 0; a < B->trans->size_alpha; a++)
+        {
+            for (uint i = 0; i < size_vertices(A->trans->edges[q][a]); i++)
+            {
                 rigins_vertices(lefread_vertices(A->trans->edges[q][a], i), B->trans->edges[q][a]);
             }
         }
     }
     // Initiaux
     B->initials = create_vertices();
-    for (uint i = 0; i < size_vertices(A->initials);i++) {
+    for (uint i = 0; i < size_vertices(A->initials); i++)
+    {
         rigins_vertices(lefread_vertices(A->initials, i), B->initials);
     }
 
     // Finals
     B->finals = create_vertices();
-    for (uint i = 0; i < size_vertices(A->finals);i++) {
+    for (uint i = 0; i < size_vertices(A->finals); i++)
+    {
         rigins_vertices(lefread_vertices(A->finals, i), B->finals);
     }
 
@@ -578,27 +592,34 @@ p_nfa nfa_copy(p_nfa A) {
     B->names = NULL;
 
     // Copie des transitions epsilon si nécessaire
-    if (A->etrans) {
+    if (A->etrans)
+    {
         B->etrans = create_graph_noedges(A->etrans->size);
-        for (uint q = 0; q < B->etrans->size; q++) {
-            for (uint i = 0; i < size_vertices(A->etrans->edges[q]);i++) {
+        for (uint q = 0; q < B->etrans->size; q++)
+        {
+            for (uint i = 0; i < size_vertices(A->etrans->edges[q]); i++)
+            {
                 rigins_vertices(lefread_vertices(A->etrans->edges[q], i), B->etrans->edges[q]);
             }
         }
     }
 
     // Copie des transitions inverses si nécessaire
-    if (A->itrans) {
+    if (A->itrans)
+    {
         B->itrans = create_lgraph_noedges(A->trans->size_graph, A->itrans->size_alpha);
-        for (uint q = 0; q < B->itrans->size_graph; q++) {
-            for (uint a = 0; a < B->itrans->size_alpha;a++) {
-                for (uint i = 0; i < size_vertices(A->itrans->edges[q][a]);i++) {
-                    rigins_vertices(lefread_vertices(A->itrans->edges[q][a], i), B->itrans->edges[q][a]);
+        for (uint q = 0; q < B->itrans->size_graph; q++)
+        {
+            for (uint a = 0; a < B->itrans->size_alpha; a++)
+            {
+                for (uint i = 0; i < size_vertices(A->itrans->edges[q][a]); i++)
+                {
+                    rigins_vertices(lefread_vertices(A->itrans->edges[q][a], i),
+                                    B->itrans->edges[q][a]);
                 }
             }
         }
     }
-
 
     return B;
 }
@@ -609,9 +630,10 @@ p_nfa nfa_union_gen(uint n, ...)
     // Création de l'automate
     p_nfa UNION;
     MALLOC(UNION, 1);
-    UNION->itrans = NULL; // L'union ne prend pas en charge les transitions inverses
-    UNION->ntype = NONAME;
-    UNION->names = NULL; // Pas de noms pour l'union
+    UNION->itrans = NULL; // L'union ne prend pas en charge les transitions
+                          // inverses
+    UNION->ntype  = NONAME;
+    UNION->names  = NULL; // Pas de noms pour l'union
 
     // Récupération des inputs
     va_list list;
@@ -621,7 +643,7 @@ p_nfa nfa_union_gen(uint n, ...)
     bool eps = false;
     for (uint i = 0; i < n; i++)
     {
-        tab[i] = va_arg(list, p_nfa);
+        tab[i]   = va_arg(list, p_nfa);
         lgtab[i] = tab[i]->trans;
         if (tab[i]->etrans != NULL)
         {
@@ -640,22 +662,25 @@ p_nfa nfa_union_gen(uint n, ...)
         p_graph epstab[n];
         for (uint i = 0; i < n; i++)
         {
-            if (tab[i]->etrans) {
+            if (tab[i]->etrans)
+            {
                 epstab[i] = tab[i]->etrans;
                 neweps[i] = false;
             }
-            else {
+            else
+            {
                 epstab[i] = create_dummy_eps(tab[i]->trans->size_graph);
                 neweps[i] = true;
             }
         }
         // printf("Print 4\n");
         UNION->etrans = merge_graphs(lag, n, epstab);
-        for (uint i = 0; i < n; i++) {
-            if (neweps[i]) {
+        for (uint i = 0; i < n; i++)
+        {
+            if (neweps[i])
+            {
                 delete_graph(epstab[i]);
             }
-
         }
     }
     else
@@ -664,7 +689,7 @@ p_nfa nfa_union_gen(uint n, ...)
     }
     // Création des listes d'états finaux et initiaux
     UNION->initials = create_vertices();
-    UNION->finals = create_vertices();
+    UNION->finals   = create_vertices();
     for (uint i = 0; i < n; i++)
     {
         copy_vertices_right(UNION->initials, tab[i]->initials, lag[i]);
@@ -678,10 +703,12 @@ p_nfa nfa_union(p_nfa A, p_nfa B)
 {
     return nfa_union_gen(2, A, B);
 }
+
 // Concaténation d'un nombre arbitraire de NFAs
 p_nfa nfa_concat_gen(uint n, ...)
 {
-    // Récupération des inputs en alternant avec de nouveaux noeuds intermédiaires pour les concaténations
+    // Récupération des inputs en alternant avec de nouveaux noeuds
+    // intermédiaires pour les concaténations
     // Initialisation simultanée des transitions epsilon (si nécessaire)
     va_list list;
     va_start(list, n);
@@ -691,30 +718,34 @@ p_nfa nfa_concat_gen(uint n, ...)
     bool neweps[n];
     for (uint i = 0; i < n - 1; i++)
     {
-        tab[i] = va_arg(list, p_nfa);
+        tab[i]          = va_arg(list, p_nfa);
         transtab[2 * i] = tab[i]->trans;
-        if (tab[i]->etrans) {
+        if (tab[i]->etrans)
+        {
             etranstab[2 * i] = tab[i]->etrans;
-            neweps[i] = false;
+            neweps[i]        = false;
         }
-        else {
+        else
+        {
             etranstab[2 * i] = create_dummy_eps(tab[i]->trans->size_graph);
-            neweps[i] = true;
+            neweps[i]        = true;
         }
         // init_epstrans(tab[i]);
         // etranstab[2 * i] = tab[i]->etrans;
-        transtab[2 * i + 1] = create_lgraph_noedges(1, 1);
+        transtab[2 * i + 1]  = create_lgraph_noedges(1, 1);
         etranstab[2 * i + 1] = create_graph_noedges(1);
     }
 
     tab[n - 1] = va_arg(list, p_nfa);
-    if (tab[n - 1]->etrans) {
+    if (tab[n - 1]->etrans)
+    {
         etranstab[2 * (n - 1)] = tab[n - 1]->etrans;
-        neweps[n - 1] = false;
+        neweps[n - 1]          = false;
     }
-    else {
+    else
+    {
         etranstab[2 * (n - 1)] = create_dummy_eps(tab[(n - 1)]->trans->size_graph);
-        neweps[n - 1] = true;
+        neweps[n - 1]          = true;
     }
 
     transtab[2 * (n - 1)] = tab[n - 1]->trans;
@@ -723,18 +754,19 @@ p_nfa nfa_concat_gen(uint n, ...)
     p_nfa CONCAT;
     MALLOC(CONCAT, 1);
 
-    CONCAT->itrans = NULL; // La concaténation ne prend pas en charge les transitions inverses
-    CONCAT->ntype = NONAME;
-    CONCAT->names = NULL; // Pas de noms pour la concaténation
+    CONCAT->itrans = NULL; // La concaténation ne prend pas en charge les
+                           // transitions inverses
+    CONCAT->ntype  = NONAME;
+    CONCAT->names  = NULL; // Pas de noms pour la concaténation
 
     uint lag[2 * n - 1];
-    CONCAT->trans = merge_lgraphs(lag, 2 * n - 1, transtab);
+    CONCAT->trans  = merge_lgraphs(lag, 2 * n - 1, transtab);
     CONCAT->etrans = merge_graphs(lag, 2 * n - 1, etranstab);
 
     // Création des listes d'états finaux et initiaux
     CONCAT->initials = create_vertices();
     copy_vertices_right(CONCAT->initials, tab[0]->initials, 0);
-    CONCAT->finals = create_vertices();
+    CONCAT->finals   = create_vertices();
     copy_vertices_right(CONCAT->finals, tab[n - 1]->finals, lag[2 * (n - 1)]);
 
     // Création des transitions epsilon
@@ -745,28 +777,32 @@ p_nfa nfa_concat_gen(uint n, ...)
             // Pour chaque état final du premier automate
             // On insère une transi epsilon vers l'état intermédiaire
             // (à la fin pour préserver l'ordre)
-            rigins_vertices(lag[2 * j + 1], CONCAT->etrans->edges[lefread_vertices(tab[j]->finals, i) + lag[2 * j]]);
+            rigins_vertices(lag[2 * j + 1],
+                            CONCAT->etrans->edges[lefread_vertices(tab[j]->finals,
+                                                                   i) + lag[2 * j]]);
         }
         for (uint i = 0; i < size_vertices(tab[j + 1]->initials); i++)
         {
             // Pour chaque état initial du second automate
             // On insère une transi epsilon depuis l'état intermédiaire
             // (au début pour préserver l'ordre)
-            lefins_vertices(lag[2 * (j + 1)] + lefread_vertices(tab[j + 1]->initials, i), CONCAT->etrans->edges[lag[2 * j + 1]]);
+            lefins_vertices(lag[2 * (j + 1)] + lefread_vertices(tab[j + 1]->initials, i),
+                            CONCAT->etrans->edges[lag[2 * j + 1]]);
         }
     }
-    for (uint i = 0; i < n - 1; i++) {
-
-        if (neweps[i]) {
+    for (uint i = 0; i < n - 1; i++)
+    {
+        if (neweps[i])
+        {
             delete_graph(etranstab[2 * i]);
         }
         delete_graph(etranstab[2 * i + 1]);
 
         delete_lgraph(transtab[2 * i + 1]);
-
     }
 
-    if (neweps[n - 1]) {
+    if (neweps[n - 1])
+    {
         delete_graph(etranstab[2 * (n - 1)]);
     }
 
@@ -782,8 +818,6 @@ p_nfa nfa_concat(p_nfa A, p_nfa B)
 // Etoile de Kleene d'un nfa
 p_nfa nfa_star(p_nfa A)
 {
-
-
     // Tableaux pour la fonction de fusion
     p_graph etranstab[2];
     p_lgraph transtab[2];
@@ -791,13 +825,15 @@ p_nfa nfa_star(p_nfa A)
     // Noeud intermédiaire pour relier le NFA avec des transitions epsilon
     etranstab[0] = create_graph_noedges(1);
     lefins_vertices(0, etranstab[0]->edges[0]);
-    transtab[0] = create_lgraph_noedges(1, 1);
+    transtab[0]  = create_lgraph_noedges(1, 1);
 
     // Automate input
-    if (A->etrans) {
+    if (A->etrans)
+    {
         etranstab[1] = A->etrans;
     }
-    else {
+    else
+    {
         etranstab[1] = create_dummy_eps(A->trans->size_graph);
     }
     transtab[1] = A->trans;
@@ -806,23 +842,25 @@ p_nfa nfa_star(p_nfa A)
     p_nfa STAR;
     MALLOC(STAR, 1);
     uint lag[2];
-    STAR->trans = merge_lgraphs(lag, 2, transtab);
+    STAR->trans  = merge_lgraphs(lag, 2, transtab);
     STAR->etrans = merge_graphs(lag, 2, etranstab);
 
     delete_graph(etranstab[0]);
     delete_lgraph(transtab[0]);
-    if (!A->etrans) {
+    if (!A->etrans)
+    {
         delete_graph(etranstab[1]);
     }
 
-    STAR->itrans = NULL; // L'étoile ne prend pas en charge les transitions inverses
-    STAR->ntype = NONAME;
-    STAR->names = NULL; // L'étoile de noms pour la concaténation
+    STAR->itrans = NULL; // L'étoile ne prend pas en charge les transitions
+                         // inverses
+    STAR->ntype  = NONAME;
+    STAR->names  = NULL; // L'étoile de noms pour la concaténation
 
     // Création des listes d'états finaux et initiaux
     STAR->initials = create_vertices();
     lefins_vertices(0, STAR->initials);
-    STAR->finals = create_vertices();
+    STAR->finals   = create_vertices();
     lefins_vertices(0, STAR->finals);
 
     // printf("Size: %d\n", STAR->etrans->size);
@@ -832,18 +870,17 @@ p_nfa nfa_star(p_nfa A)
     {
         // printf("test: %d\n", rigread_vertices(A->finals, i));
 
-        // Pour chaque état final de A on insère une transition vers le nouvel état 0
+        // Pour chaque état final de A on insère une transition vers le nouvel
+        // état 0
         lefins_vertices(0, STAR->etrans->edges[1 + rigread_vertices(A->finals, i)]);
     }
 
     for (uint i = 0; i < size_vertices(A->initials); i++)
     {
-        // Pour chaque état initial de A on va insérer une transition depuis le nouvel état 0
+        // Pour chaque état initial de A on va insérer une transition depuis le
+        // nouvel état 0
         rigins_vertices(1 + lefread_vertices(A->initials, i), STAR->etrans->edges[0]);
     }
-
-
-
 
     return STAR;
 }
@@ -851,8 +888,6 @@ p_nfa nfa_star(p_nfa A)
 // Etoile de Kleene stricte (+) d'un nfa
 p_nfa nfa_star_plus(p_nfa A)
 {
-
-
     // Tableaux pour la fonction de fusion
     p_graph etranstab[2];
     p_lgraph transtab[2];
@@ -860,13 +895,15 @@ p_nfa nfa_star_plus(p_nfa A)
     // Noeud intermédiaire pour relier le NFA avec des transitions epsilon
     etranstab[0] = create_graph_noedges(1);
     lefins_vertices(0, etranstab[0]->edges[0]);
-    transtab[0] = create_lgraph_noedges(1, 1);
+    transtab[0]  = create_lgraph_noedges(1, 1);
 
     // Automate input
-    if (A->etrans) {
+    if (A->etrans)
+    {
         etranstab[1] = A->etrans;
     }
-    else {
+    else
+    {
         etranstab[1] = create_dummy_eps(A->trans->size_graph);
     }
     transtab[1] = A->trans;
@@ -875,27 +912,29 @@ p_nfa nfa_star_plus(p_nfa A)
     p_nfa STAR;
     MALLOC(STAR, 1);
 
-    STAR->itrans = NULL; // L'étoile ne prend pas en charge les transitions inverses
-    STAR->ntype = NONAME;
-    STAR->names = NULL; // L'étoile de noms pour la concaténation
+    STAR->itrans = NULL; // L'étoile ne prend pas en charge les transitions
+                         // inverses
+    STAR->ntype  = NONAME;
+    STAR->names  = NULL; // L'étoile de noms pour la concaténation
 
     uint lag[2];
-    STAR->trans = merge_lgraphs(lag, 2, transtab);
+    STAR->trans  = merge_lgraphs(lag, 2, transtab);
     STAR->etrans = merge_graphs(lag, 2, etranstab);
-
-
 
     delete_graph(etranstab[0]);
     delete_lgraph(transtab[0]);
-    if (!A->etrans) {
+    if (!A->etrans)
+    {
         delete_graph(etranstab[1]);
     }
 
     // Création des listes d'états finaux et initiaux
     STAR->initials = create_vertices();
     lefins_vertices(0, STAR->initials);
-    STAR->finals = create_vertices();
-    copy_vertices_right(STAR->finals, A->finals, 1); // Les états finaux sont ceux de A ( étoile stricte)
+    STAR->finals   = create_vertices();
+    copy_vertices_right(STAR->finals, A->finals, 1); // Les états finaux sont
+                                                     // ceux de A ( étoile
+                                                     // stricte)
 
     // printf("Size: %d\n", STAR->etrans->size);
     // printf("Size finalsa: %d\n", size_vertices(A->finals));
@@ -904,13 +943,15 @@ p_nfa nfa_star_plus(p_nfa A)
     {
         // printf("test: %d\n", rigread_vertices(A->finals, i));
 
-        // Pour chaque état final de A on insère une transition vers le nouvel état 0
+        // Pour chaque état final de A on insère une transition vers le nouvel
+        // état 0
         lefins_vertices(0, STAR->etrans->edges[1 + rigread_vertices(A->finals, i)]);
     }
 
     for (uint i = 0; i < size_vertices(A->initials); i++)
     {
-        // Pour chaque état initial de A on va insérer une transition depuis le nouvel état 0
+        // Pour chaque état initial de A on va insérer une transition depuis le
+        // nouvel état 0
         rigins_vertices(1 + lefread_vertices(A->initials, i), STAR->etrans->edges[0]);
     }
     return STAR;
@@ -998,7 +1039,9 @@ p_nfa nfa_trim(p_nfa A)
     for (uint c = PSCC->size_par; c > 0; c--)
     {
         // printf("num: %d\n", c);
-        if (acc[c - 1] && !coacc[c - 1]) // Si une scc est accessible et n'a pas été déjà marqué co-accessible à l'initialisation
+        if (acc[c - 1] && !coacc[c - 1]) // Si une scc est accessible et n'a pas
+                                         // été déjà marqué co-accessible à
+                                         // l'initialisation
         {
             uint i = 0;
             while (!coacc[c - 1] && i < size_vertices(GSCC->edges[c - 1]))
@@ -1017,7 +1060,8 @@ p_nfa nfa_trim(p_nfa A)
     MALLOC(B, 1);
 
     // Numérotation des états. L'ordre respecte celui de l'automate original
-    uint numbers[A->trans->size_graph]; // Mémorise l'association entre les anciens états et les nouveaux
+    uint numbers[A->trans->size_graph]; // Mémorise l'association entre les
+                                        // anciens états et les nouveaux
     uint num = 0;                       // Compteur
     for (uint q = 0; q < A->trans->size_graph; q++)
     {
@@ -1031,7 +1075,8 @@ p_nfa nfa_trim(p_nfa A)
 
     // Création des nouveaux ensembles
 
-    // Les états initiaux sont tous ceux qui sont coaccessibles dans l'automate orignal (modulo renommage)
+    // Les états initiaux sont tous ceux qui sont coaccessibles dans l'automate
+    // orignal (modulo renommage)
     B->initials = create_vertices();
     for (uint i = 0; i < size_vertices(A->initials); i++)
     {
@@ -1041,7 +1086,8 @@ p_nfa nfa_trim(p_nfa A)
         }
     }
 
-    // Les états finaux sont tous ceux qui sont accessibles dans l'automate orignal (modulo renommage)
+    // Les états finaux sont tous ceux qui sont accessibles dans l'automate
+    // orignal (modulo renommage)
     B->finals = create_vertices();
     for (uint i = 0; i < size_vertices(A->finals); i++)
     {
@@ -1055,15 +1101,36 @@ p_nfa nfa_trim(p_nfa A)
     B->trans = create_lgraph_noedges(num, A->trans->size_alpha);
     for (uint q = 0; q < A->trans->size_graph; q++)
     {
-        if (coacc[PSCC->numcl[q]]) // Si l'état est utile
+        if (coacc[PSCC->numcl[q]])                                                      //
+                                                                                        //
+                                                                                        // Si
+                                                                                        //
+                                                                                        // l'état
+                                                                                        //
+                                                                                        // est
+                                                                                        //
+                                                                                        // utile
         {
             for (uint a = 0; a < A->trans->size_alpha; a++)
             {
                 for (uint i = 0; i < size_vertices(A->trans->edges[q][a]); i++)
                 {
-                    if (coacc[PSCC->numcl[lefread_vertices(A->trans->edges[q][a], i)]]) // Si l'état adjacent est utile aussi
+                    if (coacc[PSCC->numcl[lefread_vertices(A->trans->edges[q][a], i)]]) //
+                                                                                        //
+                                                                                        // Si
+                                                                                        //
+                                                                                        // l'état
+                                                                                        //
+                                                                                        // adjacent
+                                                                                        //
+                                                                                        // est
+                                                                                        //
+                                                                                        // utile
+                                                                                        //
+                                                                                        // aussi
                     {
-                        rigins_vertices(numbers[lefread_vertices(A->trans->edges[q][a], i)], B->trans->edges[numbers[q]][a]);
+                        rigins_vertices(numbers[lefread_vertices(A->trans->edges[q][a], i)],
+                                        B->trans->edges[numbers[q]][a]);
                     }
                 }
             }
@@ -1081,9 +1148,22 @@ p_nfa nfa_trim(p_nfa A)
             {
                 for (uint i = 0; i < size_vertices(A->etrans->edges[q]); i++)
                 {
-                    if (coacc[PSCC->numcl[lefread_vertices(A->etrans->edges[q], i)]]) // Si l'état adjacent est utile aussi
+                    if (coacc[PSCC->numcl[lefread_vertices(A->etrans->edges[q], i)]]) //
+                                                                                      //
+                                                                                      // Si
+                                                                                      //
+                                                                                      // l'état
+                                                                                      //
+                                                                                      // adjacent
+                                                                                      //
+                                                                                      // est
+                                                                                      //
+                                                                                      // utile
+                                                                                      //
+                                                                                      // aussi
                     {
-                        rigins_vertices(numbers[lefread_vertices(A->etrans->edges[q], i)], B->etrans->edges[numbers[q]]);
+                        rigins_vertices(numbers[lefread_vertices(A->etrans->edges[q], i)],
+                                        B->etrans->edges[numbers[q]]);
                     }
                 }
             }
@@ -1103,9 +1183,22 @@ p_nfa nfa_trim(p_nfa A)
                 {
                     for (uint i = 0; i < size_vertices(A->itrans->edges[q][a]); i++)
                     {
-                        if (coacc[PSCC->numcl[lefread_vertices(A->itrans->edges[q][a], i)]]) // Si l'état adjacent est utile aussi
+                        if (coacc[PSCC->numcl[lefread_vertices(A->itrans->edges[q][a], i)]]) //
+                                                                                             //
+                                                                                             // Si
+                                                                                             //
+                                                                                             // l'état
+                                                                                             //
+                                                                                             // adjacent
+                                                                                             //
+                                                                                             // est
+                                                                                             //
+                                                                                             // utile
+                                                                                             //
+                                                                                             // aussi
                         {
-                            rigins_vertices(numbers[lefread_vertices(A->itrans->edges[q][a], i)], B->itrans->edges[numbers[q]][a]);
+                            rigins_vertices(numbers[lefread_vertices(A->itrans->edges[q][a], i)],
+                                            B->itrans->edges[numbers[q]][a]);
                         }
                     }
                 }
@@ -1126,7 +1219,8 @@ p_nfa nfa_trim(p_nfa A)
     nfa_init_names(B);
     for (uint q = 0; q < A->trans->size_graph; q++) // Pour chaque état de A
     {
-        if (coacc[PSCC->numcl[q]]) // Si cet état est gardé dans le nouvel automate
+        if (coacc[PSCC->numcl[q]])                  // Si cet état est gardé
+                                                    // dans le nouvel automate
         {
             // Le nom de q devient celui du nouvel état correspondant dans B
             nfa_copy_name(B, numbers[q], A, q);
@@ -1141,7 +1235,8 @@ p_nfa nfa_trim(p_nfa A)
 }
 
 // Élimination des états non-accessibles (modifie le NFA originel)
-void nfa_trim_mod(p_nfa A) {
+void nfa_trim_mod(p_nfa A)
+{
     p_nfa B = nfa_trim(A);
     overwrite_nfa(A, B);
 }
@@ -1151,7 +1246,6 @@ p_nfa nfa_elimeps(p_nfa A)
 {
     if (A->etrans == NULL)
     {
-
         // Si il n'y a pas de transitions epsilon
         return nfa_copy(A);
     }
@@ -1159,8 +1253,10 @@ p_nfa nfa_elimeps(p_nfa A)
     // Calcul du graphe des SCCs des transitions epsilon
     p_parti sccs = tarjan(A->etrans);
 
-    // On fusionne les composantes fortement connexes de sccs de transitions epsilon
-    // Par construction, les nouveaux états du DAG (des trans eps) sont ordonnés selon un tri topologique
+    // On fusionne les composantes fortement connexes de sccs de transitions
+    // epsilon
+    // Par construction, les nouveaux états du DAG (des trans eps) sont ordonnés
+    // selon un tri topologique
     p_nfa B = nfa_merge_states(A, sccs);
 
     // Clôture transitive des transitions epsilon dans B
@@ -1168,12 +1264,14 @@ p_nfa nfa_elimeps(p_nfa A)
     {
         for (uint j = 0; j < size_vertices(B->etrans->edges[q - 1]); j++)
         {
-            merge_sorted_vertices(B->etrans->edges[q - 1], B->etrans->edges[lefread_vertices(B->etrans->edges[q - 1], j)]);
+            merge_sorted_vertices(B->etrans->edges[q - 1],
+                                  B->etrans->edges[lefread_vertices(B->etrans->edges[q - 1], j)]);
         }
     }
 
     // Enregistrement des nouveaux états finaux
-    bool tempfin[B->trans->size_graph]; // Tableau temporaire pour marquer les états finaux
+    bool tempfin[B->trans->size_graph]; // Tableau temporaire pour marquer les
+                                        // états finaux
     for (uint q = 0; q < B->trans->size_graph; q++)
     {
         tempfin[q] = false;
@@ -1213,7 +1311,9 @@ p_nfa nfa_elimeps(p_nfa A)
                 // Transition classiques
                 for (uint a = 0; a < B->trans->size_alpha; a++)
                 {
-                    merge_sorted_vertices(B->trans->edges[q][a], B->trans->edges[lefread_vertices(B->etrans->edges[q], i)][a]);
+                    merge_sorted_vertices(B->trans->edges[q][a],
+                                          B->trans->edges[lefread_vertices(B->etrans->edges[q],
+                                                                           i)][a]);
                 }
 
                 // Transition inverses
@@ -1221,7 +1321,9 @@ p_nfa nfa_elimeps(p_nfa A)
                 {
                     for (uint a = 0; a < B->itrans->size_alpha; a++)
                     {
-                        merge_sorted_vertices(B->itrans->edges[q][a], B->itrans->edges[lefread_vertices(B->etrans->edges[q], i)][a]);
+                        merge_sorted_vertices(B->itrans->edges[q][a],
+                                              B->itrans->edges[lefread_vertices(B->etrans->edges[q],
+                                                                                i)][a]);
                     }
                 }
             }
@@ -1236,7 +1338,8 @@ p_nfa nfa_elimeps(p_nfa A)
 }
 
 // Élimination des transitions epsilon (modifie le NFA originel)
-void nfa_elimeps_mod(p_nfa A) {
+void nfa_elimeps_mod(p_nfa A)
+{
     if (A->etrans == NULL)
     {
         return;
@@ -1244,8 +1347,6 @@ void nfa_elimeps_mod(p_nfa A) {
     p_nfa B = nfa_elimeps(A);
     overwrite_nfa(A, B);
 }
-
-
 
 // Miroir
 p_nfa nfa_mirror(p_nfa A)
@@ -1258,7 +1359,7 @@ p_nfa nfa_mirror(p_nfa A)
 
     // Création des états initiaux et finaux (swap de l'automate d'origine)
     themirror->initials = create_vertices();
-    themirror->finals = create_vertices();
+    themirror->finals   = create_vertices();
     copy_vertices_right(themirror->initials, A->finals, 0);
     copy_vertices_right(themirror->finals, A->initials, 0);
 
@@ -1270,7 +1371,8 @@ p_nfa nfa_mirror(p_nfa A)
         {
             for (uint i = 0; i < size_vertices(A->trans->edges[q][a]); i++)
             {
-                insert_vertices(themirror->trans->edges[lefread_vertices(A->trans->edges[q][a], i)][a], q);
+                insert_vertices(themirror->trans->edges[lefread_vertices(A->trans->edges[q][a],
+                                                                         i)][a], q);
             }
         }
     }
@@ -1284,7 +1386,8 @@ p_nfa nfa_mirror(p_nfa A)
         { // On affecte les transitions
             for (uint i = 0; i < size_vertices(A->etrans->edges[q]); i++)
             {
-                insert_vertices(themirror->etrans->edges[lefread_vertices(A->etrans->edges[q], i)], q);
+                insert_vertices(themirror->etrans->edges[lefread_vertices(A->etrans->edges[q], i)],
+                                q);
             }
         }
     }
@@ -1299,7 +1402,8 @@ p_nfa nfa_mirror(p_nfa A)
             {
                 for (uint i = 0; i < size_vertices(A->itrans->edges[q][a]); i++)
                 {
-                    insert_vertices(themirror->itrans->edges[lefread_vertices(A->itrans->edges[q][a], i)][a], q);
+                    insert_vertices(themirror->itrans->edges[lefread_vertices(
+                                                                 A->itrans->edges[q][a], i)][a], q);
                 }
             }
         }
@@ -1311,8 +1415,6 @@ p_nfa nfa_mirror(p_nfa A)
 /***********************/
 /* Information sur nfa */
 /***********************/
-
-
 
 // Calcule le nombre de transitions dans un preautomate
 int nfa_nb_trans(p_nfa A)
@@ -1414,16 +1516,15 @@ bool nfa_is_comp(p_nfa A)
 // Teste si un nfa reconnait le langage vide
 bool nfa_is_empty(p_nfa A)
 {
-    p_nfa B = nfa_trim(A);
+    p_nfa B  = nfa_trim(A);
     // printf("Size: %d\n", A->trans->size_graph);
     bool res = isempty_vertices(B->finals);
     delete_nfa(B);
     return res;
-
 }
 
 // Teste si un mot est accepté par un NFA
-bool nfa_accepts(p_nfa A, char* word)
+bool nfa_accepts(p_nfa A, char *word)
 {
     if (isempty_vertices(A->initials) || isempty_vertices(A->finals))
     {
@@ -1436,12 +1537,12 @@ bool nfa_accepts(p_nfa A, char* word)
     // print_dequeue(states);
 
     // Lecture du mot
-    uint i = 0;
+    uint i          = 0;
     p_vertices temp = create_vertices();
     while (word[i] != '\0')
     {
         uint letter = word[i] - 'a';
-        if (letter < 0 || A->trans->size_alpha <= letter)
+        if (A->trans->size_alpha <= letter)
         {
             printf("Error, the word contains a non-valid letter for this automaton\n");
             return false;
@@ -1492,8 +1593,8 @@ bool nfa_accepts(p_nfa A, char* word)
 }
 
 // Calcule les états qui sont atteints par un mot dans un NFA.
-p_vertices nfa_compute_runs(p_nfa A, char* word) {
-
+p_vertices nfa_compute_runs(p_nfa A, char *word)
+{
     p_vertices states = create_vertices();
 
     if (isempty_vertices(A->initials))
@@ -1504,7 +1605,7 @@ p_vertices nfa_compute_runs(p_nfa A, char* word) {
     copy_vertices_right(states, A->initials, 0);
 
     // Lecture du mot
-    uint i = 0;
+    uint i          = 0;
     p_vertices temp = create_vertices();
     while (word[i] != '\0')
     {
@@ -1542,8 +1643,6 @@ p_vertices nfa_compute_runs(p_nfa A, char* word) {
     return states;
 }
 
-
-
 // Retourne l'état atteint à partir de s en lisant le mot w dans le DFA A
 // (le déterminisme n'est pas vérifier)
 uint dfa_function(p_nfa A, uint s, p_vertices w)
@@ -1557,23 +1656,34 @@ uint dfa_function(p_nfa A, uint s, p_vertices w)
 }
 
 // Teste si un DFA est commutatif
-bool dfa_is_comm(p_nfa A, FILE* out) {
-    if (!nfa_is_det(A)) {
-        if (out) {
+bool dfa_is_comm(p_nfa A, FILE *out)
+{
+    if (!nfa_is_det(A))
+    {
+        if (out)
+        {
             fprintf(out, "#### Error: the commutativity test is only meaningful for DFAs.\n");
         }
         return false;
     }
-    if (out) {
+    if (out)
+    {
         fprintf(out, "#### Checking if the DFA is commutative.\n");
     }
-    for (uint a = 0; a < A->trans->size_alpha;a++) {
-        for (uint b = a + 1; b < A->trans->size_alpha;b++) {
-            for (uint q = 0; q < A->trans->size_graph;q++) {
-                uint r = lefread_vertices(A->trans->edges[lefread_vertices(A->trans->edges[q][b], 0)][a], 0);
-                uint s = lefread_vertices(A->trans->edges[lefread_vertices(A->trans->edges[q][a], 0)][b], 0);
-                if (r != s) {
-                    if (out) {
+    for (uint a = 0; a < A->trans->size_alpha; a++)
+    {
+        for (uint b = a + 1; b < A->trans->size_alpha; b++)
+        {
+            for (uint q = 0; q < A->trans->size_graph; q++)
+            {
+                uint r = lefread_vertices(A->trans->edges[lefread_vertices(A->trans->edges[q][b],
+                                                                           0)][a], 0);
+                uint s = lefread_vertices(A->trans->edges[lefread_vertices(A->trans->edges[q][a],
+                                                                           0)][b], 0);
+                if (r != s)
+                {
+                    if (out)
+                    {
                         fprintf(out, "#### The DFA is NOT commutative.\n");
                         fprintf(out, "#### For instance, (");
                         nfa_print_name(A, q, out);
@@ -1587,18 +1697,15 @@ bool dfa_is_comm(p_nfa A, FILE* out) {
                     }
                     return false;
                 }
-
             }
-
         }
     }
-    if (out) {
+    if (out)
+    {
         fprintf(out, "#### The DFA is commutative.\n");
     }
     return true;
-
 }
-
 
 /***********************/
 /* Partition d'un NFA  */
@@ -1608,7 +1715,8 @@ bool dfa_is_comm(p_nfa A, FILE* out) {
 // Les nouveaux états sont les classes
 // On a une transition (c,a,c') si les classes c,c' contiennent des états q,q'
 // tels que l'automate d'origine avait une transition (q,a,q')
-// De la même façon, une classe est c est initiale (resp. finale) si elle contient
+// De la même façon, une classe est c est initiale (resp. finale) si elle
+// contient
 // un état initial (resp. final).
 p_nfa nfa_merge_states(p_nfa A, p_parti P)
 {
@@ -1642,9 +1750,14 @@ p_nfa nfa_merge_states(p_nfa A, p_parti P)
             p_uint_avlnode thetree = NULL;
             for (uint i = 0; i < size_vertices(P->cl[c]); i++)
             {
-                for (uint j = 0; j < size_vertices(A->trans->edges[lefread_vertices(P->cl[c], i)][a]); j++)
+                for (uint j = 0;
+                     j < size_vertices(A->trans->edges[lefread_vertices(P->cl[c], i)][a]); j++)
                 {
-                    thetree = uint_avl_insert(P->numcl[lefread_vertices(A->trans->edges[lefread_vertices(P->cl[c], i)][a], j)], thetree);
+                    thetree =
+                        uint_avl_insert(P->numcl[lefread_vertices(A->trans->edges[lefread_vertices(
+                                                                                      P->cl[c],
+                                                                                      i)][a], j)],
+                                        thetree);
                 }
             }
             uint_avl_to_vertices(thetree, B->trans->edges[c][a]);
@@ -1662,9 +1775,14 @@ p_nfa nfa_merge_states(p_nfa A, p_parti P)
                 p_uint_avlnode thetree = NULL;
                 for (uint i = 0; i < size_vertices(P->cl[c]); i++)
                 {
-                    for (uint j = 0; j < size_vertices(A->itrans->edges[lefread_vertices(P->cl[c], i)][a]); j++)
+                    for (uint j = 0;
+                         j < size_vertices(A->itrans->edges[lefread_vertices(P->cl[c], i)][a]); j++)
                     {
-                        thetree = uint_avl_insert(P->numcl[lefread_vertices(A->itrans->edges[lefread_vertices(P->cl[c], i)][a], j)], thetree);
+                        thetree =
+                            uint_avl_insert(P->numcl[lefread_vertices(
+                                                         A->itrans->edges[lefread_vertices(P->cl[c],
+                                                                                           i)][a],
+                                                         j)], thetree);
                     }
                 }
                 uint_avl_to_vertices(thetree, B->itrans->edges[c][a]);
@@ -1685,9 +1803,14 @@ p_nfa nfa_merge_states(p_nfa A, p_parti P)
             p_uint_avlnode thetree = NULL;
             for (uint i = 0; i < size_vertices(P->cl[c]); i++)
             {
-                for (uint j = 0; j < size_vertices(A->etrans->edges[lefread_vertices(P->cl[c], i)]); j++)
+                for (uint j = 0; j < size_vertices(A->etrans->edges[lefread_vertices(P->cl[c], i)]);
+                     j++)
                 {
-                    thetree = uint_avl_insert(P->numcl[lefread_vertices(A->etrans->edges[lefread_vertices(P->cl[c], i)], j)], thetree);
+                    thetree =
+                        uint_avl_insert(P->numcl[lefread_vertices(A->etrans->edges[lefread_vertices(
+                                                                                       P->cl[c],
+                                                                                       i)], j)],
+                                        thetree);
                 }
             }
             uint_avl_to_vertices(thetree, B->etrans->edges[c]);
@@ -1698,7 +1821,8 @@ p_nfa nfa_merge_states(p_nfa A, p_parti P)
         B->etrans = NULL;
     }
 
-    // Gestion des noms: Chaque état reprend le nom d'un représentant de sa classe
+    // Gestion des noms: Chaque état reprend le nom d'un représentant de sa
+    // classe
     if (A->ntype == NONAME)
     {
         B->ntype = NUMBER;
@@ -1745,7 +1869,6 @@ p_lgraph nfa_get_lab_parti(p_nfa A, p_parti P)
 // complet, celui-ci est complété en ajoutant un état supplémentaire.
 p_nfa lgraph_to_nfa(p_lgraph G, uint ini)
 {
-
     // La pile pour le parcours en profondeur
     p_vertices thestack = create_vertices();
 
@@ -1801,16 +1924,16 @@ p_nfa lgraph_to_nfa(p_lgraph G, uint ini)
     // Création de l'automate
     p_nfa A;
     MALLOC(A, 1);
-    A->trans = create_lgraph_noedges(size_auto, G->size_alpha);
+    A->trans    = create_lgraph_noedges(size_auto, G->size_alpha);
     A->initials = create_vertices();
-    A->finals = create_vertices();
-    A->ntype = NUMBER;
-    A->etrans = NULL;
-    A->itrans = NULL;
+    A->finals   = create_vertices();
+    A->ntype    = NUMBER;
+    A->etrans   = NULL;
+    A->itrans   = NULL;
 
     // Calcul de l'association entre les nouveaux états et les anciens
 
-    uint* ATOG;
+    uint *ATOG;
     MALLOC(ATOG, size_auto);
     A->names = ATOG;
 
@@ -1843,7 +1966,8 @@ p_nfa lgraph_to_nfa(p_lgraph G, uint ini)
             {
                 for (uint i = 0; i < size_vertices(G->edges[ATOG[s]][a]); i++)
                 {
-                    rigins_vertices(GTOA[lefread_vertices(G->edges[ATOG[s]][a], i)], A->trans->edges[s][a]);
+                    rigins_vertices(GTOA[lefread_vertices(G->edges[ATOG[s]][a], i)],
+                                    A->trans->edges[s][a]);
                 }
             }
         }

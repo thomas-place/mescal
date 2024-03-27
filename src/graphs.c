@@ -15,7 +15,8 @@ void graph_printing_test(p_graph G, FILE *out)
 
     for (uint i = 0; i < size_stack(theedges); i++)
     { // Boucle sur les états de départ
-        fprintf(out, "\"%d\" -> \"%d\"\n", ((p_edge)read_stack(theedges, i))->in, ((p_edge)read_stack(theedges, i))->out);
+        fprintf(out, "\"%d\" -> \"%d\"\n", ((p_edge)read_stack(theedges, i))->in,
+                ((p_edge)read_stack(theedges, i))->out);
     }
 }
 
@@ -81,7 +82,8 @@ p_lgraph create_lgraph_noedges(uint size_graph, uint size_alpha)
     return new;
 }
 
-// Intitialise un graphe déterministe complet étiqueté sans uniquement des self-loops
+// Intitialise un graphe déterministe complet étiqueté sans uniquement des
+// self-loops
 p_dgraph create_dgraph_noedges(uint size_graph, uint size_alpha)
 {
     if (size_alpha == 0)
@@ -201,7 +203,7 @@ void saturate_mat(bool **mat, uint size)
                 if (newmat[i][j] != mat[i][j])
                 {
                     mat[i][j] = newmat[i][j];
-                    change = true;
+                    change    = true;
                 }
             }
         }
@@ -330,9 +332,11 @@ void free_lmat(bool ***themat, uint size_graph, uint size_alpha)
 /* Parcours */
 /************/
 
-// Parcours DFS: retourne la liste triée des sommets accessibles depuis un sommet dans ini
+// Parcours DFS: retourne la liste triée des sommets accessibles depuis un
+// sommet dans ini
 // La lise ini est vidée (elle est utilisée comme pile)
-// La liste "alph" contient un sous-alphabet (on peut l'utiliser pour restreindre les transitions autorisées)
+// La liste "alph" contient un sous-alphabet (on peut l'utiliser pour
+// restreindre les transitions autorisées)
 // Si la liste alph est égale à NULL, toutes les lettres sont autorisées
 p_vertices graph_dfs(p_graph G, p_vertices ini, bool *rest)
 {
@@ -403,7 +407,6 @@ p_vertices lgraph_dfs(p_lgraph G, p_vertices ini, bool *alph, bool *rest)
                 {
                     for (uint j = 0; j < size_vertices(G->edges[q][a]); j++)
                     {
-
                         if (alph[a] && !visited[lefread_vertices(G->edges[q][a], j)])
                         {
                             visited[lefread_vertices(G->edges[q][a], j)] = true;
@@ -418,7 +421,6 @@ p_vertices lgraph_dfs(p_lgraph G, p_vertices ini, bool *alph, bool *rest)
                 {
                     for (uint j = 0; j < size_vertices(G->edges[q][a]); j++)
                     {
-
                         if (!visited[lefread_vertices(G->edges[q][a], j)])
                         {
                             visited[lefread_vertices(G->edges[q][a], j)] = true;
@@ -477,7 +479,6 @@ p_vertices dgraph_dfs(p_dgraph G, p_vertices ini, bool *alph, bool *rest)
         {
             for (uint a = 0; a < G->size_alpha; a++)
             {
-
                 if (!visited[G->edges[q][a]])
                 {
                     visited[G->edges[q][a]] = true;
@@ -499,9 +500,11 @@ p_vertices dgraph_dfs(p_dgraph G, p_vertices ini, bool *alph, bool *rest)
     return res;
 }
 
-// Parcours BFS: retourne la liste triée des sommets accessibles depuis un sommet dans ini
+// Parcours BFS: retourne la liste triée des sommets accessibles depuis un
+// sommet dans ini
 // La lise ini est vidée (elle est utilisée comme file)
-// La liste "alph" contient un sous-alphabet (on peut l'utiliser pour restreindre les transitions autorisées)
+// La liste "alph" contient un sous-alphabet (on peut l'utiliser pour
+// restreindre les transitions autorisées)
 // Si la liste alph est égale à NULL, toutes les lettres sont autorisées
 p_vertices graph_bfs(p_graph G, p_vertices ini, bool *rest)
 {
@@ -572,7 +575,6 @@ p_vertices lgraph_bfs(p_lgraph G, p_vertices ini, bool *alph, bool *rest)
                 {
                     for (uint j = 0; j < size_vertices(G->edges[q][a]); j++)
                     {
-
                         if (alph[a] && !visited[lefread_vertices(G->edges[q][a], j)])
                         {
                             visited[lefread_vertices(G->edges[q][a], j)] = true;
@@ -587,7 +589,6 @@ p_vertices lgraph_bfs(p_lgraph G, p_vertices ini, bool *alph, bool *rest)
                 {
                     for (uint j = 0; j < size_vertices(G->edges[q][a]); j++)
                     {
-
                         if (!visited[lefread_vertices(G->edges[q][a], j)])
                         {
                             visited[lefread_vertices(G->edges[q][a], j)] = true;
@@ -646,7 +647,6 @@ p_vertices dgraph_bfs(p_dgraph G, p_vertices ini, bool *alph, bool *rest)
         {
             for (uint a = 0; a < G->size_alpha; a++)
             {
-
                 if (!visited[G->edges[q][a]])
                 {
                     visited[G->edges[q][a]] = true;
@@ -686,7 +686,7 @@ graph_to_edges(p_graph G)
         {
             p_edge new;
             MALLOC(new, 1);
-            new->in = q;
+            new->in  = q;
             new->out = lefread_vertices(G->edges[q], i);
             push(new, thestack);
         }
@@ -706,7 +706,7 @@ p_stack lgraph_to_ledges(p_lgraph G)
             {
                 p_ledge new;
                 MALLOC(new, 1);
-                new->in = q;
+                new->in  = q;
                 new->lab = a;
                 new->out = lefread_vertices(G->edges[q][a], i);
                 push(new, thestack);
@@ -724,10 +724,9 @@ p_stack dgraph_to_ledges(p_dgraph G)
     {
         for (uint a = 0; a < G->size_alpha; a++)
         {
-
             p_ledge new;
             MALLOC(new, 1);
-            new->in = q;
+            new->in  = q;
             new->lab = a;
             new->out = G->edges[q][a];
             push(new, thestack);
@@ -764,6 +763,7 @@ int edge_comp(void *e, void *f)
         }
     }
 }
+
 int edge_comp_rev(void *e, void *f)
 {
     if (((p_edge)e)->out < ((p_edge)f)->out)
@@ -790,6 +790,7 @@ int edge_comp_rev(void *e, void *f)
         }
     }
 }
+
 int l_edge_comp(void *e, void *f)
 {
     if (((p_ledge)e)->in < ((p_ledge)f)->in)
@@ -827,6 +828,7 @@ int l_edge_comp(void *e, void *f)
         }
     }
 }
+
 int l_edge_comp_rev(void *e, void *f)
 {
     if (((p_ledge)e)->out < ((p_ledge)f)->out)
@@ -894,7 +896,7 @@ static int multi_edges_comp(void *s, void *t)
     }
 }
 
-static void tree_to_stack(p_avlnode tree, p_stack stack)
+static void tree_to_stack(p_avlnode tree, p_stack the_stack)
 {
     if (tree == NULL)
     {
@@ -902,12 +904,13 @@ static void tree_to_stack(p_avlnode tree, p_stack stack)
     }
     else
     {
-        tree_to_stack(tree->left, stack);
-        push(tree->value, stack);
-        tree_to_stack(tree->right, stack);
+        tree_to_stack(tree->left, the_stack);
+        push(tree->value, the_stack);
+        tree_to_stack(tree->right, the_stack);
         free(tree);
     }
 }
+
 // 0: only an lgraph with classic labels
 // 1: an additional graph (eps trans)
 // 2: an additional lgraph(inv trans)
@@ -920,8 +923,8 @@ p_stack lgraph_to_multi_edges(uint n, ...)
     }
     va_list list;
     va_start(list, n);
-    p_lgraph G = va_arg(list, p_lgraph);
-    p_graph GEPS = NULL;
+    p_lgraph G    = va_arg(list, p_lgraph);
+    p_graph GEPS  = NULL;
     p_lgraph GINV = NULL;
     if (n == 1)
     {
@@ -937,7 +940,7 @@ p_stack lgraph_to_multi_edges(uint n, ...)
         GEPS = va_arg(list, p_graph);
     }
 
-    p_stack thestack = create_stack();
+    p_stack thestack  = create_stack();
     p_avlnode thetree = NULL;
     for (uint q = 0; q < G->size_graph; q++)
     {
@@ -949,16 +952,15 @@ p_stack lgraph_to_multi_edges(uint n, ...)
                 {
                     p_multi_edge new;
                     MALLOC(new, 1);
-                    new->in = q;
+                    new->in  = q;
                     new->out = lefread_vertices(GEPS->edges[q], i);
                     p_avlnode old = avl_search(new, thetree, &multi_edges_comp);
                     if (old == NULL)
                     {
-
-                        new->lab = create_vertices();
+                        new->lab   = create_vertices();
                         new->lab_i = create_vertices();
-                        new->eps = true;
-                        thetree = avl_insert(new, thetree, &multi_edges_comp);
+                        new->eps   = true;
+                        thetree    = avl_insert(new, thetree, &multi_edges_comp);
                     }
                     else
                     {
@@ -974,17 +976,16 @@ p_stack lgraph_to_multi_edges(uint n, ...)
             {
                 p_multi_edge new;
                 MALLOC(new, 1);
-                new->in = q;
+                new->in  = q;
                 new->out = lefread_vertices(G->edges[q][a], i);
                 p_avlnode old = avl_search(new, thetree, &multi_edges_comp);
                 if (old == NULL)
                 {
-
-                    new->lab = create_vertices();
+                    new->lab   = create_vertices();
                     new->lab_i = create_vertices();
-                    new->eps = false;
+                    new->eps   = false;
                     rigins_vertices(a, new->lab);
-                    thetree = avl_insert(new, thetree, &multi_edges_comp);
+                    thetree    = avl_insert(new, thetree, &multi_edges_comp);
                 }
                 else
                 {
@@ -1001,17 +1002,16 @@ p_stack lgraph_to_multi_edges(uint n, ...)
                 {
                     p_multi_edge new;
                     MALLOC(new, 1);
-                    new->in = q;
+                    new->in  = q;
                     new->out = lefread_vertices(GINV->edges[q][a], i);
                     p_avlnode old = avl_search(new, thetree, &multi_edges_comp);
                     if (old == NULL)
                     {
-
-                        new->lab = create_vertices();
+                        new->lab   = create_vertices();
                         new->lab_i = create_vertices();
-                        new->eps = false;
+                        new->eps   = false;
                         rigins_vertices(a, new->lab_i);
-                        thetree = avl_insert(new, thetree, &multi_edges_comp);
+                        thetree    = avl_insert(new, thetree, &multi_edges_comp);
                     }
                     else
                     {
@@ -1029,7 +1029,7 @@ p_stack lgraph_to_multi_edges(uint n, ...)
 
 p_stack dgraph_to_multi_edges(p_dgraph G)
 {
-    p_stack thestack = create_stack();
+    p_stack thestack  = create_stack();
     p_avlnode thetree = NULL;
     for (uint q = 0; q < G->size_graph; q++)
     {
@@ -1037,16 +1037,15 @@ p_stack dgraph_to_multi_edges(p_dgraph G)
         {
             p_multi_edge new;
             MALLOC(new, 1);
-            new->in = q;
+            new->in  = q;
             // printf("test: %d\n", G->edges[q][a]);
             new->out = G->edges[q][a];
             p_avlnode old = avl_search(new, thetree, &multi_edges_comp);
             if (old == NULL)
             {
-
                 new->lab = create_vertices();
                 rigins_vertices(a, new->lab);
-                thetree = avl_insert(new, thetree, &multi_edges_comp);
+                thetree  = avl_insert(new, thetree, &multi_edges_comp);
             }
             else
             {
@@ -1078,7 +1077,7 @@ p_graph merge_graphs(uint *lag, uint n, p_graph *list)
     for (uint i = 0; i < n; i++)
     {
         lag[i] = size;
-        size = size + list[i]->size;
+        size   = size + list[i]->size;
     }
 
     // Création du nouveau graph
@@ -1101,15 +1100,15 @@ p_graph merge_graphs(uint *lag, uint n, p_graph *list)
 // les indices où commencent les copies de chaque graph
 p_lgraph merge_lgraphs(uint *lag, uint n, p_lgraph *list)
 {
-    // Variables qui contiendront les tailles du nouveau graph et de son alphabet
+    // Variables qui contiendront les tailles du nouveau graph et de son
+    // alphabet
     uint size_graph = 0;
     uint size_alpha = 1;
 
     // Récupération des inputs
     for (uint i = 0; i < n; i++)
     {
-
-        lag[i] = size_graph;
+        lag[i]     = size_graph;
         size_graph = size_graph + list[i]->size_graph;
         size_alpha = max(size_alpha, list[i]->size_alpha);
     }
@@ -1137,14 +1136,15 @@ p_lgraph merge_lgraphs(uint *lag, uint n, p_lgraph *list)
 // les indices où commencent les copies de chaque graph
 p_lgraph merge_dgraphs(uint *lag, uint n, p_dgraph *list)
 {
-    // Variables qui contiendront les tailles du nouveau graph et de son alphabet
+    // Variables qui contiendront les tailles du nouveau graph et de son
+    // alphabet
     uint size_graph = 0;
     uint size_alpha = 1;
 
     // Récupération des inputs
     for (uint i = 0; i < n; i++)
     {
-        lag[i] = size_graph;
+        lag[i]     = size_graph;
         size_graph = size_graph + list[i]->size_graph;
         size_alpha = max(size_alpha, list[i]->size_alpha);
     }
@@ -1167,7 +1167,8 @@ p_lgraph merge_dgraphs(uint *lag, uint n, p_dgraph *list)
     return new;
 }
 
-/* Fusion de plusieurs graphes ayant le même ensemble de sommets (partage des arêtes) */
+/* Fusion de plusieurs graphes ayant le même ensemble de sommets (partage des
+   arêtes) */
 
 // ng: nombre de graphes classiques dans la fusion
 // nlg: nombre de graphes étiquetés dans la fusion
@@ -1198,7 +1199,7 @@ p_graph ldgraphs_to_graph(uint ng, uint nlg, uint ndg, uint n, ...)
             if (i == 0)
             {
                 size = ginput->size;
-                G = create_graph_noedges(size);
+                G    = create_graph_noedges(size);
             }
             else if (ginput->size != size)
             {
@@ -1223,7 +1224,7 @@ p_graph ldgraphs_to_graph(uint ng, uint nlg, uint ndg, uint n, ...)
             {
                 size = lginput->size_graph;
                 // printf("thesize %d\n", size);
-                G = create_graph_noedges(size);
+                G    = create_graph_noedges(size);
             }
             else if (lginput->size_graph != size)
             {
@@ -1250,7 +1251,7 @@ p_graph ldgraphs_to_graph(uint ng, uint nlg, uint ndg, uint n, ...)
             if (i == 0 && ng == 0 && nlg == 0)
             {
                 size = dginput->size_graph;
-                G = create_graph_noedges(size);
+                G    = create_graph_noedges(size);
             }
             else if (dginput->size_graph != size)
             {
@@ -1297,10 +1298,10 @@ p_lgraph ldgraphs_to_lgraph(uint nlg, uint ndg, uint n, ...)
             lginput = va_arg(list, p_lgraph);
             if (i == 0)
             {
-                size = lginput->size_graph;
+                size  = lginput->size_graph;
                 asize = lginput->size_alpha;
                 // printf("thesize %d\n", size);
-                G = create_lgraph_noedges(size, asize);
+                G     = create_lgraph_noedges(size, asize);
             }
             else if (lginput->size_graph != size)
             {
@@ -1326,9 +1327,9 @@ p_lgraph ldgraphs_to_lgraph(uint nlg, uint ndg, uint n, ...)
             dginput = va_arg(list, p_dgraph);
             if (i == 0 && nlg == 0)
             {
-                size = dginput->size_graph;
+                size  = dginput->size_graph;
                 asize = dginput->size_alpha;
-                G = create_lgraph_noedges(size, asize);
+                G     = create_lgraph_noedges(size, asize);
             }
             else if (dginput->size_graph != size)
             {
@@ -1364,7 +1365,8 @@ p_lgraph dgraph_to_lgraph(p_dgraph DG)
 }
 
 /**************************************************************************************/
-/* Récupération de tous les sommets adjacents à un ensemble de sommets dans un lgraph */
+/* Récupération de tous les sommets adjacents à un ensemble de sommets dans un
+   lgraph */
 /**************************************************************************************/
 
 // Retourne tous les sommets adjacents à un sommet dans start par la lettre a
@@ -1380,26 +1382,28 @@ p_vertices lgraph_reachable(p_lgraph G, p_vertices start, uint a)
     return end;
 }
 
-// // Retourne tous les sommets adjacents à un sommet dans start par la lettre a
+//// Retourne tous les sommets adjacents à un sommet dans start par la lettre a
 // p_vertices lgraph_reachable(p_lgraph G, p_vertices start, uint a)
 // {
-//     p_binheap heap = create_binheap(&fcmp_int);
-//     for (uint i = 0; i < size_vertices(start); i++)
-//     {
-//         for (uint j = 0; j < size_vertices(G->edges[lefread_vertices(start, i)][a]); j++)
-//         {
-//             push_binheap(heap, lefread_vertices_ref(G->edges[lefread_vertices(start, i)][a], j));
-//         }
-//     }
-//     p_vertices end = create_vertices();
-//     while (!isempty_binheap(heap))
-//     {
-//         uint *p_q = popmin_binheap(heap);
-//         if (isempty_vertices(end) || rigread_vertices(end, 0) != *p_q)
-//         {
-//             rigins_vertices(*p_q, end);
-//         }
-//     }
-//     delete_binheap(heap);
-//     return end;
+// p_binheap heap = create_binheap(&fcmp_int);
+// for (uint i = 0; i < size_vertices(start); i++)
+// {
+// for (uint j = 0; j < size_vertices(G->edges[lefread_vertices(start, i)][a]);
+// j++)
+// {
+// push_binheap(heap, lefread_vertices_ref(G->edges[lefread_vertices(start,
+// i)][a], j));
+// }
+// }
+// p_vertices end = create_vertices();
+// while (!isempty_binheap(heap))
+// {
+// uint *p_q = popmin_binheap(heap);
+// if (isempty_vertices(end) || rigread_vertices(end, 0) != *p_q)
+// {
+// rigins_vertices(*p_q, end);
+// }
+// }
+// delete_binheap(heap);
+// return end;
 // }

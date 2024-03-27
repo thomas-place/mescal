@@ -146,6 +146,7 @@ p_genob shell_genob_from_command(com_command *thecom)
                     return new;
                     break;
                 }
+                break;
             }
             case CM_ORBIT: {
                 int n = com_nbparams(thecom->params);
@@ -267,6 +268,7 @@ p_genob shell_genob_from_command(com_command *thecom)
                     }
                     break;
                 }
+                break;
             }
             break;
             case OG_ORBS: {

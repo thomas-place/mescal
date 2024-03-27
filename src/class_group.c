@@ -7,11 +7,11 @@
 // Langages de groupes
 
 // Pour le monoide syntaxique
-bool is_group_mono(p_cayley M, p_green G, FILE* out)
+bool is_group_mono(p_cayley M, p_green G, FILE *out)
 {
-    if (out) {
+    if (out)
+    {
         fprintf(out, "#### Checking if the monoid is a group.\n");
-
     }
     // Si il n'y a qu'une seule J-classe (celle de 1, le monoide est un groupe)
     if (G->JCL->size_par == 1)
@@ -24,7 +24,6 @@ bool is_group_mono(p_cayley M, p_green G, FILE* out)
     }
     else
     {
-
         // Sinon, on va chercher un élément non J-équivalent à 1
         if (out != NULL)
         {
@@ -41,7 +40,7 @@ bool is_group_mono(p_cayley M, p_green G, FILE* out)
 }
 
 // Pour l'automate minimal
-bool is_permutation_dfa(p_nfa A, FILE* out)
+bool is_permutation_dfa(p_nfa A, FILE *out)
 {
     for (uint s = 0; s < A->trans->size_graph; s++)
     {
@@ -51,13 +50,18 @@ bool is_permutation_dfa(p_nfa A, FILE* out)
             {
                 for (uint b = 0; b < A->trans->size_alpha; b++)
                 {
-                    if (lefread_vertices(A->trans->edges[s][b], 0) == lefread_vertices(A->trans->edges[t][b], 0))
+                    if (lefread_vertices(A->trans->edges[s][b],
+                                         0) == lefread_vertices(A->trans->edges[t][b], 0))
                     {
                         if (out != NULL)
                         {
                             fprintf(out, "#### This is NOT a permutation automaton.\n");
 
-                            fprintf(out, "#### For instance, we have the transitions (%d,%c,%d) and (%d,%c,%d).\n", s, b + 'a', lefread_vertices(A->trans->edges[s][b], 0), t, b + 'a', lefread_vertices(A->trans->edges[t][b], 0));
+                            fprintf(out,
+                                    "#### For instance, we have the transitions (%d,%c,%d) and (%d,%c,%d).\n",
+                                    s, b + 'a', lefread_vertices(A->trans->edges[s][b], 0), t,
+                                    b + 'a',
+                                    lefread_vertices(A->trans->edges[t][b], 0));
                         }
                         return false;
                     }
@@ -76,10 +80,12 @@ bool is_permutation_dfa(p_nfa A, FILE* out)
 // Langages modulo
 
 // Pour un graphe de cayley
-bool is_letterind_mono(p_cayley M, FILE* out)
+bool is_letterind_mono(p_cayley M, FILE *out)
 {
-    if (out) {
-        fprintf(out, "#### Checking if the morphism maps every letter a ∊ A to the same element.\n");
+    if (out)
+    {
+        fprintf(out,
+                "#### Checking if the morphism maps every letter a ∊ A to the same element.\n");
     }
     for (uint a = 1; a < M->trans->size_alpha; a++)
     {
@@ -88,7 +94,9 @@ bool is_letterind_mono(p_cayley M, FILE* out)
             if (out != NULL)
             {
                 fprintf(out, "#### There are letters mapped to distinct elements.\n");
-                fprintf(out, "#### For instance, \"a\" and \"%c\" are mapped to distinct elements.\n", a + 'a');
+                fprintf(out,
+                        "#### For instance, \"a\" and \"%c\" are mapped to distinct elements.\n",
+                        a + 'a');
             }
             return false;
         }
@@ -101,19 +109,23 @@ bool is_letterind_mono(p_cayley M, FILE* out)
 }
 
 // Pour l'automate minimal
-bool is_letterind_dfa(p_nfa A, FILE* out)
+bool is_letterind_dfa(p_nfa A, FILE *out)
 {
-
     for (uint s = 0; s < A->trans->size_graph; s++)
     {
         for (uint a = 1; a < A->trans->size_alpha; a++)
         {
-            if (lefread_vertices(A->trans->edges[s][0], 0) != lefread_vertices(A->trans->edges[s][a], 0))
+            if (lefread_vertices(A->trans->edges[s][0],
+                                 0) != lefread_vertices(A->trans->edges[s][a], 0))
             {
                 if (out != NULL)
                 {
-                    fprintf(out, "#### There are letters which have distinct actions on the states.\n");
-                    fprintf(out, "#### For instance, we have the transitions (%d,%c,%d) and (%d,%c,%d).\n", s, 0 + 'a', lefread_vertices(A->trans->edges[s][0], 0), s, a + 'a', lefread_vertices(A->trans->edges[s][a], 0));
+                    fprintf(out,
+                            "#### There are letters which have distinct actions on the states.\n");
+                    fprintf(out,
+                            "#### For instance, we have the transitions (%d,%c,%d) and (%d,%c,%d).\n",
+                            s, 0 + 'a', lefread_vertices(A->trans->edges[s][0], 0), s, a + 'a',
+                            lefread_vertices(A->trans->edges[s][a], 0));
                     return false;
                 }
             }
@@ -130,9 +142,10 @@ bool is_letterind_dfa(p_nfa A, FILE* out)
 // Langages triviaux
 
 // Pour le monoide syntaxique
-bool is_trivial_monoid(p_cayley M, FILE* out)
+bool is_trivial_monoid(p_cayley M, FILE *out)
 {
-    if (out) {
+    if (out)
+    {
         fprintf(out, "#### Checking if the monoid is trivial.\n");
     }
     if (M->trans->size_graph == 1)
@@ -155,7 +168,7 @@ bool is_trivial_monoid(p_cayley M, FILE* out)
 }
 
 // Pour l'automate minimal
-bool is_trivial_dfa(p_nfa A, FILE* out)
+bool is_trivial_dfa(p_nfa A, FILE *out)
 {
     if (A->trans->size_graph == 1)
     {
@@ -219,20 +232,23 @@ p_parti nfa_inv_ext(p_nfa A)
                 if (P->numcl[q] == P->numcl[lefread_vertices(A->trans->edges[q][a], i)])
                 {
                     // On ajoute la transition (r,a-1,q)
-                    insert_vertices(A->itrans->edges[lefread_vertices(A->trans->edges[q][a], i)][a], q);
+                    insert_vertices(A->itrans->edges[lefread_vertices(A->trans->edges[q][a], i)][a],
+                                    q);
                 }
             }
         }
-        // // Inversion des transitions epsilon
+        //// Inversion des transitions epsilon
         // if (A->etrans != NULL)
         // {
-        //     for (uint i = 0; i < size_vertices(A->etrans->edges[q]); i++)
-        //     {
-        //         if (part->numcl[q] == part->numcl[lefread_vertices(A->etrans->edges[q], i)])
-        //         {
-        //             insert_vertices(A->etrans->edges[lefread_vertices(A->etrans->edges[q], i)], q);
-        //         }
-        //     }
+        // for (uint i = 0; i < size_vertices(A->etrans->edges[q]); i++)
+        // {
+        // if (part->numcl[q] ==
+        // part->numcl[lefread_vertices(A->etrans->edges[q], i)])
+        // {
+        // insert_vertices(A->etrans->edges[lefread_vertices(A->etrans->edges[q],
+        // i)], q);
+        // }
+        // }
         // }
     }
     // On retourne la partition en SCCS
@@ -269,27 +285,52 @@ p_parti nfa_stal_fold(p_nfa A, p_parti sccs)
         return NULL;
     }
 
-    p_ufind merge = create_ufind(A->trans->size_graph);           // Union-find pour la partition
-    p_dlist ltrans[A->trans->size_graph][A->trans->size_alpha];   // Des listes doublement chaînées pour les arrêtes classiques
-    p_dlist litrans[A->itrans->size_graph][A->trans->size_alpha]; // Des listes doublement chaînées pour les arrêtes inverses
-    for (uint q = 0; q < A->trans->size_graph; q++)               // Remplissage des listes avec les transitions d'origine (on ne garde que les transitions internes aux sccs)
+    p_ufind merge = create_ufind(A->trans->size_graph);           // Union-find
+                                                                  // pour la
+                                                                  // partition
+    p_dlist ltrans[A->trans->size_graph][A->trans->size_alpha];   // Des listes
+                                                                  // doublement
+                                                                  // chaînées
+                                                                  // pour les
+                                                                  // arrêtes
+                                                                  // classiques
+    p_dlist litrans[A->itrans->size_graph][A->trans->size_alpha]; // Des listes
+                                                                  // doublement
+                                                                  // chaînées
+                                                                  // pour les
+                                                                  // arrêtes
+                                                                  // inverses
+    for (uint q = 0; q < A->trans->size_graph; q++)               // Remplissage
+                                                                  // des listes
+                                                                  // avec les
+                                                                  // transitions
+                                                                  // d'origine
+                                                                  // (on ne
+                                                                  // garde que
+                                                                  // les
+                                                                  // transitions
+                                                                  // internes
+                                                                  // aux sccs)
     {
         for (uint a = 0; a < A->trans->size_alpha; a++)
         {
-            ltrans[q][a] = create_dlist();
+            ltrans[q][a]  = create_dlist();
             litrans[q][a] = create_dlist();
             for (uint i = 0; i < size_vertices(A->trans->edges[q][a]); i++)
             {
-                // printf("r: %d\n", lefread_vertices(A->trans->edges[q][a], i));
+                // printf("r: %d\n", lefread_vertices(A->trans->edges[q][a],
+                // i));
                 if (sccs->numcl[lefread_vertices(A->trans->edges[q][a], i)] == sccs->numcl[q])
                 {
-                    insertprevious_dlist(ltrans[q][a], ltrans[q][a]->rsent, lefread_vertices(A->trans->edges[q][a], i));
+                    insertprevious_dlist(ltrans[q][a], ltrans[q][a]->rsent,
+                                         lefread_vertices(A->trans->edges[q][a], i));
                 }
                 // printf("Test\n");
             }
             for (uint i = 0; i < size_vertices(A->itrans->edges[q][a]); i++)
             {
-                insertprevious_dlist(litrans[q][a], litrans[q][a]->rsent, lefread_vertices(A->itrans->edges[q][a], i));
+                insertprevious_dlist(litrans[q][a], litrans[q][a]->rsent,
+                                     lefread_vertices(A->itrans->edges[q][a], i));
             }
         }
     }
@@ -306,41 +347,89 @@ p_parti nfa_stal_fold(p_nfa A, p_parti sccs)
     while (!isempty_vertices(tofold))
     {
         // On prend le représentant d'un sommet non-traité
-        uint q = find_ufind(lefpull_vertices(tofold), merge);
+        uint q      = find_ufind(lefpull_vertices(tofold), merge);
 
         bool folded = false;
-        uint a = 0;
+        uint a      = 0;
         while (!folded && a < A->trans->size_alpha)
         {
-            if (ltrans[q][a]->size > 1) // Si il y a 2 arêtes sortantes étiquetées par a
+            if (ltrans[q][a]->size > 1)                                    // Si
+                                                                           // il
+                                                                           // y a
+                                                                           // 2 arêtes
+                                                                           // sortantes
+                                                                           // étiquetées
+                                                                           // par
+                                                                           // a
             {
-                // On prend les représentant des destinations des deux premières arêtes qu'on va fusionner (si ça n'a pas été fait avant)
+                // On prend les représentant des destinations des deux premières
+                // arêtes qu'on va fusionner (si ça n'a pas été fait avant)
                 uint r = find_ufind(ltrans[q][a]->lsent->next->val, merge);
                 uint s = find_ufind(ltrans[q][a]->lsent->next->next->val, merge);
-                deletecell_dlist(ltrans[q][a], ltrans[q][a]->lsent->next); // On supprime la première des deux edges
-                if (r != s)                                                // Si les deux sommets adjacents n'avaient pas encore étés fusionnés
+                deletecell_dlist(ltrans[q][a], ltrans[q][a]->lsent->next); // On
+                                                                           // supprime
+                                                                           // la
+                                                                           // première
+                                                                           // des
+                                                                           // deux
+                                                                           // edges
+                if (r != s)                                                // Si
+                                                                           // les
+                                                                           // deux
+                                                                           // sommets
+                                                                           // adjacents
+                                                                           // n'avaient
+                                                                           // pas
+                                                                           // encore
+                                                                           // étés
+                                                                           // fusionnés
                 {
-                    union_ufind(r, s, merge);                       // On effectue la fusion
-                    for (uint b = 0; b < A->trans->size_alpha; b++) // On concatène leur listes de sommets adjacents
+                    union_ufind(r, s, merge);                              // On
+                                                                           // effectue
+                                                                           // la
+                                                                           // fusion
+                    for (uint b = 0; b < A->trans->size_alpha; b++)        // On
+                                                                           // concatène
+                                                                           // leur
+                                                                           // listes
+                                                                           // de
+                                                                           // sommets
+                                                                           // adjacents
                     {
                         concat_dlist(ltrans[r][b], ltrans[s][b]);
                         concat_dlist(litrans[r][b], litrans[s][b]);
-                        if (find_ufind(r, merge) == r) // On ne garde que la liste du nouveau représentant de la classe
+                        if (find_ufind(r, merge) == r)                     // On
+                                                                           // ne
+                                                                           // garde
+                                                                           // que
+                                                                           // la
+                                                                           // liste
+                                                                           // du
+                                                                           // nouveau
+                                                                           // représentant
+                                                                           // de
+                                                                           // la
+                                                                           // classe
                         {
                             free(ltrans[s][b]);
-                            ltrans[s][b] = NULL;
+                            ltrans[s][b]  = NULL;
                             free(litrans[s][b]);
                             litrans[s][b] = NULL;
                         }
                         else
                         {
                             free(ltrans[r][b]);
-                            ltrans[r][b] = NULL;
+                            ltrans[r][b]  = NULL;
                             free(litrans[r][b]);
                             litrans[r][b] = NULL;
                         }
                     }
-                    rigins_vertices(find_ufind(r, merge), tofold); // On va devoir éventuelement traiter la nouvelle classe
+                    rigins_vertices(find_ufind(r, merge), tofold); // On va
+                                                                   // devoir
+                                                                   // éventuelement
+                                                                   // traiter la
+                                                                   // nouvelle
+                                                                   // classe
                     if (find_ufind(r, merge) != find_ufind(q, merge))
                     {
                         rigins_vertices(find_ufind(q, merge), tofold);
@@ -352,35 +441,85 @@ p_parti nfa_stal_fold(p_nfa A, p_parti sccs)
                     rigins_vertices(find_ufind(q, merge), tofold);
                 }
             }
-            else if (litrans[q][a]->size > 1) // Si il y a 2 arêtes sortantes étiquetées par a-1
+            else if (litrans[q][a]->size > 1)                                // Si
+                                                                             // il
+                                                                             // y
+                                                                             // a
+                                                                             // 2
+                                                                             // arêtes
+                                                                             // sortantes
+                                                                             // étiquetées
+                                                                             // par
+                                                                             // a-1
             {
-                // On prend les représentant des destinations des deux premières arêtes qu'on va fusionner (si ça n'a pas été fait avant)
+                // On prend les représentant des destinations des deux premières
+                // arêtes qu'on va fusionner (si ça n'a pas été fait avant)
                 uint r = find_ufind(litrans[q][a]->lsent->next->val, merge);
                 uint s = find_ufind(litrans[q][a]->lsent->next->next->val, merge);
-                deletecell_dlist(litrans[q][a], litrans[q][a]->lsent->next); // On supprime la première des deux edges
-                if (r != s)                                                  // Si les deux sommets adjacents n'avaient pas encore étés fusionnés
+                deletecell_dlist(litrans[q][a], litrans[q][a]->lsent->next); // On
+                                                                             // supprime
+                                                                             // la
+                                                                             // première
+                                                                             // des
+                                                                             // deux
+                                                                             // edges
+                if (r != s)                                                  // Si
+                                                                             // les
+                                                                             // deux
+                                                                             // sommets
+                                                                             // adjacents
+                                                                             // n'avaient
+                                                                             // pas
+                                                                             // encore
+                                                                             // étés
+                                                                             // fusionnés
                 {
-                    union_ufind(r, s, merge);                        // On effectue la fusion
-                    for (uint b = 0; b < A->itrans->size_alpha; b++) // On concatène leur listes de sommets adjacents
+                    union_ufind(r, s, merge);                                // On
+                                                                             // effectue
+                                                                             // la
+                                                                             // fusion
+                    for (uint b = 0; b < A->itrans->size_alpha; b++)         // On
+                                                                             // concatène
+                                                                             // leur
+                                                                             // listes
+                                                                             // de
+                                                                             // sommets
+                                                                             // adjacents
                     {
                         concat_dlist(ltrans[r][b], ltrans[s][b]);
                         concat_dlist(litrans[r][b], litrans[s][b]);
-                        if (find_ufind(r, merge) == r) // On ne garde que la liste du nouveau représentant de la classe
+                        if (find_ufind(r, merge) == r)                       // On
+                                                                             // ne
+                                                                             // garde
+                                                                             // que
+                                                                             // la
+                                                                             // liste
+                                                                             // du
+                                                                             // nouveau
+                                                                             // représentant
+                                                                             // de
+                                                                             // la
+                                                                             // classe
                         {
                             free(ltrans[s][b]);
-                            ltrans[s][b] = NULL;
+                            ltrans[s][b]  = NULL;
                             free(litrans[s][b]);
                             litrans[s][b] = NULL;
                         }
                         else
                         {
                             free(ltrans[r][b]);
-                            ltrans[r][b] = NULL;
+                            ltrans[r][b]  = NULL;
                             free(litrans[r][b]);
                             litrans[r][b] = NULL;
                         }
                     }
-                    rigins_vertices(find_ufind(r, merge), tofold); // On va devoir éventuellement traiter la nouvelle classe
+                    rigins_vertices(find_ufind(r, merge), tofold); // On va
+                                                                   // devoir
+                                                                   // éventuellement
+                                                                   // traiter la
+                                                                   // nouvelle
+                                                                   // classe
                     if (find_ufind(r, merge) != find_ufind(q, merge))
                     {
                         rigins_vertices(find_ufind(q, merge), tofold);
@@ -419,7 +558,8 @@ p_nfa nfa_dyck_ext(p_nfa A, p_parti FOLD)
 {
     if (A->etrans != NULL)
     {
-        printf("Adding Dyck transitions only works for NFAs without epsilon transitions. Returned NULL.\n");
+        printf(
+            "Adding Dyck transitions only works for NFAs without epsilon transitions. Returned NULL.\n");
         return NULL;
     }
     if (A->itrans == NULL)
@@ -431,7 +571,6 @@ p_nfa nfa_dyck_ext(p_nfa A, p_parti FOLD)
     p_nfa B;
     if (FOLD != NULL)
     {
-
         // Calcul du NFA obtenu en effectuant le folding
         B = nfa_merge_states(A, FOLD);
     }
@@ -449,29 +588,33 @@ p_nfa nfa_dyck_ext(p_nfa A, p_parti FOLD)
     // Le point fixe qui calcule les transitions epsilon
     while (modified)
     {
-
         modified = false;
 
         // Ajout de nouvelles transitions epsilon avec les aa-1 a-1a
         for (uint q = 0; q < B->etrans->size; q++)
         {
-
-            uint oldsize = size_vertices(B->etrans->edges[q]); // Ancien nombre de transitions epsilon partant de q
+            uint oldsize = size_vertices(B->etrans->edges[q]); // Ancien nombre
+                                                               // de transitions
+                                                               // epsilon
+                                                               // partant de q
             for (uint a = 0; a < B->trans->size_alpha; a++)
             {
                 uint r, s;
                 // Prise en compte des chemins a 1 a-1
-                // Boucle sur les états tels que B contient une transtion (q,a,r)
+                // Boucle sur les états tels que B contient une transtion
+                // (q,a,r)
                 for (uint i = 0; i < size_vertices(B->trans->edges[q][a]); i++)
                 {
                     r = lefread_vertices(B->trans->edges[q][a], i);
 
-                    // Boucle sur les s tels qu'on a déjà la transition epsilon (r,s)
+                    // Boucle sur les s tels qu'on a déjà la transition epsilon
+                    // (r,s)
                     for (uint j = 0; j < size_vertices(B->etrans->edges[r]); j++)
                     {
                         s = lefread_vertices(B->etrans->edges[r], j);
 
-                        // Pour chaque état t tel qu'il existe une transition (s,a-1,t) dans B,
+                        // Pour chaque état t tel qu'il existe une transition
+                        // (s,a-1,t) dans B,
                         // on ajoute toutes les transitions epsilon (q,t)
                         merge_sorted_vertices(B->etrans->edges[q], B->itrans->edges[s][a]);
                     }
@@ -481,22 +624,35 @@ p_nfa nfa_dyck_ext(p_nfa A, p_parti FOLD)
                 for (uint i = 0; i < size_vertices(B->itrans->edges[q][a]); i++)
                 {
                     r = lefread_vertices(B->itrans->edges[q][a], i);
-                    // Boucle sur les s tel qu'on a déjà la transition epsilon (r,s)
+                    // Boucle sur les s tel qu'on a déjà la transition epsilon
+                    // (r,s)
                     for (uint j = 0; j < size_vertices(B->etrans->edges[r]); j++)
                     {
                         s = lefread_vertices(B->etrans->edges[r], j);
 
-                        // Pour chaque état t tel qu'il existe une transition (s,a,t) dans B,
+                        // Pour chaque état t tel qu'il existe une transition
+                        // (s,a,t) dans B,
                         // on ajoute toutes les transitions epsilon (q,t)
                         merge_sorted_vertices(B->etrans->edges[q], B->trans->edges[s][a]);
                     }
                 }
             }
 
-            if (oldsize != size_vertices(B->etrans->edges[q])) // Si au moins une nouvelle transition epsilon créée
+            if (oldsize != size_vertices(B->etrans->edges[q])) // Si au moins
+                                                               // une nouvelle
+                                                               // transition
+                                                               // epsilon créée
             {
-                modified = true;             // On devra faire un autre tour de boucle
-                make_tclos_graph(B->etrans); // On fait la clôture transitive des transitions epsilon pour le tour suivant
+                modified = true;                               // On devra faire
+                                                               // un autre tour
+                                                               // de boucle
+                make_tclos_graph(B->etrans);                   // On fait la
+                                                               // clôture
+                                                               // transitive des
+                                                               // transitions
+                                                               // epsilon pour
+                                                               // le tour
+                                                               // suivant
             }
         }
     }
@@ -511,15 +667,16 @@ p_green_sub get_grp_kernel(p_cayley M, p_green G)
     MALLOC(gker->rels, 1);
 
     /* On va utiliser l'algorithme de GR-separation */
-    p_nfa A = cayley_to_dfa(M);
+    p_nfa A      = cayley_to_dfa(M);
     p_parti SCCS = nfa_inv_ext(A);
     p_parti FOLD = nfa_stal_fold(A, SCCS);
     delete_parti(SCCS);
-    p_nfa B = nfa_dyck_ext(A, FOLD);
+    p_nfa B      = nfa_dyck_ext(A, FOLD);
     delete_nfa(A);
 
     // Calcul des éléments du GR-kernel
-    // Ce sont les éléments qui se trouvent dans une classe de FOLD telle qu'il existe
+    // Ce sont les éléments qui se trouvent dans une classe de FOLD telle qu'il
+    // existe
     // une pesilon transition vers cette classe dans B
     gker->size = 0;
     MALLOC(gker->mono_in_sub, M->trans->size_graph);
@@ -530,8 +687,10 @@ p_green_sub get_grp_kernel(p_cayley M, p_green G)
 
     for (uint i = 0; i < size_vertices(B->etrans->edges[ONE]); i++)
     {
-        gker->size = gker->size + size_vertices(FOLD->cl[lefread_vertices(B->etrans->edges[ONE], i)]);
-        for (uint j = 0; j < size_vertices(FOLD->cl[lefread_vertices(B->etrans->edges[ONE], i)]); j++)
+        gker->size = gker->size + size_vertices(FOLD->cl[lefread_vertices(B->etrans->edges[ONE],
+                                                                          i)]);
+        for (uint j = 0; j < size_vertices(FOLD->cl[lefread_vertices(B->etrans->edges[ONE], i)]);
+             j++)
         {
             uint s = lefread_vertices(FOLD->cl[lefread_vertices(B->etrans->edges[ONE], i)], j);
             gker->mono_in_sub[s] = true;
@@ -546,7 +705,7 @@ p_green_sub get_grp_kernel(p_cayley M, p_green G)
     {
         if (gker->mono_in_sub[s])
         {
-            gker->mono_to_sub[s] = num;
+            gker->mono_to_sub[s]   = num;
             gker->sub_to_mono[num] = s;
             num++;
         }
@@ -611,12 +770,13 @@ p_green_sub get_grp_kernel(p_cayley M, p_green G)
             // Le numéro de l'élément correspondant dans le monoide original
             uint ms = gker->sub_to_mono[jord[i]];
 
-            // Construction de la R-classe de jord[i] (il s'agit de la FOLD-class de ms)
+            // Construction de la R-classe de jord[i] (il s'agit de la
+            // FOLD-class de ms)
             uint c = FOLD->numcl[ms];
             for (uint j = 0; j < size_vertices(FOLD->cl[c]); j++)
             {
                 uint r = gker->mono_to_sub[lefread_vertices(FOLD->cl[c], j)];
-                done[r] = true;
+                done[r]                   = true;
                 gker->rels->RCL->numcl[r] = num;
             }
             num++;
@@ -637,7 +797,7 @@ p_green_sub get_grp_kernel(p_cayley M, p_green G)
     delete_parti(FOLD);
 
     // Calcul des L-classes
-    A = left_cayley_to_dfa(M);
+    A    = left_cayley_to_dfa(M);
     SCCS = nfa_inv_ext(A);
     FOLD = nfa_stal_fold(A, SCCS);
     delete_parti(SCCS);
@@ -665,7 +825,7 @@ p_green_sub get_grp_kernel(p_cayley M, p_green G)
             for (uint j = 0; j < size_vertices(FOLD->cl[c]); j++)
             {
                 uint r = gker->mono_to_sub[lefread_vertices(FOLD->cl[c], j)];
-                done[r] = true;
+                done[r]                   = true;
                 gker->rels->LCL->numcl[r] = num;
             }
             num++;
@@ -700,7 +860,6 @@ p_green_sub get_grp_kernel(p_cayley M, p_green G)
 
     for (uint i = 0; i < gker->size; i++)
     {
-
         if (!done[jord[i]])
         {
             uint cr = gker->rels->RCL->numcl[jord[i]];
@@ -713,7 +872,7 @@ p_green_sub get_grp_kernel(p_cayley M, p_green G)
                     for (uint k = 0; k < size_vertices(gker->rels->LCL->cl[cl]); k++)
                     {
                         gker->rels->JCL->numcl[lefread_vertices(gker->rels->LCL->cl[cl], k)] = num;
-                        done[lefread_vertices(gker->rels->LCL->cl[cl], k)] = true;
+                        done[lefread_vertices(gker->rels->LCL->cl[cl], k)]                   = true;
                     }
                 }
             }
@@ -735,13 +894,14 @@ p_green_sub get_grp_kernel(p_cayley M, p_green G)
     // Création des H-classes
     h_green_compute(gker->rels);
 
-    // Il reste à remplir les listes des H-classes qui sont des groupes et des J-classes régulières
+    // Il reste à remplir les listes des H-classes qui sont des groupes et des
+    // J-classes régulières
     gr_green_compute(gker->idem_list, gker->rels);
     return gker;
 }
 
 // Procédure de séparation complète
-bool decid_grp_sep(p_nfa I1, p_nfa I2, bool details, FILE* out)
+bool decid_grp_sep(p_nfa I1, p_nfa I2, bool details, FILE *out)
 {
     // Gestion des cas triviaux
     if (isempty_vertices(I1->finals))
@@ -779,30 +939,33 @@ bool decid_grp_sep(p_nfa I1, p_nfa I2, bool details, FILE* out)
     if (out && details)
     {
         print_sep_line(100, out);
-        fprintf(out, "#### Phase 1: adding the inverse transitions inside the strongly connected components.\n");
+        fprintf(out,
+                "#### Phase 1: adding the inverse transitions inside the strongly connected components.\n");
         fprintf(out, "#### NFA of the first input language extended with inverse transitions.\n");
         view_nfa(I1);
         fprintf(out, "#### NFA of the second input language extended with inverse transitions.\n");
         view_nfa(I2);
     }
 
-    // Phase 2: calcul des transitions induites par les mots de Dyck puis éliminations de celles-ci
+    // Phase 2: calcul des transitions induites par les mots de Dyck puis
+    // éliminations de celles-ci
     p_parti FOLD1 = nfa_stal_fold(I1, SCCS1);
     delete_parti(SCCS1);
-    p_nfa A1 = nfa_dyck_ext(I1, FOLD1);
+    p_nfa A1      = nfa_dyck_ext(I1, FOLD1);
     delete_parti(FOLD1);
     nfa_remove_inv(I1);
     nfa_elimeps_mod(A1);
     p_parti FOLD2 = nfa_stal_fold(I2, SCCS2);
     delete_parti(SCCS2);
-    p_nfa A2 = nfa_dyck_ext(I2, FOLD2);
+    p_nfa A2      = nfa_dyck_ext(I2, FOLD2);
     delete_parti(FOLD2);
     nfa_remove_inv(I2);
     nfa_elimeps_mod(A2);
     if (out && details)
     {
         print_sep_line(100, out);
-        fprintf(out, "\n****************** Phase 2: Computing the epsilon transitions induced by Dyck words and eliminating them.\n");
+        fprintf(out,
+                "\n****************** Phase 2: Computing the epsilon transitions induced by Dyck words and eliminating them.\n");
         fprintf(out, "#### Construction on the NFA of the first input language.\n");
         view_nfa(A1);
         fprintf(out, "#### Construction on the NFA of the second input language.\n");
@@ -811,22 +974,23 @@ bool decid_grp_sep(p_nfa I1, p_nfa I2, bool details, FILE* out)
 
     // Phase 3: Calcul de l'intersection
 
-    p_nfa INTER = nfa_intersect(A1, A2, true);
+    p_nfa INTERSECT = nfa_intersect(A1, A2, true);
     delete_nfa(A1);
     delete_nfa(A2);
     if (out && details)
     {
         print_sep_line(100, out);
-        fprintf(out, "\n****************** Phase 3: Computing the intersection of the resulting NFAs.\n");
-        view_nfa(INTER);
+        fprintf(out,
+                "\n****************** Phase 3: Computing the intersection of the resulting NFAs.\n");
+        view_nfa(INTERSECT);
     }
-    if (isempty_vertices(INTER->finals))
+    if (isempty_vertices(INTERSECT->finals))
     {
         if (out && details)
         {
             fprintf(out, "#### This NFA recognizes the empty language\n");
         }
-        delete_nfa(INTER);
+        delete_nfa(INTERSECT);
         return true;
     }
     else
@@ -836,7 +1000,7 @@ bool decid_grp_sep(p_nfa I1, p_nfa I2, bool details, FILE* out)
             fprintf(out, "#### This NFA recognizes a nonempty language\n");
         }
 
-        delete_nfa(INTER);
+        delete_nfa(INTERSECT);
         return false;
     }
 }
@@ -863,11 +1027,11 @@ p_nfa nfa_proj_unary(p_nfa A)
     MALLOC(B, 1);
     B->initials = create_vertices();
     copy_vertices_right(B->initials, A->initials, 0);
-    B->finals = create_vertices();
+    B->finals   = create_vertices();
     copy_vertices_right(B->finals, A->finals, 0);
-    B->trans = create_lgraph_noedges(A->trans->size_graph, 1);
-    B->etrans = NULL;
-    B->itrans = NULL;
+    B->trans    = create_lgraph_noedges(A->trans->size_graph, 1);
+    B->etrans   = NULL;
+    B->itrans   = NULL;
 
     // Noms: On copie ceux de A
     if (A->ntype == NONAME)
@@ -900,11 +1064,11 @@ p_nfa nfa_proj_unary(p_nfa A)
 // Calcul du MOD-kernel
 p_green_sub get_mod_kernel(p_cayley M, p_green G)
 {
-
     // Création du sous-monoide
     p_green_sub mker = init_submono(M, G);
     // Si il y a une lettre neutre, le MOD-kernel est tout le monoide
-    if (M->neutlet) {
+    if (M->neutlet)
+    {
         mker->size = M->trans->size_graph;
         mker->rels = G;
         return mker;
@@ -913,15 +1077,14 @@ p_green_sub get_mod_kernel(p_cayley M, p_green G)
     // Sinon on calcule tout le MOD-kernel
     MALLOC(mker->rels, 1);
 
-
     // On utilise l'algorithme de MD-separation
-    p_nfa A = cayley_to_dfa(M);
-    p_nfa U = nfa_proj_unary(A);
+    p_nfa A      = cayley_to_dfa(M);
+    p_nfa U      = nfa_proj_unary(A);
     delete_nfa(A);
     p_parti SCCS = nfa_inv_ext(U);
     p_parti FOLD = nfa_stal_fold(U, SCCS);
     delete_parti(SCCS);
-    p_nfa B = nfa_dyck_ext(U, FOLD);
+    p_nfa B      = nfa_dyck_ext(U, FOLD);
 
     delete_nfa(U);
 
@@ -936,8 +1099,10 @@ p_green_sub get_mod_kernel(p_cayley M, p_green G)
 
     for (uint i = 0; i < size_vertices(B->etrans->edges[ONE]); i++)
     {
-        mker->size = mker->size + size_vertices(FOLD->cl[lefread_vertices(B->etrans->edges[ONE], i)]);
-        for (uint j = 0; j < size_vertices(FOLD->cl[lefread_vertices(B->etrans->edges[ONE], i)]); j++)
+        mker->size = mker->size + size_vertices(FOLD->cl[lefread_vertices(B->etrans->edges[ONE],
+                                                                          i)]);
+        for (uint j = 0; j < size_vertices(FOLD->cl[lefread_vertices(B->etrans->edges[ONE], i)]);
+             j++)
         {
             uint s = lefread_vertices(FOLD->cl[lefread_vertices(B->etrans->edges[ONE], i)], j);
             mker->mono_in_sub[s] = true;
@@ -952,7 +1117,7 @@ p_green_sub get_mod_kernel(p_cayley M, p_green G)
     {
         if (mker->mono_in_sub[s])
         {
-            mker->mono_to_sub[s] = num;
+            mker->mono_to_sub[s]   = num;
             mker->sub_to_mono[num] = s;
             num++;
         }
@@ -1017,12 +1182,13 @@ p_green_sub get_mod_kernel(p_cayley M, p_green G)
             // Le numéro de l'élément correspondant dans le monoide original
             uint ms = mker->sub_to_mono[jord[i]];
 
-            // Construction de la R-classe de jord[i] (il s'agit de la FOLD-class de ms)
+            // Construction de la R-classe de jord[i] (il s'agit de la
+            // FOLD-class de ms)
             uint c = FOLD->numcl[ms];
             for (uint j = 0; j < size_vertices(FOLD->cl[c]); j++)
             {
                 uint r = mker->mono_to_sub[lefread_vertices(FOLD->cl[c], j)];
-                done[r] = true;
+                done[r]                   = true;
                 mker->rels->RCL->numcl[r] = num;
             }
             num++;
@@ -1044,8 +1210,8 @@ p_green_sub get_mod_kernel(p_cayley M, p_green G)
 
     // Calcul des L-classes
 
-    A = left_cayley_to_dfa(M);
-    U = nfa_proj_unary(A);
+    A    = left_cayley_to_dfa(M);
+    U    = nfa_proj_unary(A);
     delete_nfa(A);
     SCCS = nfa_inv_ext(U);
     FOLD = nfa_stal_fold(U, SCCS);
@@ -1075,7 +1241,7 @@ p_green_sub get_mod_kernel(p_cayley M, p_green G)
             for (uint j = 0; j < size_vertices(FOLD->cl[c]); j++)
             {
                 uint r = mker->mono_to_sub[lefread_vertices(FOLD->cl[c], j)];
-                done[r] = true;
+                done[r]                   = true;
                 mker->rels->LCL->numcl[r] = num;
             }
             num++;
@@ -1122,7 +1288,7 @@ p_green_sub get_mod_kernel(p_cayley M, p_green G)
                     for (uint k = 0; k < size_vertices(mker->rels->LCL->cl[cl]); k++)
                     {
                         mker->rels->JCL->numcl[lefread_vertices(mker->rels->LCL->cl[cl], k)] = num;
-                        done[lefread_vertices(mker->rels->LCL->cl[cl], k)] = true;
+                        done[lefread_vertices(mker->rels->LCL->cl[cl], k)]                   = true;
                     }
                 }
             }
@@ -1144,50 +1310,58 @@ p_green_sub get_mod_kernel(p_cayley M, p_green G)
     // Création des H-classes
     h_green_compute(mker->rels);
 
-    // Il reste à remplir les listes des H-classes qui sont des groupes et des J-classes régulières
+    // Il reste à remplir les listes des H-classes qui sont des groupes et des
+    // J-classes régulières
     gr_green_compute(mker->idem_list, mker->rels);
     // mker->rels->->group_list = create_vertices();
     // mker->rels->group_list = create_vertices();
 
-    // // Pour chaque H-classe
+    //// Pour chaque H-classe
     // for (uint c = 0; c < mker->rels->HCL->size_par; c++)
     // {
-    //     // On prend un élément de la H-classe
-    //     uint s = lefread_vertices(mker->rels->HCL->cl[c], 0);
-    //     // Si ss H s, alors la H-class c est un groupe
+    //// On prend un élément de la H-classe
+    // uint s = lefread_vertices(mker->rels->HCL->cl[c], 0);
+    //// Si ss H s, alors la H-class c est un groupe
 
-    //     if (mker->rels->HCL->numcl[mker->mono_to_sub[cayley_mult(M, mker->sub_to_mono[s], mker->sub_to_mono[s])]] == mker->rels->HCL->numcl[s])
-    //     {
-    //         // On insère donc c dans la liste des groupes
-    //         rigins_vertices(c, mker->rels->group_list);
+    // if (mker->rels->HCL->numcl[mker->mono_to_sub[cayley_mult(M,
+    // mker->sub_to_mono[s], mker->sub_to_mono[s])]] ==
+    // mker->rels->HCL->numcl[s])
+    // {
+    //// On insère donc c dans la liste des groupes
+    // rigins_vertices(c, mker->rels->group_list);
 
-    //         // On sait également que la J-classe de s est régulière, on l'insère donc dans la liste si ce n'est pas déjà fait
-    //         if (isempty_vertices(mker->rels->->group_list) || rigread_vertices(mker->rels->->group_list, 0) != mker->rels->JCL->numcl[s])
-    //         {
-    //             rigins_vertices(mker->rels->JCL->numcl[s], mker->rels->->group_list);
-    //         }
-    //     }
+    //// On sait également que la J-classe de s est régulière, on l'insère donc
+    // dans la liste si ce n'est pas déjà fait
+    // if (isempty_vertices(mker->rels->->group_list) ||
+    // rigread_vertices(mker->rels->->group_list, 0) !=
+    // mker->rels->JCL->numcl[s])
+    // {
+    // rigins_vertices(mker->rels->JCL->numcl[s], mker->rels->->group_list);
+    // }
+    // }
     // }
     return mker;
 }
 
-// Calcul d'une MODPlus-orbite d'un morphisme (le MOD-kernel doit être passé en entrée)
+// Calcul d'une MODPlus-orbite d'un morphisme (le MOD-kernel doit être passé en
+// entrée)
 p_green_sub get_one_modporb(p_green_sub mker, uint e)
 {
     // On prend le morphisme original et ses relations de green
     p_cayley M = mker->original;
-    p_green G = mker->originalrels;
+    p_green G  = mker->originalrels;
 
     // Si e est l'élément neutre et qu'il a un antécédent non-vide
     // Alors son orbite est le MOD-kernel entier
-    if (e == ONE && cayley_neutstrict(M, G)) {
+    if (e == ONE && cayley_neutstrict(M, G))
+    {
         return mker;
     }
 
-
     p_green_sub S = init_submono(M, G);
 
-    // Calcul de l'ensemble des éléments (le calcul des idéaux est restreint aux éléments dans le MD-kernel)
+    // Calcul de l'ensemble des éléments (le calcul des idéaux est restreint aux
+    // éléments dans le MD-kernel)
     // Si e est l'élément neutre et qu'il n'a pas d'antécédent non-vide
     // Alors son orbite est le singleton {1}
     if (e == ONE && !cayley_neutstrict(M, G))
@@ -1204,13 +1378,12 @@ p_green_sub get_one_modporb(p_green_sub mker, uint e)
 
         MALLOC(S->sub_to_mono, 1);
         S->sub_to_mono[ONE] = ONE;
-        S->neut = ONE;
+        S->neut             = ONE;
     }
     else
     {
-
-        p_vertices eM = compute_r_ideal(M, e, mker->mono_in_sub);
-        p_vertices Me = compute_l_ideal(M, e, mker->mono_in_sub);
+        p_vertices eM  = compute_r_ideal(M, e, mker->mono_in_sub);
+        p_vertices Me  = compute_l_ideal(M, e, mker->mono_in_sub);
         p_vertices eMe = make_inter_sorted_vertices(eM, Me);
 
         S->size = size_vertices(eMe);
@@ -1225,7 +1398,7 @@ p_green_sub get_one_modporb(p_green_sub mker, uint e)
         }
         for (uint i = 0; i < size_vertices(eMe); i++)
         {
-            S->sub_to_mono[i] = lefread_vertices(eMe, i);
+            S->sub_to_mono[i]                        = lefread_vertices(eMe, i);
             S->mono_to_sub[lefread_vertices(eMe, i)] = i;
             S->mono_in_sub[lefread_vertices(eMe, i)] = true;
         }
@@ -1259,7 +1432,7 @@ p_green_sub get_one_modporb(p_green_sub mker, uint e)
     MALLOC(S->rels->RCL, 1);
     S->rels->RCL->size_set = S->size;
     MALLOC(S->rels->RCL->numcl, S->size);
-    num = 0;
+    num                    = 0;
     for (uint i = 0; i < mker->rels->RCL->size_par; i++)
     {
         bool inter = false;
@@ -1267,8 +1440,12 @@ p_green_sub get_one_modporb(p_green_sub mker, uint e)
         {
             if (S->mono_in_sub[mker->sub_to_mono[lefread_vertices(mker->rels->RCL->cl[i], j)]])
             {
-                inter = true;
-                S->rels->RCL->numcl[S->mono_to_sub[mker->sub_to_mono[lefread_vertices(mker->rels->RCL->cl[i], j)]]] = num;
+                inter
+                                                                               =
+                        true;
+                S->rels->RCL->numcl[S->mono_to_sub[mker->sub_to_mono[lefread_vertices(
+                                                                         mker->rels->RCL->cl[i],
+                                                                         j)]]] = num;
             }
         }
         if (inter)
@@ -1293,7 +1470,7 @@ p_green_sub get_one_modporb(p_green_sub mker, uint e)
     MALLOC(S->rels->LCL, 1);
     S->rels->LCL->size_set = S->size;
     MALLOC(S->rels->LCL->numcl, S->size);
-    num = 0;
+    num                    = 0;
     for (uint i = 0; i < mker->rels->LCL->size_par; i++)
     {
         bool inter = false;
@@ -1301,8 +1478,12 @@ p_green_sub get_one_modporb(p_green_sub mker, uint e)
         {
             if (S->mono_in_sub[mker->sub_to_mono[lefread_vertices(mker->rels->LCL->cl[i], j)]])
             {
-                inter = true;
-                S->rels->LCL->numcl[S->mono_to_sub[mker->sub_to_mono[lefread_vertices(mker->rels->LCL->cl[i], j)]]] = num;
+                inter
+                                                                               =
+                        true;
+                S->rels->LCL->numcl[S->mono_to_sub[mker->sub_to_mono[lefread_vertices(
+                                                                         mker->rels->LCL->cl[i],
+                                                                         j)]]] = num;
             }
         }
         if (inter)
@@ -1326,7 +1507,7 @@ p_green_sub get_one_modporb(p_green_sub mker, uint e)
     MALLOC(S->rels->JCL, 1);
     S->rels->JCL->size_set = S->size;
     MALLOC(S->rels->JCL->numcl, S->size);
-    num = 0;
+    num                    = 0;
     for (uint i = 0; i < mker->rels->JCL->size_par; i++)
     {
         bool inter = false;
@@ -1334,8 +1515,12 @@ p_green_sub get_one_modporb(p_green_sub mker, uint e)
         {
             if (S->mono_in_sub[mker->sub_to_mono[lefread_vertices(mker->rels->JCL->cl[i], j)]])
             {
-                inter = true;
-                S->rels->JCL->numcl[S->mono_to_sub[mker->sub_to_mono[lefread_vertices(mker->rels->JCL->cl[i], j)]]] = num;
+                inter
+                                                                               =
+                        true;
+                S->rels->JCL->numcl[S->mono_to_sub[mker->sub_to_mono[lefread_vertices(
+                                                                         mker->rels->JCL->cl[i],
+                                                                         j)]]] = num;
             }
         }
         if (inter)
@@ -1359,7 +1544,7 @@ p_green_sub get_one_modporb(p_green_sub mker, uint e)
     MALLOC(S->rels->HCL, 1);
     S->rels->HCL->size_set = S->size;
     MALLOC(S->rels->HCL->numcl, S->size);
-    num = 0;
+    num                    = 0;
     for (uint i = 0; i < mker->rels->HCL->size_par; i++)
     {
         bool inter = false;
@@ -1367,8 +1552,12 @@ p_green_sub get_one_modporb(p_green_sub mker, uint e)
         {
             if (S->mono_in_sub[mker->sub_to_mono[lefread_vertices(mker->rels->HCL->cl[i], j)]])
             {
-                inter = true;
-                S->rels->HCL->numcl[S->mono_to_sub[mker->sub_to_mono[lefread_vertices(mker->rels->HCL->cl[i], j)]]] = num;
+                inter
+                                                                               =
+                        true;
+                S->rels->HCL->numcl[S->mono_to_sub[mker->sub_to_mono[lefread_vertices(
+                                                                         mker->rels->HCL->cl[i],
+                                                                         j)]]] = num;
             }
         }
         if (inter)
@@ -1393,16 +1582,17 @@ p_green_sub get_one_modporb(p_green_sub mker, uint e)
     return S;
 }
 
-// Calcul de toutes les  MODPlus-orbites d'un morphisme (le MOD-kernel doit être passé en entrée)
+// Calcul de toutes les  MODPlus-orbites d'un morphisme (le MOD-kernel doit être
+// passé en entrée)
 p_orbits get_all_modporbs(p_green_sub mker)
 {
     p_orbits res = init_orbits(mker);
 
-
     // Si le neutre a un antécédent non-vide, toutes les MODP-orbites
     // sont des sous-semigroupes de celle de 1 (qui est le MOD-kernel entier).
     // On n'effectue donc le calcul que dans le cas contraire
-    if (!cayley_neutstrict(mker->original, mker->originalrels)) {
+    if (!cayley_neutstrict(mker->original, mker->originalrels))
+    {
         res->oneonly = false;
         MALLOC(res->orbits, res->nb_idems);
         for (uint i = 0; i < res->nb_idems; i++)
@@ -1410,16 +1600,13 @@ p_orbits get_all_modporbs(p_green_sub mker)
             uint e = lefread_vertices(mker->original->idem_list, i);
             res->orbits[i] = get_one_modporb(mker, e);
         }
-
-
     }
     return res;
 }
 
 // Affiche toutes les orbites enregistrées
-void print_all_modporbs(p_orbits L, bool title, FILE* out)
+void print_all_modporbs(p_orbits L, bool title, FILE *out)
 {
-
     if (title)
     {
         print_title_box(0, true, out, 1, "MOD⁺-orbits of the morphism.");
@@ -1428,33 +1615,35 @@ void print_all_modporbs(p_orbits L, bool title, FILE* out)
     fprintf(out, "#### The list of all idempotents:\n");
     cayley_print_idems(L->sub->original, out);
 
-    if (L->oneonly) {
-        fprintf(out, "#### Since the neutral element has a nonempty antecedent all DD-orbits are\n");
+    if (L->oneonly)
+    {
+        fprintf(out,
+                "#### Since the neutral element has a nonempty antecedent all DD-orbits are\n");
         fprintf(out, "     subsemigroups of the MOD⁺-orbit of 1 (which is the full MOD-kernel).\n");
         print_sep_line(100, out);
         fprintf(out, "#### MOD⁺-orbit of the idempotent 1:");
         print_full_green_sub(L->sub, false, out);
         return;
     }
-    else {
+    else
+    {
         fprintf(out, "#### Printing the MOD⁺-orbits of all idempotents:\n");
         for (uint i = 0; i < L->nb_idems; i++)
         {
             print_sep_line(100, out);
             fprintf(out, "#### MOD⁺-orbit of the idempotent ");
-            cayley_print_name(L->sub->original, lefread_vertices(L->sub->original->idem_list, i), out);
+            cayley_print_name(L->sub->original, lefread_vertices(L->sub->original->idem_list, i),
+                              out);
             printf(".\n");
             print_full_green_sub(L->orbits[i], false, out);
         }
-
     }
     return;
 }
 
 // Procédure de séparation complète
-bool decid_mod_sep(p_nfa I1, p_nfa I2, bool details, FILE* out)
+bool decid_mod_sep(p_nfa I1, p_nfa I2, bool details, FILE *out)
 {
-
     // Gestion des cas triviaux
     if (isempty_vertices(I1->finals))
     {
@@ -1492,12 +1681,14 @@ bool decid_mod_sep(p_nfa I1, p_nfa I2, bool details, FILE* out)
     if (out && details)
     {
         print_sep_line(100, out);
-        fprintf(out, "#### Reduction to GR-separation: projection of the two inputs on a unary alphabet.\n");
+        fprintf(out,
+                "#### Reduction to GR-separation: projection of the two inputs on a unary alphabet.\n");
         fprintf(out, "#### Projection of the first input language:\n");
         view_nfa(U1);
         fprintf(out, "#### Projection of the second input language:\n");
         view_nfa(U2);
-        fprintf(out, "#### Now applying the GR-separation algorithm based on inverse extension to the resulting languages.\n\n");
+        fprintf(out,
+                "#### Now applying the GR-separation algorithm based on inverse extension to the resulting languages.\n\n");
     }
 
     // Phase 1: Calcul des transitions inverses
@@ -1506,30 +1697,33 @@ bool decid_mod_sep(p_nfa I1, p_nfa I2, bool details, FILE* out)
     if (out && details)
     {
         print_sep_line(100, out);
-        fprintf(out, "#### Phase 1: adding the inverse transitions inside the strongly connected components.\n");
+        fprintf(out,
+                "#### Phase 1: adding the inverse transitions inside the strongly connected components.\n");
         fprintf(out, "#### NFA of the first input language extended with inverse transitions.\n");
         view_nfa(U1);
         fprintf(out, "#### NFA of the second input language extended with inverse transitions.\n");
         view_nfa(U2);
     }
 
-    // Phase 2: calcul des transitions induites par les mots de Dyck puis éliminations de celles-ci
+    // Phase 2: calcul des transitions induites par les mots de Dyck puis
+    // éliminations de celles-ci
     p_parti FOLD1 = nfa_stal_fold(U1, SCCS1);
     delete_parti(SCCS1);
-    p_nfa A1 = nfa_dyck_ext(U1, FOLD1);
+    p_nfa A1      = nfa_dyck_ext(U1, FOLD1);
     delete_parti(FOLD1);
     delete_nfa(U1);
     nfa_elimeps_mod(A1);
     p_parti FOLD2 = nfa_stal_fold(U2, SCCS2);
     delete_parti(SCCS2);
-    p_nfa A2 = nfa_dyck_ext(U2, FOLD2);
+    p_nfa A2      = nfa_dyck_ext(U2, FOLD2);
     delete_parti(FOLD2);
     delete_nfa(U2);
     nfa_elimeps_mod(A2);
     if (out && details)
     {
         print_sep_line(100, out);
-        fprintf(out, "\n****************** Phase 2: Computing the epsilon transitions induced by Dyck words and eliminating them.\n");
+        fprintf(out,
+                "\n****************** Phase 2: Computing the epsilon transitions induced by Dyck words and eliminating them.\n");
         fprintf(out, "#### Construction on the NFA of the first input language.\n");
         view_nfa(A1);
         fprintf(out, "#### Construction on the NFA of the second input language.\n");
@@ -1538,22 +1732,23 @@ bool decid_mod_sep(p_nfa I1, p_nfa I2, bool details, FILE* out)
 
     // Phase 3: Calcul de l'intersection
 
-    p_nfa INTER = nfa_intersect(A1, A2, true);
+    p_nfa INTERSECT = nfa_intersect(A1, A2, true);
     delete_nfa(A1);
     delete_nfa(A2);
     if (out && details)
     {
         print_sep_line(100, out);
-        fprintf(out, "\n****************** Phase 3: Computing the intersection of the resulting NFAs.\n");
-        view_nfa(INTER);
+        fprintf(out,
+                "\n****************** Phase 3: Computing the intersection of the resulting NFAs.\n");
+        view_nfa(INTERSECT);
     }
-    if (isempty_vertices(INTER->finals))
+    if (isempty_vertices(INTERSECT->finals))
     {
         if (out && details)
         {
             fprintf(out, "#### This NFA recognizes the empty language\n");
         }
-        delete_nfa(INTER);
+        delete_nfa(INTERSECT);
         return true;
     }
     else
@@ -1563,7 +1758,7 @@ bool decid_mod_sep(p_nfa I1, p_nfa I2, bool details, FILE* out)
             fprintf(out, "#### This NFA recognizes a nonempty language\n");
         }
 
-        delete_nfa(INTER);
+        delete_nfa(INTERSECT);
         return false;
     }
 }
@@ -1573,11 +1768,12 @@ bool decid_mod_sep(p_nfa I1, p_nfa I2, bool details, FILE* out)
 /*****************************************/
 
 // Procédure de séparation complète
-bool decid_st_sep(p_nfa I1, p_nfa I2, FILE* out)
+bool decid_st_sep(p_nfa I1, p_nfa I2, FILE *out)
 {
     if (out)
     {
-        fprintf(out, "#### The input languages are ST-separable if and only if one of them is empty.\n\n");
+        fprintf(out,
+                "#### The input languages are ST-separable if and only if one of them is empty.\n\n");
     }
     // Gestion des cas triviaux
     if (isempty_vertices(I1->finals))
@@ -1621,14 +1817,14 @@ p_nfa nfa_add_eps(p_nfa A)
     p_nfa B;
     MALLOC(B, 1);
     uint temp;
-    B->trans = merge_lgraphs(&temp, 1, &A->trans);
+    B->trans    = merge_lgraphs(&temp, 1, &A->trans);
     B->initials = create_vertices();
-    B->finals = create_vertices();
+    B->finals   = create_vertices();
     copy_vertices_right(B->initials, A->initials, 0);
     copy_vertices_right(B->finals, A->finals, 0);
     B->itrans = NULL;
-    B->ntype = NONAME;
-    B->names = NULL;
+    B->ntype  = NONAME;
+    B->names  = NULL;
     B->etrans = create_graph_noedges(B->trans->size_graph);
 
     for (uint q = 0; q < B->etrans->size; q++)

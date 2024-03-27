@@ -41,7 +41,7 @@ s : s ';' {}
 
 | s HELP { help(); }
 
-| s EXIT { exit(0); }
+| s EXIT { return 0; }
 
 | s COMMAND[var] '=' cc[com] ';' {
   com_apply_link_command($var, $com);

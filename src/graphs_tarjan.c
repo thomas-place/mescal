@@ -72,7 +72,7 @@ p_parti ufind_to_parti(p_ufind uf)
         {
             new->numcl[r] = num_class;
             num_class++;
-            doelems[r] = true;
+            doelems[r]    = true;
         }
 
         uint c = new->numcl[r];
@@ -118,7 +118,7 @@ p_parti ufind_to_parti_refined(p_ufind uf, p_parti P)
             {
                 new->numcl[r] = num_class;
                 num_class++;
-                doelems[r] = true;
+                doelems[r]    = true;
             }
 
             uint c = new->numcl[r];
@@ -151,27 +151,30 @@ void scc(p_graph g,
          uint v,        // sommet courant
          int *index,    // tableau des indices
          int *id,       // id courant (prochain indice à donner)
-         int *lowlink,  // tableau des lowlinks (min indice atteignable depuis v)
-         int *stack,    // pile de sommets (la scc courante est en haut de pile)
+         int *lowlink,  // tableau des lowlinks (min indice atteignable depuis
+                        // v)
+         int *thestack, // pile de sommets (la scc courante est en haut de pile)
          int *top,      // taille de la pile
          bool *onStack, // tableau de booléens indiquant les sommets dansla pile
-                        //  ufind **result, // structure union-find pour stocker les scc
+                        // ufind **result, // structure union-find pour stocker
+                        // les scc
          uint *ncount,  // Entier pour numéroter les partitions trouvées
-         uint *nums     // Tableau mémorisant le numéro de classe de chaque élément
-)
+         uint *nums     // Tableau mémorisant le numéro de classe de chaque
+                        // élément
+         )
 {
-    index[v] = lowlink[v] = (*id)++;
-    stack[(*top)++] = v;
-    onStack[v] = true;
+    index[v]           = lowlink[v] = (*id)++;
+    thestack[(*top)++] = v;
+    onStack[v]         = true;
 
     uint w;
 
     for (uint c = 0; c < size_vertices(g->edges[v]); c++)
     {
         w = lefread_vertices(g->edges[v], c);
-        if (index[w] == -1) // w n'a pas encore été visité
+        if (index[w] == -1)  // w n'a pas encore été visité
         {
-            scc(g, w, index, id, lowlink, stack, top, onStack, ncount, nums);
+            scc(g, w, index, id, lowlink, thestack, top, onStack, ncount, nums);
             lowlink[v] = min(lowlink[v], lowlink[w]);
         }
         else if (onStack[w]) // w est dans la pile
@@ -181,16 +184,16 @@ void scc(p_graph g,
     }
     // for (uint c = 0; c < g->edges[v]->size_array; c++)
     // {
-    //     w = g->edges[v]->array[c];
-    //     if (index[w] == -1) // w n'a pas encore été visité
-    //     {
-    //         scc(g, w, index, id, lowlink, stack, top, onStack, result);
-    //         lowlink[v] = min(lowlink[v], lowlink[w]);
-    //     }
-    //     else if (onStack[w]) // w est dans la pile
-    //     {
-    //         lowlink[v] = min(lowlink[v], index[w]);
-    //     }
+    // w = g->edges[v]->array[c];
+    // if (index[w] == -1) // w n'a pas encore été visité
+    // {
+    // scc(g, w, index, id, lowlink, thestack, top, onStack, result);
+    // lowlink[v] = min(lowlink[v], lowlink[w]);
+    // }
+    // else if (onStack[w]) // w est dans la pile
+    // {
+    // lowlink[v] = min(lowlink[v], index[w]);
+    // }
     // }
 
     if (lowlink[v] == index[v]) // v est la racine de sa scc
@@ -199,9 +202,9 @@ void scc(p_graph g,
         // printf("Discovered a SCC starting at %d\n", v);
         while (*top > 0)
         {
-            w = stack[--(*top)];
+            w          = thestack[--(*top)];
             onStack[w] = false;
-            nums[w] = *ncount;
+            nums[w]    = *ncount;
             // union_ufind(v, w, *result);
             // printf("Union: %d %d\n", v, w);
 
@@ -218,17 +221,21 @@ void lscc(p_lgraph g,
           uint v,        // sommet courant
           int *index,    // tableau des indices
           int *id,       // id courant (prochain indice à donner)
-          int *lowlink,  // tableau des lowlinks (min indice atteignable depuis v)
-          int *stack,    // pile de sommets (la scc courante est en haut de pile)
+          int *lowlink,  // tableau des lowlinks (min indice atteignable depuis
+                         // v)
+          int *thestack, // pile de sommets (la scc courante est en haut de
+                         // pile)
           int *top,      // taille de la pile
-          bool *onStack, // tableau de booléens indiquant les sommets dansla pile
+          bool *onStack, // tableau de booléens indiquant les sommets dansla
+                         // pile
           uint *ncount,  // Entier pour numéroter les partitions trouvées
-          uint *nums     // Tableau mémorisant le numéro de classe de chaque élément
-)
+          uint *nums     // Tableau mémorisant le numéro de classe de chaque
+                         // élément
+          )
 {
-    index[v] = lowlink[v] = (*id)++;
-    stack[(*top)++] = v;
-    onStack[v] = true;
+    index[v]           = lowlink[v] = (*id)++;
+    thestack[(*top)++] = v;
+    onStack[v]         = true;
 
     uint w;
 
@@ -237,29 +244,32 @@ void lscc(p_lgraph g,
     {
         for (uint k = 0; k < size_vertices(g->edges[v][c]); k++)
         {
-            w = lefread_vertices(g->edges[v][c], k); // k-eme voisins de v étiqueté par c
+            w = lefread_vertices(g->edges[v][c], k); // k-eme voisins de v
+                                                     // étiqueté par c
             DEBUG("lscc(%d):\t c = %d, k = %d, w = %d", v, c, k, w);
-            if (index[w] == -1) // w n'a pas encore été visité
+            if (index[w] == -1)                      // w n'a pas encore été
+                                                     // visité
             {
-                lscc(g, w, index, id, lowlink, stack, top, onStack, ncount, nums);
+                lscc(g, w, index, id, lowlink, thestack, top, onStack, ncount, nums);
                 lowlink[v] = min(lowlink[v], lowlink[w]);
             }
-            else if (onStack[w]) // w est dans la pile
+            else if (onStack[w])                     // w est dans la pile
             {
                 lowlink[v] = min(lowlink[v], index[w]);
             }
         }
     }
 
-    if (lowlink[v] == index[v]) // v est la racine de sa scc
+    if (lowlink[v] == index[v])                      // v est la racine de sa
+                                                     // scc
     {
         DEBUG("Discovered a SCC starting at %d", v);
         nums[v] = *ncount;
         while (*top > 0)
         {
-            w = stack[--(*top)];
+            w          = thestack[--(*top)];
             onStack[w] = false;
-            nums[w] = *ncount;
+            nums[w]    = *ncount;
             if (w == v)
             {
                 break;
@@ -273,30 +283,34 @@ void dscc(p_dgraph g,
           uint v,        // sommet courant
           int *index,    // tableau des indices
           int *id,       // id courant (prochain indice à donner)
-          int *lowlink,  // tableau des lowlinks (min indice atteignable depuis v)
-          int *stack,    // pile de sommets (la scc courante est en haut de pile)
+          int *lowlink,  // tableau des lowlinks (min indice atteignable depuis
+                         // v)
+          int *thestack, // pile de sommets (la scc courante est en haut de
+                         // pile)
           int *top,      // taille de la pile
-          bool *onStack, // tableau de booléens indiquant les sommets dansla pile
+          bool *onStack, // tableau de booléens indiquant les sommets dansla
+                         // pile
           uint *ncount,  // Entier pour numéroter les partitions trouvées
-          uint *nums     // Tableau mémorisant le numéro de classe de chaque élément
-)
+          uint *nums     // Tableau mémorisant le numéro de classe de chaque
+                         // élément
+          )
 {
-    index[v] = lowlink[v] = (*id)++;
-    stack[(*top)++] = v;
-    onStack[v] = true;
+    index[v]           = lowlink[v] = (*id)++;
+    thestack[(*top)++] = v;
+    onStack[v]         = true;
 
     uint w;
 
     // Parcours des transitions étiquetées par chaque lettre sortant du sommet v
     for (uint c = 0; c < g->size_alpha; c++)
     {
-        w = g->edges[v][c]; // voisin de v étiqueté par c
-        if (index[w] == -1) // w n'a pas encore été visité
+        w = g->edges[v][c];     // voisin de v étiqueté par c
+        if (index[w] == -1)     // w n'a pas encore été visité
         {
-            dscc(g, w, index, id, lowlink, stack, top, onStack, ncount, nums);
+            dscc(g, w, index, id, lowlink, thestack, top, onStack, ncount, nums);
             lowlink[v] = min(lowlink[v], lowlink[w]);
         }
-        else if (onStack[w]) // w est dans la pile
+        else if (onStack[w])    // w est dans la pile
         {
             lowlink[v] = min(lowlink[v], index[w]);
         }
@@ -308,9 +322,9 @@ void dscc(p_dgraph g,
         nums[v] = *ncount;
         while (*top > 0)
         {
-            w = stack[--(*top)];
+            w          = thestack[--(*top)];
             onStack[w] = false;
-            nums[w] = *ncount;
+            nums[w]    = *ncount;
             if (w == v)
             {
                 break;
@@ -322,10 +336,10 @@ void dscc(p_dgraph g,
 
 p_parti tarjan(p_graph g)
 {
-    int *index, *lowlink, *stack;
+    int *index, *lowlink, *thestack;
     MALLOC(index, g->size);
     MALLOC(lowlink, g->size);
-    MALLOC(stack, g->size);
+    MALLOC(thestack, g->size);
 
     for (uint v = 0; v < g->size; v++)
     {
@@ -352,7 +366,8 @@ p_parti tarjan(p_graph g)
     {
         if (index[v] == -1)
         {
-            scc(g, v, index, id, lowlink, stack, &top, onStack, &result->size_par, result->numcl);
+            scc(g, v, index, id, lowlink, thestack, &top, onStack, &result->size_par,
+                result->numcl);
         }
     }
 
@@ -370,7 +385,7 @@ p_parti tarjan(p_graph g)
 
     free(index);
     free(lowlink);
-    free(stack);
+    free(thestack);
     free(onStack);
     free(id);
 
@@ -379,10 +394,10 @@ p_parti tarjan(p_graph g)
 
 p_parti ltarjan(p_lgraph g)
 {
-    int *index, *lowlink, *stack;
+    int *index, *lowlink, *thestack;
     MALLOC(index, g->size_graph);
     MALLOC(lowlink, g->size_graph);
-    MALLOC(stack, g->size_graph);
+    MALLOC(thestack, g->size_graph);
 
     for (uint v = 0; v < g->size_graph; v++)
     {
@@ -407,7 +422,8 @@ p_parti ltarjan(p_lgraph g)
     {
         if (index[v] == -1)
         {
-            lscc(g, v, index, id, lowlink, stack, &top, onStack, &result->size_par, result->numcl);
+            lscc(g, v, index, id, lowlink, thestack, &top, onStack, &result->size_par,
+                 result->numcl);
         }
     }
 
@@ -425,7 +441,7 @@ p_parti ltarjan(p_lgraph g)
 
     free(index);
     free(lowlink);
-    free(stack);
+    free(thestack);
     free(onStack);
     free(id);
 
@@ -434,10 +450,10 @@ p_parti ltarjan(p_lgraph g)
 
 p_parti dtarjan(p_dgraph g)
 {
-    int *index, *lowlink, *stack;
+    int *index, *lowlink, *thestack;
     MALLOC(index, g->size_graph);
     MALLOC(lowlink, g->size_graph);
-    MALLOC(stack, g->size_graph);
+    MALLOC(thestack, g->size_graph);
 
     for (uint v = 0; v < g->size_graph; v++)
     {
@@ -462,7 +478,8 @@ p_parti dtarjan(p_dgraph g)
     {
         if (index[v] == -1)
         {
-            dscc(g, v, index, id, lowlink, stack, &top, onStack, &result->size_par, result->numcl);
+            dscc(g, v, index, id, lowlink, thestack, &top, onStack, &result->size_par,
+                 result->numcl);
         }
     }
 
@@ -480,7 +497,7 @@ p_parti dtarjan(p_dgraph g)
 
     free(index);
     free(lowlink);
-    free(stack);
+    free(thestack);
     free(onStack);
     free(id);
 
@@ -495,17 +512,21 @@ void lscc_alph(p_lgraph g,
                uint v,        // sommet courant
                int *index,    // tableau des indices
                int *id,       // id courant (prochain indice à donner)
-               int *lowlink,  // tableau des lowlinks (min indice atteignable depuis v)
-               int *stack,    // pile de sommets (la scc courante est en haut de pile)
+               int *lowlink,  // tableau des lowlinks (min indice atteignable
+                              // depuis v)
+               int *thestack, // pile de sommets (la scc courante est en haut de
+                              // pile)
                int *top,      // taille de la pile
-               bool *onStack, // tableau de booléens indiquant les sommets dansla pile
+               bool *onStack, // tableau de booléens indiquant les sommets
+                              // dansla pile
                uint *ncount,  // Entier pour numéroter les partitions trouvées
-               uint *nums,    // Tableau mémorisant le numéro de classe de chaque élément
+               uint *nums,    // Tableau mémorisant le numéro de classe de
+                              // chaque élément
                bool *alph)
 {
-    index[v] = lowlink[v] = (*id)++;
-    stack[(*top)++] = v;
-    onStack[v] = true;
+    index[v]           = lowlink[v] = (*id)++;
+    thestack[(*top)++] = v;
+    onStack[v]         = true;
 
     uint w;
 
@@ -516,14 +537,16 @@ void lscc_alph(p_lgraph g,
         {
             for (uint k = 0; k < size_vertices(g->edges[v][c]); k++)
             {
-                w = lefread_vertices(g->edges[v][c], k); // k-eme voisins de v étiqueté par c
+                w = lefread_vertices(g->edges[v][c], k); // k-eme voisins de v
+                                                         // étiqueté par c
                 DEBUG("lscc(%d):\t c = %d, k = %d, w = %d", v, c, k, w);
-                if (index[w] == -1) // w n'a pas encore été visité
+                if (index[w] == -1)                      // w n'a pas encore été
+                                                         // visité
                 {
-                    lscc(g, w, index, id, lowlink, stack, top, onStack, ncount, nums);
+                    lscc(g, w, index, id, lowlink, thestack, top, onStack, ncount, nums);
                     lowlink[v] = min(lowlink[v], lowlink[w]);
                 }
-                else if (onStack[w]) // w est dans la pile
+                else if (onStack[w])                     // w est dans la pile
                 {
                     lowlink[v] = min(lowlink[v], index[w]);
                 }
@@ -531,15 +554,16 @@ void lscc_alph(p_lgraph g,
         }
     }
 
-    if (lowlink[v] == index[v]) // v est la racine de sa scc
+    if (lowlink[v] == index[v])                          // v est la racine de
+                                                         // sa scc
     {
         DEBUG("Discovered a SCC starting at %d", v);
         nums[v] = *ncount;
         while (*top > 0)
         {
-            w = stack[--(*top)];
+            w          = thestack[--(*top)];
             onStack[w] = false;
-            nums[w] = *ncount;
+            nums[w]    = *ncount;
             if (w == v)
             {
                 break;
@@ -553,17 +577,21 @@ void dscc_alph(p_dgraph g,
                uint v,        // sommet courant
                int *index,    // tableau des indices
                int *id,       // id courant (prochain indice à donner)
-               int *lowlink,  // tableau des lowlinks (min indice atteignable depuis v)
-               int *stack,    // pile de sommets (la scc courante est en haut de pile)
+               int *lowlink,  // tableau des lowlinks (min indice atteignable
+                              // depuis v)
+               int *thestack, // pile de sommets (la scc courante est en haut de
+                              // pile)
                int *top,      // taille de la pile
-               bool *onStack, // tableau de booléens indiquant les sommets dansla pile
+               bool *onStack, // tableau de booléens indiquant les sommets
+                              // dansla pile
                uint *ncount,  // Entier pour numéroter les partitions trouvées
-               uint *nums,    // Tableau mémorisant le numéro de classe de chaque élément
+               uint *nums,    // Tableau mémorisant le numéro de classe de
+                              // chaque élément
                bool *alph)
 {
-    index[v] = lowlink[v] = (*id)++;
-    stack[(*top)++] = v;
-    onStack[v] = true;
+    index[v]           = lowlink[v] = (*id)++;
+    thestack[(*top)++] = v;
+    onStack[v]         = true;
 
     uint w;
 
@@ -572,10 +600,10 @@ void dscc_alph(p_dgraph g,
     {
         if (alph[c])
         {
-            w = g->edges[v][c]; // voisin de v étiqueté par c
-            if (index[w] == -1) // w n'a pas encore été visité
+            w = g->edges[v][c];  // voisin de v étiqueté par c
+            if (index[w] == -1)  // w n'a pas encore été visité
             {
-                dscc(g, w, index, id, lowlink, stack, top, onStack, ncount, nums);
+                dscc(g, w, index, id, lowlink, thestack, top, onStack, ncount, nums);
                 lowlink[v] = min(lowlink[v], lowlink[w]);
             }
             else if (onStack[w]) // w est dans la pile
@@ -585,15 +613,15 @@ void dscc_alph(p_dgraph g,
         }
     }
 
-    if (lowlink[v] == index[v]) // v est la racine de sa scc
+    if (lowlink[v] == index[v])  // v est la racine de sa scc
     {
         DEBUG("Discovered a SCC starting at %d", v);
         nums[v] = *ncount;
         while (*top > 0)
         {
-            w = stack[--(*top)];
+            w          = thestack[--(*top)];
             onStack[w] = false;
-            nums[w] = *ncount;
+            nums[w]    = *ncount;
             if (w == v)
             {
                 break;
@@ -606,10 +634,10 @@ void dscc_alph(p_dgraph g,
 // Les sccs sont ordonnées selon un tri topologique du DAG des sccs
 p_parti ltarjan_alph(p_lgraph g, bool *alph)
 {
-    int *index, *lowlink, *stack;
+    int *index, *lowlink, *thestack;
     MALLOC(index, g->size_graph);
     MALLOC(lowlink, g->size_graph);
-    MALLOC(stack, g->size_graph);
+    MALLOC(thestack, g->size_graph);
 
     for (uint v = 0; v < g->size_graph; v++)
     {
@@ -634,7 +662,8 @@ p_parti ltarjan_alph(p_lgraph g, bool *alph)
     {
         if (index[v] == -1)
         {
-            lscc_alph(g, v, index, id, lowlink, stack, &top, onStack, &result->size_par, result->numcl, alph);
+            lscc_alph(g, v, index, id, lowlink, thestack, &top, onStack, &result->size_par,
+                      result->numcl, alph);
         }
     }
 
@@ -652,18 +681,19 @@ p_parti ltarjan_alph(p_lgraph g, bool *alph)
 
     free(index);
     free(lowlink);
-    free(stack);
+    free(thestack);
     free(onStack);
     free(id);
 
     return result;
 }
+
 p_parti dtarjan_alph(p_dgraph g, bool *alph)
 {
-    int *index, *lowlink, *stack;
+    int *index, *lowlink, *thestack;
     MALLOC(index, g->size_graph);
     MALLOC(lowlink, g->size_graph);
-    MALLOC(stack, g->size_graph);
+    MALLOC(thestack, g->size_graph);
 
     for (uint v = 0; v < g->size_graph; v++)
     {
@@ -688,7 +718,8 @@ p_parti dtarjan_alph(p_dgraph g, bool *alph)
     {
         if (index[v] == -1)
         {
-            dscc_alph(g, v, index, id, lowlink, stack, &top, onStack, &result->size_par, result->numcl, alph);
+            dscc_alph(g, v, index, id, lowlink, thestack, &top, onStack, &result->size_par,
+                      result->numcl, alph);
         }
     }
 
@@ -706,7 +737,7 @@ p_parti dtarjan_alph(p_dgraph g, bool *alph)
 
     free(index);
     free(lowlink);
-    free(stack);
+    free(thestack);
     free(onStack);
     free(id);
 
