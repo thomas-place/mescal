@@ -6,9 +6,26 @@
 
 The aim of this program is to implement most of the known algorithms for deciding membership and separation for prominent classes of regular languages.
 
-# Available commands
+## Compilation/utilisation
 
-## Basic commands
+A makefile is provided in the src/ folder. It creates 
+
+
+## Required software
+
+Currently, the program only works on MacOS
+
++ Graphviz
++ iTerm + imgcat plugin 
+
+
+
+
+
+
+## Available commands
+
+### Basic commands
 
 + `help` This help.
 + `quit` or `exit` Quits.
@@ -21,9 +38,9 @@ The aim of this program is to implement most of the known algorithms for decidin
 + `loadsession("<filename>")` Loads all current objects from a file.
 + Variable names: `<upper><upper|digits>*`.
 
-## Commands for language variables
+### Commands for language variables
 
-### Definition, storing a language in a variable
+#### Definition, storing a language in a variable
 
 + Specification by a regular expression:\
   `<variable> = "<regexp>"`\
@@ -33,15 +50,15 @@ The aim of this program is to implement most of the known algorithms for decidin
   `<variable> = link(<variable_name_of_automaton>)`\
   Creates a link with the NFA in the automata variable A (A becomes protected).
 
-#### Manipulation of languages:
+##### Manipulation of languages:
 
 + `L` Displays the regular expression or the automaton used to define L.
 + `L.minimal` The minimal automaton of L: works as an automata variable.
 + `L.syntactic` The syntactic morphism of L: works as a morphism variable.
 
-## Commands for automata variables
+### Commands for automata variables
 
-### Definition, storing an automaton in a variable A:
+#### Definition, storing an automaton in a variable A:
 
 + `A = B` Makes a copy of the automaton B.
 + `open("filename")` Opens the NFA stored in a file.
@@ -54,15 +71,15 @@ The aim of this program is to implement most of the known algorithms for decidin
 + `kleene(B1,B2)` Subset construction applied to the automaton B.
 + `minimal(B1,B2)` Minimization applied to the automaton B.
 
-### Manipulation:
+#### Manipulation:
 
 + `A` Displays the automaton.
 + `A.run(word)` Computes the set of states reached with an input word.
 + `save(A,"filename")` Saves the automaton A in a file.
 
-## Commands for morphisms variables
+### Commands for morphisms variables
 
-### Manipulation
+#### Manipulation
 
 + `M` Displays the Green relations of M.
 + `M.rcayley` The right Cayley graph of M.
@@ -77,7 +94,7 @@ The aim of this program is to implement most of the known algorithms for decidin
 + `M.orbits(OP,𝒞)` The OP(𝒞)-orbits for M (implemented for OP = BPol, TL and 𝒞 = ST, DD, MOD, MOD⁺, GR).
 + `M.orbit(OP,𝒞,e)` The OP(𝒞)-orbits of the idempotent e for M (implemented for OP = BPol, TL and 𝒞 = ST, DD, MOD, MOD⁺, GR).
 
-## Membership tests
+### Membership tests
 
 + `membership(𝒞,L)` Checks if the language L belongs to 𝒞.
   - Available classes:
@@ -128,7 +145,7 @@ The aim of this program is to implement most of the known algorithms for decidin
     * `MODP` Well-suited extension of the modulo languages (MODP = MOD⁺).
     * `GR` Group languages.
 
-## Separation tests
+### Separation tests
 
 + `separ(𝒞,L1,L2,(info))` Checks if L1 is 𝒞-separable from L2 (\"info\" is an optional parameter for asking more details).
   - Available classes:
