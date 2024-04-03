@@ -12,14 +12,14 @@ A `Makefile` is provided in the src/ folder. It creates an executable file named
 
 ## Required software
 
-Currently, the program is experimental. It works on MacOS and Linux. It depends on the following software, which can be installed through  [homebrew](https://brew.sh).
+Currently, the program is **experimental**. It works on MacOS and Linux. It depends on the following software, which can be installed through  [homebrew](https://brew.sh).
 
 + A C compiler (tested on OSX with Apple clang 15.0.0, hardlinked to gcc), with the readline library.
 + The [json-c](https://github.com/json-c) library.
 + flex and bison.
 + [Graphviz](https://graphviz.org)
 + On MacOS: [iTerm](https://iterm2.com) with [imgcat](https://iterm2.com/utilities/imgcat).
-+ On Linux: a [sixel capable terminal](https://www.arewesixelyet.com).
++ On Linux: a [sixel capable terminal](https://www.arewesixelyet.com). Tested with [Konsole](https://konsole.kde.org).
 
 ## Available commands
 
