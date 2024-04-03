@@ -6,6 +6,8 @@ src/.mescal_history
 src/parse_regexp.tab.c
 src/parse_regexp.tab.h
 .ccls-cache/
+.ccls
+.uncrustify
 
 # OSX specific
 .DS_Store
