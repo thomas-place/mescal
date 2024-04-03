@@ -34,9 +34,9 @@ override CFLAGS += -std=gnu2x -MMD -Wall -pedantic -Wextra -Wshadow -Wpointer-ar
 endif
 
 
-LDLIBS += $(shell sdl2-config --libs)
+# LDLIBS += $(shell sdl2-config --libs)
+# LDFLAGS += $(shell sdl2-config --cflags)
 LDLIBS += -ljson-c
-LDFLAGS += $(shell sdl2-config --cflags)
 
 SOURCES := $(wildcard *.c)
 OBJECTS := $(SOURCES:%.c=%.o)

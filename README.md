@@ -12,13 +12,14 @@ A `Makefile` is provided in the src/ folder. It creates an executable file named
 
 ## Required software
 
-Currently, the program only works on MacOS. It depends on the following software, which can be installed through  [homebrew](https://brew.sh).
+Currently, the program is experimental. It works on MacOS and Linux. It depends on the following software, which can be installed through  [homebrew](https://brew.sh).
 
-+ A C compiler (tested with Apple clang 15.0.0, hardlinked to gcc), with the readline library.
++ A C compiler (tested on OSX with Apple clang 15.0.0, hardlinked to gcc), with the readline library.
 + The [json-c](https://github.com/json-c) library.
 + flex and bison.
 + [Graphviz](https://graphviz.org)
-+ [iTerm](https://iterm2.com) with [imgcat](https://iterm2.com/utilities/imgcat).
++ On MacOS: [iTerm](https://iterm2.com) with [imgcat](https://iterm2.com/utilities/imgcat).
++ On Linux: a [sixel capable terminal](https://www.arewesixelyet.com).
 
 ## Available commands
 
@@ -26,12 +27,12 @@ Currently, the program only works on MacOS. It depends on the following software
 
 + `help` This help.
 + `quit` or `exit` Quits.
-+  `languages` Lists stored languages.
-+  `automata` Lists stored automata.
-+  `morphisms` Lists stored morphisms.
-+  `sort` Sorts all objects, lexicographically by name.
-+  `delete(<variable>)` Deletes object (language, automaton or morphism).
-+  `savesession("<filename>")` Saves all current objects in a file.
++ `languages` Lists stored languages.
++ `automata` Lists stored automata.
++ `morphisms` Lists stored morphisms.
++ `sort` Sorts all objects, lexicographically by name.
++ `delete(<variable>)` Deletes object (language, automaton or morphism).
++ `savesession("<filename>")` Saves all current objects in a file.
 + `loadsession("<filename>")` Loads all current objects from a file.
 + Variable names: `<upper><upper|digits>*`.
 

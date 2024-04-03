@@ -1,0 +1,13 @@
+gcc
+%c -std=std2x
+%c -Wall
+%c -Wextra
+%c -pedantic
+%c -Wshadow
+%c -Wpointer-arith
+%c -Wcast-qual
+%c -Wstrict-prototypes
+%c -Wmissing-prototypes
+%c -Wno-gnu-zero-variadic-macro-arguments
+%c -I/opt/homebrew/include/
+%c -I/usr/include/
