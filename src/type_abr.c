@@ -1,59 +1,32 @@
 #include "type_abr.h"
 
-/****************************************/
-/* Version générique: pointeur sur void */
-/****************************************/
-
-/* La fonction de comparaison pour les entiers */
-int avlcomp_int(void *x, void *y)
-{
-    if (*(int *)x < *(int *)y)
-    {
-        return 1;
-    }
-    else if (*(int *)x == *(int *)y)
-    {
-        return 0;
-    }
-    else
-    {
-        return -1;
-    }
-}
 
 /**************************************/
 /* Fonctions auxiliaires et rotations */
 /**************************************/
 
-static int get_height_avl(p_avlnode p)
-{
-    if (p == NULL)
-    {
+static int get_height_avl(avlnode* p) {
+    if (p == NULL) {
         return -1;
     }
-    else
-    {
+    else {
         return p->height;
     }
 }
 
 // Répare la hauteur si elle n'est fausse que à la racine
-static void fix_height(p_avlnode p)
-{
+static void fix_height(avlnode* p) {
     p->height = max(get_height_avl(p->left), get_height_avl(p->right)) + 1;
 }
 
 // p should not be NULL
-static int get_balance_avl(p_avlnode p)
-{
+static int get_balance_avl(avlnode* p) {
     return get_height_avl(p->right) - get_height_avl(p->left);
 }
 
-static p_avlnode rotate_left(p_avlnode p)
-{
-    p_avlnode rightson = p->right;
-    if (rightson == NULL)
-    {
+static avlnode* rotate_left(avlnode* p) {
+    avlnode* rightson = p->right;
+    if (rightson == NULL) {
         printf("Warning, can't rotate left if there is no right son.\n");
         return NULL;
     }
@@ -64,11 +37,9 @@ static p_avlnode rotate_left(p_avlnode p)
     return rightson;
 }
 
-static p_avlnode rotate_right(p_avlnode p)
-{
-    p_avlnode leftson = p->left;
-    if (leftson == NULL)
-    {
+static avlnode* rotate_right(avlnode* p) {
+    avlnode* leftson = p->left;
+    if (leftson == NULL) {
         printf("Warning, can't rotate right if there is no left son.\n");
         return NULL;
     }
@@ -79,10 +50,8 @@ static p_avlnode rotate_right(p_avlnode p)
     return leftson;
 }
 
-static p_avlnode rotate_left_right(p_avlnode p)
-{
-    if (p->left == NULL)
-    {
+static avlnode* rotate_left_right(avlnode* p) {
+    if (p->left == NULL) {
         printf("Warning, can't rotate left-right if there is no left son.\n");
         return NULL;
     }
@@ -90,10 +59,8 @@ static p_avlnode rotate_left_right(p_avlnode p)
     return rotate_right(p);
 }
 
-static p_avlnode rotate_right_left(p_avlnode p)
-{
-    if (p->right == NULL)
-    {
+static avlnode* rotate_right_left(avlnode* p) {
+    if (p->right == NULL) {
         printf("Warning, can't rotate right-left if there is no right son.\n");
         return NULL;
     }
@@ -102,34 +69,26 @@ static p_avlnode rotate_right_left(p_avlnode p)
 }
 
 // Répare l'équilibre à la racine
-static p_avlnode repare_balance_avl(p_avlnode p)
-{
-    if (p == NULL)
-    {
+static avlnode* repare_balance_avl(avlnode* p) {
+    if (p == NULL) {
         return NULL;
     }
     int b = get_balance_avl(p);
-    if (b == 2)
-    {
+    if (b == 2) {
         int bd = get_balance_avl(p->right);
-        if (bd >= 0)
-        {
+        if (bd >= 0) {
             return rotate_left(p);
         }
-        else
-        {
+        else {
             return rotate_right_left(p);
         }
     }
-    else if (b == -2)
-    {
+    else if (b == -2) {
         int bg = get_balance_avl(p->left);
-        if (bg <= 0)
-        {
+        if (bg <= 0) {
             return rotate_right(p);
         }
-        else
-        {
+        else {
             return rotate_left_right(p);
         }
     }
@@ -140,34 +99,27 @@ static p_avlnode repare_balance_avl(p_avlnode p)
 /* Opérations */
 /**************/
 
-p_avlnode avl_search(void *val, p_avlnode p, int (*f)(void *, void *))
-{
-    if (p == NULL)
-    {
+avlnode* avl_search(void* val, avlnode* p, int (*f)(void*, void*)) {
+    if (p == NULL) {
         return NULL;
     }
-    else if ((*f)(val, p->value) == 0)
-    {
+    else if ((*f) (val, p->value) == 0) {
         // Si la valeur est déjà présente à la racine
         return p;
     }
-    else if ((*f)(val, p->value) >= 1)
-    {
+    else if ((*f) (val, p->value) >= 1) {
         // Si la valeur est strictement inférieure à celle de la racine
         return avl_search(val, p->left, f);
     }
-    else
-    {
+    else {
         // Si la valeur est strictement supérieure à celle de la racine
         return avl_search(val, p->right, f);
     }
 }
 
-p_avlnode avl_insert(void *val, p_avlnode p, int (*f)(void *, void *))
-{
-    if (p == NULL)
-    {
-        p_avlnode new;
+avlnode* avl_insert(void* val, avlnode* p, int (*f)(void*, void*), void (*d)(void*)) {
+    if (p == NULL) {
+        avlnode* new;
         MALLOC(new, 1);
         new->height = 0;
         new->left = NULL;
@@ -175,79 +127,80 @@ p_avlnode avl_insert(void *val, p_avlnode p, int (*f)(void *, void *))
         new->value = val;
         return new;
     }
-    else if ((*f)(val, p->value) == 0)
-    {
+    else if ((*f) (val, p->value) == 0) {
         // Si la valeur est déjà présente à la racine
+        if (d) {
+            d(val);
+        }
         return p;
     }
-    else if ((*f)(val, p->value) >= 1)
-    {
+    else if ((*f) (val, p->value) >= 1) {
         // Si la valeur est strictement inférieure à celle de la racine
-        p->left = avl_insert(val, p->left, f);
+        p->left = avl_insert(val, p->left, f, d);
         return repare_balance_avl(p);
     }
-    else
-    {
+    else {
         // Si la valeur est strictement supérieure à celle de la racine
-        p->right = avl_insert(val, p->right, f);
+        p->right = avl_insert(val, p->right, f, d);
         return repare_balance_avl(p);
     }
 }
 
-int getsize_avl(p_avlnode p)
-{
-    if (p == NULL)
-    {
+int getsize_avl(avlnode* p) {
+    if (p == NULL) {
         return 0;
     }
-    else
-    {
+    else {
         return getsize_avl(p->left) + getsize_avl(p->right) + 1;
     }
 }
 
-static int avl_to_array(p_avlnode tree, int *tab, int num)
-{
-    if (tree == NULL)
-    {
+/* static int avl_to_array(avlnode* tree, int* tab, int num) {
+    if (tree == NULL) {
         return num;
     }
-    else
-    {
+    else {
         int newnum = avl_to_array(tree->left, tab, num);
-        printf("%d\n", *(int *)tree->value);
-        tab[newnum] = *(int *)tree->value;
+        printf("%d\n", *(int*)tree->value);
+        tab[newnum] = *(int*)tree->value;
         return avl_to_array(tree->right, tab, newnum + 1);
     }
-}
+} */
 
-void avl_sort(int *tab, int size)
-{
-    p_avlnode tree = NULL;
-    for (int i = 0; i < size; i++)
-    {
+/*
+int avlcomdequeueint(void* x, void* y) {
+    if (*(int*)x < *(int*)y) {
+        return 1;
+    }
+    else if (*(int*)x == *(int*)y) {
+        return 0;
+    }
+    else {
+        return -1;
+    }
+}
+void avl_sort(int* tab, int size) {
+    avlnode* tree = NULL;
+    for (int i = 0; i < size; i++) {
         // printf("%d\n", tab[i]);
-        tree = avl_insert(&tab[i], tree, &avlcomp_int);
+        tree = avl_insert(&tab[i], tree, &avlcomdequeueint);
     }
     int temp[size];
     avl_to_array(tree, temp, 0);
-    for (int i = 0; i < size; i++)
-    {
+    for (int i = 0; i < size; i++) {
         tab[i] = temp[i];
     }
 }
+*/
 
-void avl_free_strong(p_avlnode p, void (*f)(void *))
-{
-    if (p == NULL)
-    {
+void avl_free_strong(avlnode* p, void (*f)(void*)) {
+    if (p == NULL) {
         return;
     }
-    else
-    {
+    else {
         avl_free_strong(p->left, f);
         avl_free_strong(p->right, f);
-        (*f)(p->value);
+        (*f) (p->value);
         free(p);
     }
 }
@@ -260,35 +213,28 @@ void avl_free_strong(p_avlnode p, void (*f)(void *))
 /* Fonctions auxiliaires et rotations */
 /**************************************/
 
-static int get_height_uint_avl(p_uint_avlnode p)
-{
-    if (p == NULL)
-    {
+static int get_height_uint_avl(uint_avlnode* p) {
+    if (p == NULL) {
         return -1;
     }
-    else
-    {
+    else {
         return p->height;
     }
 }
 
 // Répare la hauteur si elle n'est fausse que à la racine
-static void uint_fix_height(p_uint_avlnode p)
-{
+static void uint_fix_height(uint_avlnode* p) {
     p->height = max(get_height_uint_avl(p->left), get_height_uint_avl(p->right)) + 1;
 }
 
 // p should not be NULL
-static int get_balance_uint_avl(p_uint_avlnode p)
-{
+static int get_balance_uint_avl(uint_avlnode* p) {
     return get_height_uint_avl(p->right) - get_height_uint_avl(p->left);
 }
 
-static p_uint_avlnode uint_rotate_left(p_uint_avlnode p)
-{
-    p_uint_avlnode rightson = p->right;
-    if (rightson == NULL)
-    {
+static uint_avlnode* uint_rotate_left(uint_avlnode* p) {
+    uint_avlnode* rightson = p->right;
+    if (rightson == NULL) {
         printf("Warning, can't rotate left if there is no right son.\n");
         return NULL;
     }
@@ -299,11 +245,9 @@ static p_uint_avlnode uint_rotate_left(p_uint_avlnode p)
     return rightson;
 }
 
-static p_uint_avlnode uint_rotate_right(p_uint_avlnode p)
-{
-    p_uint_avlnode leftson = p->left;
-    if (leftson == NULL)
-    {
+static uint_avlnode* uint_rotate_right(uint_avlnode* p) {
+    uint_avlnode* leftson = p->left;
+    if (leftson == NULL) {
         printf("Warning, can't rotate right if there is no left son.\n");
         return NULL;
     }
@@ -314,10 +258,8 @@ static p_uint_avlnode uint_rotate_right(p_uint_avlnode p)
     return leftson;
 }
 
-static p_uint_avlnode uint_rotate_left_right(p_uint_avlnode p)
-{
-    if (p->left == NULL)
-    {
+static uint_avlnode* uint_rotate_left_right(uint_avlnode* p) {
+    if (p->left == NULL) {
         printf("Warning, can't rotate left-right if there is no left son.\n");
         return NULL;
     }
@@ -325,10 +267,8 @@ static p_uint_avlnode uint_rotate_left_right(p_uint_avlnode p)
     return uint_rotate_right(p);
 }
 
-static p_uint_avlnode uint_rotate_right_left(p_uint_avlnode p)
-{
-    if (p->right == NULL)
-    {
+static uint_avlnode* uint_rotate_right_left(uint_avlnode* p) {
+    if (p->right == NULL) {
         printf("Warning, can't rotate right-left if there is no right son.\n");
         return NULL;
     }
@@ -337,34 +277,26 @@ static p_uint_avlnode uint_rotate_right_left(p_uint_avlnode p)
 }
 
 // Répare l'équilibre à la racine
-static p_uint_avlnode repare_balance_uint_avl(p_uint_avlnode p)
-{
-    if (p == NULL)
-    {
+static uint_avlnode* repare_balance_uint_avl(uint_avlnode* p) {
+    if (p == NULL) {
         return NULL;
     }
     int b = get_balance_uint_avl(p);
-    if (b == 2)
-    {
+    if (b == 2) {
         int bd = get_balance_uint_avl(p->right);
-        if (bd >= 0)
-        {
+        if (bd >= 0) {
             return uint_rotate_left(p);
         }
-        else
-        {
+        else {
             return uint_rotate_right_left(p);
         }
     }
-    else if (b == -2)
-    {
+    else if (b == -2) {
         int bg = get_balance_uint_avl(p->left);
-        if (bg <= 0)
-        {
+        if (bg <= 0) {
             return uint_rotate_right(p);
         }
-        else
-        {
+        else {
             return uint_rotate_left_right(p);
         }
     }
@@ -375,34 +307,27 @@ static p_uint_avlnode repare_balance_uint_avl(p_uint_avlnode p)
 /* Opérations */
 /**************/
 
-p_uint_avlnode uint_avl_search(uint val, p_uint_avlnode p)
-{
-    if (p == NULL)
-    {
+uint_avlnode* uint_avl_search(uint val, uint_avlnode* p) {
+    if (p == NULL) {
         return NULL;
     }
-    else if (val == p->value)
-    {
+    else if (val == p->value) {
         // Si la valeur est déjà présente à la racine
         return p;
     }
-    else if (val < p->value)
-    {
+    else if (val < p->value) {
         // Si la valeur est strictement inférieure à celle de la racine
         return uint_avl_search(val, p->left);
     }
-    else
-    {
+    else {
         // Si la valeur est strictement supérieure à celle de la racine
         return uint_avl_search(val, p->right);
     }
 }
 
-p_uint_avlnode uint_avl_insert(uint val, p_uint_avlnode p)
-{
-    if (p == NULL)
-    {
-        p_uint_avlnode new;
+uint_avlnode* uint_avl_insert(uint val, uint_avlnode* p) {
+    if (p == NULL) {
+        uint_avlnode* new;
         MALLOC(new, 1);
         new->height = 0;
         new->left = NULL;
@@ -410,64 +335,55 @@ p_uint_avlnode uint_avl_insert(uint val, p_uint_avlnode p)
         new->value = val;
         return new;
     }
-    else if (val == p->value)
-    {
+    else if (val == p->value) {
         // Si la valeur est déjà présente à la racine
         return p;
     }
-    else if (val < p->value)
-    {
+    else if (val < p->value) {
         // Si la valeur est strictement inférieure à celle de la racine
         p->left = uint_avl_insert(val, p->left);
         return repare_balance_uint_avl(p);
     }
-    else
-    {
+    else {
         // Si la valeur est strictement supérieure à celle de la racine
         p->right = uint_avl_insert(val, p->right);
         return repare_balance_uint_avl(p);
     }
 }
 
-int getsize_uint_avl(p_uint_avlnode p)
-{
-    if (p == NULL)
-    {
+int getsize_uint_avl(uint_avlnode* p) {
+    if (p == NULL) {
         return 0;
     }
-    else
-    {
+    else {
         return getsize_uint_avl(p->left) + getsize_uint_avl(p->right) + 1;
     }
 }
 
-// Récupération de la liste des valeurs dans un p_vertices
-void uint_avl_to_vertices(p_uint_avlnode p, p_vertices v)
-{
-    if (p == NULL)
-    {
+// Récupération de la liste des valeurs dans un dequeue*
+void uint_avl_to_dequeue(uint_avlnode* p, dequeue* v) {
+    if (p == NULL) {
         return;
     }
-    else
-    {
-        uint_avl_to_vertices(p->left, v);
-        rigins_vertices(p->value, v);
-        uint_avl_to_vertices(p->right, v);
+    else {
+        uint_avl_to_dequeue(p->left, v);
+        rigins_dequeue(p->value, v);
+        uint_avl_to_dequeue(p->right, v);
         free(p);
     }
 }
 
-// static int uint_avl_to_array(p_uint_avlnode tree, int *tab, int num)
+// static int uint_avl_to_array(uint_avlnode * tree, int *tab, int num)
 // {
-//     if (tree == NULL)
-//     {
-//         return num;
-//     }
-//     else
-//     {
-//         int newnum = avl_to_array(tree->left, tab, num);
-//         printf("%d\n", *(int *)tree->value);
-//         tab[newnum] = *(int *)tree->value;
-//         return avl_to_array(tree->right, tab, newnum + 1);
-//     }
+// if (tree == NULL)
+// {
+// return num;
+// }
+// else
+// {
+// int newnum = avl_to_array(tree->left, tab, num);
+// printf("%d\n", *(int *)tree->value);
+// tab[newnum] = *(int *)tree->value;
+// return avl_to_array(tree->right, tab, newnum + 1);
+// }
 // }

@@ -1,9 +1,11 @@
+/**
+ * @file main.h
+ * @brief
+ * The main file of the program.
+ */
+
 #ifndef MAIN_H
 #define MAIN_H
-
-// ----------------------------//
-// NE PAS MODIFIER CE FICHIER //
-// ----------------------------//
 
 #include <assert.h>
 #include <getopt.h>
@@ -14,17 +16,34 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "macros_alloc.h"
+#include "alloc.h"
+#include "files.h"
+#include "interrupt.h"
+#include "nfa.h"
+#include "printing.h"
+#include "readline.h"
+#include "regexp.h"
+#include "shell_keywords.h"
+#include "string.h"
+#include "time.h"
+#include "tools.h"
 
-#define PROMPT ">>> "
+/**
+ * @brief
+ * Print the usage of the program.
+ */
+void usage(char *argv[]);
 
-// Affiche un message d'aide.
-void usage(char* argv[]);
+/**
+ * @brief
+ * Parse the command line arguments.
+ */
+void parse_argv(int argc, char *argv[]);
 
-// Parse les arguments de la ligne de commande.
-void parse_argv(int argc, char* argv[]);
-
-// Analyse la ligne de commande.
+/**
+ * @brief
+ * Parse the command line of the shell.
+ */
 int shell_parse(void);
 
 #endif /* MAIN_H */

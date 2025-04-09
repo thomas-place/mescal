@@ -1,28 +1,45 @@
-/********************************************/
-/* Determinisation et Minimisation des NFAs */
-/********************************************/
+/**
+ * @file nfa_determi.h
+ * @brief
+ * Determinization and complementation of NFAs
+ */
 
 #ifndef NFA_DETERMI_H
 #define NFA_DETERMI_H
 
+ /*  _   _ _____ _        ____  _____ _____ _____ ____  __  __ ___ _   _ ___ _____   _  _____ ___ ___  _   _  */
+ /* | \ | |  ___/ \   _  |  _ \| ____|_   _| ____|  _ \|  \/  |_ _| \ | |_ _|__  /  / \|_   _|_ _/ _ \| \ | | */
+ /* |  \| | |_ / _ \ (_) | | | |  _|   | | |  _| | |_) | |\/| || ||  \| || |  / /  / _ \ | |  | | | | |  \| | */
+ /* | |\  |  _/ ___ \ _  | |_| | |___  | | | |___|  _ <| |  | || || |\  || | / /_ / ___ \| |  | | |_| | |\  | */
+ /* |_| \_|_|/_/   \_(_) |____/|_____| |_| |_____|_| \_\_|  |_|___|_| \_|___/____/_/   \_\_| |___\___/|_| \_| */
+
 #include "nfa.h"
+#include "printing.h"
 
-/************************/
-/* Procédure principale */
-/************************/
+/**
+ * @brief
+ * Determinization of a NFA with the subset construction.
+ *
+ * @remark
+ * The input Boolean is used to indicate whether the names of the states have to be saved (this only
+ * impacts display).  The name of a state is the set of states to which it corresponds in the subset
+ * construction.
+ *
+ * @return
+ * The complete DFA built with the subset construction.
+ */
+nfa* nfa_determinize(nfa*, //!< The NFA.
+    bool                   //!< A Boolean indicating whether the state names have to be saved.
+);
 
-// Procédure de déterminisation. Le Booléen names indique si les noms des nouveaux états
-// (des ensembles d'états de l'ancien NFA) doivent être sauvegardés dans le DFA.
-p_nfa nfa_determinize(p_nfa A, bool names);
-
-/********************************************/
-/* Procédures basées sur la determinisation */
-/********************************************/
-
-// Minimisation (Brzozowski)
-p_nfa nfa_minimize(p_nfa A);
-
-// Complementation
-p_nfa nfa_complement(p_nfa A);
+/**
+ * @brief
+ * Complementation of a NFA.
+ *
+ * @return
+ * A complete DFA recognizing the complement of the input language.
+ */
+nfa* nfa_complement(nfa* //!< The NFA.
+);
 
 #endif

@@ -1,961 +1,816 @@
 #include "monoid.h"
+#include "monoid_display.h"
+#include "interrupt.h"
+#include "shell_errors.h"
 
-/*****************************************/
-/* Fonctions génériques pour l'affichage */
-/*****************************************/
 
-static uint cayley_get_name_length(p_cayley M, uint q)
-{
-    if (isempty_vertices(M->names[q]))
-    {
-        // La longueur du neutre est 1 (chaine "1")
-        return 1;
+
+/*******************/
+/* Basic functions */
+/*******************/
+
+
+void delete_green(green* G) {
+    if (G == NULL) {
+        return;
     }
-    // Sinon
-    // Un entier pour la longueur
-    uint l = 0;
-    // Un entier temporaire pour stocker le nombre de copies consécutives d'une
-    // même lettre
-    uint num;
-    for (uint i = 0; i < size_vertices(M->names[q]); i++)
-    {
-        // printf("%d\n", i);
-        // Si la lettre lue est distincte de la précédente
-        if (i == 0 || lefread_vertices(M->names[q], i - 1) != lefread_vertices(M->names[q], i))
-        {
-            uint d = 0;
-            // On compte le nombre de chiffres du nombre de copies de la lettre
-            // précédente
-            if (num > 1)
-            {
-                while (num != 0)
-                {
-                    d++;
-                    num = num / 10;
+    free(G->regular_idems);
+    free(G->regular_set);
+    free(G->group_set);
+
+    delete_parti(G->HCL);
+    delete_parti(G->RCL);
+    delete_parti(G->LCL);
+    delete_parti(G->JCL);
+    free(G);
+}
+
+void delete_morphism(morphism* M) {
+    if (!M) {
+        return;
+    }
+    /* Mandatory fields */
+
+    // Free all names.
+    for (uint i = 0; i < M->r_cayley->size_graph; i++) {
+        delete_dequeue(M->names[i]);
+    }
+    free(M->names);
+
+    // Free accepting elements.
+    free(M->accept_array);
+    delete_dequeue(M->accept_list);
+
+    // Free idempotents.
+    free(M->idem_array);
+    delete_dequeue(M->idem_list);
+
+    // Free generators.
+    free(M->alphabet);
+
+    // Free Green relations.
+    delete_green(M->rels);
+
+    // Free jord
+    delete_lgraph(M->j_order);
+
+
+
+    free(M->min_regular_idems);
+
+    /* Optional fields */
+
+    // Free multiplication table (if needed).
+    if (M->mult != NULL) {
+        for (uint i = 0; i < M->r_cayley->size_graph; i++) {
+            free(M->mult[i]);
+        }
+        free(M->mult);
+    }
+
+    // Free monoid order (if needed)
+    if (M->order != NULL) {
+        for (uint i = 0; i < M->r_cayley->size_graph; i++) {
+            delete_dequeue(M->order[i]);
+        }
+    }
+
+    // Free Cayley graphs
+    delete_dgraph(M->l_cayley);
+    delete_dgraph(M->r_cayley);
+
+    free(M);
+}
+
+letter* mor_duplicate_alpha(const morphism* M) {
+    if (!M) {
+        return NULL;
+    }
+    letter* alphabet;
+    MALLOC(alphabet, M->r_cayley->size_alpha);
+    for (uint i = 0; i < M->r_cayley->size_alpha; i++) {
+        alphabet[i] = M->alphabet[i];
+    }
+    return alphabet;
+}
+
+uint mor_letter_index(const morphism* M, letter l) {
+    const letter* p = bsearch(&l, M->alphabet, M->r_cayley->size_alpha, sizeof(letter), compare_letters);
+    if (p) {
+        return p - M->alphabet;
+    }
+    else {
+        return UINT_MAX;
+    }
+}
+
+/**********************************************/
+/* Preliminary functions for the construction */
+/**********************************************/
+
+
+void mor_compute_leftcayley(morphism* M) {
+
+    // As a precaution, we delete the left Cayley graph if it already exists.
+    if (M->l_cayley) {
+        delete_dgraph(M->l_cayley);
+    }
+
+
+    // Création du graphe.
+    M->l_cayley = create_dgraph_noedges(M->r_cayley->size_graph, M->r_cayley->size_alpha);
+    dequeue* fromlet = create_dequeue();
+    dequeue* fromone = create_dequeue();
+    bool* visited;
+    MALLOC(visited, M->r_cayley->size_graph);
+
+    // For each letter in the alphabet.
+    for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
+
+        // Initialize the queues and the visited array.
+        makeempty_dequeue(fromlet);
+        makeempty_dequeue(fromone);
+        for (uint s = 0; s < M->r_cayley->size_graph; s++) {
+            visited[s] = false;
+        }
+        rigins_dequeue(ONE, fromone);
+        rigins_dequeue(M->r_cayley->edges[ONE][a], fromlet);
+        visited[ONE] = true;
+
+        while (!isempty_dequeue(fromone)) {
+            uint s = rigpull_dequeue(fromone);
+            uint as = rigpull_dequeue(fromlet);
+            M->l_cayley->edges[s][a] = as;
+            for (uint b = 0; b < M->r_cayley->size_alpha; b++) {
+                if (!visited[M->r_cayley->edges[s][b]]) {
+                    rigins_dequeue(M->r_cayley->edges[s][b], fromone);
+                    rigins_dequeue(M->r_cayley->edges[as][b], fromlet);
+                    visited[M->r_cayley->edges[s][b]] = true;
                 }
             }
-            // La longueur est augmentée de ce nombre de chiffre plus la
-            // nouvelle lettre lue
-            l   = l + d + 1;
-            // On a pour l'instant une copie de la nouvelle lettre
-            num = 1;
-        }
-        else
-        {
-            // On a lu une copie de plus
-            num++;
         }
     }
-
-    uint d = 0;
-    // On compte le nombre de chiffres du nombre de copies de la lettre
-    // précédente
-    if (num > 1)
-    {
-        while (num != 0)
-        {
-            d++;
-            num = num / 10;
-        }
-    }
-    l = l + d;
-    return l;
+    free(visited);
+    delete_dequeue(fromlet);
+    delete_dequeue(fromone);
 }
 
-// Retourne une chaîne de caractères correspondant au nom d'un élément
-// char* cayley_get_name(p_cayley M, uint q) {
-// char* res;
-// if (isempty_vertices(M->names[q])) {
-// MALLOC(res, 2);
-// res[0] = '1';
-// res[1] = '\0';
-// }
-// else {
-// MALLOC(res, size_vertices(M->names[q]) + 1);
-// for (uint i = 0; i < size_vertices(M->names[q]); i++) {
-// res[i] = lefread_vertices(M->names[q], i) + 'a';
-// }
-// res[size_vertices(M->names[q])] = '\0';
-// }
-// return res;
-// }
 
-// Retourne une chaîne de caractères correspondant au nom d'un élément
-// (factorisation des puissances)
-char *cayley_get_name(p_cayley M, uint q)
-{
-    char *res;
-    MALLOC(res, NAMELEN);
-    if (isempty_vertices(M->names[q]))
-    {
-        res[0] = '1';
-        res[1] = '\0';
-    }
-    else
-    {
-        char let[] = "a";
-        let[0] = lefread_vertices(M->names[q], 0) + 'a';
-        strcpy(res, let);
 
-        // Un entier temporaire pour stocker le nombre de copies consécutives
-        // d'une même lettre
-        uint num = 1;
+// Quick sort algorithm between the indices i and j - 1 (inclusive)
+static void aux_quick_sort_green(uint* array, uint i, uint j, uint* rnums, uint* lnums) {
 
-        for (uint i = 1; i < size_vertices(M->names[q]); i++)
-        {
-            // Si la lettre lue est distincte de la précédente
-            if (lefread_vertices(M->names[q], i - 1) != lefread_vertices(M->names[q], i))
-            {
-                if (num > 1)
-                {
-                    append_power(num, res);
-                }
-                let[0] = 'a' + lefread_vertices(M->names[q], i);
-                strcat(res, let);
-                // On a pour l'instant une copie de la nouvelle lettre
-                num = 1;
-            }
-            else
-            {
-                // On a lu une copie de plus
-                num++;
-            }
-        }
-        if (num > 1)
-        {
-            append_power(num, res);
-        }
-    }
-    REALLOC(res, strlen(res) + 1);
-    return res;
-}
-
-//// Affichage du nom de l'élément q
-// void cayley_print_name(p_cayley M, uint q, FILE* out) {
-
-// if (isempty_vertices(M->names[q])) {
-// fprintf(out, "1");
-// }
-// else {
-// for (uint i = 0; i < size_vertices(M->names[q]); i++) {
-// fprintf(out, "%c", lefread_vertices(M->names[q], i) + 'a');
-// }
-// }
-// }
-
-//// Affichage du nom de l'élément q
-// uint cayley_print_name(p_cayley M, uint q, FILE* out) {
-
-// char* thename = cayley_get_name(M, q);
-// fprintf(out, "%s", thename);
-// free(thename);
-// }
-
-// Affichage du nom de l'élément q
-uint cayley_print_name(p_cayley M, uint q, FILE *out)
-{
-    if (isempty_vertices(M->names[q]))
-    {
-        fprintf(out, "1");
-        return 1;
-    }
-    else
-    {
-        uint n   = 1;
-        fprintf(out, "%c", lefread_vertices(M->names[q], 0) + 'a');
-        uint len = 1;
-        for (uint i = 1; i < size_vertices(M->names[q]); i++)
-        {
-            if (lefread_vertices(M->names[q], i) != lefread_vertices(M->names[q], i - 1))
-            {
-                if (n > 1)
-                {
-                    print_power(n, out);
-                    while (n != 0)
-                    {
-                        len++;
-                        n = n / 10;
-                    }
-                }
-                fprintf(out, "%c", lefread_vertices(M->names[q], i) + 'a');
-                len++;
-                n = 1;
-            }
-            else
-            {
-                n++;
-            }
-        }
-        if (n > 1)
-        {
-            print_power(n, out);
-            while (n != 0)
-            {
-                len++;
-                n = n / 10;
-            }
-        }
-        return len;
-    }
-}
-
-//// Affichage du nom de l'élément q, version alignée
-//// On utilise exactement size caractère en ajoutant des espaces (size doit
-// être
-//// suffisament grand)
-// void cayley_print_name_aligned(p_cayley M, uint q, uint size_max, FILE* out)
-// {
-// if (isempty_vertices(M->names[q])) {
-// fprintf(out, "1");
-// print_spaces(size_max - 1, out);
-// }
-// else {
-// for (uint i = 0; i < size_vertices(M->names[q]); i++) {
-
-// fprintf(out, "%c", lefread_vertices(M->names[q], i) + 'a');
-// }
-// print_spaces(size_max - size_vertices(M->names[q]), out);
-// }
-// }
-
-// Affichage du nom de l'élément q, version alignée
-// On utilise exactement size caractères en ajoutant des espaces (size doit être
-// suffisament grand)
-void cayley_print_name_aligned(p_cayley M, uint q, uint size_max, FILE *out)
-{
-    uint len = cayley_print_name(M, q, out);
-    print_spaces(size_max - len, out);
-}
-
-//// Récupération de la longueur maximale d'un nom (à utiliser avec la fonction
-//// précédente)
-// uint cayley_max_name_size(p_cayley M, p_vertices sub) {
-// uint size = 1;
-
-// if (sub == NULL) {
-
-// for (uint q = 0; q < M->trans->size_graph; q++) {
-// size = max(size, size_vertices(M->names[q]));
-// }
-// return size;
-// }
-// else {
-// for (uint i = 0; i < size_vertices(sub); i++) {
-// size = max(size, size_vertices(M->names[lefread_vertices(sub, i)]));
-// }
-// return size;
-// }
-// }
-
-// Récupération de la longueur maximale d'un nom (à utiliser avec la fonction
-// précédente)
-uint cayley_max_name_size(p_cayley M, p_vertices sub)
-{
-    uint size = 1;
-
-    if (sub == NULL)
-    {
-        for (uint q = 0; q < M->trans->size_graph; q++)
-        {
-            size = max(size, cayley_get_name_length(M, q));
-        }
-        return size;
-    }
-    else
-    {
-        for (uint i = 0; i < size_vertices(sub); i++)
-        {
-            size = max(size, cayley_get_name_length(M, lefread_vertices(sub, i)));
-        }
-        return size;
-    }
-}
-
-// Affichage d'un sous ensemble d'éléments dans un cayley graph
-void print_sub_cayley(p_cayley M, p_vertices elems, FILE *out)
-{
-    for (uint i = 0; i < size_vertices(elems); i++)
-    {
-        cayley_print_name(M, lefread_vertices(elems, i), out);
-        if (i < size_vertices(elems) - 1)
-        {
-            fprintf(out, ", ");
-        }
-    }
-    fprintf(out, "\n");
-}
-
-// Affichage d'un sous ensemble d'éléments dans un cayley graph
-// Version alignement automatique
-void print_sub_cayley_aligned(p_cayley M, p_vertices elems, uint length,
-                              uint padding, FILE *out)
-{
-    uint max_size = length - padding;
-    uint use_size = 0;
-    for (uint i = 0; i < size_vertices(elems); i++)
-    {
-        uint e         = lefread_vertices(elems, i);
-        uint size_elem = cayley_get_name_length(M, e); // size_vertices(M->names[e]);
-        if (size_elem == 0)                            // Si on a à faire au mot
-                                                       // vide, on l'affichera
-                                                       // comme 1
-        {
-            size_elem++;
-        }
-        if (size_elem + use_size + 2 > max_size ||
-            (i == size_vertices(elems) - 1 && size_elem + use_size > max_size))
-        {
-            for (uint j = 0; j < max_size - use_size; j++)
-            {
-                fprintf(out, " ");
-            }
-            fprintf(out, "│\n│");
-            for (uint j = 0; j < padding; j++)
-            {
-                fprintf(out, " ");
-            }
-            use_size = 0;
-        }
-        cayley_print_name(M, e, out);
-        // if (e == 0)
-        // {
-        //// Si l'élément est le neutre
-        // fprintf(out, "1");
-        // }
-        // else
-        // {
-        // for (uint j = 0; j < size_elem; j++)
-        // {
-
-        // fprintf(out, "%c", lefread_vertices(M->names[e], j) + 'a');
-        // }
-        // }
-        use_size = use_size + size_elem;
-        if (i < size_vertices(elems) - 1)
-        {
-            fprintf(out, ", ");
-            use_size = use_size + 2;
-        }
-    }
-    print_spaces(max_size - use_size, out);
-    fprintf(out, "│\n");
-}
-
-// Affichage d'un sous-ensemble d'éléments dans un cayley graph
-// Version avec un titre (utilise la fonction précédente)
-void print_sub_cayley_titled(p_cayley M, p_vertices elems, uint length,
-                             char *name, FILE *out)
-{
-    print_title_box(length, false, out, 1, name);
-    fprintf(out, "│");
-
-    // Affichage du sous-ensemble
-    print_sub_cayley_aligned(M, elems, length, 0, out);
-
-    print_bot_line(length, out);
-}
-
-// Affichage des images de toutes les lettres
-void cayley_print_morphism(p_cayley M, FILE *out)
-{
-    for (uint a = 0; a < M->trans->size_alpha; a++)
-    {
-        fprintf(out, "    %c ⟼ ", a + 'a');
-        cayley_print_name(M, M->trans->edges[ONE][a], out);
-        fprintf(out, "\n");
-    }
-}
-
-/**********************************/
-/* Construction à partir d'un DFA */
-/**********************************/
-
-// Représentation d'un état du graphe de Cayley construit à partir d'un DFA
-// complet et des transitions qui partent de celui-ci
-struct cayley_state {
-    // Nombre d'états du DFA utilisé dans la construction
-    uint size_graph;
-
-    // Un état: une permutation de {0,...,size_auto-1}
-    uint *state;
-
-    // Le nom de l'état
-    p_vertices name;
-
-    // La taille de l'alphabet
-    uint size_alpha;
-
-    // Le numéro de l'état dans le future graphe de Cayley
-    uint num;
-
-    // Un tableau de taille size_alph contenant les transitions depuis l'état
-    // pour chaque lettre
-    struct cayley_state **next;
-};
-
-typedef struct cayley_state *p_cayley_state;
-
-// Fonction de libération
-static void free_cayley_state(void *p)
-{
-    if (p == NULL)
+    if (i + 1 >= j)
     {
         return;
     }
-    free(((p_cayley_state)p)->state); // Suppression de la permutation
-    free(((p_cayley_state)p)->next);  // Suppression de la table des transitions
+    else {
+        uint pivot = array[i];
+        uint l = j;
+
+        for (uint k = j - 1; i < k; k--) {
+            if (rnums[pivot] < rnums[array[k]] || (rnums[pivot] == rnums[array[k]] && lnums[pivot] < lnums[array[k]])) {
+                l--;
+                uint temp = array[l];
+                array[l] = array[k];
+                array[k] = temp;
+            }
+        }
+        uint temp = array[l - 1];
+        array[l - 1] = array[i];
+        array[i] = temp;
+
+        aux_quick_sort_green(array, i, l - 1, rnums, lnums);
+        aux_quick_sort_green(array, l, j, rnums, lnums);
+    }
+}
+
+
+uint* green_sorted_jclass(green* G, uint i) {
+    uint* sorted_jclass;
+    MALLOC(sorted_jclass, size_dequeue(G->JCL->cl[i]));
+    for (uint j = 0; j < size_dequeue(G->JCL->cl[i]); j++) {
+        sorted_jclass[j] = lefread_dequeue(G->JCL->cl[i], j);
+    }
+    aux_quick_sort_green(sorted_jclass, 0, size_dequeue(G->JCL->cl[i]), G->RCL->numcl, G->LCL->numcl);
+    return sorted_jclass;
+}
+
+
+void h_green_compute(green* GREL) {
+    if (GREL->RCL == NULL || GREL->LCL == NULL || GREL->JCL == NULL) {
+        fprintf(stderr, "Error. Cannot compute the H-classes without the J-classes, the "
+            "L-classes and the R-classes\n");
+        return;
+    }
+
+    // If the H-classes already exist, we delete them (should not happen).
+    if (GREL->HCL) {
+        delete_parti(GREL->HCL);
+        return;
+    }
+
+    uint num = 0;
+
+    // Computes the H-classes
+    MALLOC(GREL->HCL, 1);
+    GREL->HCL->size_set = GREL->JCL->size_set;
+    MALLOC(GREL->HCL->numcl, GREL->HCL->size_set);
+
+
+    // For each J-class.
+    for (uint cr = 0; cr < GREL->JCL->size_par; cr++) {
+        // We store the elements of the J-class in an array.
+        // We sort these elements according to their index in the R-class and then in the L-class.
+        // This is done to ensure that the elements of the same H-class are contiguous in the array.
+        uint* thejclass = green_sorted_jclass(GREL, cr);
+
+
+        uint elem = thejclass[0];
+        GREL->HCL->numcl[elem] = num;
+        num++;
+        for (uint i = 1; i < size_dequeue(GREL->JCL->cl[cr]); i++) {
+            if (GREL->LCL->numcl[thejclass[i]] == GREL->LCL->numcl[elem] && GREL->RCL->numcl[thejclass[i]] == GREL->RCL->numcl[elem]) {
+                GREL->HCL->numcl[thejclass[i]] = GREL->HCL->numcl[elem];
+            }
+            else {
+                GREL->HCL->numcl[thejclass[i]] = num;
+                num++;
+                elem = thejclass[i];
+            }
+        }
+        free(thejclass);
+
+    }
+
+    // We now know the number of H-classes.
+    GREL->HCL->size_par = num;
+
+    // It remains to build the table of classes.
+    MALLOC(GREL->HCL->cl, GREL->HCL->size_par);
+
+    for (uint c = 0; c < GREL->HCL->size_par; c++) {
+        GREL->HCL->cl[c] = create_dequeue();
+    }
+    for (uint v = 0; v < GREL->HCL->size_set; v++) {
+        rigins_dequeue(v, GREL->HCL->cl[GREL->HCL->numcl[v]]);
+    }
+
+}
+
+void gr_green_compute(dequeue* idem_list, green* G) {
+
+    // First, we compute the regular j-classes.
+    uint* regular_array;
+    MALLOC(regular_array, G->JCL->size_par);
+    for (uint i = 0; i < G->JCL->size_par; i++) {
+        regular_array[i] = UINT_MAX;
+    }
+
+    // For each J-class index i, if the J-class is regular, we store
+    // a member idempotent e in regular_array[i] (the one with the least index).
+    for (uint i = size_dequeue(idem_list); i > 0; i--) {
+        uint e = lefread_dequeue(idem_list, i - 1);
+        regular_array[G->JCL->numcl[e]] = e;
+    }
+
+    // Building information on regular J-classes.
+    G->nb_regular_elems = 0;
+    G->nb_regular_jcl = 0;
+    CALLOC(G->regular_set, G->JCL->size_set);
+    MALLOC(G->regular_idems, G->JCL->size_set);
+
+
+
+    for (uint c = 0; c < G->JCL->size_par; c++) {
+        // For each regular J-class
+        if (regular_array[c] != UINT_MAX) {
+            G->regular_idems[G->nb_regular_jcl] = regular_array[c];
+            G->nb_regular_jcl++;
+            G->nb_regular_elems += size_dequeue(G->JCL->cl[c]);
+            for (uint i = 0; i < size_dequeue(G->JCL->cl[c]); i++) {
+                G->regular_set[lefread_dequeue(G->JCL->cl[c], i)] = true;
+            }
+        }
+    }
+    free(regular_array);
+
+    // Building information on groups.
+    CALLOC(G->group_set, G->HCL->size_set);
+    for (uint i = 0; i < size_dequeue(idem_list); i++) {
+        uint j = G->HCL->numcl[lefread_dequeue(idem_list, i)];
+        for (uint k = 0; k < size_dequeue(G->HCL->cl[j]); k++) {
+            G->group_set[lefread_dequeue(G->HCL->cl[j], k)] = true;
+        }
+    }
+}
+
+
+
+void mor_compute_green(morphism* M) {
+    if (M->rels) {
+        delete_green(M->rels);
+    }
+
+    // Initialization of the structure.
+    MALLOC(M->rels, 1);
+
+    // Computing the R equivalence (strongly connected components of the right cayley graph).
+    M->rels->RCL = dtarjan(M->r_cayley);
+
+    // Computing the L equivalence (strongly connected components of the left cayley graph).
+    M->rels->LCL = dtarjan(M->l_cayley);
+
+    // Computing the J equivalence (strongly connected components of the J order).
+    M->rels->JCL = ltarjan(M->j_order);
+
+
+    // Computing the relation H.
+    h_green_compute(M->rels);
+    // Computing the regular elements and the groups.
+    gr_green_compute(M->idem_list, M->rels);
+}
+
+
+
+
+
+void mor_compute_min_regular_jcl(morphism* M) {
+    if (!M || !M->rels) {
+        fprintf(stderr, "Error in mor_compute_min_regular_jcl.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    M->nb_min_regular_jcl = 1;
+
+    // If the neutral element has a nonempty antecedent, the only minimal strict J-class is the one
+    // containing the neutral element.
+    if (mor_nonempty_neutral(M)) {
+        MALLOC(M->min_regular_idems, 1);
+        M->min_regular_idems[0] = ONE;
+        return;
+    }
+
+    // We now know that the J-class of 1 is a singleton.
+
+
+    bool* visited;
+    CALLOC(visited, M->r_cayley->size_graph);
+    visited[ONE] = true;
+    bool* min_regjcl;
+    CALLOC(min_regjcl, M->rels->JCL->size_par);
+    min_regjcl[M->rels->JCL->numcl[ONE]] = true;
+
+    dequeue* thestack = create_dequeue();
+
+    for (uint i = 0; i < M->rels->JCL->size_par; i++) {
+        uint s = lefread_dequeue(M->rels->JCL->cl[i], 0);
+        // If the J-class has already been visited or is not regular, we skip it.
+        if (visited[s] || !M->rels->regular_set[s]) {
+            continue;
+        }
+        // Otherwise, we found a minimal regular strict J-class.
+        M->nb_min_regular_jcl++;
+        min_regjcl[M->rels->JCL->numcl[s]] = true;
+
+        // We mark all elements larger than the J-class as visited.
+        // This enables us to skip the larger J-classes in the counting.
+        rigins_dequeue(s, thestack);
+        while (!isempty_dequeue(thestack)) {
+            uint t = rigpull_dequeue(thestack);
+            if (visited[t]) {
+                continue;
+            }
+            visited[t] = true;
+            for (uint a = 0; a < M->j_order->size_alpha; a++) {
+                for (uint j = 0; j < size_dequeue(M->j_order->edges[t][a]); j++) {
+                    uint u = lefread_dequeue(M->j_order->edges[t][a], j);
+                    rigins_dequeue(u, thestack);
+                }
+            }
+        }
+    }
+    free(visited);
+    delete_dequeue(thestack);
+
+    uint j = 0;
+
+    CALLOC(M->min_regular_idems, M->nb_min_regular_jcl);
+    for (uint i = 0; i < M->rels->nb_regular_jcl;i++) {
+        if (min_regjcl[M->rels->JCL->numcl[M->rels->regular_idems[i]]]) {
+            M->min_regular_idems[j] = M->rels->regular_idems[i];
+            j++;
+        }
+    }
+    free(min_regjcl);
+}
+
+
+/************************************/
+/* Construction from a complete DFA */
+/************************************/
+
+// Representation of a state of the morphism graph built from a
+// complete DFA and of the outgoing transitions from this state.
+typedef struct morphism_state {
+    uint size_graph;              //!< Number of states of the DFA used in the construction.
+    uint* state;                  //!< A state: a permutation of {0, ..., size_graph-1}.
+    dequeue* name;                //!< The name of the state.
+    uint size_alpha;              //!< The size of the alphabet.
+    uint num;                     //!< The number of the state in the future monoid.
+    struct morphism_state** next; //!< Array of size size_alpha containing the transitions, one for each letter.
+} morphism_state;
+
+// Release function
+static void delete_morphism_state(void* p) {
+    if (p == NULL) {
+        return;
+    }
+    free(((morphism_state*)p)->state); // Free the permutation
+    free(((morphism_state*)p)->next);  // Free the transition table
     free(p);
 }
 
-// La fonction de comparaison de deux objets de type p_cayley_state (utilise la
-// précédente) Pour les AVLs
-static int comp_cayley_state(void *p1, void *p2)
-{
-    if (((p_cayley_state)p1)->size_graph != ((p_cayley_state)p2)->size_graph)
-    {
-        fprintf(stderr, "Error, the cayley states should have the same size\n");
+// Function comparing two objects of type morphism_state. Useful for comparing states in AVLs.
+static int comp_morphism_state(void* p1, void* p2) {
+    if (((morphism_state*)p1)->size_graph != ((morphism_state*)p2)->size_graph) {
+        fprintf(stderr, "Error, the morphism states should have the same size.\n");
         exit(EXIT_FAILURE);
     }
-    for (uint i = 0; i < ((p_cayley_state)p1)->size_graph; i++)
-    {
-        if (((p_cayley_state)p1)->state[i] < ((p_cayley_state)p2)->state[i])
-        {
+    for (uint i = 0; i < ((morphism_state*)p1)->size_graph; i++) {
+        if (((morphism_state*)p1)->state[i] < ((morphism_state*)p2)->state[i]) {
             return 1;
         }
-        if (((p_cayley_state)p1)->state[i] > ((p_cayley_state)p2)->state[i])
-        {
+        if (((morphism_state*)p1)->state[i] > ((morphism_state*)p2)->state[i]) {
             return -1;
         }
     }
     return 0;
 }
 
-// Fonction auxiliaire
-static void cayley_avl_to_table(p_avlnode tree, p_nfa A, p_cayley thegraph,
-                                bool *newfinals, bool *theidems)
-{
-    if (tree == NULL)
-    {
+// Auxiliary function used in dfa_to_morphism. The AVL contains morphism states.
+static void morphism_avl_to_table(avlnode* tree, nfa* A, morphism* thegraph, bool* newfinals, bool* theidems) {
+    if (tree == NULL) {
         return;
     }
-    else
-    {
-        cayley_avl_to_table(tree->left, A, thegraph, newfinals, theidems);
-        cayley_avl_to_table(tree->right, A, thegraph, newfinals, theidems);
-        p_cayley_state thestate = (p_cayley_state)tree->value;
 
-        // Affectation des transitions
-        for (uint a = 0; a < thegraph->trans->size_alpha; a++)
-        {
-            thegraph->trans->edges[thestate->num][a] = thestate->next[a]->num;
-        }
+    morphism_avl_to_table(tree->left, A, thegraph, newfinals, theidems);
+    morphism_avl_to_table(tree->right, A, thegraph, newfinals, theidems);
 
-        // Est-ce un élément de l'ensemble acceptant ?
-        if (mem_vertices_sorted(thestate->state[0], A->finals))
-        {
-            newfinals[thestate->num] = true;
-        }
-        else
-        {
-            newfinals[thestate->num] = false;
-        }
+    morphism_state* thestate = (morphism_state*)tree->value;
 
-        // Est-ce un idempotent ?
-        theidems[thestate->num] = true;
-        uint q = 0;
-        while (theidems[thestate->num] && q < thestate->size_graph)
-        {
-            if (thestate->state[q] != thestate->state[thestate->state[q]])
-            {
-                theidems[thestate->num] = false;
-            }
-            else
-            {
-                q++;
-            }
-        }
-        // Enregistrement des noms
-        thegraph->names[thestate->num] = thestate->name;
+    // Assign transitions in the right Cayley graph.
+    for (uint a = 0; a < thegraph->r_cayley->size_alpha; a++) {
+        thegraph->r_cayley->edges[thestate->num][a] = thestate->next[a]->num;
     }
+
+    // Is the state an accepting element?
+    if (mem_dequeue_sorted(thestate->state[lefread_dequeue(A->initials, 0)], A->finals, NULL)) {
+        newfinals[thestate->num] = true;
+    }
+    else {
+        newfinals[thestate->num] = false;
+    }
+
+    // Is the state an idempotent?
+    theidems[thestate->num] = true;
+    uint q = 0;
+    while (theidems[thestate->num] && q < thestate->size_graph) {
+        if (thestate->state[q] != thestate->state[thestate->state[q]]) {
+            theidems[thestate->num] = false;
+        }
+        else {
+            q++;
+        }
+    }
+
+    // Store the name of the element in the morphism.
+    thegraph->names[thestate->num] = thestate->name;
 }
 
-// Ne fonctionne qu'avec un DFA complet
-p_cayley dfa_to_right_cayley(p_nfa A)
-{
-    if (!nfa_is_det(A) || !nfa_is_comp(A))
-    {
-        printf("Error: The construction of the transition morphism requires a "
-               "Complete DFA. Returned NULL\n");
+// Works only with a complete input DFA
+morphism* dfa_to_morphism(nfa* A, int* error) {
+    if (!nfa_is_det(A) || !nfa_is_comp(A)) {
+        fprintf(stderr, "Error: The construction of the transition morphism requires a Complete DFA. Returned NULL\n");
+        if (error != NULL) {
+            *error = INVALID_OBJECT;
+        }
         return NULL;
     }
 
-    // Pile qui contiendra les éléments à traiter
-    p_dequeue thequeue = create_dequeue();
+    // Fifo containing the elements to be processed.
+    dequeue_gen* thequeue = create_dequeue_gen();
 
-    // Un avl qui contiendra les éléments déjà construits
-    p_avlnode thetree = NULL;
+    // AVL containing all elements already constructed.
+    avlnode* thetree = NULL;
 
-    // Compteur du nombre d'éléments construits
+    // Count the number of elements constructed.
     uint num = 0;
 
-    // Empilement du premier élément (le neutre)
-    p_cayley_state neutral;
+    // Stack the first element: the identity (which has number 0).
+    morphism_state* neutral;
     MALLOC(neutral, 1);
-    neutral->num        = num;
+    neutral->num = num;
     num++;
-    neutral->name       = create_vertices();       // Le nom de cet élément est
-                                                   // le mot vide
-    neutral->size_alpha = A->trans->size_alpha;
-    neutral->size_graph = A->trans->size_graph;
-    neutral->next       = NULL;                    // Les élément suivants ne
-                                                   // sont pas encore calculés
+    neutral->name = create_dequeue();           // The name of this element is the empty word.
+    neutral->size_alpha = A->trans->size_alpha; // Number of letters.
+    neutral->size_graph = A->trans->size_graph; // Number of states.
+    neutral->next = NULL;                       // The next elements are not yet computed.
     MALLOC(neutral->state, neutral->size_graph);
-    for (uint q = 0; q < neutral->size_graph; q++) // Cet élément est l'identité
+    for (uint q = 0; q < neutral->size_graph; q++) // This element is the identity.
     {
         neutral->state[q] = q;
     }
 
-    thetree = avl_insert(neutral, thetree,
-                         &comp_cayley_state);      // Insertion dans l'ensemble
-                                                   // des
-    // éléments déjà rencontrés
-    leftinsert(neutral, thequeue);                 // Cet élément est à traiter
+    // Insertion in the set of already met elements.
+    thetree = avl_insert(neutral, thetree, &comp_morphism_state, NULL);
 
-    while (!isempty_dequeue(thequeue))
-    {
-        // Récupération de l'élément qu'on va traiter
-        p_cayley_state theelem = (p_cayley_state)rightpull(thequeue);
+    // Treat this element.
+    lefins_dequeue_gen(neutral, thequeue);
 
-        // Calcul des transitions à partir de notre élément
+    // Potentially long loop, react to interrupts and timeout.
+    listening_mode(timeout_value);
+
+    while (!isempty_dequeue_gen(thequeue)) {
+        // Free allocated memory if the limit is reached, or if a yser
+        // interruption occurs, or if the timeout is reached.
+        if ((limit_value > 0 && num > limit_value) || interrupt_flag || timeout_flag) {
+            delete_dequeue_gen(thequeue);
+            avl_free_strong(thetree, &delete_morphism_state);
+
+            if (error != NULL) {
+                if ((limit_value > 0 && num > limit_value)) {
+                    *error = MEMORY_LIMIT;
+                }
+                if (interrupt_flag) {
+                    INFO("INTERRUPT");
+                    *error = INTERRUPTION;
+                }
+                if (timeout_flag) {
+                    *error = TIMEOUT_OCCURRED;
+                }
+
+                // Go back to normal mode, where interruptions and timeouts are ignored.
+                normal_mode();
+                return NULL;
+            }
+        }
+
+        // Get the element to be processed.
+        morphism_state* theelem = (morphism_state*)rigpull_dequeue_gen(thequeue);
+
+        // Compute the transitions from this element.
         MALLOC(theelem->next, theelem->size_alpha);
-        for (uint a = 0; a < theelem->size_alpha; a++)
-        {
-            // On crée le (potentiel) nouvel élément obtenu en multipliant a à
-            // droite
-            p_cayley_state new;
+
+        for (uint a = 0; a < theelem->size_alpha; a++) {
+            // Create the (potential) new element, computed by multiplying the old one on the right.
+            morphism_state* new;
             MALLOC(new, 1);
             new->size_graph = A->trans->size_graph;
             MALLOC(new->state, new->size_graph);
-            for (uint q = 0; q < neutral->size_graph;
-                 q++)                                  // Calcul de la
-                                                       // permutation
-                                                       // correspondante
-            {
-                new->state[q] =
-                    lefread_vertices(A->trans->edges[theelem->state[q]][a], 0);
+
+            // Compute the corresponding permutation.
+            for (uint q = 0; q < neutral->size_graph; q++) {
+                new->state[q] = lefread_dequeue(A->trans->edges[theelem->state[q]][a], 0);
             }
 
-            // On regarde si cet état a en fait déjà été construit
-            p_avlnode thenode = avl_search(new, thetree, &comp_cayley_state);
+            // Check if this state already exists.
+            avlnode* thenode = avl_search(new, thetree, &comp_morphism_state);
 
-            if (thenode == NULL)                       // Si cet état n'a pas
-                                                       // encore été construit
-            // printf("NULL\n");
-            {
+            // If not, initialize a new element.
+            if (thenode == NULL) {
                 new->size_alpha = A->trans->size_alpha;
-                new->next       = NULL;                // On ne connaît pas
-                                                       // encore les élément
-                                                       // suivants
-                new->num        = num;
+                new->next = NULL; // For now, we don't know the next elements.
+                new->num = num;
                 num++;
-                new->name       = create_vertices();   // Création du nom à
-                                                       // partir de celui de
-                // l'élément précédent
-                copy_vertices_right(new->name, theelem->name, 0);
-                rigins_vertices(a, new->name);
-                theelem->next[a] =
-                    new;                               // On l'affecte comme
-                                                       // successeur pour la
-                                                       // lettre a
-                thetree          = avl_insert(
-                    new, thetree, &comp_cayley_state); // On le mémorise dans
-                                                       // l'ensemble
-                // des éléments rencontrés
-                leftinsert(new, thequeue);             // Ce nouvel état élément
-                                                       // est à traiter
+                new->name = create_dequeue(); // Create name from the one of the previous element.
+                copy_dequeue_right(new->name, theelem->name, 0);
+                rigins_dequeue(a, new->name);
+                theelem->next[a] = new;                                         // Assign it as a successor for letter a.
+                thetree = avl_insert(new, thetree, &comp_morphism_state, NULL); // Store it in the set of known elements.
+                lefins_dequeue_gen(new, thequeue);                              // This new element has to be treated in the future..
             }
-            else                                       // Sinon, cet état a déjà
-                                                       // été construit
-            // printf("not NULL\n");
+            else
+                // The element was already constructed.
             {
-                theelem->next[a] =
-                    ((p_cayley_state)
-                     thenode->value);                  // On affecte la version
-                                                       // déjà construite comme
-                // successeur pour la lettre a
-                free(new->state);                      // On supprime la copie
-                                                       // qu'on vient de créer
+                theelem->next[a] = ((morphism_state*)thenode->value); // We assign the version already built as an a-successor.
+                free(new->state);                                      // We free the copy we've just created.
                 free(new);
             }
         }
     }
-    delete_dequeue(thequeue);
+    delete_dequeue_gen(thequeue);
 
-    // Construction du Cayley graph
-    p_cayley M;
+    // Construction of the morphism.
+    morphism* M;
     MALLOC(M, 1);
-    M->trans =
-        create_dgraph_noedges(num, A->trans->size_alpha); // Création du graph
-    MALLOC(M->names, num);                                // Noms des éléments
-    M->mult      = NULL;                                  // Initialement, on ne
-                                                          // crée pas la table
-                                                          // de multiplication
-    M->leftgraph = NULL;                                  // Initialement, on ne
-                                                          // crée pas le graphe
-                                                          // gauche
-    M->order     = NULL;                                  // Initialement, pas
-                                                          // d'ordre calculé
-    MALLOC(M->accept_array, num);                         // Tableau de
-                                                          // l'ensemble
-                                                          // acceptant
-    MALLOC(M->idem_array, num);                           // Tableau des
-                                                          // idempotents
+    M->alphabet = nfa_duplicate_alpha(A);                           // Copy letter names.
+    M->r_cayley = create_dgraph_noedges(num, A->trans->size_alpha); // Create the graph.
+    MALLOC(M->names, num);                                          // Element names.
+    MALLOC(M->accept_array, num);                                   // Array representing the accepting set.
+    MALLOC(M->idem_array, num);                                     // Array of idempotents.
 
-    // Création des transitions, des idempotents et détection des éléments
-    // acceptants
-    cayley_avl_to_table(thetree, A, M, M->accept_array, M->idem_array);
+    // Creation of transitions, idempotents and detection of accepting elements.
+    morphism_avl_to_table(thetree, A, M, M->accept_array, M->idem_array);
 
-    // Libération de l'AVL
-    avl_free_strong(thetree, &free_cayley_state);
+    // Free the AVL
+    avl_free_strong(thetree, &delete_morphism_state);
 
-    // Création des listes d'idempotents et d'éléments acceptant
-    M->accept_list = create_vertices();
-    M->idem_list   = create_vertices();
-
-    for (uint i = 0; i < num; i++)
-    {
-        if (M->accept_array[i])
-        {
-            // printf("Test: %d\n", i);
-            rigins_vertices(i, M->accept_list);
+    // Creation of lists of idempotents and accepting elements.
+    M->idem_list = create_dequeue();
+    M->accept_list = create_dequeue();
+    for (uint i = 0; i < num; i++) {
+        if (M->accept_array[i]) {
+            rigins_dequeue(i, M->accept_list);
         }
-        if (M->idem_array[i])
-        {
-            rigins_vertices(i, M->idem_list);
+        if (M->idem_array[i]) {
+            rigins_dequeue(i, M->idem_list);
         }
     }
 
-    // Affectation de l'éventuelle lettre neutre
-    M->neutlet = 0;
-    for (uint a = 0; a < M->trans->size_alpha; a++)
-    {
-        if (M->trans->edges[ONE][a] == ONE)
-        {
-            M->neutlet = a + 'a';
-            return M;
-        }
-    }
+
+    // Compute the left Cayley graph.
+    mor_compute_leftcayley(M);
+
+
+    // Compute the Green relations.
+    M->j_order = ldgraphs_to_lgraph(0, 2, 2, M->r_cayley, M->l_cayley); // Compute the J-order.
+    mor_compute_green(M);
+
+    // for (uint i = 0; i < M->rels->nb_regular_jcl; i++) {
+      //   mor_fprint_name_utf8(M, M->rels->regular_idems[i], stdout);
+        // printf(" ");
+    // }
+     //printf("\n");
+
+    mor_compute_min_regular_jcl(M);
+
+    //printf("Number of strict J-classes: %u\n", M->nb_strictj);
+
+
+    ignore_interrupt();
+    normal_mode();
     return M;
 }
 
-// Conversion d'un cayley en DFA
-p_nfa cayley_to_dfa(p_cayley M)
-{
-    p_nfa A;
-    MALLOC(A, 1);
-    A->trans    = dgraph_to_lgraph(M->trans);
-    A->etrans   = NULL;
-    A->itrans   = NULL;
-    A->names    = NULL;
-
-    A->initials = create_vertices();
-    rigins_vertices(0, A->initials);
-    A->finals   = create_vertices();
-    copy_vertices_right(A->finals, M->accept_list, 0);
+nfa* morphism_to_dfa(morphism* M) {
+    nfa* A = nfa_init();
+    A->alphabet = mor_duplicate_alpha(M);
+    A->trans = dgraph_to_lgraph(M->r_cayley);
+    rigins_dequeue(0, A->initials);
+    copy_dequeue_right(A->finals, M->accept_list, 0);
     return A;
 }
 
-// Conversion d'un cayley gauche en DFA
-p_nfa left_cayley_to_dfa(p_cayley M)
-{
-    compute_left_cayley(M);
-    p_nfa A;
-    MALLOC(A, 1);
-    A->trans    = dgraph_to_lgraph(M->leftgraph);
-    A->etrans   = NULL;
-    A->itrans   = NULL;
-    A->names    = NULL;
-
-    A->initials = create_vertices();
-    rigins_vertices(0, A->initials);
-    A->finals   = create_vertices();
-    copy_vertices_right(A->finals, M->accept_list, 0);
+nfa* left_morphism_to_dfa(morphism* M) {
+    nfa* A = nfa_init();
+    A->alphabet = mor_duplicate_alpha(M);
+    A->trans = dgraph_to_lgraph(M->l_cayley);
+    rigins_dequeue(0, A->initials);
+    copy_dequeue_right(A->finals, M->accept_list, 0);
     return A;
 }
 
-// Suppression d'un cayley
-
-void free_cayley(p_cayley M)
-{
-    /* Champs obligatoires */
-
-    // Libération de la table des noms
-    for (uint i = 0; i < M->trans->size_graph; i++)
-    {
-        delete_vertices(M->names[i]);
-    }
-
-    // Libération des éléments acceptants
-    free(M->accept_array);
-    delete_vertices(M->accept_list);
-
-    // Libération des idempotents
-    free(M->idem_array);
-    delete_vertices(M->idem_list);
-
-    /* Champs optionnels */
-
-    // Libération du graph gauche (si besoin)
-    if (M->leftgraph != NULL)
-    {
-        delete_dgraph(M->leftgraph);
-    }
-
-    // Libération de la table de multiplication (si besoin)
-    if (M->mult != NULL)
-    {
-        for (uint i = 0; i < M->trans->size_graph; i++)
-        {
-            free(M->mult[i]);
-        }
-        free(M->mult);
-    }
-
-    // Libération de l'ordre (si besoin)
-    if (M->order != NULL)
-    {
-        for (uint i = 0; i < M->trans->size_graph; i++)
-        {
-            delete_vertices(M->order[i]);
-        }
-    }
-
-    // Libération du graphe
-    delete_dgraph(M->trans);
-    free(M);
-}
-
 /************************************************/
-/* Calculs des informations sur un Cayley graph */
+/* Calculs des informations sur un morphism graph */
 /************************************************/
 
-// Calcule le graph de Cayley gauche
-void compute_left_cayley(p_cayley M)
-{
-    if (M->leftgraph != NULL)                        // Si le calcul a déjà été
-                                                     // fait
-    {
-        return;
-    }
-    M->leftgraph = create_dgraph_noedges(
-        M->trans->size_graph, M->trans->size_alpha); // Création du graph
-    p_vertices fromlet = create_vertices();
-    p_vertices fromone = create_vertices();
-    bool visited[M->trans->size_graph];
-    for (uint a = 0; a < M->trans->size_alpha; a++)
-    {
-        makeempty_vertices(fromlet);
-        makeempty_vertices(fromone);
-        for (uint s = 0; s < M->trans->size_graph; s++)
-        {
-            visited[s] = false;
-        }
-        rigins_vertices(ONE, fromone);
-        rigins_vertices(M->trans->edges[ONE][a], fromlet);
-        visited[ONE] = true;
 
-        while (!isempty_vertices(fromone))
-        {
-            uint s  = rigpull_vertices(fromone);
-            uint as = rigpull_vertices(fromlet);
-            M->leftgraph->edges[s][a] = as;
-            for (uint b = 0; b < M->trans->size_alpha; b++)
-            {
-                if (!visited[M->trans->edges[s][b]])
-                {
-                    rigins_vertices(M->trans->edges[s][b], fromone);
-                    rigins_vertices(M->trans->edges[as][b], fromlet);
-                    visited[M->trans->edges[s][b]] = true;
-                }
-            }
-        }
-    }
-    delete_vertices(fromlet);
-    delete_vertices(fromone);
-}
 
-// Calcule la table de multiplication d'un Cayley graph
-void compute_mult(p_cayley M)
-{
+void mor_compute_mult(morphism* M) {
     if (M->mult != NULL) // Si la table a déjà été calculée
     {
         return;
     }
     // Création du tableau
-    MALLOC(M->mult, M->trans->size_graph);
-    p_vertices fromcur = create_vertices();
-    p_vertices fromone = create_vertices();
-    bool visited[M->trans->size_graph];
+    MALLOC(M->mult, M->r_cayley->size_graph);
+    dequeue* fromcur = create_dequeue();
+    dequeue* fromone = create_dequeue();
+    bool visited[M->r_cayley->size_graph];
     // Pour chaque élément
-    for (uint q = 0; q < M->trans->size_graph; q++)
-    {
+    for (uint q = 0; q < M->r_cayley->size_graph; q++) {
         // Création du tableau des multiplications de q
-        MALLOC(M->mult[q], M->trans->size_graph);
+        MALLOC(M->mult[q], M->r_cayley->size_graph);
 
         // Initialisation des strucutures
-        makeempty_vertices(fromcur);
-        makeempty_vertices(fromone);
-        for (uint s = 0; s < M->trans->size_graph; s++)
-        {
+        makeempty_dequeue(fromcur);
+        makeempty_dequeue(fromone);
+        for (uint s = 0; s < M->r_cayley->size_graph; s++) {
             visited[s] = false;
         }
 
-        rigins_vertices(ONE, fromone);
-        rigins_vertices(q, fromcur);
+        rigins_dequeue(ONE, fromone);
+        rigins_dequeue(q, fromcur);
         visited[ONE] = true;
 
-        while (!isempty_vertices(fromone))
-        {
-            uint s  = rigpull_vertices(fromone);
-            uint qs = rigpull_vertices(fromcur);
+        while (!isempty_dequeue(fromone)) {
+            uint s = rigpull_dequeue(fromone);
+            uint qs = rigpull_dequeue(fromcur);
             M->mult[q][s] = qs;
-            for (uint a = 0; a < M->trans->size_alpha; a++)
-            {
-                if (!visited[M->trans->edges[s][a]])
-                {
-                    rigins_vertices(M->trans->edges[s][a], fromone);
-                    rigins_vertices(M->trans->edges[qs][a], fromcur);
-                    visited[M->trans->edges[s][a]] = true;
+            for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
+                if (!visited[M->r_cayley->edges[s][a]]) {
+                    rigins_dequeue(M->r_cayley->edges[s][a], fromone);
+                    rigins_dequeue(M->r_cayley->edges[qs][a], fromcur);
+                    visited[M->r_cayley->edges[s][a]] = true;
                 }
             }
         }
     }
-    delete_vertices(fromcur);
-    delete_vertices(fromone);
+    delete_dequeue(fromcur);
+    delete_dequeue(fromone);
 }
 
-// Calcule le mirroir du graphe de Cayley droit
-p_lgraph cayley_rmirror(p_cayley M)
-{
-    p_lgraph themirror =
-        create_lgraph_noedges(M->trans->size_graph, M->trans->size_alpha);
 
-    for (uint q = 0; q < themirror->size_graph; q++)
-    {
-        for (uint a = 0; a < themirror->size_alpha; a++)
-        {
-            insert_vertices(themirror->edges[M->trans->edges[q][a]][a], q);
+static lgraph* mor_mirror_aux(dgraph* G) {
+    lgraph* themirror = create_lgraph_noedges(G->size_graph, G->size_alpha);
+    for (uint q = 0; q < themirror->size_graph; q++) {
+        for (uint a = 0; a < themirror->size_alpha; a++) {
+            insert_dequeue(themirror->edges[G->edges[q][a]][a], q);
         }
     }
     return themirror;
 }
 
-// Calcule le mirroir du graphe de Cayley gauche
-p_lgraph cayley_lmirror(p_cayley M)
-{
-    compute_left_cayley(M); // Calcule le graph gauche si nécessaire
-    p_lgraph themirror =
-        create_lgraph_noedges(M->trans->size_graph, M->trans->size_alpha);
+lgraph* mor_rmirror(morphism* M) {
+    return mor_mirror_aux(M->r_cayley);
+}
 
-    for (uint q = 0; q < themirror->size_graph; q++)
-    {
-        for (uint a = 0; a < themirror->size_alpha; a++)
-        {
-            insert_vertices(themirror->edges[M->leftgraph->edges[q][a]][a], q);
-        }
-    }
-    return themirror;
+lgraph* mor_lmirror(morphism* M) {
+    return mor_mirror_aux(M->l_cayley);
 }
 
 // Calcule l'ordre syntaxique
 
 // Retourne la valeur du ième bit de mem (en partant de la droite)
 // 1 <= pos <= 8
-static uchar get_nth_bit(uchar mem, uchar pos)
-{
+static uchar get_nth_bit(uchar mem, uchar pos) {
     mem = mem >> (pos - 1);
     return mem & 1;
 }
 
 // Modifier la valeur du ième bit de mem (en partant de la droite)
 // 1 <= pos <= 8, 0 <= val <= 1
-static void set_nth_bit(uchar *mem, uchar val, uchar pos)
-{
+static void set_nth_bit(uchar* mem, uchar val, uchar pos) {
     uchar mask = 1 << (pos - 1);
-    if (val == 0)
-    {
+    if (val == 0) {
         mask = ~mask;
         *mem = *mem & mask;
     }
-    else
-    {
+    else {
         *mem = *mem | mask;
     }
 }
 
 // Calcule de l'ordre syntaxique complet
-void compute_syntac_order(p_cayley M)
-{
-    if (M->order != NULL)
-    {
+void mor_compute_order(morphism* M) {
+    if (M->order != NULL) {
         return;
     }
-    uint thesize = M->trans->size_graph;
+    uint thesize = M->r_cayley->size_graph;
 
     // On utilisera les 4 premiers bits à droite pour
     // coder les informations nécessaires au parcours
     // uchar thepairs[thesize][thesize];
 
-    uchar **thepairs;
+    uchar** thepairs;
     MALLOC(thepairs, thesize);
 
     // On commence par tout initialiser à 00000011 (c'est-à-dire 3)
-    for (uint q = 0; q < M->trans->size_graph; q++)
-    {
+    for (uint q = 0; q < M->r_cayley->size_graph; q++) {
         MALLOC(thepairs[q], thesize);
-        for (uint r = 0; r < M->trans->size_graph; r++)
-        {
+        for (uint r = 0; r < M->r_cayley->size_graph; r++) {
             thepairs[q][r] = 3;
         }
     }
 
     // Stacks for the two DFSs
-    p_vertices first_stack_1 = create_vertices();
-    p_vertices first_stack_2 = create_vertices();
-    p_vertices secon_stack_1 = create_vertices();
-    p_vertices secon_stack_2 = create_vertices();
+    dequeue* first_stack_1 = create_dequeue();
+    dequeue* first_stack_2 = create_dequeue();
+    dequeue* secon_stack_1 = create_dequeue();
+    dequeue* secon_stack_2 = create_dequeue();
 
     // On empile les paires (non-acceptant,acceptant) pour le DFS1 et les paires
     // (acceptant,non-acceptant) pour le DFS2
-    for (uint i = 0; i < size_vertices(M->accept_list);
-         i++)                            // Boucle sur les éléments acceptants
+    for (uint i = 0; i < size_dequeue(M->accept_list); i++) // Boucle sur les éléments acceptants
     {
         uint j = 0;
         uint r = 0;
-        while (r < M->trans->size_graph) // Boucle sur tous les éléments en
-        // identifiants les acceptants
-        {
-            if (size_vertices(M->accept_list) <= j ||
-                r < lefread_vertices(M->accept_list, j))
-            {
-                set_nth_bit(&thepairs[r][lefread_vertices(M->accept_list, i)], 1,
-                            3);          // On marque la paire comme ayant été
-                                         // visitée pour le
-                // DF1 (bit 3)
-                rigins_vertices(r, first_stack_1);
-                rigins_vertices(lefread_vertices(M->accept_list, i), first_stack_2);
+        // Boucle sur tous les éléments en identifiant les acceptants
+        while (r < M->r_cayley->size_graph) {
+            if (size_dequeue(M->accept_list) <= j || r < lefread_dequeue(M->accept_list, j)) {
+                // On marque la paire comme ayant été visitée pour le DFS1 (bit 3)
+                set_nth_bit(&thepairs[r][lefread_dequeue(M->accept_list, i)], 1, 3);
+                rigins_dequeue(r, first_stack_1);
+                rigins_dequeue(lefread_dequeue(M->accept_list, i), first_stack_2);
 
-                set_nth_bit(&thepairs[lefread_vertices(M->accept_list, i)][r], 1,
-                            4);          // On marque la paire comme ayant été
-                                         // visitée pour le
-                // DF2 (bit 4)
-                rigins_vertices(lefread_vertices(M->accept_list, i), secon_stack_1);
-                rigins_vertices(r, secon_stack_2);
+                // On marque la paire comme ayant été visitée pour le DFS2 (bit 4)
+                set_nth_bit(&thepairs[lefread_dequeue(M->accept_list, i)][r], 1, 4);
+                rigins_dequeue(lefread_dequeue(M->accept_list, i), secon_stack_1);
+                rigins_dequeue(r, secon_stack_2);
 
                 r++;
             }
-            else
-            {
+            else {
                 r++;
                 j++;
             }
@@ -963,53 +818,33 @@ void compute_syntac_order(p_cayley M)
     }
 
     // Calcul des graphes miroirs
-    p_lgraph rmirror = cayley_rmirror(M);
-    p_lgraph lmirror = cayley_lmirror(M);
+    lgraph* rmirror = mor_rmirror(M);
+    lgraph* lmirror = mor_lmirror(M);
 
     // Premier DFS
-    while (!isempty_vertices(first_stack_1))
-    {
-        uint q = rigpull_vertices(first_stack_1);
-        uint r = rigpull_vertices(first_stack_2);
+    while (!isempty_dequeue(first_stack_1)) {
+        uint q = rigpull_dequeue(first_stack_1);
+        uint r = rigpull_dequeue(first_stack_2);
 
         set_nth_bit(&thepairs[q][r], 0, 2); // On met le 2ème bit à 0, DFS1
 
-        for (uint a = 0; a < M->trans->size_alpha; a++)
-        {
-            for (uint i = 0; i < size_vertices(rmirror->edges[q][a]); i++)
-            {
-                for (uint j = 0; j < size_vertices(rmirror->edges[r][a]); j++)
-                {
-                    if (get_nth_bit(thepairs[lefread_vertices(rmirror->edges[q][a], i)]
-                                    [lefread_vertices(rmirror->edges[r][a], j)],
-                                    3) == 0)
-                    {
-                        set_nth_bit(&thepairs[lefread_vertices(rmirror->edges[q][a], i)]
-                                    [lefread_vertices(rmirror->edges[r][a], j)],
-                                    1, 3);
-                        rigins_vertices(lefread_vertices(rmirror->edges[q][a], i),
-                                        first_stack_1);
-                        rigins_vertices(lefread_vertices(rmirror->edges[r][a], j),
-                                        first_stack_2);
+        for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
+            for (uint i = 0; i < size_dequeue(rmirror->edges[q][a]); i++) {
+                for (uint j = 0; j < size_dequeue(rmirror->edges[r][a]); j++) {
+                    if (get_nth_bit(thepairs[lefread_dequeue(rmirror->edges[q][a], i)][lefread_dequeue(rmirror->edges[r][a], j)], 3) == 0) {
+                        set_nth_bit(&thepairs[lefread_dequeue(rmirror->edges[q][a], i)][lefread_dequeue(rmirror->edges[r][a], j)], 1, 3);
+                        rigins_dequeue(lefread_dequeue(rmirror->edges[q][a], i), first_stack_1);
+                        rigins_dequeue(lefread_dequeue(rmirror->edges[r][a], j), first_stack_2);
                     }
                 }
             }
 
-            for (uint i = 0; i < size_vertices(lmirror->edges[q][a]); i++)
-            {
-                for (uint j = 0; j < size_vertices(lmirror->edges[r][a]); j++)
-                {
-                    if (get_nth_bit(thepairs[lefread_vertices(lmirror->edges[q][a], i)]
-                                    [lefread_vertices(lmirror->edges[r][a], j)],
-                                    3) == 0)
-                    {
-                        set_nth_bit(&thepairs[lefread_vertices(lmirror->edges[q][a], i)]
-                                    [lefread_vertices(lmirror->edges[r][a], j)],
-                                    1, 3);
-                        rigins_vertices(lefread_vertices(lmirror->edges[q][a], i),
-                                        first_stack_1);
-                        rigins_vertices(lefread_vertices(lmirror->edges[r][a], j),
-                                        first_stack_2);
+            for (uint i = 0; i < size_dequeue(lmirror->edges[q][a]); i++) {
+                for (uint j = 0; j < size_dequeue(lmirror->edges[r][a]); j++) {
+                    if (get_nth_bit(thepairs[lefread_dequeue(lmirror->edges[q][a], i)][lefread_dequeue(lmirror->edges[r][a], j)], 3) == 0) {
+                        set_nth_bit(&thepairs[lefread_dequeue(lmirror->edges[q][a], i)][lefread_dequeue(lmirror->edges[r][a], j)], 1, 3);
+                        rigins_dequeue(lefread_dequeue(lmirror->edges[q][a], i), first_stack_1);
+                        rigins_dequeue(lefread_dequeue(lmirror->edges[r][a], j), first_stack_2);
                     }
                 }
             }
@@ -1017,49 +852,29 @@ void compute_syntac_order(p_cayley M)
     }
 
     // Second DFS
-    while (!isempty_vertices(secon_stack_1))
-    {
-        uint q = rigpull_vertices(secon_stack_1);
-        uint r = rigpull_vertices(secon_stack_2);
+    while (!isempty_dequeue(secon_stack_1)) {
+        uint q = rigpull_dequeue(secon_stack_1);
+        uint r = rigpull_dequeue(secon_stack_2);
 
         set_nth_bit(&thepairs[q][r], 0, 1); // On met le 1er bit à 0, DFS2
 
-        for (uint a = 0; a < M->trans->size_alpha; a++)
-        {
-            for (uint i = 0; i < size_vertices(rmirror->edges[q][a]); i++)
-            {
-                for (uint j = 0; j < size_vertices(rmirror->edges[r][a]); j++)
-                {
-                    if (get_nth_bit(thepairs[lefread_vertices(rmirror->edges[q][a], i)]
-                                    [lefread_vertices(rmirror->edges[r][a], j)],
-                                    4) == 0)
-                    {
-                        set_nth_bit(&thepairs[lefread_vertices(rmirror->edges[q][a], i)]
-                                    [lefread_vertices(rmirror->edges[r][a], j)],
-                                    1, 4);
-                        rigins_vertices(lefread_vertices(rmirror->edges[q][a], i),
-                                        secon_stack_1);
-                        rigins_vertices(lefread_vertices(rmirror->edges[r][a], j),
-                                        secon_stack_2);
+        for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
+            for (uint i = 0; i < size_dequeue(rmirror->edges[q][a]); i++) {
+                for (uint j = 0; j < size_dequeue(rmirror->edges[r][a]); j++) {
+                    if (get_nth_bit(thepairs[lefread_dequeue(rmirror->edges[q][a], i)][lefread_dequeue(rmirror->edges[r][a], j)], 4) == 0) {
+                        set_nth_bit(&thepairs[lefread_dequeue(rmirror->edges[q][a], i)][lefread_dequeue(rmirror->edges[r][a], j)], 1, 4);
+                        rigins_dequeue(lefread_dequeue(rmirror->edges[q][a], i), secon_stack_1);
+                        rigins_dequeue(lefread_dequeue(rmirror->edges[r][a], j), secon_stack_2);
                     }
                 }
             }
 
-            for (uint i = 0; i < size_vertices(lmirror->edges[q][a]); i++)
-            {
-                for (uint j = 0; j < size_vertices(lmirror->edges[r][a]); j++)
-                {
-                    if (get_nth_bit(thepairs[lefread_vertices(lmirror->edges[q][a], i)]
-                                    [lefread_vertices(lmirror->edges[r][a], j)],
-                                    4) == 0)
-                    {
-                        set_nth_bit(&thepairs[lefread_vertices(lmirror->edges[q][a], i)]
-                                    [lefread_vertices(lmirror->edges[r][a], j)],
-                                    1, 4);
-                        rigins_vertices(lefread_vertices(lmirror->edges[q][a], i),
-                                        secon_stack_1);
-                        rigins_vertices(lefread_vertices(lmirror->edges[r][a], j),
-                                        secon_stack_2);
+            for (uint i = 0; i < size_dequeue(lmirror->edges[q][a]); i++) {
+                for (uint j = 0; j < size_dequeue(lmirror->edges[r][a]); j++) {
+                    if (get_nth_bit(thepairs[lefread_dequeue(lmirror->edges[q][a], i)][lefread_dequeue(lmirror->edges[r][a], j)], 4) == 0) {
+                        set_nth_bit(&thepairs[lefread_dequeue(lmirror->edges[q][a], i)][lefread_dequeue(lmirror->edges[r][a], j)], 1, 4);
+                        rigins_dequeue(lefread_dequeue(lmirror->edges[q][a], i), secon_stack_1);
+                        rigins_dequeue(lefread_dequeue(lmirror->edges[r][a], j), secon_stack_2);
                     }
                 }
             }
@@ -1067,15 +882,12 @@ void compute_syntac_order(p_cayley M)
     }
 
     // Affectation dans la structure de données
-    MALLOC(M->order, M->trans->size_graph);
-    for (uint q = 0; q < M->trans->size_graph; q++)
-    {
-        M->order[q] = create_vertices();
-        for (uint r = 0; r < M->trans->size_graph; r++)
-        {
-            if (get_nth_bit(thepairs[q][r], 1) == 1)
-            {
-                rigins_vertices(r, M->order[q]);
+    MALLOC(M->order, M->r_cayley->size_graph);
+    for (uint q = 0; q < M->r_cayley->size_graph; q++) {
+        M->order[q] = create_dequeue();
+        for (uint r = 0; r < M->r_cayley->size_graph; r++) {
+            if (get_nth_bit(thepairs[q][r], 1) == 1) {
+                rigins_dequeue(r, M->order[q]);
             }
         }
         free(thepairs[q]);
@@ -1083,221 +895,81 @@ void compute_syntac_order(p_cayley M)
     free(thepairs);
 }
 
-// Affichage des idempotents
-void cayley_print_idems(p_cayley M, FILE *out)
-{
-    print_top_line(100, out);
 
-    fprintf(out, "│Idempotents : ");
-    print_sub_cayley_aligned(M, M->idem_list, 100, 14, out);
-    print_bot_line(100, out);
-}
+/*********************************/
+/* Opérations sur les morphismes */
+/*********************************/
 
-// Affichage de l'ordre syntaxique
-void cayley_print_order(p_cayley M, FILE *out)
-{
-    compute_syntac_order(M); // Calcul (si nécessaire de l'ordre)
-    print_top_line(100, out);
-    // print_title_box(100, false, out, 1, "Computation on the syntactic
-    // morphism.
-    // Syntactic order.");
-
-    // Calcul de la longueur maximale d'un nom
-    uint size_max = 1;
-    for (uint q = 0; q < M->trans->size_graph; q++)
-    {
-        size_max = max(size_max, size_vertices(M->names[q]));
+uint mor_mult(morphism* M, uint s, uint t) {
+    if (s >= M->r_cayley->size_graph || t >= M->r_cayley->size_graph) {
+        fprintf(stderr, "Error, these are not elements of the monoid\n");
+        return M->r_cayley->size_graph;
     }
-
-    uint padding = 24 + size_max;
-
-    for (uint q = 0; q < M->trans->size_graph; q++)
-    {
-        fprintf(out, "│Elements larger than ");
-        cayley_print_name_aligned(M, q, size_max, out);
-        fprintf(out, " : ");
-        print_sub_cayley_aligned(M, M->order[q], 100, padding, out);
-    }
-    print_bot_line(100, out);
-}
-
-// Print de la table de multiplication
-void cayley_mult_print(p_cayley M, FILE *out)
-{
-    // Calcule de la table de multiplication
-    compute_mult(M);
-
-    // Calcul de la longueur max du nom d'un élément
-    uint length = cayley_max_name_size(M, NULL);
-
-    // Barre Horizontale haute
-    fprintf(out, "┌");
-    for (uint i = 0; i < length; i++)
-    {
-        fprintf(out, "─");
-    }
-    fprintf(out, "┬");
-    for (uint i = 0; i < M->trans->size_graph; i++)
-    {
-        for (uint j = 0; j < length; j++)
-        {
-            fprintf(out, "─");
-        }
-        if (i < M->trans->size_graph - 1)
-        {
-            fprintf(out, "┬");
-        }
-        else
-        {
-            fprintf(out, "┐");
-        }
-    }
-    fprintf(out, "\n");
-
-    // Première ligne
-    fprintf(out, "│");
-    for (uint i = 0; i < length; i++)
-    {
-        fprintf(out, " ");
-    }
-    fprintf(out, "│");
-    for (uint i = 0; i < M->trans->size_graph; i++)
-    {
-        cayley_print_name_aligned(M, i, length, out);
-        fprintf(out, "│");
-    }
-    fprintf(out, "\n");
-
-    // Barre Horizontale mid
-    fprintf(out, "├");
-    for (uint i = 0; i < length; i++)
-    {
-        fprintf(out, "─");
-    }
-    fprintf(out, "┼");
-    for (uint i = 0; i < M->trans->size_graph; i++)
-    {
-        for (uint j = 0; j < length; j++)
-        {
-            fprintf(out, "─");
-        }
-        if (i < M->trans->size_graph - 1)
-        {
-            fprintf(out, "┼");
-        }
-        else
-        {
-            fprintf(out, "┤");
-        }
-    }
-    fprintf(out, "\n");
-
-    // La table
-
-    for (uint k = 0; k < M->trans->size_graph; k++)
-    {
-        fprintf(out, "│");
-        cayley_print_name_aligned(M, k, length, out);
-        fprintf(out, "│");
-        for (uint i = 0; i < M->trans->size_graph; i++)
-        {
-            cayley_print_name_aligned(M, M->mult[k][i], length, out);
-            fprintf(out, "│");
-        }
-        fprintf(out, "\n");
-    }
-
-    // Barre Horizontale basse
-    fprintf(out, "└");
-    for (uint i = 0; i < length; i++)
-    {
-        fprintf(out, "─");
-    }
-    fprintf(out, "┴");
-    for (uint i = 0; i < M->trans->size_graph; i++)
-    {
-        for (uint j = 0; j < length; j++)
-        {
-            fprintf(out, "─");
-        }
-        if (i < M->trans->size_graph - 1)
-        {
-            fprintf(out, "┴");
-        }
-        else
-        {
-            fprintf(out, "┘");
-        }
-    }
-    fprintf(out, "\n");
-}
-
-/************************************/
-/* Opérations sur les Cayley graphs */
-/************************************/
-
-uint cayley_mult(p_cayley M, uint s, uint t)
-{
-    if (s >= M->trans->size_graph || t >= M->trans->size_graph)
-    {
-        printf("Error, these are not elements of the monoid\n");
-        return M->trans->size_graph;
-    }
-    if (M->mult != NULL)
-    {
+    if (M->mult != NULL) {
         return M->mult[s][t];
     }
     uint r = s;
-    for (uint i = 0; i < size_vertices(M->names[t]); i++)
-    {
-        r = M->trans->edges[r][lefread_vertices(M->names[t], i)];
+    for (uint i = 0; i < size_dequeue(M->names[t]); i++) {
+        r = M->r_cayley->edges[r][lefread_dequeue(M->names[t], i)];
     }
     return r;
 }
 
-uint cayley_mult_gen(p_cayley M, uint n, ...)
-{
+uint mor_mult_gen(morphism* M, uint n, ...) {
     va_list liste;
     va_start(liste, n);
 
     uint elem = ONE;
 
     // Calcul
-    for (uint i = 0; i < n; i++)
-    {
-        elem = cayley_mult(M, elem, va_arg(liste, uint));
+    for (uint i = 0; i < n; i++) {
+        elem = mor_mult(M, elem, va_arg(liste, uint));
     }
+
+    va_end(liste);
     return elem;
 }
 
-uint cayley_omega(p_cayley M, uint s)
-{
-    if (s >= M->trans->size_graph)
-    {
-        printf("Error, these are not elements of the monoid\n");
-        return M->trans->size_graph;
+uint mor_omega(morphism* M, uint s) {
+    if (s >= M->r_cayley->size_graph) {
+        fprintf(stderr, "Error, these are not elements of the monoid\n");
+        return M->r_cayley->size_graph;
     }
-    uint s2 = cayley_mult(M, s, s);
-    uint q  = s;
-    uint r  = s2;
-    while (q != r)
-    {
-        q = cayley_mult(M, q, s);
-        r = cayley_mult(M, r, s2);
+    uint s2 = mor_mult(M, s, s);
+    uint q = s;
+    uint r = s2;
+    while (q != r) {
+        q = mor_mult(M, q, s);
+        r = mor_mult(M, r, s2);
     }
     return q;
 }
 
-bool cayley_elem_from_string(p_cayley M, char *w, uint *res)
+//
+bool mor_num_idem(morphism* M, uint s, uint* res) {
+    for (uint i = 0; i < size_dequeue(M->idem_list); i++) {
+        if (lefread_dequeue(M->idem_list, i) == s) {
+            *res = i;
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
+
+/*
+bool morphism_elem_from_string(morphism* M, char* w, uint* res)
 {
     uint len = strlen(w);
     *res = ONE;
     for (uint i = 0; i < len; i++)
     {
         uint a = w[i] - 'a';
-        if (w[i] >= 'a' && a < M->trans->size_alpha)
+        if (w[i] >= 'a' && a < M->r_cayley->size_alpha)
         {
-            *res = M->trans->edges[*res][a];
+            *res = M->r_cayley->edges[*res][a];
         }
         else
         {
@@ -1308,13 +980,13 @@ bool cayley_elem_from_string(p_cayley M, char *w, uint *res)
 }
 
 // Image d'un mot passé sous ma forme d'une chaîne de caractère
-void cayley_print_image(p_cayley M, char *w, FILE *out)
+void morphism_print_image(morphism* M, char* w, FILE* out)
 {
     uint s;
-    if (cayley_elem_from_string(M, w, &s))
+    if (morphism_elem_from_string(M, w, &s))
     {
         fprintf(out, "The image of the word %s is ", w);
-        cayley_print_name(M, s, out);
+        morphism_print_name(M, s, out);
         fprintf(out, ".\n");
     }
     else
@@ -1322,88 +994,246 @@ void cayley_print_image(p_cayley M, char *w, FILE *out)
         printf("Error: this is not a valid word for this morphism.\n");
         return;
     }
-}
-
-//
-bool cayley_num_idem(p_cayley M, uint s, uint *res)
-{
-    for (uint i = 0; i < size_vertices(M->idem_list); i++)
-    {
-        if (lefread_vertices(M->idem_list, i) == s)
-        {
-            *res = i;
-            return true;
-        }
-    }
-    return false;
-}
+} */
 
 /**********************************/
 /* Tests de propriétés classiques */
 /**********************************/
 
-// Idempotence
-bool is_idem_mono(p_cayley M, FILE *out)
-{
-    if (out)
-    {
-        fprintf(out, "#### Checking if the monoid is idempotent.\n");
-    }
-    if (size_vertices(M->idem_list) == M->trans->size_graph)
-    {
-        if (out)
-        {
-            fprintf(out, "#### The monoid is idempotent.\n");
+bool mor_neutral_letter(morphism* M, FILE* out) {
+    for (uint b = 0; b < M->r_cayley->size_alpha; b++) {
+        if (M->r_cayley->edges[ONE][b] == ONE) {
+            if (out) {
+                fprintf(out, "#### The letter ");
+                fprint_letter_utf8(M->alphabet[b], out);
+                fprintf(out, " is neutral.\n");
+            }
+            return true;
         }
+    }
+    if (out) {
+        fprintf(out, "#### No neutral letter.\n");
+    }
+    return false;
+}
 
-        return true;
+
+bool mor_nonempty_neutral(morphism* M) {
+    green* G = M->rels;
+    if (size_dequeue(G->HCL->cl[G->HCL->numcl[ONE]]) == 1) {
+        return false;
+    }
+    return true;
+}
+
+
+
+// Calcule l'image d'un mot par un morphisme.
+uint mor_compute_image(morphism* M, word* w) {
+
+    uint temp = ONE;
+    for (uint i = 0; i < size_word(w); i++) {
+        uint letter_index = mor_letter_index(M, lefread_word(w, i));
+        if (letter_index == M->r_cayley->size_alpha) {
+            return M->r_cayley->size_graph;
+        }
+        temp = M->r_cayley->edges[temp][letter_index];
+    }
+    return temp;
+}
+
+/*
+// Structure pout stocker les paires rencontrée dans le DFA à l'intérieur d'un AVL
+struct at_explore
+{
+    // Élément du monoide
+    uint elem;
+
+    // // Taille de l'alphabet
+    // uint size_alpha;
+
+    // Alphabet calculé: le ième bit de poids faible détermine si la ième lettre est présente
+    ulong thealph;
+
+    // // Pour chaque lettre, un pointeur sur l'état atteint
+    // struct at_explore **next;
+};
+
+typedef struct at_explore* p_at_explore;
+
+// Fonction de comparaison pour les AVLs
+static int at_explore_comp(void* e1, void* e2)
+{
+    if (((p_at_explore)e1)->thealph < ((p_at_explore)e2)->thealph)
+    {
+        return 1;
+    }
+    else if (((p_at_explore)e1)->thealph > ((p_at_explore)e2)->thealph)
+    {
+        return -1;
     }
     else
     {
-        if (out)
+        if (((p_at_explore)e1)->elem < ((p_at_explore)e2)->elem)
         {
-            fprintf(out, "#### The monoid is NOT idempotent.\n");
-            for (uint q = 0; q < M->trans->size_graph; q++)
+            return 1;
+        }
+        else if (((p_at_explore)e1)->elem > ((p_at_explore)e2)->elem)
+        {
+            return -1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+}
+
+// Extraction de l'information de l'AVL une fois le DFS fini
+static void at_avl_to_table(avlnode* thetree, dequeue** table)
+{
+    if (thetree == NULL)
+    {
+        return;
+    }
+    else
+    {
+        at_avl_to_table(thetree->left, table);
+        rigins_dequeue(((p_at_explore)thetree->value)->elem, table[((p_at_explore)thetree->value)->thealph]);
+
+        at_avl_to_table(thetree->right, table);
+        free(thetree);
+    }
+} */
+
+/*
+dequeue** at_table_cayley(morphism* M)
+{
+    // Création de la pile pour le DFS
+    dequeue_gen* thestack = create_dequeue_gen();
+
+    // Création de l'AVL pour mémoriser les sommets déjà visités
+    avlnode* thetree = NULL;
+
+    // Création du sommet initial
+    p_at_explore inode;
+    MALLOC(inode, 1);
+    inode->elem = ONE;
+    // inode->size_alpha = M->r_cayley->size_alpha;
+    inode->thealph = 0; // Le mot vide a un alphabet vide
+    // inode->next = NULL; // On ne connait pas encore les sommets adjacents
+
+    rigins_dequeue_gen(inode, thestack);
+    thetree = avl_insert(inode, thetree, &at_explore_comp);
+
+    while (!isempty_dequeue_gen(thestack))
+    {
+        // On prend un sommet non-traité
+        p_at_explore thenode = rigpull_dequeue_gen(thestack);
+        // MALLOC(thenode->next, M->r_cayley->size_alpha);
+        for (uint a = 0; a < M->r_cayley->size_alpha; a++)
+        {
+            // printf("Letter %d\n", a);
+            // Création du potentiel nouveau sommet
+            p_at_explore newnode;
+            MALLOC(newnode, 1);
+            newnode->elem = M->r_cayley->edges[thenode->elem][a];
+            ulong mask = 1 << a;
+
+            newnode->thealph = thenode->thealph | mask;
+            // newnode->size_alpha = M->r_cayley->size_alpha;
+            // newnode->next = NULL;
+
+            // Recherche dans les sommets déjà visités
+            avlnode* found = avl_search(newnode, thetree, &at_explore_comp);
+
+            if (found == NULL)
             {
-                if (size_vertices(M->idem_list) <= q ||
-                    lefread_vertices(M->idem_list, q) != q)
+                // printf("test 1\n");
+                // thenode->next[a] = newnode;
+                rigins_dequeue_gen(newnode, thestack);
+                thetree = avl_insert(newnode, thetree, &at_explore_comp);
+                // printf("test 11\n");
+            }
+            else
+            {
+                // printf("test 2\n");
+
+                // thenode->next[a] = found->value;
+                free(newnode);
+
+                // printf("test 22\n");
+            }
+        }
+    }
+
+    // Création de la table à retourner
+    dequeue** theresult;
+    ulong result_size = 1 << M->r_cayley->size_alpha;
+    MALLOC(theresult, result_size);
+    for (uint i = 0; i < result_size; i++)
+    {
+        theresult[i] = create_dequeue();
+    }
+    at_avl_to_table(thetree, theresult);
+    delete_dequeue_gen(thestack);
+    return theresult;
+}
+
+void print_at_table(morphism* M, dequeue** table, FILE* out)
+{
+    uint max_length = 100; // Longueur d'une ligne
+    print_title_box(100, false, out, 2, "Computation on the syntactic morphism. For each sub-alphabet, lists the elements", "which are the image of a word with this sub-alphabet.");
+
+    // Récupération d'information pour l'alignement
+    ulong table_size = 1 << M->r_cayley->size_alpha;    // Nombre de sous-alphabets
+    uint prefix_size = M->r_cayley->size_alpha * 2 + 2; // Longueur-maximale de l'affichage d'un sous-alphabet
+
+    // L'unique élément d'antécédent eps (d'alphabet vide) est 1
+    // fprintf(out, "Number of sub-alphabets: %lu\n", table_size);
+    fprintf(out, "│∅");
+    for (uint i = 0; i < prefix_size - 1; i++)
+    {
+        fprintf(out, " ");
+    }
+    fprintf(out, ": 1");
+    for (uint i = 0; i < max_length - prefix_size - 3; i++)
+    {
+        fprintf(out, " ");
+    }
+    fprintf(out, "│\n");
+
+    // Pour les alphabets non-vides
+    for (ulong i = 1; i < table_size; i++)
+    {
+        fprintf(out, "│{");
+        ulong j = i;
+        uint length = 1;
+        for (uint a = 0; a < M->r_cayley->size_alpha; a++)
+        {
+            if (j % 2 == 1)
+            {
+                length++;
+                fprintf(out, "%c", a + 'a');
+                if (j / 2 != 0)
                 {
-                    fprintf(out, "#### For instance, ");
-                    cayley_print_name(M, q, out);
-                    fprintf(out, " is not an idempotent\n");
-                    break;
+                    fprintf(out, ",");
+                    length++;
                 }
             }
+            j = j / 2;
         }
-        return false;
-    }
-}
-
-// Commutativité
-bool is_comm_mono(p_cayley M, FILE *out)
-{
-    if (out)
-    {
-        fprintf(out, "#### Checking if the monoid is commutative.\n");
-    }
-    for (uint a = 0; a < M->trans->size_alpha - 1; a++)
-    {
-        for (uint b = a + 1; b < M->trans->size_alpha; b++)
+        printf("}");
+        length++;
+        for (uint k = 0; k < prefix_size - length; k++)
         {
-            uint av = M->trans->edges[ONE][a];
-            uint bv = M->trans->edges[ONE][b];
-
-            uint ab = cayley_mult(M, av, bv);
-            uint ba = cayley_mult(M, bv, av);
-            if (ab != ba)
-            {
-                fprintf(out, "#### The monoid is NOT commutative.\n");
-                fprintf(out, "#### For instance, %c%c ≠ %c%c.\n", a + 'a', b + 'a',
-                        b + 'a', a + 'a');
-                return false;
-            }
+            fprintf(out, " ");
         }
+        printf(": ");
+        mor_print_sub_aligned(M, table[i], max_length, prefix_size + 2, out);
     }
-    fprintf(out, "#### The monoid is commutative.\n");
-    return true;
+
+    // Fin du tableau
+    print_bot_line(max_length, out);
 }
+ */

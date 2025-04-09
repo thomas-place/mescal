@@ -10,41 +10,41 @@
 
 // Prend un graphe quelconque et la liste de ses SCCs en entrée (déjà calculée)
 // Retourne le DAG obtenu en prenant chaque SCC comme sommet
-p_graph compute_dag_of_sccs(p_graph G, p_parti clist)
+graph* compute_dag_of_sccs(graph* G, parti* clist)
 {
     // Précalcul: liste des classes adjacentes pour chaque sommet
-    p_vertices adjclass[G->size];
+    dequeue* adjclass[G->size];
     for (uint q = 0; q < G->size; q++)
     {
-        adjclass[q] = create_vertices();
-        for (uint i = 0; i < size_vertices(G->edges[q]); i++) // Boucle sur les sommets adjacents à q
+        adjclass[q] = create_dequeue();
+        for (uint i = 0; i < size_dequeue(G->edges[q]); i++) // Boucle sur les sommets adjacents à q
         {
-            uint c = clist->numcl[lefread_vertices(G->edges[q], i)]; // la classe du ième sommet adjacent à q
+            uint c = clist->numcl[lefread_dequeue(G->edges[q], i)]; // la classe du ième sommet adjacent à q
 
-            if ((isempty_vertices(adjclass[q]) || c != rigread_vertices(adjclass[q], 0)) && c != clist->numcl[q])
-                rigins_vertices(c, adjclass[q]);
+            if ((isempty_dequeue(adjclass[q]) || c != rigread_dequeue(adjclass[q], 0)) && c != clist->numcl[q])
+                rigins_dequeue(c, adjclass[q]);
         }
     }
 
     // Création du nouveau graph
-    p_graph new = create_graph_noedges(clist->size_par);
+    graph* new = create_graph_noedges(clist->size_par);
     for (uint c = 0; c < clist->size_par; c++)
     {
-        for (uint i = 0; i < size_vertices(clist->cl[c]); i++)
+        for (uint i = 0; i < size_dequeue(clist->cl[c]); i++)
         {
-            merge_sorted_vertices(new->edges[c], adjclass[lefread_vertices(clist->cl[c], i)]);
+            merge_sorted_dequeue(new->edges[c], adjclass[lefread_dequeue(clist->cl[c], i)]);
         }
     }
     for (uint q = 0; q < clist->size_set; q++)
     {
-        delete_vertices(adjclass[q]);
+        delete_dequeue(adjclass[q]);
     }
 
     return new;
 }
 
 // Fonction auciliaire pour le tri topologique
-static void topo_sort_dag_visit(uint q, p_graph G, p_vertices thesort, bool *marked)
+static void topo_sort_dag_visit(uint q, graph* G, dequeue* thesort, bool* marked)
 {
     // printf("the q: %d\n", q);
     if (marked[q])
@@ -53,25 +53,25 @@ static void topo_sort_dag_visit(uint q, p_graph G, p_vertices thesort, bool *mar
     }
     else
     {
-        for (uint i = 0; i < size_vertices(G->edges[q]); i++)
+        for (uint i = 0; i < size_dequeue(G->edges[q]); i++)
         {
-            uint r = lefread_vertices(G->edges[q], i);
+            uint r = lefread_dequeue(G->edges[q], i);
             if (r != q)
             {
                 topo_sort_dag_visit(r, G, thesort, marked);
             }
         }
         marked[q] = true;
-        lefins_vertices(q, thesort);
+        lefins_dequeue(q, thesort);
     }
 }
 
 // Prend un DAG en entrée (ne termine pas sur un graphe quelconque)
 // Calcule un tri topologique de ses sommets
-p_vertices topo_sort_dag(p_graph G)
+dequeue* topo_sort_dag(graph* G)
 {
     // Future liste contenant le tri topologique
-    p_vertices thesort = create_vertices();
+    dequeue* thesort = create_dequeue();
 
     // Tableaux de Booléens pour marquer les sommets
     bool marked[G->size];
@@ -88,10 +88,10 @@ p_vertices topo_sort_dag(p_graph G)
     return thesort;
 }
 
-p_vertices topo_sort_dag_start(p_graph G, uint start)
+dequeue* topo_sort_dag_start(graph* G, uint start)
 {
     // Future liste contenant le tri topologique
-    p_vertices thesort = create_vertices();
+    dequeue* thesort = create_dequeue();
 
     // Tableaux de Booléens pour marquer les sommets
     bool marked[G->size];
@@ -107,15 +107,15 @@ p_vertices topo_sort_dag_start(p_graph G, uint start)
 // Calcule la clôture transitive d'un DAG
 // Si topo_sort == NULL, les sommets doivent être ordonnés selon un tri topologique
 // Sinon, topo_sort doit contenir un tri topologique des sommets
-p_graph compute_tclos_dag(p_graph G, p_vertices topo_sort)
+graph* compute_tclos_dag(graph* G, dequeue* topo_sort)
 {
 
-    // p_vertices topo_sort = topo_sort_dag(G);
-    p_graph TC = create_graph_noedges(G->size);
+    // dequeue* topo_sort = topo_sort_dag(G);
+    graph* TC = create_graph_noedges(G->size);
     for (uint q = 0; q < G->size; q++)
     {
-        TC->edges[q] = create_vertices();
-        rigins_vertices(q, TC->edges[q]);
+        TC->edges[q] = create_dequeue();
+        rigins_dequeue(q, TC->edges[q]);
     }
     for (uint i = 0; i < G->size; i++)
     {
@@ -126,15 +126,15 @@ p_graph compute_tclos_dag(p_graph G, p_vertices topo_sort)
         }
         else // Sinon, on prend l'ordre donné par topo_sort
         {
-            q = rigread_vertices(topo_sort, i);
+            q = rigread_dequeue(topo_sort, i);
         }
 
-        for (uint j = 0; j < size_vertices(G->edges[q]); j++)
+        for (uint j = 0; j < size_dequeue(G->edges[q]); j++)
         {
-            merge_sorted_vertices(TC->edges[q], TC->edges[lefread_vertices(G->edges[q], j)]);
+            merge_sorted_dequeue(TC->edges[q], TC->edges[lefread_dequeue(G->edges[q], j)]);
         }
     }
-    // delete_vertices(topo_sort);
+    // delete_dequeue(topo_sort);
     return TC;
 }
 
@@ -143,28 +143,28 @@ p_graph compute_tclos_dag(p_graph G, p_vertices topo_sort)
 /*****************************************/
 
 // Prend un graphe quelconque en entrée et l'étend en faisant sa clôture transitive
-void make_tclos_graph(p_graph G)
+void make_tclos_graph(graph* G)
 {
 
     // Calcul du graphe des SCCs
-    p_parti clist = tarjan(G);
-    p_graph dag_of_sccs = compute_dag_of_sccs(G, clist);
+    parti* clist = tarjan(G);
+    graph* dag_of_sccs = compute_dag_of_sccs(G, clist);
 
     // graph_printing_test(dag_of_sccs, stdout);
 
     // Calcul de la cloture transitive du graphe des SCCs
     // Les sommets sont déjà triés selon un ordre topologique (conséquence de tarjan)
-    p_graph tc_dag_of_scss = compute_tclos_dag(dag_of_sccs, NULL);
+    graph* tc_dag_of_scss = compute_tclos_dag(dag_of_sccs, NULL);
 
     // graph_printing_test(tc_dag_of_scss, stdout);
 
     for (uint q = 0; q < G->size; q++)
     {
         uint c = clist->numcl[q]; // La classe de q
-        for (uint i = 0; i < size_vertices(tc_dag_of_scss->edges[c]); i++)
+        for (uint i = 0; i < size_dequeue(tc_dag_of_scss->edges[c]); i++)
         { // On lit les classes adjacentes dans la TC
-            uint d = lefread_vertices(tc_dag_of_scss->edges[c], i);
-            merge_sorted_vertices(G->edges[q], clist->cl[d]);
+            uint d = lefread_dequeue(tc_dag_of_scss->edges[c], i);
+            merge_sorted_dequeue(G->edges[q], clist->cl[d]);
         }
     }
 

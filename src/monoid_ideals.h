@@ -1,84 +1,171 @@
-/*********************/
-/* Ideals of monoids */
-/*********************/
+/**
+ * @file monoid_ideals.h
+ * @brief
+ * Computations of ideals in monoids.
+ */
 
 #ifndef IDEALS_H
 #define IDEALS_H
 
+ /*  __  __                   _     _         ___    _            _      */
+ /* |  \/  | ___  _ __   ___ (_) __| |___ _  |_ _|__| | ___  __ _| |___  */
+ /* | |\/| |/ _ \| '_ \ / _ \| |/ _` / __(_)  | |/ _` |/ _ \/ _` | / __| */
+ /* | |  | | (_) | | | | (_) | | (_| \__ \_   | | (_| |  __/ (_| | \__ \ */
+ /* |_|  |_|\___/|_| |_|\___/|_|\__,_|___(_) |___\__,_|\___|\__,_|_|___/ */
+
 #include <stdbool.h>
 #include "monoid.h"
-#include "monoid_green.h"
 
-/**************************/
-/* Computations of ideals */
-/**************************/
 
-// Calcul d'un idéal droit (la liste triée des éléments de l'ensemble sM)
-p_vertices compute_r_ideal(p_cayley M, uint s, bool* rest);
 
-// Calcul d'un idéal gauche (la liste triée des éléments de l'ensemble Ms)
-p_vertices compute_l_ideal(p_cayley M, uint s, bool* rest);
+/**
+ * @brief
+ * Computation of the right ideal of an element.
+ *
+ * @remark
+ * The third parameter is an array of Booleans indexed by the elements of
+ * the monoid. It restricts the elements in the returned list to those which
+ * are marked true by the array. When no restriction is needed a NULL pointer
+ * should be given as input.
+ *
+ * @return
+ * The right ideal sorted in increasing order.
+ */
+dequeue* compute_r_ideal(morphism*, //!< The morphism.
+    uint,    //!< The element
+    bool*                        //!< An array of Booleans indexed by the elements. Can be used to restrict the output.
+);
 
-// Calcul d'un idéal droit restreint par l'alphabet.
-p_vertices compute_r_ideal_alph(p_cayley M, uint s, bool* alph, bool* rest);
+/**
+ * @brief
+ * Computation of the left ideal of an element.
+ *
+ * @remark
+ * The third parameter is an array of Booleans indexed by the elements of
+ * the monoid. It restricts the elements in the returned list to those which
+ * are marked true by the array. When no restriction is needed a NULL pointer
+ * should be given as input.
+ *
+ * @return
+ * The left ideal sorted in increasing order.
+ */
+dequeue* compute_l_ideal(morphism*, //!< The morphism.
+    uint,                         //!< The element
+    bool*                        //!< An array of Booleans indexed by the elements. Can be used to restrict the output.
+);
 
-// Calcul d'un idéal gauche restreint par l'alphabet.
-p_vertices compute_l_ideal_alph(p_cayley M, uint s, bool* alph, bool* rest);
+/**
+ * @brief
+ * Computation of the two-sided ideal of an element.
+ *
+ * @remark
+ * The third parameter is an array of Booleans indexed by the elements of
+ * the monoid. It restricts the elements in the returned list to those which
+ * are marked true by the array. When no restriction is needed a NULL pointer
+ * should be given as input.
+ *
+ * @return
+ * The two-sided ideal sorted in increasing order.
+ */
+dequeue* compute_j_ideal(morphism*, //!< The morphism.
+    uint,                      //!< The element
+    bool*                     //!< An array of Booleans indexed by the elements. Can be used to restrict the output.
+);
 
-/***********************/
-/* Gestion des orbites */
-/***********************/
 
-typedef struct
-{
-    // Un Booléen qui permet de marquer le cas où toutes les orbites sont des sous-semigroupes
-    // de celle de 1 qui est égale à sub. Dans ce cas, on n'enregistre pas les orbites: orbits == NULL
-    bool oneonly;
+/**
+ * @brief
+ * Computation of a given restricted right ideal of an element. The restriction is
+ * given by a sub-alphabet: the only available transitions are those labeled by a
+ * letter in this sub-alphabet.
+ *
+ * @remark
+ * The fourth parameter is an array of Booleans indexed by the elements of
+ * the monoid. It restricts the elements in the returned list to those which
+ * are marked true by the array. When no restriction is needed a NULL pointer
+ * should be given as input.
+ *
+ * @return
+ * The restricted right ideal sorted in increasing order.
+ */
+dequeue* compute_r_ideal_alph(morphism*, //!< The morphism.
+    uint,                              //!< The element
+    bool*,                           //!< An array of Booleans indexed by the letters. Marks the letters inside the sub-alphabet
+    bool*                             //!< An array of Booleans indexed by the elements. Can be used to restrict the output.
+);
 
-    // Le sous-monoide à l'intérieur duquel les orbites sont calculées
-    p_green_sub sub;
+/**
+ * @brief
+ * Computation of a given restricted left ideal of an element. The restriction is
+ * given by a sub-alphabet: the only available transitions are those labeled by a
+ * letter in this sub-alphabet.
+ *
+ * @remark
+ * The fourth parameter is an array of Booleans indexed by the elements of
+ * the monoid. It restricts the elements in the returned list to those which
+ * are marked true by the array. When no restriction is needed a NULL pointer
+ * should be given as input.
+ *
+ * @return
+ * The restricted left ideal sorted in increasing order.
+ */
+dequeue* compute_l_ideal_alph(morphism*, //!< The morphism.
+    uint,                  //!< The element
+    bool*,                    //!< An array of Booleans indexed by the letters. Marks the letters inside the sub-alphabet
+    bool*                             //!< An array of Booleans indexed by the elements. Can be used to restrict the output.
+);
 
-    // Nombre d'idempotents
-    uint nb_idems;
 
-    // Tableau des orbites
-    p_green_sub* orbits;
+/**
+ * @brief
+ * Computation of a given restricted left/right ideal of an element. The restriction is
+ * given by a sub-alphabet: the only available transitions are those labeled by a
+ * letter in this sub-alphabet.
+ *
+ * @remark
+ * The fourth parameter is an array of Booleans indexed by the elements of
+ * the monoid. It restricts the elements in the returned list to those which
+ * are marked true by the array. When no restriction is needed a NULL pointer
+ * should be given as input.
+ *
+ * @return
+ * The restricted left ideal sorted in increasing order.
+ */
+dequeue* compute_j_ideal_alph(morphism*, //!< The morphism.
+    uint,                      //!< The element
+    bool*,                         //!< An array of Booleans indexed by the letters. Marks the letters inside the sub-alphabet
+    bool*                             //!< An array of Booleans indexed by the elements. Can be used to restrict the output.
+);
 
-} orbits;
 
-typedef orbits* p_orbits;
+/**
+ * @brief
+ * Given an idempotent g and an element q such that g R q, compute an element
+ * s such that g = qr.
+ *
+ * @return
+ * The element r.
+ */
+uint get_rlink(morphism*, //!< The morphism.
+    parti*,       //!< The R-classes.
+    uint,            //!< Idempotent.
+    uint               //!< Start element.
+);
 
-// Intialise un ensemble d'orbites
-// Après initialisation, on est dans le cas où l'orbite de 1 est tout le sous-monoide
-p_orbits init_orbits(p_green_sub S);
+/**
+ * @brief
+ * Given an idempotent h and an element t such that h R t, compute an element
+ * s such that h = st.
+ *
+ * @return
+ * The element s.
+ */
+uint get_llink(morphism*, //!< The morphism.
+    parti*,         //!< The L-classes.
+    uint,             //!< Idempotent.
+    uint               //!< Start element.
+);
 
-// Suppression (le Booléen indque si on doit aussi supprimer sub)
-void delete_orbits(p_orbits L, bool delsub);
 
-// Affichage d'un ensemble d'orbites
-void print_all_orbs(p_orbits L, char* namecl, FILE* out);
-
-void print_one_orb(p_orbits L, char* namecl, uint idem_num, FILE* out);
-
-/**************/
-/* DD-orbites */
-/**************/
-
-// Calcule la DD-orbite associée à l'idempotent e (monoide local)
-p_green_sub compute_one_ddorb(p_cayley M, p_green G, uint e);
-
-// Calcule toutes les DD-orbites associées
-p_orbits compute_all_ddorbs(p_cayley M, p_green G);
-
-// Affiche toutes les DD-orbites
-void print_all_ddorbs(p_orbits L, bool title, FILE* out);
-
-/********************************/
-/* Liens entre deux idempotents */
-/********************************/
-
-// Pour deux idempotents e,f calcule tous le sous-ensemble eMf
-// Marque simultanément les éléments dans eM et Mf si les pointeurs sont non-nuls
-p_vertices compute_ef_links(p_cayley M, uint e, uint f);
 
 #endif

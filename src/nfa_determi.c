@@ -1,307 +1,249 @@
-/********************************************/
-/* Determinisation et Minimisation des NFAs */
-/********************************************/
-
 #include "nfa_determi.h"
 
-/************************/
-/* Procédure principale */
-/************************/
 
-// Représentation temporaire d'un état de l'automate determinisé
-// pendant le parcours en profondeur.  On mémorise également les
-// états adjacents trouvés pour la construction du DFA ensuite.
-struct detstate
-{
-    // L'état du DFA: un ensemble trié d'états du NFA d'origine
-    p_vertices set;
 
-    // La taille de l'alphabet
-    uint size_alpha;
+// Temporary representation of a state of the deterministic automaton
+// during the depth-first search. We also store the adjacent states
+// found for the construction of the DFA afterwards.
+typedef struct detstate {
+    dequeue* set;           //!< The state of the DFA: a sorted set of states of the original NFA.
+    uint size_alpha;        //!< The size of the alphabet.
+    uint num;               //!< The number of the state in the future DFA.
+    struct detstate** next; //!< An array of size size_alph containing the transitions from the state for each letter.
+} detstate;
 
-    // Le numéro de l'état dans le future automate det
-    uint num;
 
-    // Un tableau de taille size_alph contenant les transitions depuis l'état
-    // pour chaque lettre
-    struct detstate** next;
-};
-typedef struct detstate* p_detstate;
-
-// Fonctions de libération d'un detstate. La première supprime le
-// champ "set" alors que la seconde le laisse alloué. Cete seconde
-// fonction permet de réutiliser le champ "set" comme nom de l'état
-// dans le DFA construit.
-static void free_detstate(void* p)
-{
-    if (p == NULL)
-    {
+// Release functions for a detstate. 
+static void free_detstate(void* p) {
+    if (p == NULL) {
         return;
     }
-    delete_vertices(((p_detstate)p)->set);
+    delete_dequeue(((detstate*)p)->set);
+    free(((detstate*)p)->next);
 
     free(p);
 }
 
-// static void free_detstate_saveset(void *p)
-// {
-//     if (p == NULL)
-//     {
-//         return;
-//     }
-//     free(((p_detstate)p)->next);
-//     free(p);
-// }
+// For the depth-first search, we store the states encountered
+// in an AVL. We therefore need a comparison function.
+// Return, O if =, 1 if <, -1 if >.
+static int comdequeuedetstate(void* e1, void* e2) {
+    dequeue* s1 = ((detstate*)e1)->set;
+    dequeue* s2 = ((detstate*)e2)->set;
 
-// Pour le parcours profondeur, on stocke les états rencontrés
-// dans un AVL. On a donc besoin d'une fonction de comparaison.
-// Retour, O si =, 1 si <, -1 si >
-static int comp_detstate(void* e1, void* e2)
-{
-    p_vertices s1 = ((p_detstate)e1)->set;
-    p_vertices s2 = ((p_detstate)e2)->set;
-    // On compare d'abord la taille
-    if (size_vertices(s1) < size_vertices(s2))
-    {
+    // First we compare the size.
+    if (size_dequeue(s1) < size_dequeue(s2)) {
         return 1;
     }
-    if (size_vertices(s1) > size_vertices(s2))
-    {
+    if (size_dequeue(s1) > size_dequeue(s2)) {
         return -1;
     }
-    // Sinon ordre lexico
-    for (uint i = 0; i < size_vertices(s1); i++)
-    {
-        if (lefread_vertices(s1, i) < lefread_vertices(s2, i))
-        {
+    // If the size is the same, we compare the elements in lexicogrpahic order.
+    for (uint i = 0; i < size_dequeue(s1); i++) {
+        if (lefread_dequeue(s1, i) < lefread_dequeue(s2, i)) {
             return 1;
         }
-        if (lefread_vertices(s1, i) > lefread_vertices(s2, i))
-        {
+        if (lefread_dequeue(s1, i) > lefread_dequeue(s2, i)) {
             return 1;
         }
     }
     return 0;
 }
 
-// Fonction qui remplit le tableau des transitions du DFA final à partir de l'AVL
-// contruit pendant le parcours en profondeur.
-// La fonction calcule également les nouveaux états finaux: oldfinals est la liste
-// des états finaux du NFA original et boolfinals est un tableau de Booléens dans
-// lequel on enregistre les nouveaux états finaux.
-// Le Booléen names indique si les noms des nouveaux états (des ensembles d'états
-// de l'ancien NFA) doivent être sauvegardés.
-static void dfa_avl_to_table(p_avlnode AVL, p_nfa DFA, p_vertices oldfinals, bool* newfinals, bool names, state_name ntype, void* oldnames)
-{
-    if (AVL == NULL)
-    {
+
+// Function that fills the transition table of the final DFA from the AVL
+// built during the depth-first search.
+// The function also calculates the new final states: oldfinals is the list
+// of final states of the original NFA and boolfinals is an array of Booleans
+// in which we record the new final states.
+// The names Boolean indicates whether the names of the new states (sets of states
+// of the old NFA) should be saved.
+static void dfa_avl_to_table(avlnode* AVL, nfa* DFA, dequeue* oldfinals, bool* newfinals,
+    bool names, char** oldnames) {
+    if (AVL == NULL) {
         return;
     }
-    else
-    {
-        dfa_avl_to_table(AVL->left, DFA, oldfinals, newfinals, names, ntype, oldnames);
-        dfa_avl_to_table(AVL->right, DFA, oldfinals, newfinals, names, ntype, oldnames);
-        p_detstate thestate = (p_detstate)AVL->value;
+    else {
+        dfa_avl_to_table(AVL->left, DFA, oldfinals, newfinals, names, oldnames);
+        dfa_avl_to_table(AVL->right, DFA, oldfinals, newfinals, names, oldnames);
+        detstate* thestate = (detstate*)AVL->value;
 
-        // Enregistrement des transitions depuis l'état (son numéro est "thestate->num")
-        for (uint a = 0; a < DFA->trans->size_alpha; a++)
-        {
-            lefins_vertices(thestate->next[a]->num, DFA->trans->edges[thestate->num][a]);
+        for (uint a = 0; a < DFA->trans->size_alpha; a++) {
+            lefins_dequeue(thestate->next[a]->num, DFA->trans->edges[thestate->num][a]);
         }
 
-        // Si l'état est final (il correspond à un ensemble d'états du NFA original qui
-        // intersecte les anciens états finaux), on enregistre cette information.
-        if (intersec_vertices(oldfinals, thestate->set))
-        {
+        if (intersec_dequeue(oldfinals, thestate->set)) {
             newfinals[thestate->num] = true;
         }
-        else
-        {
+        else {
             newfinals[thestate->num] = false;
         }
 
-        // Enregistrement du nom de l'état (si nécessaire).
-        if (names)
-        {
-            uint* temp;
-            MALLOC(temp, size_vertices(thestate->set) + 1);
-            temp[0] = size_vertices(thestate->set);
-            for (uint i = 0; i < temp[0]; i++)
-            {
-                if (ntype == NUMBER)
-                {
-                    temp[i + 1] = ((uint*)oldnames)[lefread_vertices(thestate->set, i)];
+        if (names) {
+            if (isempty_dequeue(thestate->set)) {
+                MALLOC(DFA->state_names[thestate->num], 6);
+                sprintf(DFA->state_names[thestate->num], "∅");
+            }
+            else {
+                uint string_size = 2 + size_dequeue(thestate->set);
+                for (uint i = 0; i < size_dequeue(thestate->set); i++) {
+                    if (oldnames) {
+                        string_size += strlen(oldnames[lefread_dequeue(thestate->set, i)]);
+                    }
+                    else {
+                        string_size += num_length(lefread_dequeue(thestate->set, i));
+                    }
                 }
-                else
-                {
-                    temp[i + 1] = lefread_vertices(thestate->set, i);
+
+                MALLOC(DFA->state_names[thestate->num], string_size);
+                sprintf(DFA->state_names[thestate->num], "{");
+                char aux[10];
+                for (uint i = 0; i < size_dequeue(thestate->set) - 1; i++) {
+                    if (oldnames) {
+                        strcat(DFA->state_names[thestate->num],
+                            oldnames[lefread_dequeue(thestate->set, i)]);
+                        strcat(DFA->state_names[thestate->num], ",");
+                    }
+                    else {
+                        sprintf(aux, "%d,", lefread_dequeue(thestate->set, i));
+                        strcat(DFA->state_names[thestate->num], aux);
+                    }
+                }
+                if (oldnames) {
+                    strcat(DFA->state_names[thestate->num],
+                        oldnames[rigread_dequeue(thestate->set, 0)]);
+                    strcat(DFA->state_names[thestate->num], "}");
+                }
+                else {
+                    sprintf(aux, "%d}", rigread_dequeue(thestate->set, 0));
+                    strcat(DFA->state_names[thestate->num], aux);
                 }
             }
-            ((uint**)DFA->names)[thestate->num] = temp;
         }
     }
 }
 
-// Procédure de déterminisation. Le Booléen names indique si les noms des nouveaux états
-// (des ensembles d'états de l'ancien NFA) doivent être sauvegardés dans le DFA.
-p_nfa nfa_determinize(p_nfa A, bool names)
-{
-    // On commence par éliminer les (éventuelles) transitions epsilon
-    nfa_elimeps_mod(A);
+// Determinization procedure. The Boolean names indicates whether the names of the new states
+// (sets of states of the old NFA) should be saved in the DFA.
+nfa* nfa_determinize(nfa* A, bool names) {
 
-    // La pile utilisée pour le parcours en profondeur.
-    p_stack thestack = create_stack();
+    // First we eliminate the (possible) epsilon transitions
+    A = nfa_elimeps(A);
 
-    // L'AVL qu'on utilise pour mémoriser les états du futur DFA déjà construits pendant
-    // le parcours en profondeur.
-    p_avlnode tree = NULL;
 
-    // Compteur qui servira à compter et numéroter les états créés
+    // We create the stack used for the depth-first search.
+    dequeue_gen* thestack = create_dequeue_gen();
+
+    // We use the AVL to store the states of the future DFA already built during
+    // the depth-first search.
+    avlnode* tree = NULL;
+
+    // Counter that will be used to count and number the states created.
     int num = 0;
 
-    // Construction de l'état initial du futur DFA.
-    p_detstate start;
+    // Construction of the initial state of the future DFA.
+    detstate* start;
     MALLOC(start, 1);
-    start->set = create_vertices();
-    copy_vertices_right(start->set, A->initials, 0); // L'état initial est l'ensemble des états initiaux du NFA original
+    start->set = create_dequeue();
+    copy_dequeue_right(start->set, A->initials, 0);    // The initial state of the DFA is the set of initial states of the NFA
     start->size_alpha = A->trans->size_alpha;
-    start->num = num; // L'état initial aura le numéro 0
+    start->num = num;                     // The initial state is the state 0
     num++;
-    start->next = NULL;                             // Les transitions seront enregistrées plus tard en explorant les états adjacents
-    tree = avl_insert(start, tree, &comp_detstate); // Insertion dans l'ensemble des états déjà rencontrés
-    push(start, thestack);                          // Cet état est à traiter
+    start->next = NULL;     // The transitions are not yet known.
+    tree = avl_insert(start, tree, &comdequeuedetstate, NULL); // We store the initial state in the AVL.
+    rigins_dequeue_gen(start, thestack);                    // We put the initial state in the stack to explore it.
 
-    while (!isempty_stack(thestack))
-    {
-        // Récupération de l'état qu'on va traiter
-        p_detstate thestate = (p_detstate)pop(thestack);
+    while (!isempty_dequeue_gen(thestack)) {
 
-        // Calcul des transitions à partir de thestate
+        // We retrieve the state to be processed.
+        detstate* thestate = (detstate*)rigpull_dequeue_gen(thestack);
+
+        // We calculate the transitions from thestate.
         MALLOC(thestate->next, A->trans->size_alpha);
-        for (uint a = 0; a < A->trans->size_alpha; a++) // Pour chaque lettre a
-        {
-            // On crée un (potentiel) nouvel état à traiter pour la transition étiquetée par a
-            // On n'affecte que l'ensemble d'états correspondant dans le NFA d'origine
-            // En effte, cette information suffit pour comparer cet état avec ceux dans l'AVL
-            p_detstate new;
+        for (uint a = 0; a < A->trans->size_alpha; a++) {
+            // For each letter a
+            // We create a (potential) new state to be processed for the transition labeled by a.
+            // We only assign the corresponding set of states in the original NFA.
+            // In fact, this information is sufficient to compare this state with those in the AVL.
+            detstate* new;
             MALLOC(new, 1);
             new->set = lgraph_reachable(A->trans, thestate->set, a);
 
-            // On regarde dans l'AVL si cet état a en fait déjà été construit
-            p_avlnode thenode = avl_search(new, tree, &comp_detstate);
-            if (thenode == NULL)
-            {
-                // Si cet état est nouveau, on termine sa construction
+            // We check if this state has already been built in the AVL.
+            avlnode* thenode = avl_search(new, tree, &comdequeuedetstate);
+            if (thenode == NULL) {
+                // If this state is new, we finish its construction.
                 new->size_alpha = A->trans->size_alpha;
                 new->num = num;
                 num++;
                 new->next = NULL;
 
-                // Ce nouvel état est adjacent à l'état courant pour la lettre a
+                // This new state is adjacent to thestate for the letter a.
                 thestate->next[a] = new;
 
-                // On mémorise ce nouvel état et on le met dans la pile pour l'explorer ensuite
-                tree = avl_insert(new, tree, &comp_detstate);
-                push(new, thestack);
+                // We store this new state in the AVL and in the stack to explore it later.
+                tree = avl_insert(new, tree, &comdequeuedetstate, NULL);
+                rigins_dequeue_gen(new, thestack);
             }
-            else
-            {
-                // Si l'état n'est pas nouveau, on affecte la version déjà construite comme adjacent pour la lettre a
-                thestate->next[a] = ((p_detstate)thenode->value);
+            else {
+                // If the state is not new, we assign the version already built as adjacent for the letter a.
+                thestate->next[a] = ((detstate*)thenode->value);
 
-                // On supprime la copie qu'on vient de créer
-                delete_vertices(new->set);
+                // We delete the copy we just created.
+                delete_dequeue(new->set);
                 free(new);
             }
         }
     }
-    // Le parcours en profondeur est fini, la pile n'est plus nécessaire
-    delete_stack(thestack);
+    // We have finished the depth-first search. We can delete the stack.
+    delete_dequeue_gen(thestack);
 
-    // Construction du DFA
-    p_nfa DFA;
-    MALLOC(DFA, 1);                                                // Création du DFA
-    DFA->initials = create_vertices();                             // Création de la liste contenant l'état initial
-    lefins_vertices(0, DFA->initials);                             // Par construction, l'état initial a le numéro 0
-    DFA->trans = create_lgraph_noedges(num, A->trans->size_alpha); // Création du graph
-    DFA->etrans = NULL;                                            // Pas de transitions epsilon
-    DFA->itrans = NULL;                                            // Pas de transitions inverses
-    if (names)
-    {
-        DFA->ntype = SET;
-        nfa_init_names(DFA);
+    // We have built the AVL. We can now build the DFA.
+    nfa* DFA = nfa_init();
+
+
+
+    DFA->alphabet = nfa_duplicate_alpha(A);
+    lefins_dequeue(0, DFA->initials);
+    DFA->trans = create_lgraph_noedges(num, A->trans->size_alpha);
+    if (names) {
+        MALLOC(DFA->state_names, DFA->trans->size_graph);
     }
-    else
-    {
-        DFA->ntype = NONAME;
-        DFA->names = NULL;
+    else {
+        DFA->state_names = NULL;
     }
 
-    // Enregistrement des transitions et des états finaux
 
-    bool tempfinals[num];                                                          // Tableau temporaire pour enregistrer les futurs états finaux
-    dfa_avl_to_table(tree, DFA, A->finals, tempfinals, names, A->ntype, A->names); // Création des transitions
 
-    DFA->finals = create_vertices();
-    for (int i = 0; i < num; i++) // Enregistrement des états finaux
-    {
-        if (tempfinals[i])
-        {
-            rigins_vertices(i, DFA->finals);
+
+    bool tempfinals[num];                                                      // Temporary array to store the final states
+    dfa_avl_to_table(tree, DFA, A->finals, tempfinals, names, A->state_names); // We fill the transition table.
+
+    for (int i = 0; i < num; i++) {                                            // We fill the list of final states.
+        if (tempfinals[i]) {
+            rigins_dequeue(i, DFA->finals);
         }
     }
 
+    delete_nfa(A);
     avl_free_strong(tree, &free_detstate);
-    // if (names)
-    // {
-    //     avl_free_strong(tree, &free_detstate_saveset);
-    // }
-    // else
-    // {
-    //     avl_free_strong(tree, &free_detstate);
-    // }
-
-    // print_dequeue(DFA->finals);
 
     return DFA;
 }
 
-/********************************************/
-/* Procédures basées sur la determinisation */
-/********************************************/
-
-// Minimisation (Brzozowski)
-p_nfa nfa_minimize(p_nfa A)
-{
-    p_nfa D = nfa_elimeps(A);
-    p_nfa B = nfa_mirror(D);
-    delete_nfa(D);
-    p_nfa C = nfa_determinize(B, false);
-    delete_nfa(B);
-    B = nfa_mirror(C);
-    delete_nfa(C);
-    C = nfa_determinize(B, false);
-    delete_nfa(B);
-    return C;
-}
-
 // Complementation
-p_nfa nfa_complement(p_nfa A)
-{
-    p_nfa B = nfa_determinize(A, false);
-    p_vertices newfinals = create_vertices();
-    for (uint q = 0; q < B->trans->size_graph; q++)
-    {
-        if (isempty_vertices(B->finals) || q < lefread_vertices(B->finals, 0))
-        {
-            rigins_vertices(q, newfinals);
+nfa* nfa_complement(nfa* A) {
+    nfa* B = nfa_determinize(A, false);
+    dequeue* newfinals = create_dequeue();
+    for (uint q = 0; q < B->trans->size_graph; q++) {
+        if (isempty_dequeue(B->finals) || q < lefread_dequeue(B->finals, 0)) {
+            rigins_dequeue(q, newfinals);
         }
-        else
-        {
-            lefpull_vertices(B->finals);
+        else {
+            lefpull_dequeue(B->finals);
         }
     }
-    delete_vertices(B->finals);
+    delete_dequeue(B->finals);
     B->finals = newfinals;
     return B;
 }

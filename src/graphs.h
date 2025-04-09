@@ -1,249 +1,427 @@
-/********************************************/
-/*   Structures pour stocker les machines   */
-/* Ensuite spécialisées pour NFA,DFA,Cayley */
-/********************************************/
+/**
+ * @file graphs.h
+ * @brief
+ * Implementation of graphs.
+ *
+ * @details
+ * Contains the various types used to represent graphs and some functions that can
+ * manipulate them.
+ */
 
-#ifndef MACHINES_H
-#define MACHINES_H
+#ifndef GRAPHS_H
+#define GRAPHS_H
 
-#include <stdbool.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include "type_basic.h"
-#include "type_vertices.h"
-#include "type_stack.h"
-#include "type_binheap.h"
+ /*   ____                 _          */
+ /*  / ___|_ __ __ _ _ __ | |__  ___  */
+ /* | |  _| '__/ _` | '_ \| '_ \/ __| */
+ /* | |_| | | | (_| | |_) | | | \__ \ */
+ /*  \____|_|  \__,_| .__/|_| |_|___/ */
+ /*                 |_|               */
+
 #include "type_abr.h"
+#include "type_basic.h"
+#include "type_binheap.h"
+#include "type_dequeue.h"
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-/* Graphs orientés non-étiquetés */
-typedef struct
-{
-    // Nombre de sommets
-    uint size;
-
-    // Tableau de taille "size"
-    // Edge[s] contient la liste des sommets adajacents à s
-    p_vertices *edges;
-
+/**
+ * @brief
+ * Type used to represent a directed unlabeled graph.
+ *
+ * @remark
+ * The set of edges is represented by the array of dequeues `edges`.
+ * For each vertex `q`, the cell `edge[q]` contains a list of all vertices that
+ * are connected to `q` by an edge.
+ *
+ * This list must be sorted in increasing order.
+ */
+typedef struct {
+    uint size;       //!< Number of vertices.
+    dequeue** edges; //!< The edges: an array of size "size".
 } graph;
 
-/* Graph orientés étiquetés par un alphabet */
-typedef struct
-{
-    // Nombre de sommets
-    uint size_graph;
-
-    // Taille de l'alphabet
-    uint size_alpha;
-
-    // Tableau de tableaux taille "size_graph * size_alpha"
-    // Edge[s][a] contient la liste des sommets reliés à s par la lettre a
-    p_vertices **edges;
-
+/**
+ * @brief
+ * Type used to represent a directed labeled graph.
+ *
+ * @remark
+ * The set of edges is represented by the array of arrays of dequeues `edges`.
+ * For each vertex `q` and each letter `a` the cell `edge[q][a]` contains a list
+ * of all vertices that are connected to `q` by an edge labeled by `a`.
+ * This list must be sorted in increasing order.
+ */
+typedef struct {
+    uint size_graph;  //!< Number of vertices.
+    uint size_alpha;  //!< Number of labels.
+    dequeue*** edges; //!< The edges: an array of arrays of size `size_graph * size_alpha`.
 } lgraph;
 
-/* Graph orientés déterministes complets étiquetés par un alphabet */
-typedef struct
-{
-    // Nombre de sommets
-    uint size_graph;
-
-    // Taille de l'alphabet
-    uint size_alpha;
-
-    // Tableau de tableaux taille "size_graph * size_alpha"
-    // Edge[s][a] contient l'unique sommet relié à s par la lettre a
-    uint **edges;
-
+/**
+ * @brief
+ * Type used to represent a complete deterministic directed labeled graph.
+ *
+ * @remark
+ * The set of edges is represented by the array of arrays of usigned integers `edges`.
+ * For each vertex `q` and each letter `a` the cell `edge[q][a]` contains the
+ * unique vertex connected to `q` by an edge labeled by `a`.
+ */
+typedef struct {
+    uint size_graph; //!< Number of vertices.
+    uint size_alpha; //!< Number of labels.
+    uint** edges;    //!< The edges: an array of arrays of size "size_graph * size_alpha".
 } dgraph;
 
-typedef graph *p_graph;
-typedef lgraph *p_lgraph;
-typedef dgraph *p_dgraph;
+/**************/
+/* Allocation */
+/**************/
 
-/*********************/
-/* Fonctions de test */
-/*********************/
+/**
+ * @brief
+ * Creates a directed unlabeled graph without edges.
+ *
+ * @return
+ * The created graph.
+ */
+graph* create_graph_noedges(uint //!< Number of vertices.
+);
 
-void graph_printing_test(p_graph G, FILE *out);
+/**
+ * @brief
+ * Creates a directed unlabeled graph whose only edges are self-loops.
+ *
+ * @return
+ * The created graph.
+ */
+graph* create_graph_selfloops(uint //!< Number of vertices.
+);
 
-/*************************/
-/* Fonctions de création */
-/*************************/
+/**
+ * @brief
+ * Releases a directed unlabeled graph.
+ */
+void delete_graph(graph* //<! The graph that needs to be freed.
+);
 
-// Intitialise un graphe sans arêtes
-p_graph create_graph_noedges(uint size);
+/**
+ * @brief
+ * Creates a directed graph without edges.
+ *
+ * @return
+ * The created graph.
+ */
+lgraph* create_lgraph_noedges(uint, //!< Number of vertices.
+    uint //!< Number of labels.
+);
 
-// Intitialise un graphe étiqueté sans arêtes
-p_lgraph create_lgraph_noedges(uint size_graph, uint size_alpha);
+/**
+ * @brief
+ * Releases a directed graph.
+ */
+void delete_lgraph(lgraph* //<! The graph that needs to be freed.
+);
 
-// Intitialise un graphe déterministe complet étiqueté sans uniquement des self-loops
-p_dgraph create_dgraph_noedges(uint size_graph, uint size_alpha);
+/**
+ * @brief
+ * Creates a complete deterministic directed graph without edges.
+ *
+ * @return
+ * The created graph.
+ */
+dgraph* create_dgraph_noedges(uint, //!< Number of vertices.
+    uint //!< Number of labels.
+);
 
-/****************************/
-/* Fonctions de suppression */
-/****************************/
+/**
+ * @brief
+ * Release of a complete deterministic directed graph.
+ */
+void delete_dgraph(dgraph* //<! The graph that needs to be freed.
+);
 
-// Désallocation d'un graphe
-void delete_graph(p_graph G);
 
-// Désallocation d'un graphe étiqueté
-void delete_lgraph(p_lgraph G);
+/*******************/
+/* Basic functions */
+/*******************/
 
-// Désallocation d'un graphe étiqueté déterministe complet
-void delete_dgraph(p_dgraph G);
+/**
+ * @brief
+ * Computes the number of edges in a directed unlabeled graph.
+ * @return
+ * The number of edges in the graph.
+ */
+int graph_nb_edges(graph* //<! The graph.
+);
 
-/****************************/
-/* Matrices d'accessibilité */
-/****************************/
+/**
+ * @brief
+ * Computes the number of edges in a directed labeled graph.
+ * @return
+ * The number of edges in the graph.
+ */
+int lgraph_nb_edges(lgraph* //<! The graph.
+);
 
-// Saturation d'une matrice, la diagonale est supposée contenir des true
-void saturate_mat(bool **mat, uint size);
-
-// Récupération de la matrice des arêtes d'un graphe
-bool **graph_to_mat(p_graph);
-
-// Récupération de la matrice d'accessibilité d'un
-// graphe.
-bool **graph_to_accmat(p_graph);
-
-// Récupération de la matrice des arêtes étiquetée
-// d'un graphe étiqueté.  Indicage: [q][a][r] pour
-// l'arête (q,a,r)
-bool ***lgraph_to_lmat(p_lgraph);
-
-// Récupération de la matrice d'accessibilité d'un
-// graphe étiqueté.
-bool **lgraph_to_accmat(p_lgraph);
-
-// Fonctions de libération
-void free_mat(bool **, uint size_graph);
-void free_lmat(bool ***, uint size_graph, uint size_alpha);
+/**
+ * @brief
+ * Computes the number of edges in a complete deterministic directed labeled graph.
+ * @return
+ * The number of edges in the graph.
+ */
+int dgraph_nb_edges(dgraph* //<! The graph.
+);
 
 /************/
-/* Parcours */
+/* Searches */
 /************/
 
-// Parcours DFS: retourne la liste triée des sommets accessibles depuis un sommet dans ini
-// La lise ini est vidée (elle est utilisée comme pile)
-// Le tableau "alph" contient un sous-alphabet (on peut l'utiliser pour restreindre les transitions autorisées)
-// Si alph = NULL, toutes les lettres sont autorisées
-// Le tableau "rest" permet de restreindre les sommets retournés
-p_vertices graph_dfs(p_graph G, p_vertices ini, bool *rest);
-p_vertices lgraph_dfs(p_lgraph G, p_vertices ini, bool *alph, bool *rest);
-p_vertices dgraph_dfs(p_dgraph G, p_vertices ini, bool *alph, bool *rest);
+/**
+ * @brief
+ * Names for the two available algorithms for searches.
+ */
+typedef enum {
+    DFS,
+    BFS,
+} graph_stype;
 
-// Parcours BFS: retourne la liste triée des sommets accessibles depuis un sommet dans ini
-// La lise ini est vidée (elle est utilisée comme file)
-// Le tableau "alph" contient un sous-alphabet (on peut l'utiliser pour restreindre les transitions autorisées)
-// Si alph = NULL, toutes les lettres sont autorisées
-// Le tableau "rest" permet de restreindre les sommets retournés
-p_vertices graph_bfs(p_graph G, p_vertices ini, bool *rest);
-p_vertices lgraph_bfs(p_lgraph G, p_vertices ini, bool *alph, bool *rest);
-p_vertices dgraph_bfs(p_dgraph G, p_vertices ini, bool *alph, bool *rest);
+/**
+ * @brief
+ * Searches in an unlabeled graph. A set of already visited vertices is taken as input.
+ * This set is updated by the search.
+ *
+ * @attention
+ * The starting set is emptied by the function (it serves as a stack or a queue).
+ */
+void graph_search_update(graph_stype, //!< The type of search that has to be used.
+    graph*,     //!< The graph.
+    dequeue*,   //!< The starting set of vertices.
+    bool*       //!< A set of already visited vertices. It is updated by the fucntion.
+);
 
-/************************************/
-/* Récupération des listes d'arêtes */
-/************************************/
+/**
+ * @brief
+ * Searches in an unlabeled graph. Reachable vertices are returned inside a dequeue sorted in increasing
+ * order.
+ *
+ * @attention
+ * The starting set is emptied by the function (it serves as a stack or a queue).
+ *
+ * @remark
+ * An array of Booleans is taken as input. It is indexed by the vertices in the graph and represents
+ * a subset of these vertices. It is used to restrict the list of reachable vertices to those in the
+ * given set. If no restriction is needed, a NULL pointer should be given as input.
+ *
+ * @return
+ * The list of reachable vertices sorted in increasing order.
+ */
+dequeue* graph_search(graph_stype, //!< The type of search that has to be used.
+    graph*,     //!< The graph.
+    dequeue*,   //!< The starting set of vertices.
+    bool*       //!< An array indexed by the vertices. Used to restrict the list of reachable vertices.
+);
 
-/* Version simple: arêtes indépendantes */
+/**
+ * @brief
+ * Search in a labeled graph. A set of already visited vertices is taken as input. This set
+ * is updated by the search.
+ *
+ * @remark
+ * An additional array of Booleans is taken as input. It is indexed by the labels and represents a
+ * set of labels. It restricts the edges that can be used to those labeled by a label in this set.
+ * If no restriction is needed, a NULL pointer should be given as input.
+ *
+ * @attention
+ * The starting set is emptied by the function (it serves as a stack or a queue).
+ */
+void lgraph_search_update(graph_stype, //!< The type of search that has to be used.
+    lgraph*,    //!< The graph.
+    dequeue*,   //!< The starting set of vertices.
+    bool*,      //!< An array indexed by the labels. Used to restrict the edges that can be used.
+    bool*       //!< A set of already visited vertices. It is updated by the fucntion.
+);
 
-/* Une arête non étiquetée */
-typedef struct
-{
-    uint in;
-    uint out;
-} edge;
+/**
+ * @brief
+ * Search in a labeled graph. Reachable vertices are returned inside a dequeue sorted in increasing
+ * order.
+ *
+ * @attention
+ * The starting set is emptied by the function (it serves as a stack or a queue).
+ *
+ * @remark
+ * Two arrays of Booleans are taken as input. The first one is indexed by the labels. It represents
+ * a set of labels which restricts the edges that can be used to those labeled by a label in this set.
+ * The second array is indexed by the vertices. It represents a subset of these vertices which is used
+ * to restrict the list of reachable vertices to those in the given set. In both cases, if no restriction
+ * is needed, a NULL pointer should be given as input.
+ *
+ * @return
+ * The list of reachable vertices sorted in increasing order.
+ */
+dequeue* lgraph_search(graph_stype, //!< The type of search that has to be used.
+    lgraph*,    //!< The graph.
+    dequeue*,   //!< The starting set of vertices.
+    bool*,      //!< An array indexed by the labels. Used to restrict the edges that can be used.
+    bool*       //!< An array indexed by the vertices. Used to restrict the list of reachable vertices.
+);
 
-/* Une arête-étiquetée */
-typedef struct
-{
-    uint in;
-    uint lab;
-    uint out;
-} ledge;
+/**
+ * @brief
+ * Search in a desterministic complete labeled graph. A set of already visited vertices is taken as input.
+ * This set is updated by the search.
+ *
+ * @remark
+ * An additional array of Booleans is taken as input. It is indexed by the labels and represents a
+ * set of labels. It restricts the edges that can be used to those labeled by a label in this set.
+ * If no restriction is needed, a NULL pointer should be given as input.
+ *
+ * @attention
+ * The starting set is emptied by the function (it serves as a stack or a queue).
+ */
+void dgraph_search_update(graph_stype, //!< The type of search that has to be used.
+    dgraph*,    //!< The graph.
+    dequeue*,   //!< The starting set of vertices.
+    bool*,      //!< An array indexed by the labels. Used to restrict the edges that can be used.
+    bool*       //!< A set of already visited vertices. It is updated by the fucntion.
+);
 
-typedef edge *p_edge;
-typedef ledge *p_ledge;
+/**
+ * @brief
+ * Search in a desterministic complete labeled graph. Reachable vertices are returned inside a
+ * dequeue sorted in increasing order.
+ *
+ * @attention
+ * The starting set is emptied by the function (it serves as a stack or a queue).
+ *
+ * @remark
+ * Two arrays of Booleans are taken as input. The first one is indexed by the labels. It represents
+ * a set of labels which restricts the edges that can be used to those labeled by a label in this set.
+ * The second array is indexed by the vertices. It represents a subset of these vertices which is used
+ * to restrict the list of reachable vertices to those in the given set. In both cases, if no restriction
+ * is needed, a NULL pointer should be given as input.
+ *
+ * @return
+ * The list of reachable vertices sorted in increasing order.
+ */
+dequeue* dgraph_search(graph_stype, //!< The type of search that has to be used.
+    dgraph*,    //!< The graph.
+    dequeue*,   //!< The starting set of vertices.
+    bool*,      //!< An array indexed by the labels. Used to restrict the edges that can be used.
+    bool*       //!< An array indexed by the vertices. Used to restrict the list of reachable vertices.
+);
 
-// Calcul
-p_stack graph_to_edges(p_graph);
-p_stack lgraph_to_ledges(p_lgraph);
-p_stack dgraph_to_ledges(p_dgraph);
+/********************************/
+/*+ Disjoint merging of graphs +*/
+/********************************/
 
-// Fonctions de comparaison (pour les tris)
-// -1: >, 0 : ==, 1: <
-int edge_comp(void *, void *);
-int edge_comp_rev(void *, void *);
-int l_edge_comp(void *, void *);
-int l_edge_comp_rev(void *, void *);
+/**
+ * @brief
+ * Disjoint merge of an arbitrary number of unlabeled graphs.
+ *
+ * @remark
+ * If one of the input graphs is NULL, it is not taken into account. If all of the
+ * input graphs are NULL, the function returns NULL.
+ *
+ * @return
+ * The resulting unlabeled graph.
+ */
+graph* merge_graphs(uint*, //!< An array indexed by the input graphs. It is used to return the index of the first vertex of each graph in the merged graph.
+    uint,   //!< The number of graphs given as input.
+    ...     //!< The graphs.
+);
 
-/* Version fusion: pour l'affichage */
+/**
+ * @brief
+ * Disjoint merge of an arbitrary number of labeled graphs.
+ *
+ * @remark
+ * If one of the input graphs is NULL, it is not taken into account. If all of the
+ * input graphs are NULL, the function returns NULL.
+ *
+ * @attention
+ * The input graphs must have the same number of labels.
+ *
+ * @return
+ * The resulting labeled graph.
+ */
+lgraph* merge_lgraphs(uint*, //!< An array indexed by the input graphs. It is used to return the index of the first vertex of each graph in the merged graph.
+    uint, //!< The number of graphs given as input.
+    ... //!< The graphs.
+);
 
-/* Une fusion d'arêtes étiquetées (pour l'affichage) */
-typedef struct
-{
-    uint in;
-    p_vertices lab;   // étiquettes standard
-    p_vertices lab_i; // étiquettes inverses
-    bool eps;         // epsilon
-    uint out;
-} multi_edge;
+/**************************************************/
+/*+ Merging graphs with the same set of vertices +*/
+/**************************************************/
 
-typedef multi_edge *p_multi_edge;
+/**
+ * @brief
+ * Merging an arbitrary number of graphs using the same set of vertices into a single unlabeled graph.
+ *
+ * @remark
+ * It is possible to merge arbitrary kinds of graphs. The unlabeled inputs must be given first, then the
+ * labeled one, then the complete deterministic labeled ones.
+ *
+ * @attention
+ * All graphs must have the same size.
+ *
+ * @return
+ * The resulting unlabeled graph.
+ */
+graph* ldgraphs_to_graph(uint, //!< Number of input unlabeled graphs.
+    uint, //!< Number of input labeled graphs.
+    uint, //!< Number of input complete deterministic labeled graphs.
+    uint, //!< Total number of input graphs (sum of the three).
+    ...   //!< The graphs.
+);
 
-// Quatre modes:
-// 0: only an lgraph with classic labels
-// 1: an additional graph (eps trans)
-// 2: an additional lgraph(inv trans)
-// 3: an additional lgraph(inv trans) + an additional graph (eps trans)
-// Les transitions epsilon self-loops ne sont pas ajoutées
-p_stack lgraph_to_multi_edges(uint n, ...);
-p_stack dgraph_to_multi_edges(p_dgraph);
+/**
+ * @brief
+ * Merging an arbitrary number of labeled graphs using the same set of vertices into a single labeled graph.
+ *
+ * @remark
+ * It is possible to merge standard labeled graphs with complete deterministic labeled graphs. The former must
+ * be given first, then the latter.
+ *
+ * @attention
+ * All graphs must have the same size.
+ *
+ * @return
+ * The resulting labeled graph.
+ */
+lgraph* ldgraphs_to_lgraph(uint, //!< Number of input labeled graphs.
+    uint, //!< Number of input complete deterministic labeled graphs.
+    uint, //!< Total number of input graphs (sum of the two).
+    ...   //!< The graphs.
+);
 
-/*******************************/
-/* Fusion de plusieurs graphes */
-/*******************************/
+/**
+ * @brief
+ * Conversion of a complete deterministic labeled graph into a standard labeled graph.
+ *
+ * @return
+ * The labeled graph.
+ */
+lgraph* dgraph_to_lgraph(dgraph* //!< The complete deterministic labeled graph.
+);
 
-/* Versions disjointes (de nouveaux sommets sont créées) */
+/***************************************/
+/*+ Computation of adjacents vertices +*/
+/***************************************/
 
-// Le paramètre int* lag set à retourner (par pointeur)
-// les indices où commencent les copies de chaque graph
-p_graph merge_graphs(uint *lag, uint n, p_graph *);
-
-// Le paramètre int* lag set à retourner (par pointeur)
-// les indices où commencent les copies de chaque graph
-p_lgraph merge_lgraphs(uint *lag, uint n, p_lgraph *);
-
-// Graphes étiqueté déterministe (le retour n'est plus déterministe)
-// Le paramètre int* lag set à retourner (par pointeur)
-// les indices où commencent les copies de chaque graph
-p_lgraph merge_dgraphs(uint *lag, uint n, p_dgraph *list);
-
-/* Fusion de plusieurs graphes ayant le même ensemble de sommets (partage des arêtes) */
-
-// ng: nombre de graphes classiques dans la fusion
-// nlg: nombre de graphes étiquetés dans la fusion
-// ndg: nombre de graphes étiquetés déterministes dans la fusion
-// n: le nombre total de paramètre (la somme des 3)
-// Les graphes à fusionner
-p_graph ldgraphs_to_graph(uint ng, uint nlg, uint ndg, uint n, ...);
-
-// nlg: nombre de graphes étiquetés dans la fusion
-// ndg: nombre de graphes étiquetés déterministes dans la fusion
-// n: le nombre total de paramètre (la somme des 2)
-// Les graphes à fusionner
-p_lgraph ldgraphs_to_lgraph(uint nlg, uint ndg, uint n, ...);
-
-/* Conversion d'un dgraph en lgraph */
-p_lgraph dgraph_to_lgraph(p_dgraph);
-
-/**************************************************************************************/
-/* Récupération de tous les sommets adjacents à un ensemble de sommets dans un lgraph */
-/**************************************************************************************/
-
-// Retourne tous les sommets adjacents à un sommet dans start par la lettre a
-p_vertices lgraph_reachable(p_lgraph G, p_vertices start, uint a);
+/**
+ * @brief
+ * Given a labeled graph, a list of vertices in this graph and a label, computed the
+ * list of all vertices connected to a vertex in the input list by an edge labeled by
+ * the input label.
+ *
+ * @return
+ * The list of all connected vertices sorted in increasing order.
+ */
+dequeue* lgraph_reachable(lgraph*,  //!< The graph.
+    dequeue*, //!< The input list of vertices.
+    uint       //!< The label.
+);
 
 #endif

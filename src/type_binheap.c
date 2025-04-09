@@ -5,46 +5,49 @@
 /*************************/
 
 /* La fonction de comparaison pour les tas d'entiers */
-bool fcmp_int(void *x, void *y)
-{
-    return *(int *)x < *(int *)y;
+int fcmp_int(void* x, void* y) {
+    return *(int*)x - *(int*)y;
 }
 
-bool fcmp_uint(void *x, void *y)
-{
-    return *(uint *)x < *(uint *)y;
+int fcmp_uint(void* x, void* y) {
+    if (*(uint*)x < *(uint*)y) {
+        return -1;
+    }
+    else if (*(uint*)x == *(uint*)y) {
+        return 0;
+    }
+    else {
+        return 1;
+    }
 }
 
 /* Fonctions de navigation dans un arbre représenté par un tableau */
-uint left_binheap(uint i)
-{
+static uint left_binheap(uint i) {
     return 2 * i + 1;
 }
-uint right_binheap(uint i)
-{
+
+static uint right_binheap(uint i) {
     return 2 * i + 2;
 }
-uint parent_binheap(uint i)
-{
+
+static uint parent_binheap(uint i) {
     return (i - 1) / 2;
 }
-bool isvalid_binheap(p_binheap p, uint i)
-{
+
+static bool isvalid_binheap(binheap* p, uint i) {
     return i < p->size_heap;
 }
 
 /* Modification de la taille du tableau */
-void grow_binheap(p_binheap p)
-{
+static void grow_binheap(binheap* p) {
     CHECK_NULL(2, p, "The binary heap", p->array, "The array used to implement the binary heap");
     p->size_array = p->size_array * 2;
     REALLOC(p->array, p->size_array);
 }
-void shrink_binheap(p_binheap p)
-{
+
+static void shrink_binheap(binheap* p) {
     CHECK_NULL(2, p, "The binary heap", p->array, "The array used to implement the binary heap");
-    if (p->size_array == 1)
-    {
+    if (p->size_array == 1) {
         return;
     }
     p->size_array = p->size_array / 2;
@@ -56,9 +59,8 @@ void shrink_binheap(p_binheap p)
 /************************/
 
 /* Création d'un tas vide */
-p_binheap create_binheap(bool (*fc)(void *, void *))
-{
-    p_binheap new;
+binheap* create_binheap(int (*fc) (void*, void*)) {
+    binheap* new;
     MALLOC(new, 1);
     MALLOC(new->array, 1);
     new->size_array = 1;
@@ -68,81 +70,68 @@ p_binheap create_binheap(bool (*fc)(void *, void *))
 }
 
 /* Suppression */
-void delete_binheap(p_binheap p)
-{
+void delete_binheap(binheap* p) {
     CHECK_NULL(1, p, "The binary heap");
     free(p->array);
     free(p);
 }
 
 /* Test du vide */
-bool isempty_binheap(p_binheap p)
-{
+bool isempty_binheap(binheap* p) {
     return p->size_heap == 0;
 }
 
 /* Récupération de la taille */
-int getsize_binheap(p_binheap p)
-{
+int getsize_binheap(binheap* p) {
     return p->size_heap;
 }
 
 /* Insertion d'une valeur */
-static void void_swap(void **a, void **b)
-{
+static void void_swap(void** a, void** b) {
     CHECK_NULL(2, a, "Le premier entier à échanger", b, "Le second entier à échanger");
-    void *tmp = *a;
+    void* tmp = *a;
     *a = *b;
     *b = tmp;
 }
 
-static void percup_binheap(p_binheap p, uint i)
-{
+static void percudequeuebinheap(binheap* p, uint i) {
     CHECK_NULL(2, p, "The binary heap", p->array, "The array used to implement the binary heap");
-    while (i != 0 && (*p->fc)(p->array[i], p->array[parent_binheap(i)]))
-    {
+    while (i != 0 && p->fc(p->array[i], p->array[parent_binheap(i)]) < 0) {
         void_swap(p->array + i, p->array + parent_binheap(i));
         i = parent_binheap(i);
     }
 }
 
-void push_binheap(p_binheap p, void *val)
-{
+void push_binheap(binheap* p, void* val) {
     CHECK_NULL(2, p, "The binary heap", p->array, "The array used to implement the binary heap");
-    if (p->size_array == p->size_heap)
-    {
+    if (p->size_array == p->size_heap) {
         grow_binheap(p);
     }
     p->array[p->size_heap] = val;
-    percup_binheap(p, p->size_heap);
+    percudequeuebinheap(p, p->size_heap);
     p->size_heap++;
 }
 
 /* Récupération du minimum sans le retirer */
-void *peekmin_binheap(p_binheap p)
-{
+void* peekmin_binheap(binheap* p) {
     CHECK_NULL(2, p, "The binary heap", p->array, "The array used to implement the binary heap");
     return p->array[0];
 }
 
 /* Récupération du minimum en le retirant */
-static void percdown_binheap(p_binheap p, uint i)
-{
+static void percdown_binheap(binheap* p, uint i) {
     CHECK_NULL(2, p, "The binary heap", p->array, "The array used to implement the binary heap");
     uint left = left_binheap(i);
     uint right = right_binheap(i);
 
-    while ((isvalid_binheap(p, left) && (*p->fc)(p->array[left], p->array[i])) || (isvalid_binheap(p, right) && (*p->fc)(p->array[right], p->array[i])))
-    {
-        if (!isvalid_binheap(p, right) || (*p->fc)(p->array[left], p->array[right]))
-        {
+    while ((isvalid_binheap(p, left) && p->fc(p->array[left], p->array[i]) < 0) || (isvalid_binheap(p, right) && p->fc(p->array[right], p->array[i]) < 0)) {
+        if (!isvalid_binheap(p, right) || p->fc(p->array[left], p->array[right]) < 0) {
             void_swap(p->array + i, p->array + left);
             i = left;
             left = left_binheap(i);
             right = right_binheap(i);
         }
-        else
-        {
+        else {
             void_swap(p->array + i, p->array + right);
             i = right;
             left = left_binheap(i);
@@ -151,15 +140,13 @@ static void percdown_binheap(p_binheap p, uint i)
     }
 }
 
-void *popmin_binheap(p_binheap p)
-{
+void* popmin_binheap(binheap* p) {
     CHECK_NULL(2, p, "The binary heap", p->array, "The array used to implement the binary heap");
-    void *res = p->array[0];
+    void* res = p->array[0];
     p->size_heap--;
     p->array[0] = p->array[p->size_heap];
     percdown_binheap(p, 0);
-    if (p->size_array > 1 && p->size_heap <= p->size_array / 4)
-    {
+    if (p->size_array > 1 && p->size_heap <= p->size_array / 4) {
         shrink_binheap(p);
     }
     return res;

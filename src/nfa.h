@@ -1,220 +1,519 @@
-/***************************/
-/* Implémentation des NFAs */
-/***************************/
+/**
+ * @file nfa.h
+ * @brief
+ * Implementation of NFAs.
+ */
 
-#ifndef NFA_H
-#define NFA_H
+#ifndef NFA_H_
+#define NFA_H_
 
-#include <stdbool.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include "type_basic.h"
+ /*  _   _ _____ _     */
+ /* | \ | |  ___/ \    */
+ /* |  \| | |_ / _ \   */
+ /* | |\  |  _/ ___ \  */
+ /* |_| \_|_|/_/   \_\ */
+
 #include "graphs.h"
-#include "type_vertices.h"
-#include "type_stack.h"
-#include "type_binheap.h"
-#include "type_abr.h"
-#include "type_unionfind.h"
-#include "graphs_tarjan.h"
 #include "graphs_transclos.h"
+#include "type_abr.h"
+#include "type_basic.h"
+#include "type_binheap.h"
+#include "type_boolarray.h"
+#include "type_dequeue.h"
+#include "words.h"
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-/* Types de noms pour les états */
+/**
+ * @brief
+ * Type used to represent a NFA.
+ *
+ * @details
+ * The last four fields are not mandatory (if not used, they must be set to a NULL pointer). The letters
+ * in the alphabet are sorted in increasing order.
+ *
+ * @remark
+ * The array of state names is not mandatory. If it is set to a NULL pointer, each set will be named
+ * by its index when displaying the NFA.
+ */
+typedef struct {
+    lgraph* trans;     //!< Graph of transitions (also stores the number of states and the size of the alphabet).
+    dequeue* initials; //!< The list of initial states (sorted in increasing order).
+    dequeue* finals;   //!< The list of final states (sorted in increasing order).
+    letter* alphabet;  //!< Array indexed by the indices of letters. Maps each index to its actual letter (NULL if the alphabet is empty).
 
-typedef enum
-{
-    NONAME,
-    NUMBER,
-    PAIR,
-    TUPLE,
-    SET
-} state_name;
-
-/* Le type */
-
-typedef struct
-{
-    /* Champs obligatoires */
-
-    // Graphe des transitions classiques
-    p_lgraph trans;
-
-    // Liste triée des états initiaux
-    p_vertices initials;
-
-    // Liste triée des états finaux
-    p_vertices finals;
-
-    /* Champs optionels (NULL si non-utilisés) */
-
-    // Graphe des transitions inverses
-    p_lgraph itrans;
-
-    // Graphe des transitions epsilon
-    p_graph etrans;
-
-    /* Noms des états (NULL si non-utilisé) */
-
-    // Type de nom utilisé
-    state_name ntype;
-
-    // Tableau des noms.
-    void* names;
-
+    graph* trans_e;     //!< Graph of espilon transitions (NULL if there are no such transitions).
+    lgraph* trans_i;    //!< Graph of inverse transitions (NULL if there are no such transitions).
+    char** state_names; //!< Array of state names (only utilized when displaying the NFA). Each state is mapped to its name (NULL if unused).
+    uint* ancestors; //!< Array of ancestors. Useful when the NFA has been built from another NFA by merging and/or removing states. Maps each state to an ancestor state in the original NFA (NULL if
+    //!< unused).
 } nfa;
 
+/*************/
+/* Alphabets */
+/*************/
 
+/**
+ * @brief
+ * Displays a letter in the alphabet of a NFA on a given stream: utf8 version.
+ */
+void nfa_fprint_letter_utf8(const nfa*, //!< The NFA.
+    uint,        //!< Index of the letter.
+    FILE*       //!< The stream.
+);
 
-typedef nfa* p_nfa;
+/**
+ * @brief
+ * Displays a letter in the alphabet of a NFA on a given stream: graphviz version.
+ *
+ * @remark
+ * Includes an option for displaying an inverse power "-1" on the letter.
+ * This is used for displaying inverse transitions.
+ */
+void nfa_fprint_letter_gviz(const nfa* //!< The NFA.
+    ,
+    uint //!< Index of the letter.
+    ,
+    FILE* //!< The stream.
+    ,
+    bool //!< True if an inverse power has to be displayed, false otherwise.
+);
 
-/***************************************************************/
-/* Affichage des noms si ce sont des pointeurs sur des entiers */
-/***************************************************************/
+/**
+ * @brief
+ * Copies the alphabet array of a NFA.
+ *
+ * @remark
+ * Auxiliary function utilized when copying a NFA.
+ *
+ * @return
+ * A copy of the alphabet array.
+ */
+letter* nfa_duplicate_alpha(const nfa* //!< The NFA.
+);
 
-// Affiche le nom du ième état d'un NFA
-void nfa_print_name(p_nfa A, uint i, FILE* out);
+/**
+ * @brief
+ * Retrieves the index of a letter in the alphabet of a NFA.
+ *
+ * @remark
+ * If the letter does not belong to the alphabet the invalid index
+ * A->trans->size_alpha is returned
+ *
+ * @return
+ * The index of the letter.
+ */
+uint nfa_letter_index(const nfa*, //!< The NFA.
+    letter       //!< The letter.
+);
 
-// Initialise la table des noms suivant le type choisit dans le NFA
-void nfa_init_names(p_nfa A);
+/***************/
+/* State names */
+/***************/
 
-// Copie le nom du jème état du NFA B dans le ième état du NFA A
-// Les tables doivent avoit été initialisées et les types de noms
-// doivent être compatibles entre A et B
-void nfa_copy_name(p_nfa A, uint i, p_nfa B, uint j);
+/**
+ * @brief
+ * Displays the name of a state in a NFA on a given stream.
+ *
+ * @remark
+ * If no names are defined for the states, each state is named by its index.
+ */
+void nfa_print_state(const nfa*, //!< The NFA.
+    uint,        //!< Index of the state.
+    FILE*       //!< The stream.
+);
 
-// Efface les noms des états d'un NFA
-// (si ces états ont des noms)
-void nfa_delete_names(p_nfa A);
+/**
+ * @brief
+ * Release the state names in a NFA (if there are states names).
+ */
+void nfa_reset_state_names(nfa* // The NFA.
+);
 
-/*********************************/
-/* Initialisation et suppression */
-/*********************************/
+/**
+ * @brief
+ * Copies the name of a single state in a NFA.
+ *
+ * @remark
+ * If no names are defined for the states, the function returns a NULL pointer.
+ *
+ * @return
+ * A copy of the name.
+ */
+char* nfa_copy_one_name(const nfa*, //!< The NFA.
+    uint         //!< Index of the state.
+);
 
-// Initialise (si besoin) le graphe des transitions epsilon
-void init_epstrans(p_nfa A);
+/**
+ * @brief
+ * Returns a copy of the array of state names in a NFA.
+ *
+ * @remark
+ * If no names are defined for the states, the function returns a NULL pointer.
+ *
+ * @return
+ * A copy of the array of state names.
+ */
+char** nfa_copy_all_names(const nfa* //!< The NFA.
+);
 
-// Crée un NFA qui reconnait le langage vide
-p_nfa create_emptylang(uint size_alpha);
+/*************/
+/* Ancestors */
+/*************/
 
-// Créé un NFA qui reconnait le singleton {epsilon}
-p_nfa create_sing_epsilon(uint size_alpha);
+/**
+ * @brief
+ * Returns a copy of the array of ancstors in a NFA.
+ *
+ * @remark
+ * If no ancestors are defined for the states, the function returns a NULL pointer.
+ *
+ * @return
+ * A copy of the array of ancestors.
+ */
+uint* nfa_copy_ancestors(const nfa* //!< The NFA.
+);
 
-// Créé un NFA qui reconnait le langage A^* de tous les mots
-p_nfa create_freemonolang(uint size_alpha);
+/******************************/
+/* Initialization and release */
+/******************************/
 
-// Créé un NFA qui reconnait le langage A^+ de tous les mots non-vides
-p_nfa create_freesemilang(uint size_alpha);
+/**
+ * @brief
+ * Initialization of an NFA.
+ *
+ * @attention
+ * Transitions are not initialized (this would require the number of states
+ * and the size of the alphabets). On the other hand, the dequeues containing
+ * the intial and final states are initialized.
+ *
+ * @return
+ * Le NFA.
+ */
+nfa* nfa_init(void);
 
-// Création d'un automate qui reconnait un singleton dont le mot contient une seule lettre
-p_nfa create_sing_letter(uint size_alpha, uint letter);
+/**
+ * @brief
+ * Computes a NFA recognizing the empty language.
+ *
+ * @remark
+ * The computed NFA is defined over an empty alphabet.
+ *
+ * @return
+ * The NFA.
+ */
+nfa* create_emptylang(void);
 
-// Création d'un automate qui reconnait un singleton
-p_nfa create_sing(uint size_alpha, uint* word, uint length);
+/**
+ * @brief
+ * Computes a NFA recognizing the singleton language {ε}.
+ *
+ * @remark
+ * The computed NFA is defined over an empty alphabet.
+ *
+ * @return
+ * The NFA.
+ */
+nfa* create_sing_epsilon(void);
 
-// Désallocation d'un NFA.
-void delete_nfa(p_nfa A);
+/**
+ * @brief
+ * Computes a NFA recognizing a singleton language {a} containing a single letter word.
+ *
+ * @remark
+ * The computed NFA is defined over the singleton alphabet {a}.
+ *
+ * @return
+ * The NFA.
+ */
+nfa* create_sing_letter(letter //!< The letter.
+);
 
-// Recopie du NFA B sur le NFA A (les anciens éléments de A sont supprimés, B est libéré)
-void overwrite_nfa(p_nfa A, p_nfa B);
+/**
+ * @brief
+ * Computes a NFA recognizing a singleton language {w} for some input word w.
+ *
+ * @remark
+ * The computed NFA is defined over the alphabet containing only the letters occurring in w.
+ *
+ * @return
+ * The NFA.
+ */
+nfa* create_sing_word(word* //!< The word.
+);
 
-// Génération d'un NFA aléatoire
-p_nfa nfa_random(uint size_alpha, uint min_size, uint max_size);
+/**
+ * @brief
+ * Release of a NFA.
+ */
+void delete_nfa(nfa* //!< The NFA.
+);
 
-// Génération d'un DFA aléatoire
-p_nfa dfa_random(uint size_alpha, uint min_size, uint max_size);
+/**
+ * @brief
+ * Overwrites a NFA by copying another NFA and releasing this other NFA.
+ */
+void overwrite_nfa(nfa*, //!< The NFA that is being overwritten (its original fields are released).
+    nfa*  //!< The NFA being copied (it is completely released).
+);
 
-/***********************************/
-/* Opérations simples sur les NFAs */
-/***********************************/
+/*****************************/
+/* Simple operations on NFAs */
+/*****************************/
 
-// Copie d'un NFA
-p_nfa nfa_copy(p_nfa A);
+/**
+ * @brief
+ * Copy of a NFA.
+ *
+ * @return
+ * The copy
+ */
+nfa* nfa_copy(nfa* //!< The NFA.
+);
 
-// Union disjointe d'un nombre arbitraire de NFAs
-p_nfa nfa_union_gen(uint n, ...);
+/**
+ * @brief
+ * Extension of the alphabet of a NFA.
+ *
+ * @remark
+ * The input array contains the letters that should be added to the alphabet. It may contain
+ * letters which are already in the alphabet.  The new alphabet is the union between the old
+ * one and the set of letters contains in this array.
+ *
+ * @attention
+ * The array containing the new letter must be sorted in increasing order.
+ *
+ * @return
+ * A copy of the original NFA with its alphabet extended.
+ */
+nfa* nfa_copy_exalpha(nfa*,    //!< The NFA.
+    letter*, //!< Array containing the new letters (sorted in increasing order).
+    uint      //!< Size of the array.
+);
 
-// Union disjointe de deux nfas
-p_nfa nfa_union(p_nfa A, p_nfa B);
+/**
+ * @brief
+ * Union of two NFAs.
+ *
+ * @remark
+ * The two NFAs may have dsitinct alphabets. In this case, the alphabet of the computed NFA
+ * is the union of the two alphabets.
+ *
+ * @return
+ * A NFA recognizing the union of the two input languages.
+ */
+nfa* nfa_union(nfa*, //!< First NFA.
+    nfa*  //!< Second NFA.
+);
 
-// Concaténation d'un nombre arbitraire de NFAs
-p_nfa nfa_concat_gen(uint n, ...);
+/**
+ * @brief
+ * Concatenation of two NFAs.
+ *
+ * @remark
+ * The two NFAs may have dsitinct alphabets. In this case, the alphabet of the computed NFA
+ * is the union of the two alphabets.
+ *
+ * @return
+ * A NFA recognizing the concatenation of the two input languages.
+ */
+nfa* nfa_concat(nfa*, //!< First NFA.
+    nfa*  //!< Second NFA.
+);
 
-// Concaténation de deux nfas
-p_nfa nfa_concat(p_nfa A, p_nfa B);
+/**
+ * @brief
+ * Kleene star of a NFA.
+ *
+ * @return
+ * A NFA recognizing the Kleene star of the input language.
+ */
+nfa* nfa_star(nfa* //!< The NFA.
+);
 
-// Etoile de Kleene d'un nfa
-p_nfa nfa_star(p_nfa A);
+/**
+ * @brief
+ * Kleene plus of a NFA.
+ *
+ * @return
+ * A NFA recognizing the Kleene plus of the input language.
+ */
+nfa* nfa_plus(nfa* //!< The NFA.
+);
 
-// Etoile de Kleene stricte (+) d'un nfa
-p_nfa nfa_star_plus(p_nfa A);
+/**
+ * @brief
+ * Mirror of a NFA.
+ *
+ * @return
+ * A NFA recognizing the mirror of the input language.
+ */
+nfa* nfa_mirror(nfa* //!< The NFA.
+);
 
-// Élimination des états non-accessibles
-p_nfa nfa_trim(p_nfa A);
+/**
+ * @brief
+ * Elimination of the epsilon transitions in a NFA.
+ *
+ * @return
+ * A copy of the input NFA with its epsilon transitions eliminated.
+ */
+nfa* nfa_elimeps(nfa* //!< The NFA.
+);
 
-// Élimination des états non-accessibles (modifie le NFA originel)
-void nfa_trim_mod(p_nfa A);
+/**
+ * @brief
+ * Elimination of the epsilon transitions in a NFA. Overwrites the input NFA.
+ */
+void nfa_elimeps_mod(nfa* //!< The NFA.
+);
 
-// Élimination des transitions epsilon
-p_nfa nfa_elimeps(p_nfa A);
+/**
+ * @brief
+ * Elimination of all states that are not simultaneously reachable from an initial state
+ * and co-reachable from a final state.
+ *
+ * @return
+ * A copy of the input NFA with its useless states eliminated.
+ */
+nfa* nfa_trim(nfa* //!< The NFA.
+);
 
-// Élimination des transitions epsilon (modifie le NFA originel)
-void nfa_elimeps_mod(p_nfa A);
+/**
+ * @brief
+ * Elimination of all states that are not simultaneously reachable from an initial state
+ * and co-reachable from a final state. Overwrites the input NFA.
+ */
+void nfa_trim_mod(nfa* //!< The NFA.
+);
 
-// Miroir
-p_nfa nfa_mirror(p_nfa A);
+/*****************************/
+/* Generation of random NFAs */
+/*****************************/
 
+/**
+ * @brief
+ * Generates a random NFA.
+ *
+ * @return
+ * The random NFA.
+ */
+nfa* nfa_random(uint, //!< Size of the alphabet.
+    uint, //!< Minimum number of states.
+    uint  //!< Maximum number of states.
+);
+
+/**
+ * @brief
+ * Generates a random DFA.
+ *
+ * @return
+ * The random DFA.
+ */
+nfa* dfa_random(uint, //!< Size of the alphabet.
+    uint, //!< Minimum number of states.
+    uint  //!< Maximum number of states.
+);
 /***********************/
-/* Information sur nfa */
+/* Information on NFAs */
 /***********************/
 
-// Calcule le nombre de transitions dans un automate
-int nfa_nb_trans(p_nfa A);
+/**
+ * @brief
+ * Computes the number of transitions in a NFA.
+ *
+ * @return
+ * The number of transitions.
+ */
+int nfa_nb_trans(nfa* //!< The NFA.
+);
 
-// Teste si un nfa est déterministe
-bool nfa_is_det(p_nfa A);
+/**
+ * @brief
+ * Tests if a NFA is deterministic.
+ *
+ * @return
+ * A Boolean indicating whether the NFA is deterministic.
+ */
+bool nfa_is_det(nfa* //!< The NFA.
+);
 
-// Teste si un nfa est complet
-bool nfa_is_comp(p_nfa A);
+/**
+ * @brief
+ * Tests if a NFA is complete.
+ *
+ * @return
+ * A Boolean indicating whether the NFA is complete.
+ */
+bool nfa_is_comp(nfa* //!< The NFA.
+);
 
-// Teste si un nfa reconnait le langage vide
-bool nfa_is_empty(p_nfa A);
+/**
+ * @brief
+ * Tests if a NFA recognizes the empty language.
+ *
+ * @return
+ * A Boolean indicating whether the NFA recognizes the empty language.
+ */
+bool nfa_is_empty(nfa* //!< The NFA.
+);
 
-// Teste si un mot est accepté par un NFA
-// Le NFA doit être sans transitions epsilon et inverses
-bool nfa_accepts(p_nfa A, char* word);
+/**
+ * @brief
+ * Tests if a word is accepted by a NFA.
+ *
+ * @return
+ * A Boolean indicating whether the word is accepted.
+ */
+bool nfa_accepts(nfa*, //!< The NFA.
+    word* //!< The word.
+);
 
-// Calcule les états qui sont atteints par un mot dans un NFA.
-p_vertices nfa_compute_runs(p_nfa A, char* word);
+/**
+ * @brief
+ * Computes the set of states reached by a word in a NFA.
+ *
+ * @return
+ * The list of states reached by the word.
+ */
+dequeue* nfa_compute_runs(nfa*, //!< The NFA.
+    word* //!< The word.
+);
 
+/************************/
+/* Partitions of states */
+/************************/
 
-// Retourne l'état atteint à partir de s en lisant le mot w dans le DFA A
-// (le déterminisme n'est pas vérifier)
-uint dfa_function(p_nfa A, uint s, p_vertices w);
+/**
+ * @brief
+ * Merges the states of a NFA according to the partition given as input.
+ *
+ * @details
+ * The new states are the classes of the partition. Given two classes c,c'
+ * and a letter a, a transition (c,a,c') is added if and only if there are
+ * two states q in c and q' in c' and a transition (q,a,q') in the original
+ * automaton. Similarly, a class c is initial (resp. final) if and only if
+ * it contains an intial (resp.final) state.
+ *
+ * @return
+ * The merged NFA.
+ */
+nfa* nfa_merge_states(nfa*,  //!< The NFA.
+    parti* //!< Partition of the states.
+);
 
-// Teste si un DFA est commutatif
-bool dfa_is_comm(p_nfa, FILE*);
+/**
+ * @brief
+ * Given a NFA and a partition of its states, computes the labeled graph obtained
+ * by keeping only the transitions that connect states belonging to the same class.
+ *
+ * @return
+ * The labeled graph.
+ */
+lgraph* nfa_get_lab_parti(nfa*,  //!< The NFA.
+    parti* //!< Partition of the states.
+);
 
-
-/***********************/
-/* Partition d'un NFA  */
-/***********************/
-
-// Fusion des états d'un NFA selon une partition prise en entrée
-// Les nouveaux états sont les classes
-// On a une transition (c,a,c') si les classes c,c' contiennent des états q,q'
-// tels que l'automate d'origine avait une transition (q,a,q')
-// De la même façon, une classe est c est initiale (resp. finale) si elle contient
-// un état initial (resp. final).
-p_nfa nfa_merge_states(p_nfa, p_parti);
-
-// Récupération du graphe étiqueté obtenu en ne gardant que
-// les transitions internes à une partition prise en entrée
-// (typiquement utilisé pour la partition en SCCs)
-p_lgraph nfa_get_lab_parti(p_nfa A, p_parti P);
-
-// Génération d'un nfa à partir d'un lgraph et d'un unique état initial
-// Seuls les états accessibles sont conservés. Si l'automate n'est pas
-// complet, celui-ci est complété en ajoutant un état supplémentaire.
-p_nfa lgraph_to_nfa(p_lgraph P, uint ini);
-
-#endif
+#endif // NFA_H_

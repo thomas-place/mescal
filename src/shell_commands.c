@@ -3,670 +3,779 @@
 /*****************************/
 
 #include "shell_commands.h"
+#include "monoid_display.h"
+
+sub_level optimization_level = LV_REG;
 
 /******************************************************************************/
-/* Récupération des automates et des sous-monoides désignés par une commande */
+/* Récupération des automates désignés par une commande */
 /******************************************************************************/
 
-p_genob shell_genob_from_command(com_command *thecom)
-{
-    // Si la commande est mal formée
-    if (thecom == NULL || thecom->main == NULL)
-    {
-        return NULL;
-    }
-
-    // On récupère l'objet correspondant au premier maillon
-    int i = object_get_from_name(thecom->main->string);
-    if (i == -1)
-    {
-        return NULL;
-    }
-
-    // L'objet généralisé qu'on va retourner
-    p_genob new = NULL;
-
-    // La chaîne complète
-    string_chain *thechain = thecom->main;
-
+int com_get_object(int i, string_chain* thechain) {
     // Tant qu'il y a des maillons
-    while (thechain != NULL)
-    {
+    while (thechain != NULL && i != -1) {
+        switch (string_to_keyword(thechain->string)) {
+        case KY_MINI:
+            i = shell_compute_minimal(i);
+            break;
+        case KY_SYNT:
+            i = shell_compute_syntac(i);
+            break;
+        default:
+            return -1;
+            break;
+        }
         // On prend le prochain maillon
         thechain = thechain->next;
-        // On regarde le type de l'objet
-        switch (objects[i]->type)
-        {
-        case LANGUAGE: {
-            // Si il n'y pas de maillon suivant et pas de paramètre
-            // La commande désigne simplement le langage
-            if (thechain == NULL && thecom->params == NULL)
-            {
-                MALLOC(new, 1);
-                new->type  = OG_LANG;
-                new->theob = objects[i]->theob.lan;
-                return new;
-            }
-
-            // Sinon la commande continue pour désigner soit l'automate minimal,
-            // soit
-            // le morphisme syntactique du langage
-            com_keyword key = key_from_string_chain(thechain);
-            switch (key)
-            {
-            case CM_MINI:
-                i = shell_compute_minimal(i);
-                break;
-            case CM_SYNT:
-                i = shell_compute_syntac(i);
-                break;
-            default:
-                return NULL;
-                break;
-            }
-        }
-        break;
-        case AUTOMATA: {
-            // Pour l'instant seul le cas d'un automate simple est géré
-            if (thechain == NULL && thecom->params == NULL)
-            {
-                MALLOC(new, 1);
-                new->type  = OG_AUTO;
-                new->theob = objects[i]->theob.aut->nfa;
-                return new;
-            }
-            else
-            {
-                return NULL;
-            }
-        }
-        case MORPHISM: {
-            morphism *themor = objects[i]->theob.mor;
-            // Si il n'y pas de maillon suivant et pas de paramètres
-            // La commande désigne simplement le morphisme
-            if (thechain == NULL && thecom->params == NULL)
-            {
-                MALLOC(new, 1);
-                new->type  = OG_MORP;
-                new->theob = objects[i]->theob.mor->cayley;
-                return new;
-            }
-
-            // Sinon, il doit reste un unique maillon désignant le paramètre du
-            // morphisme qui nous intéresse
-            if (thechain->next != NULL)
-            {
-                return NULL;
-            }
-            com_keyword key = key_from_string_chain(thechain);
-            switch (key)
-            {
-            case CM_MKERNEL: {
-                shell_compute_mker(themor);
-
-                MALLOC(new, 1);
-                new->type  = OG_SUBM;
-                new->theob = themor->mker;
-                return new;
-                break;
-            }
-            case CM_GKERNEL: {
-                shell_compute_gker(themor);
-
-                MALLOC(new, 1);
-                new->type  = OG_SUBM;
-                new->theob = themor->gker;
-                return new;
-                break;
-            }
-            case CM_KERNEL: {
-                if (com_nbparams(thecom->params) != 1 || !com_single(thecom->params->param))
-                {
-                    shell_arguments_error();
-                    return NULL;
-                }
-                com_keyword class = key_from_string_chain_single(thecom->params->param->main);
-                if (class == CL_MOD)
-                {
-                    shell_compute_mker(themor);
-
-                    MALLOC(new, 1);
-                    new->type  = OG_SUBM;
-                    new->theob = themor->mker;
-                    return new;
-                    break;
-                }
-                if (class == CL_GR)
-                {
-                    shell_compute_gker(themor);
-
-                    MALLOC(new, 1);
-                    new->type  = OG_SUBM;
-                    new->theob = themor->gker;
-                    return new;
-                    break;
-                }
-                break;
-            }
-            case CM_ORBIT: {
-                int n = com_nbparams(thecom->params);
-                if (n < 2 || n > 3)
-                {
-                    shell_arguments_error();
-                    return NULL;
-                }
-                com_command *theidem = com_getparam(thecom->params, n - 1);
-
-                // Récupération du numéro de l'idempotent dont on doit tester
-                // l'orbite.
-                if (!com_single(theidem))
-                {
-                    shell_arguments_error();
-                    return NULL;
-                }
-                uint j;
-                char *word = theidem->main->string;
-                uint s;
-                if (!cayley_elem_from_string(themor->cayley, word, &s))
-                {
-                    fprintf(stdout,
-                            "Error: this word does not correspond to an element of the monoid.\n");
-                    return NULL;
-                }
-                if (!cayley_num_idem(themor->cayley, s, &j))
-                {
-                    fprintf(stdout, "Error: this is not an idempotent element.\n");
-                    return NULL;
-                }
-
-                com_keyword arg1 = key_from_string_chain_single(com_getparam(thecom->params,
-                                                                             0)->main);
-
-                if (n == 2)
-                {
-                    switch (arg1)
-                    {
-                    case CL_DD:
-                        shell_compute_ddorbs(themor);
-
-                        MALLOC(new, 1);
-                        new->type  = OG_SUBM;
-                        new->theob = themor->ddorbs->orbits[j];
-                        return new;
-                        break;
-                    case CL_MODP:
-                        shell_compute_mporbs(themor);
-
-                        MALLOC(new, 1);
-                        new->type  = OG_SUBM;
-                        new->theob = themor->mporbs->orbits[j];
-                        return new;
-                        break;
-                    case CL_AT:
-                        shell_compute_atorbs(themor);
-                        MALLOC(new, 1);
-                        new->type  = OG_SUBM;
-                        new->theob = themor->atorbs->orbits[j];
-                        return new;
-                        break;
-                    default:
-                        return NULL;
-                        break;
-                    }
-                }
-                else if (n == 3)
-                {
-                    com_keyword arg2 = key_from_string_chain_single(com_getparam(thecom->params,
-                                                                                 1)->main);
-                    if (arg1 != OP_TLC && arg1 != OP_BPOL)
-                    {
-                        return NULL;
-                    }
-                    switch (arg2)
-                    {
-                    case CL_ST:
-                        shell_compute_atorbs(themor);
-
-                        MALLOC(new, 1);
-                        new->type  = OG_SUBM;
-                        new->theob = themor->atorbs->orbits[j];
-                        return new;
-                        break;
-                    case CL_DD:
-                        shell_compute_bpddorbs(themor);
-
-                        MALLOC(new, 1);
-                        new->type  = OG_SUBM;
-                        new->theob = shell_get_bpddorbs(themor)->orbits[j];
-                        return new;
-                        break;
-                    case CL_MOD:
-                        shell_compute_bpmorbs(themor);
-
-                        MALLOC(new, 1);
-                        new->type  = OG_SUBM;
-                        new->theob = shell_get_bpmorbs(themor)->orbits[j];
-                        return new;
-                        break;
-                    case CL_MODP:
-                        shell_compute_bpmporbs(themor);
-                        MALLOC(new, 1);
-                        new->type  = OG_SUBM;
-                        new->theob = shell_get_bpmporbs(themor)->orbits[j];
-                        return new;
-                        break;
-                    case CL_GR:
-                        shell_compute_bpgorbs(themor);
-
-                        MALLOC(new, 1);
-                        new->type  = OG_SUBM;
-                        new->theob = themor->bpgorbs->orbits[j];
-                        return new;
-                        break;
-                    default:
-                        break;
-                    }
-                    break;
-                }
-                break;
-            }
-            break;
-            case OG_ORBS: {
-                int n = com_nbparams(thecom->params);
-                if (n < 1 || n > 2)
-                {
-                    shell_arguments_error();
-                    return NULL;
-                }
-                com_keyword arg1 = key_from_string_chain_single(thecom->params->param->main);
-                if (n == 1)
-                {
-                    switch (arg1)
-                    {
-                    case CL_DD:
-                        MALLOC(new, 1);
-                        new->type  = OG_ORBS;
-                        new->theob = themor->ddorbs;
-                        return new;
-                        break;
-                    case CL_MODP:
-
-                        MALLOC(new, 1);
-                        new->type  = OG_ORBS;
-                        new->theob = themor->mporbs;
-                        return new;
-                        break;
-                    case CL_AT:
-
-                        MALLOC(new, 1);
-                        new->type  = OG_ORBS;
-                        new->theob = themor->atorbs;
-                        return new;
-                        break;
-                    default:
-                        return NULL;
-                        break;
-                    }
-                }
-                else if (n == 2)
-                {
-                    com_keyword arg2 =
-                        key_from_string_chain_single(thecom->params->next->param->main);
-                    switch (arg1)
-                    {
-                    case OP_BPOL:
-                    case OP_TLC:
-                        switch (arg2)
-                        {
-                        case CL_ST:
-                            MALLOC(new, 1);
-                            new->type  = OG_ORBS;
-                            new->theob = themor->atorbs;
-                            return new;
-                            break;
-                        case CL_DD:
-                            MALLOC(new, 1);
-                            new->type  = OG_ORBS;
-                            new->theob = shell_get_bpddorbs(themor);
-                            return new;
-                            break;
-                        case CL_MOD:
-                            MALLOC(new, 1);
-                            new->type  = OG_ORBS;
-                            new->theob = shell_get_bpmorbs(themor);
-                            return new;
-                            break;
-                        case CL_MODP:
-
-                            MALLOC(new, 1);
-                            new->type  = OG_ORBS;
-                            new->theob = shell_get_bpmporbs(themor);
-                            return new;
-                            break;
-                        case CL_GR:
-
-                            MALLOC(new, 1);
-                            new->type  = OG_ORBS;
-                            new->theob = themor->bpgorbs;
-                            return new;
-                            break;
-                        default:
-                            return NULL;
-                            break;
-                        }
-                        break;
-
-                    default:
-                        return NULL;
-                        break;
-                    }
-                }
-            }
-
-            break;
-            default:
-                return NULL;
-                break;
-            }
-        }
-        break;
-
-        default:
-            break;
-        }
     }
-    return NULL;
+    return i;
 }
 
 /******************************/
 /* Application d'une commande */
 /******************************/
 
-static bool com_apply_command_rec(string_chain *thechain, com_parameters *pars, int i)
-{
-    if (i == -1)
-    {
-        shell_command_error();
-        return false;
+void com_setrec_command(char* varname, char* subname, char* par, com_command* thecom) {
+
+    int i = object_get_from_name(varname);
+    if (i == -1) {
+        shell_error_unknownvar(varname);
+        return;
+    }
+    if (objects[i]->type != RECDEF) {
+        shell_error_notrecvar(varname);
+        return;
     }
 
-    switch (objects[i]->type)
-    {
-    case LANGUAGE: {
-        language *thelang = objects[i]->theob.lan;
-        if (thechain == NULL && pars == NULL)
-        {
-            if (thelang->type == SPE_REG)
-            {
-                fprintf(stdout, "This language is specified by a regular expression:\n");
-                reg_print(reg_simplify(thelang->spe.reg));
-            }
-            else if (thelang->type == SPE_NFA)
-            {
-                fprintf(stdout, "This language is specified by an automaton:\n");
-                view_nfa(objects[thelang->spe.nfa]->theob.aut->nfa);
-            }
-            return true;
-        }
-
-        com_keyword key = key_from_string_chain(thechain);
-
-        switch (key)
-        {
-        case CM_MINI:
-            shell_compute_minimal(i);
-            return com_apply_command_rec(thechain->next, pars, thelang->minauto);
-            break;
-        case CM_SYNT:
-            shell_compute_syntac(i);
-            return com_apply_command_rec(thechain->next, pars, thelang->syntmor);
-            break;
-        default:
-            shell_command_error();
-            return false;
-            break;
-        }
+    uchar h = shell_rec_getnum(objects[i]->rec, subname);
+    if (h >= objects[i]->rec->num) {
+        shell_error_unknownrel(varname, subname);
+        return;
     }
-    break;
-    case AUTOMATA: {
-        automata *theauto = objects[i]->theob.aut;
-        if (thechain == NULL && pars == NULL)
-        {
-            print_title_box(100, true, stdout, 1, "Automaton.");
-            view_nfa(theauto->nfa);
-            return true;
+    if (strlen(par) == 1 && par[0] == 'i') {
+        if (thecom->thetype != CMT_RAW) {
+            shell_error_notrecdef(thecom);
+            return;
         }
-        com_keyword key = key_from_string_chain_single(thechain);
-        switch (key)
-        {
-        case CM_RUN:
-            shell_make_nfa_run(theauto, pars);
-            break;
-
-        default:
-            shell_command_error();
-            return false;
-            break;
+        symbolic_count = objects[i]->rec->num;
+        symbolic_names = objects[i]->rec->names;
+        regexp* myexp = parse_string_regexp(thecom->main->string);
+        symbolic_count = 0;
+        symbolic_names = NULL;
+        if (myexp == NULL) {
+            shell_error_notrecdef(thecom);
+            return;
         }
-    }
-    break;
-    case MORPHISM: {
-        morphism *themor = objects[i]->theob.mor;
-        if (thechain == NULL)
-        {
-            return shell_view_morphism(themor, pars);
-        }
-        com_keyword key = key_from_string_chain_single(thechain);
-        switch (key)
-        {
-        case CM_RCAY:
-            return shell_view_rcayley(themor, pars);
-            break;
-        case CM_LCAY:
-            return shell_view_lcayley(themor, pars);
-            break;
-        case CM_MULT:
-            return shell_view_mormult(themor, pars);
-            break;
-        case CM_IDEMS:
-            return shell_view_idems(themor, pars);
-            break;
-        case CM_ORDER:
-            return shell_view_morder(themor, pars);
-            break;
-        case CM_MKERNEL:
-            return shell_view_mkernel(themor, pars);
-            break;
-        case CM_GKERNEL:
-            return shell_view_gkernel(themor, pars);
-            break;
-        case CM_KERNEL:
-            return shell_view_kernel(themor, pars);
-            break;
-        case CM_ORBIT:
-            return shell_view_oneorbit(themor, pars);
-            break;
-        case CM_ORBITS:
-            return shell_view_orbits(themor, pars);
-            break;
-        case CM_IMAGE:
-            return shell_compute_image(themor, pars);
-            break;
-        default:
-            shell_command_error();
-            return false;
-            break;
-        }
-    }
-    break;
-    default:
-        shell_command_error();
-        return false;
-        break;
+        shell_rec_defadd(i, h, myexp);
+        return;
     }
 
-    return false;
+    char* end;
+    ushort nb = strtol(par, &end, 10);
+    if (*end != '\0') {
+        shell_error_syntax();
+        return;
+    }
+    if (nb >= objects[i]->rec->init) {
+        shell_error_wrongrecindex(nb, varname);
+        return;
+    }
+
+    bool save;
+    int j = com_apply_command(thecom, NULL, MODE_DEFAULT, &save);
+    if (j == -1 || objects[j]->type != REGEXP) {
+        shell_error_notregexp(thecom);
+        if (save && j != -1) {
+            object_free(j);
+        }
+        return;
+    }
+    shell_rec_iniadd(i, h, nb, reg_copy(objects[j]->exp));
+
+    if (save) {
+        object_free(j);
+    }
 }
 
-bool com_apply_command(com_command *thecom)
-{
-    if (thecom == NULL || thecom->main == NULL)
-    {
-        shell_command_error();
-        return false;
+int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* saved) {
+
+
+    if (thecom == NULL || thecom->main == NULL) {
+        shell_error_syntax();
+        return -1;
+    }
+    if (varname && !check_varname(varname)) {
+        shell_error_disallowedvar(varname);
+        return -1;
     }
 
-    // On commence par regarder si le premier maillon de la commande correspond
-    // à
-    // une variable.
-    int i = object_get_from_name(thecom->main->string);
-    if (i != -1)
-    {
-        // Si c'est le cas, la commande est récursive
-        return com_apply_command_rec(thecom->main->next, thecom->params, i);
+    // Intialisation du Booléen de retour
+    if (saved) {
+        switch (mode) {
+        case MODE_PRINT:
+            *saved = false;
+            break;
+        case MODE_DEFAULT:
+        case MODE_COPY:
+            *saved = true;
+            break;
+        default:
+            break;
+        }
     }
 
-    // Sinon, le premier maillon doit être le seul et doit correspondre à un
-    // keyword
-    if (thecom->main->next)
-    {
-        shell_command_error();
-        return false;
-    }
-
+    // On cherche d'abord si la commande commence par un mot-clé
     com_keyword key = string_to_keyword(thecom->main->string);
-    switch (key)
-    {
-    case CM_MEMB:
-        return shell_membership_test(thecom->params);
-        break;
-    case CM_CONCAT:
-        return shell_concat_summary(thecom->params);
-        break;
-    case CM_NEGHIERA:
-        return shell_neghiera(thecom->params);
-        break;
-    case CM_FPHIERA:
-        return shell_fphiera(thecom->params);
-        break;
-    case CM_SEPAR:
-        return shell_separation_test(thecom->params);
-        break;
-    case CM_SAVE:
-        return shell_save_to_file(thecom->params);
-        break;
-    case CM_SAVESESSION:
-        return shell_save_session(thecom->params);
-        break;
-    case CM_LOADSESSION:
-        return shell_load_session(thecom->params);
-        break;
-    case CM_DELETE:
-        return shell_delete(thecom->params);
-        break;
-    case CM_SORT:
-        return shell_sort(thecom->params);
-        break;
-    case CM_RECDEF:
-        return shell_recursion_lang(thecom->params);
-        break;
-    case PR_COMM:
-        return shell_prop_comm(thecom->params);
-        break;
-    default:
-        shell_command_error();
-        return false;
-        break;
-    }
-    shell_command_error();
-    return false;
-}
 
-int com_apply_link_command(char *name, com_command *thecom)
-{
-    if (thecom == NULL || thecom->main == NULL)
-    {
-        shell_command_error();
-        return -1;
-    }
-    if (!check_varname(name))
-    {
-        return -1;
-    }
+    // Si ce n'est pas le cas
+    if (key == KY_NULL) {
 
-    // Premier cas: la commmande est juste un texte à traiter comme une regexp
-    if (thecom->thetype == CMT_RAW)
-    {
-        regexp *myexp = parse_string_regexp(thecom->main->string);
-        if (myexp == NULL)
-        {
+        // Dans ce cas, on ne doit pas avoir de paramètres.
+
+        if (thecom->params) {
+            shell_error_syntax();
             return -1;
         }
-        int i = object_add_language_reg(name, myexp);
-        reg_print(reg_simplify(myexp));
-        return i;
+        // Premier cas: la commmande est un texte à traiter comme une regexp
+        if (thecom->thetype == CMT_RAW) {
+
+            regexp* myexp = parse_string_regexp(thecom->main->string);
+            if (myexp == NULL) {
+                shell_error_notregexp(thecom);
+                return -1;
+            }
+            switch (mode) {
+            case MODE_PRINT:
+                reg_print(myexp);
+                reg_free(myexp);
+                return -1;
+                break;
+            case MODE_DEFAULT:
+            case MODE_COPY:
+                return object_add_regexp(varname, myexp);
+                break;
+            default:
+                break;
+            }
+            return -1;
+        }
+
+        // Sinon, le premier maillon doit être une variable.
+        if (!check_varname(thecom->main->string)) {
+            shell_error_syntax();
+            return -1;
+        }
+
+        // On récupère l'objet désigné par la commande
+        int i = object_get_from_name(thecom->main->string);
+        if (i == -1) {
+            shell_error_unknownvar(thecom->main->string);
+            return -1;
+        }
+
+        // There are now two cases, depending on the type of variables we are dealing with
+
+        // If the variable stands for an expression, an automaton or a morphism.
+        if (objects[i]->type != RECDEF) {
+            int j = com_get_object(i, thecom->main->next);
+            if (j < 0) {
+                shell_error_dispatch(j);
+                return j;
+            }
+            switch (mode) {
+
+            case MODE_DEFAULT:
+                if (saved) {
+                    *saved = false;
+                }
+                return j;
+                break;
+            case MODE_PRINT:
+                shell_view_object(objects[j], true);
+                return -1;
+                break;
+            case MODE_COPY:
+                return shell_copy_generic(j, varname);
+                break;
+            default:
+                break;
+            }
+        }
+        else {
+            // Otherwise, the object is a recursive definition (recdef).
+
+            // If the command consists of a single link, display the summary of the recdef.
+            if (com_single(thecom)) {
+                if (mode == MODE_PRINT) {
+                    shell_view_object(objects[i], true);
+                    return -1;
+                }
+                else {
+                    shell_error_copyrec();
+                    return -1;
+                }
+            }
+
+            if (thecom->thetype != CMT_IND || !thecom->main->next || thecom->main->next->next) {
+                shell_error_syntax();
+                return -1;
+            }
+
+            uchar h = shell_rec_getnum(objects[i]->rec, thecom->main->next->string);
+
+            if (h >= objects[i]->rec->num) {
+                shell_error_unknownrel(thecom->main->string, thecom->main->next->string);
+                return -1;
+            }
+
+            if (!objects[i]->rec->full) {
+                shell_error_recnotok(thecom->main->string);
+                return -1;
+            }
+
+            int j = object_add_regexp(varname, shell_rec_getexp(i, thecom->main->next->string, thecom->ind));
+            if (j == -1) {
+                return -1;
+            }
+
+            switch (mode) {
+
+            case MODE_DEFAULT:
+                *saved = true;
+                return j;
+                break;
+            case MODE_PRINT:
+                shell_view_object(objects[j], true);
+                object_free(j);
+                return -1;
+                break;
+            case MODE_COPY:
+                return j;
+                break;
+            default:
+                break;
+            }
+            return j;
+        }
+
+        shell_error_syntax();
+        return -1;
     }
 
-    // Si le premier maillon est un nom de variable, alors il s'agit juste de
-    // faire une copie
-    int i = index_from_string_chain(thecom->main);
-    if (i != -1 && thecom->params == NULL)
-    {
-        object_copy_generic(i, name);
-        return true;
+
+
+
+    // The first link must be the only one and must correspond to a keyword.
+    if (thecom->main->next || key == KY_NULL) {
+        shell_error_syntax();
+        return -1;
     }
 
-    // On sait maintenant que le premier argument est un keyword
-    // Dans ce cas il ne peut pas y avoir de nesting.
-    com_keyword key = key_from_string_chain_single(thecom->main);
-    switch (key)
-    {
-    case CM_THOMSON:
-        return shell_thomson_nfa(name, thecom->params);
+    // Commands that don't calculate objects (specific to print mode).
+    if (mode == MODE_PRINT) {
+
+
+        classes cl = command_to_class(thecom);
+        if (cl != CL_END) {
+            fprintf(stdout, "#### ");
+            print_command(thecom, stdout);
+            fprintf(stdout, " is equal to the class %s.\n", class_names[cl]);
+            print_class_info(cl, stdout);
+            return -1;
+        }
+
+        switch (key) {
+        case KY_SAVE:
+            return shell_save_to_file(thecom->params);
+            break;
+        case KY_SAVESESSION:
+            return shell_save_session(thecom->params);
+            break;
+        case KY_LOADSESSION:
+            return shell_load_session(thecom->params);
+            break;
+        case KY_DELETE:
+            return shell_delete(thecom->params);
+            break;
+        case KY_SEPAR:
+            return shell_separation(thecom->params);
+            break;
+        case KY_RESET:
+            return shell_reset(thecom->params);
+            break;
+        case KY_INVTRANS:
+            return shell_invtrans(thecom->params);
+            break;
+        case KY_RCAY:
+            return shell_view_rcayley(thecom->params);
+            break;
+        case KY_LCAY:
+            return shell_view_lcayley(thecom->params);
+            break;
+        case KY_MULT:
+            return shell_view_mormult(thecom->params);
+            break;
+        case KY_IDEMS:
+            return shell_view_idems(thecom->params);
+            break;
+        case KY_ORDER:
+            return shell_view_morder(thecom->params);
+            break;
+        case KY_RUN:
+            return shell_view_nfa_run(thecom->params);
+            break;
+        case KY_IMAGE:
+            return shell_view_mor_image(thecom->params);
+            break;
+        case KY_GKER:
+            return shell_view_gkernel(thecom->params);
+            break;
+        case KY_MKER:
+            return shell_view_mkernel(thecom->params);
+            break;
+        case KY_AKER:
+            return shell_view_akernel(thecom->params);
+            break;
+        case KY_ORB:
+            return shell_view_orbits(thecom->params);
+            break;
+        case KY_MEMB:
+            return shell_membership(thecom->params);
+            break;
+        case KY_CHIERA:
+            return shell_chiera_summary(thecom->params);
+            break;
+        case KY_NHIERA:
+            return shell_neghiera(thecom->params);
+            break;
+        case KY_FPHIERA:
+            return shell_fphiera(thecom->params);
+            break;
+        case KY_COUNTER:
+            return shell_counterfree(thecom->params);
+            break;
+        case KY_PERMUT:
+            return shell_permutation(thecom->params);
+            break;
+        case KY_EXSEARCH:
+            return shell_exsearch(thecom->params);
+            break;
+        case KY_EXALL:
+            return shell_exall(thecom->params);
+            break;
+        case KY_SORT:
+            return shell_sort(thecom->params);
+            break;
+        case KY_LIST:
+            return shell_filter_objects(thecom->params, DUMMY);
+            break;
+        case KY_CLEAR:
+            return shell_delete_all(thecom->params);
+            break;
+        case KY_TOGGLE:
+            return shell_toggle_optimization(thecom->params);
+            break;
+        case KY_AUTOMATA:
+            return shell_filter_objects(thecom->params, AUTOMATON);
+            break;
+        case KY_MORPHISMS:
+            return shell_filter_objects(thecom->params, MORPHISM);
+            break;
+        case KY_REGEXPS:
+            return shell_filter_objects(thecom->params, REGEXP);
+            break;
+        case KY_RECDEFS:
+            return shell_filter_objects(thecom->params, RECDEF);
+            break;
+        default:
+            break;
+        }
+    }
+
+    int k = -1;
+    switch (key) {
+    case KY_BMCK:
+        k = shell_mccluskey_reg(varname, thecom->params);
         break;
-    case CM_ELIMEPS:
-        return shell_elimeps_nfa(name, thecom->params);
+    case KY_THOMPSON:
+        k = shell_thompson_nfa(varname, thecom->params);
         break;
-    case CM_TRIMNFA:
-        return shell_trim_nfa(name, thecom->params);
+    case KY_DYCKTRANS:
+        k = shell_dycktrans_nfa(varname, thecom->params);
         break;
-    case CM_KLEENE:
-        return shell_kleene_nfa(name, thecom->params);
+    case KY_GLUSHKOV:
+        k = shell_glushkov_nfa(varname, thecom->params);
         break;
-    case CM_INTERSEC:
-        return shell_intersect_nfa(name, thecom->params);
+    case KY_HOPCROFT:
+        k = shell_hopcroft_nfa(varname, thecom->params);
         break;
-    case CM_CONCAT:
-        return shell_concat_nfa(name, thecom->params);
+    case KY_MIRROR:
+        k = shell_mirror_nfa(varname, thecom->params);
         break;
-    case CM_UNION:
-        return shell_union_nfa(name, thecom->params);
+    case KY_TRIMNFA:
+        k = shell_trim_nfa(varname, thecom->params);
         break;
-    case CM_DETERMIN:
-        return shell_determinize_nfa(name, thecom->params);
+    case KY_KLEENE:
+        k = shell_kleene_nfa(varname, thecom->params);
         break;
-    case CM_MINI:
-        return shell_minimize_nfa(name, thecom->params);
+    case KY_ELIMEPS:
+        k = shell_elimeps_nfa(varname, thecom->params);
         break;
-    case CM_LINK:
-        return shell_linktolang_nfa(name, thecom->params);
+    case KY_INTERSEC:
+        k = shell_intersect_nfa(varname, thecom->params);
         break;
-    case CM_OPEN:
-        return shell_open_object(name, thecom->params);
+    case KY_UNION:
+        k = shell_union_nfa(varname, thecom->params);
         break;
-    case CM_RNFA:
-        return shell_random_nfa(name, thecom->params, false);
+    case KY_BRZOZO:
+        k = shell_brzozowski_nfa(varname, thecom->params);
         break;
-    case CM_RDFA:
-        return shell_random_nfa(name, thecom->params, true);
+    case KY_OPEN:
+        k = shell_open_object(varname, thecom->params);
+        break;
+    case KY_RNFA:
+        k = shell_random_nfa(varname, thecom->params);
+        break;
+    case KY_RDFA:
+        k = shell_random_dfa(varname, thecom->params);
+        break;
+    case KY_RECINIT:
+        k = shell_recursive_init(varname, thecom->params);
+        break;
+
+    case KY_SAVE:
+    case KY_SAVESESSION:
+    case KY_LOADSESSION:
+    case KY_DELETE:
+    case KY_SEPAR:
+    case KY_RESET:
+    case KY_INVTRANS:
+    case KY_SORT:
+    case KY_RCAY:
+    case KY_LCAY:
+    case KY_MULT:
+    case KY_IDEMS:
+    case KY_ORDER:
+    case KY_RUN:
+    case KY_IMAGE:
+    case KY_GKER:
+    case KY_MKER:
+    case KY_ORB:
+    case KY_MEMB:
+    case KY_CHIERA:
+    case KY_NHIERA:
+    case KY_FPHIERA:
+        shell_error_noreturn(thecom);
+        return -1;
         break;
     default:
-        shell_command_error();
-        return false;
+        shell_error_syntax();
+        return -1;
         break;
     }
-    shell_command_error();
+
+    if (k != -1 && mode == MODE_PRINT) {
+        shell_view_object(objects[k], true);
+        object_free(k);
+        return -1;
+    }
+    return k;
+}
+
+/****************************/
+/* Affichage d'informations */
+/****************************/
+
+static bool filter_syntactic(int i, int* vals) {
+    if (!objects[i] || objects[i]->type == RECDEF) {
+        return false;
+    }
+    int j = shell_compute_syntac(i);
+    if (objects[j]->mor->obj->r_cayley->size_graph >= (uint)vals[0] && (vals[1] == -1 || objects[j]->mor->obj->r_cayley->size_graph <= (uint)vals[1])) {
+        return true;
+    }
     return false;
+}
+
+static void info_syntactic(int i) {
+    int j = shell_compute_syntac(i);
+    char buffer[64];
+    sprintf(buffer, "Syntactic monoid: %d elements", objects[j]->mor->obj->r_cayley->size_graph);
+    fprintf(stdout, "%-45s", buffer);
+}
+
+static bool params_syntactic(com_parameters* pars, int* vals) {
+    if (com_nbparams(pars) == 0) {
+        vals[0] = 0;
+        vals[1] = -1;
+        return true;
+    }
+    char* end;
+    vals[0] = strtol(com_getparam(pars, 0)->main->string, &end, 10);
+    if (*end != '\0') {
+        shell_error_numpar(keywordtostring(KY_SYNT), 1);
+        return false;
+    }
+    if (com_nbparams(pars) == 1) {
+        vals[1] = -1;
+        return true;
+    }
+    vals[1] = strtol(com_getparam(pars, 1)->main->string, &end, 10);
+    if (*end != '\0') {
+        shell_error_numpar(keywordtostring(KY_SYNT), 2);
+        return false;
+    }
+    return true;
+}
+
+static bool filter_minimal(int i, int* vals) {
+    if (!objects[i] || objects[i]->type == RECDEF) {
+        return false;
+    }
+    int j = shell_compute_minimal(i);
+    if (objects[j]->nfa->trans->size_graph >= (uint)vals[0] && (vals[1] == -1 || objects[j]->nfa->trans->size_graph <= (uint)vals[1])) {
+        return true;
+    }
+    return false;
+}
+
+static void info_minimal(int i) {
+    int j = shell_compute_minimal(i);
+    char buffer[64];
+    sprintf(buffer, "Minimal automaton: %d states", objects[j]->nfa->trans->size_graph);
+    fprintf(stdout, "%-45s", buffer);
+}
+
+static bool params_minimal(com_parameters* pars, int* vals) {
+    if (com_nbparams(pars) == 0) {
+        vals[0] = 0;
+        vals[1] = -1;
+        return true;
+    }
+    char* end;
+    vals[0] = strtol(com_getparam(pars, 0)->main->string, &end, 10);
+    if (*end != '\0') {
+        shell_error_numpar(keywordtostring(KY_MINI), 1);
+        return false;
+    }
+    if (com_nbparams(pars) == 1) {
+        vals[1] = -1;
+        return true;
+    }
+    vals[1] = strtol(com_getparam(pars, 1)->main->string, &end, 10);
+    if (*end != '\0') {
+        shell_error_numpar(keywordtostring(KY_MINI), 2);
+        return false;
+    }
+    return true;
+}
+
+static bool filter_idems(int i, int* vals) {
+    if (!objects[i] || objects[i]->type == RECDEF) {
+        return false;
+    }
+    int j = shell_compute_syntac(i);
+    morphism* M = objects[j]->mor->obj;
+    if (size_dequeue(M->idem_list) >= (uint)vals[0] && (vals[1] == -1 || size_dequeue(M->idem_list) <= (uint)vals[1])) {
+        return true;
+    }
+    return false;
+}
+
+static void info_idems(int i) {
+    int j = shell_compute_syntac(i);
+    char buffer[64];
+    morphism* M = objects[j]->mor->obj;
+    sprintf(buffer, "Idempotents in the syntactic monoid: %d", size_dequeue(M->idem_list));
+    fprintf(stdout, "%-45s", buffer);
+}
+
+static bool params_idems(com_parameters* pars, int* vals) {
+    if (com_nbparams(pars) == 0) {
+        vals[0] = 0;
+        vals[1] = -1;
+        return true;
+    }
+    char* end;
+    vals[0] = strtol(com_getparam(pars, 0)->main->string, &end, 10);
+    if (*end != '\0') {
+        shell_error_numpar(keywordtostring(KY_IDEMS), 1);
+        return false;
+    }
+    if (com_nbparams(pars) == 1) {
+        vals[1] = -1;
+        return true;
+    }
+    vals[1] = strtol(com_getparam(pars, 1)->main->string, &end, 10);
+    if (*end != '\0') {
+        shell_error_numpar(keywordtostring(KY_IDEMS), 2);
+        return false;
+    }
+    return true;
+}
+
+int shell_filter_objects(com_parameters* pars, ob_type type) {
+    int n = com_nbparams(pars);
+    if (type == RECDEF && n > 0) {
+        fprintf(stderr, "Error: This command does not take any parameters.\n");
+        return -1;
+    }
+
+    bool (*filters[n + 1])(int, int*);
+    void (*infos[n + 1])(int);
+    int vals[n + 1][8];
+
+    for (int i = 0; i < n; i++) {
+        if (!com_single_par(com_getparam(pars, i))) {
+            shell_error_syntax();
+            return -1;
+        }
+        com_keyword key = string_to_keyword(com_getparam(pars, i)->main->string);
+        switch (key) {
+        case KY_SYNT:
+            filters[i] = filter_syntactic;
+            infos[i] = info_syntactic;
+            if (!params_syntactic(com_getparam(pars, i)->params, vals[i])) {
+                return -1;
+            }
+            break;
+        case KY_MINI:
+            filters[i] = filter_minimal;
+            infos[i] = info_minimal;
+            if (!params_minimal(com_getparam(pars, i)->params, vals[i])) {
+                return -1;
+            }
+            break;
+        case KY_IDEMS:
+            filters[i] = filter_idems;
+            infos[i] = info_idems;
+            if (!params_idems(com_getparam(pars, i)->params, vals[i])) {
+                return -1;
+            }
+            break;
+        default:
+            shell_error_syntax();
+            return -1;
+            break;
+        }
+    }
+
+    // Computes the number of user objects
+    uint count = 0;
+    for (int i = 0; i < nb_objects; i++) {
+        bool ok = true;
+        for (int h = 0; h < n; h++) {
+            if (!filters[h](i, vals[h])) {
+                ok = false;
+                break;
+            }
+        }
+        if (objects[i] && objects[i]->name && ok) {
+            count++;
+        }
+    }
+
+    if (n == 0) {
+        switch (type) {
+        case REGEXP:
+            printf("#### There are %d regular expressions(s) in memory:\n\n", count);
+            break;
+        case AUTOMATON:
+            printf("#### There are %d automata in memory:\n\n", count);
+            break;
+        case MORPHISM:
+            printf("#### There are %d morphism(s) in memory:\n\n", count);
+            break;
+        case RECDEF:
+            printf("#### There are %d recursive definition(s) in memory:\n\n", count);
+            break;
+        case DUMMY:
+            printf("#### There are %d object(s) in memory:\n\n", count);
+            break;
+        default:
+            break;
+        }
+    }
+    else {
+        switch (type) {
+        case REGEXP:
+            printf("#### There are %d regular expressions(s) in memory with the specified properties:\n\n", count);
+            break;
+        case AUTOMATON:
+            printf("#### There are %d automata in memory with the specified properties:\n\n", count);
+            break;
+        case MORPHISM:
+            printf("#### There are %d morphism(s) in memory with the specified properties:\n\n", count);
+            break;
+        case RECDEF:
+            printf("#### There are %d recursive definition(s) in memory with the specified properties:\n\n", count);
+            break;
+        case DUMMY:
+            printf("#### There are %d object(s) in memory with the specified properties:\n\n", count);
+            break;
+        default:
+            break;
+        }
+    }
+    if (count > 0) {
+        count = 1;
+    }
+    char buffer[128];
+    int line[5];
+    uchar found = 0;
+    for (int i = 0; i < nb_objects; i++) {
+        bool ok = objects[i] && objects[i]->name;
+        if (ok) {
+            for (int h = 0; h < n; h++) {
+                if (!filters[h](i, vals[h])) {
+                    ok = false;
+                    break;
+                }
+            }
+        }
+        if (ok) {
+            line[found] = i;
+            found++;
+            if (type == DUMMY) {
+                sprintf(buffer, "#### %d (%s): %s", count, object_types_names[objects[i]->type], objects[i]->name);
+            }
+            else {
+                sprintf(buffer, "#### %d: %s", count, objects[i]->name);
+            }
+            fprintf(stdout, "%-45s", buffer);
+            count++;
+        }
+
+        if (found == 5) {
+            fprintf(stdout, "\n");
+            found = 0;
+            for (int k = 0; k < n; k++) {
+                for (int j = 0; j < 5; j++) {
+                    if (infos[k]) {
+                        infos[k](line[j]);
+                    }
+                }
+                fprintf(stdout, "\n");
+            }
+            fprintf(stdout, "\n");
+        }
+    }
+
+    if (found != 0) {
+
+        fprintf(stdout, "\n");
+        for (int k = 0; k < n; k++) {
+            for (int j = 0; j < found; j++) {
+                if (infos[k]) {
+                    infos[k](line[j]);
+                }
+            }
+            fprintf(stdout, "\n");
+        }
+        fprintf(stdout, "\n");
+    }
+
+    return -1;
 }
 
 /******************************/
@@ -674,1058 +783,1364 @@ int com_apply_link_command(char *name, com_command *thecom)
 /******************************/
 
 // Ajout d'un nouvel objet en copiant un objet déjà existant dans la table
-int object_copy_generic(int i, char *newname)
-{
-    if (i == -1)
-    {
-        fprintf(stderr, "Error: this is not a valid object to copy.\n");
+int shell_copy_generic(int i, char* newname) {
+    if (i == -1) {
         return -1;
     }
-    switch (objects[i]->type)
-    {
-    case AUTOMATA:
-        return object_add_automata(newname, nfa_copy(objects[i]->theob.aut->nfa));
+    switch (objects[i]->type) {
+    case AUTOMATON:
+        return object_add_automaton(newname, nfa_copy(objects[i]->nfa));
         break;
-    case LANGUAGE:
-        if (objects[i]->theob.lan->type == SPE_REG)
-        {
-            return object_add_language_reg(newname, reg_copy(objects[i]->theob.lan->spe.reg));
-        }
-        else
-        {
-            int j = object_add_automata(newname,
-                                        nfa_copy(
-                                            objects[objects[i]->theob.lan->spe.nfa]->theob.aut->nfa));
-            return object_add_language_nfa(newname, j);
-        }
-
+    case REGEXP:
+        return object_add_regexp(newname, reg_copy(objects[i]->exp));
     default:
         return -1;
         break;
     }
 }
 
-// Calcule un nouveau NFA avec la méthode de thomson à partir d'un langage.
-int shell_thomson_nfa(char *varname, com_parameters *pars)
-{
-    if (com_nbparams(pars) != 1)
-    {
-        shell_arguments_error();
+// Calcule un nouveau NFA avec la méthode de Glushkov à partir d'un langage.
+int shell_glushkov_nfa(char* varname, com_parameters* pars) {
+
+    if (com_nbparams(pars) != 1) {
+        shell_error_nbparams(keywordtostring(KY_GLUSHKOV), 1);
         return -1;
     }
-    int i = index_from_string_chain(pars->param->main);
-    if (i == -1)
-    {
-        shell_variable_error();
-        return false;
+    bool saved;
+    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1) {
+        return -1;
+    }
+    if (objects[i]->type != REGEXP) {
+        shell_error_exppar(keywordtostring(KY_GLUSHKOV), 1);
+        return -1;
+    }
+    nfa* automaton = reg_glushkov(objects[i]->exp);
+    if (saved) {
+        object_free(i);
+    }
+    return object_add_automaton(varname, automaton);
+}
+
+// Calcule le miroir d'un nfa à partir d'un langage.
+int shell_mirror_nfa(char* varname, com_parameters* pars) {
+    if (com_nbparams(pars) != 1) {
+        shell_error_nbparams(keywordtostring(KY_MIRROR), 1);
+        return -1;
     }
 
-    if (i < 0 || objects[i]->type != LANGUAGE || objects[i]->theob.lan->type != SPE_REG)
-    {
-        fprintf(stderr,
-                "Error: Thomson's algorithm can only be applied to a language specified by a regular expression.\n");
+    bool saved;
+    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1 || objects[i]->type != AUTOMATON) {
+        shell_error_autopar(keywordtostring(KY_MIRROR), 1);
         return -1;
     }
-    DEBUG("Computing an automaton from a language");
-    return object_add_automata(varname, reg2nfa(objects[i]->theob.lan->spe.reg));
+    nfa* automaton = nfa_mirror(objects[i]->nfa);
+    if (saved) {
+        object_free(i);
+    }
+    return object_add_automaton(varname, automaton);
+}
+
+int shell_hopcroft_nfa(char* varname, com_parameters* pars) {
+    if (com_nbparams(pars) != 1) {
+        shell_error_nbparams(keywordtostring(KY_HOPCROFT), 1);
+        return -1;
+    }
+    bool saved;
+    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1) {
+        return -1;
+    }
+    if (objects[i]->type != AUTOMATON) {
+        shell_error_autopar(keywordtostring(KY_HOPCROFT), 1);
+        return -1;
+    }
+    nfa* automaton = nfa_hopcroft(objects[i]->nfa);
+    if (saved) {
+        object_free(i);
+    }
+    return object_add_automaton(varname, automaton);
+}
+
+int shell_mccluskey_reg(char* varname, com_parameters* pars) {
+    if (com_nbparams(pars) != 1) {
+        shell_error_nbparams(keywordtostring(KY_BMCK), 1);
+        return -1;
+    }
+    bool saved;
+    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1) {
+        return -1;
+    }
+    if (objects[i]->type != AUTOMATON) {
+        shell_error_autopar(keywordtostring(KY_BMCK), 1);
+        return -1;
+    }
+    DEBUG("Computing a regular expression from an automaton");
+    regexp* exp = nfa_mccluskey(objects[i]->nfa);
+    if (saved) {
+        object_free(i);
+    }
+    return object_add_regexp(varname, exp);
+}
+
+// Calcule un nouveau NFA avec la méthode de thompson à partir d'un langage.
+int shell_thompson_nfa(char* varname, com_parameters* pars) {
+    if (com_nbparams(pars) != 1) {
+        shell_error_nbparams(keywordtostring(KY_BMCK), 1);
+        return -1;
+    }
+    bool saved;
+    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1) {
+        return -1;
+    }
+    if (objects[i]->type != REGEXP) {
+        shell_error_exppar(keywordtostring(KY_THOMPSON), 1);
+        return -1;
+    }
+    nfa* automaton = reg_thompson(objects[i]->exp);
+    if (saved) {
+        object_free(i);
+    }
+    return object_add_automaton(varname, automaton);
 }
 
 // Union de deux NFAs
-int shell_union_nfa(char *varname, com_parameters *pars)
-{
-    if (com_nbparams(pars) != 2)
-    {
-        shell_arguments_error();
+int shell_union_nfa(char* varname, com_parameters* pars) {
+    if (com_nbparams(pars) != 2) {
+        shell_error_nbparams(keywordtostring(KY_UNION), 2);
         return -1;
     }
-    int i1 = index_from_string_chain(pars->param->main);
-    int i2 = index_from_string_chain(pars->next->param->main);
-    if (i1 == -1 || i2 == -1)
-    {
-        shell_variable_error();
-        return false;
-    }
-    if (i1 < 0 || i2 < 0 || objects[i1]->type != AUTOMATA || objects[i2]->type != AUTOMATA)
-    {
-        fprintf(stderr, "Error: The union algorithm requires two automata as input.\n");
+    bool saved1;
+    bool saved2;
+    int i1 = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved1);
+    int i2 = com_apply_command(pars->next->param, NULL, MODE_DEFAULT, &saved2);
+    if (i1 == -1 || i2 == -1) {
         return -1;
     }
-    return object_add_automata(varname,
-                               nfa_union(objects[i1]->theob.aut->nfa, objects[i2]->theob.aut->nfa));
+    if (objects[i1]->type != AUTOMATON) {
+        shell_error_autopar(keywordtostring(KY_UNION), 1);
+        return -1;
+    }
+    if (objects[i2]->type != AUTOMATON) {
+        shell_error_autopar(keywordtostring(KY_UNION), 2);
+        return -1;
+    }
+    nfa* automaton = nfa_union(objects[i1]->nfa, objects[i2]->nfa);
+    if (saved1) {
+        object_free(i1);
+    }
+    if (saved2) {
+        object_free(i2);
+    }
+    return object_add_automaton(varname, automaton);
 }
 
 // Concatène deux NFAs
-int shell_concat_nfa(char *varname, com_parameters *pars)
-{
-    if (com_nbparams(pars) != 2)
-    {
-        shell_arguments_error();
+int shell_concat_nfa(char* varname, com_parameters* pars) {
+    if (com_nbparams(pars) != 2) {
+        shell_error_nbparams(keywordtostring(KY_CONCAT), 2);
         return -1;
     }
-    int i1 = index_from_string_chain(pars->param->main);
-    int i2 = index_from_string_chain(pars->next->param->main);
-    if (i1 == -1 || i2 == -1)
-    {
-        shell_variable_error();
-        return false;
-    }
-    if (i1 < 0 || i2 < 0 || objects[i1]->type != AUTOMATA || objects[i2]->type != AUTOMATA)
-    {
-        fprintf(stderr, "Error: The concatenation algorithm requires two automata as input.\n");
+    bool saved1;
+    bool saved2;
+    int i1 = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved1);
+    int i2 = com_apply_command(pars->next->param, NULL, MODE_DEFAULT, &saved2);
+    if (i1 == -1 || i2 == -1) {
         return -1;
     }
-    return object_add_automata(varname,
-                               nfa_concat(objects[i1]->theob.aut->nfa,
-                                          objects[i2]->theob.aut->nfa));
+    if (objects[i1]->type != AUTOMATON) {
+        shell_error_autopar(keywordtostring(KY_CONCAT), 1);
+        return -1;
+    }
+    if (objects[i2]->type != AUTOMATON) {
+        shell_error_autopar(keywordtostring(KY_CONCAT), 2);
+        return -1;
+    }
+    nfa* automaton = nfa_concat(objects[i1]->nfa, objects[i2]->nfa);
+    if (saved1) {
+        object_free(i1);
+    }
+    if (saved2) {
+        object_free(i2);
+    }
+    return object_add_automaton(varname, automaton);
 }
 
 // Étoile de Kleene sur un NFA
-int shell_kleene_nfa(char *varname, com_parameters *pars)
-{
-    if (com_nbparams(pars) != 1)
-    {
-        shell_arguments_error();
+int shell_kleene_nfa(char* varname, com_parameters* pars) {
+    if (com_nbparams(pars) != 1) {
+        shell_error_nbparams(keywordtostring(KY_KLEENE), 1);
         return -1;
     }
-    int i = index_from_string_chain(pars->param->main);
-    if (i == -1)
-    {
-        shell_variable_error();
-        return false;
-    }
-    if (i < 0 || objects[i]->type != AUTOMATA)
-    {
-        fprintf(stderr, "Error: The Kleene star algorithm can only be applied to an automaton.\n");
+    bool saved;
+    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1) {
         return -1;
     }
-    return object_add_automata(varname, nfa_star(objects[i]->theob.aut->nfa));
+    if (objects[i]->type != AUTOMATON) {
+        shell_error_autopar(keywordtostring(KY_KLEENE), 1);
+        return -1;
+    }
+    nfa* automaton = nfa_star(objects[i]->nfa);
+    if (saved) {
+        object_free(i);
+    }
+    return object_add_automaton(varname, automaton);
 }
 
 // Calcule un nouveau NFA en éliminant les transitions epsilon
-int shell_elimeps_nfa(char *varname, com_parameters *pars)
-{
-    if (com_nbparams(pars) != 1)
-    {
-        shell_arguments_error();
+int shell_elimeps_nfa(char* varname, com_parameters* pars) {
+    if (com_nbparams(pars) != 1) {
+        shell_error_nbparams(keywordtostring(KY_ELIMEPS), 1);
         return -1;
     }
-    int i = index_from_string_chain(pars->param->main);
-    if (i == -1)
-    {
-        shell_variable_error();
-        return false;
-    }
-    if (i < 0 || objects[i]->type != AUTOMATA)
-    {
-        fprintf(stderr, "Error: Can only eliminate the epsilon transitions in an automaton.\n");
+    bool saved;
+    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1) {
         return -1;
     }
-    return object_add_automata(varname, nfa_elimeps(objects[i]->theob.aut->nfa));
+    if (objects[i]->type != AUTOMATON) {
+        shell_error_autopar(keywordtostring(KY_ELIMEPS), 1);
+        return -1;
+    }
+    nfa* automaton = nfa_elimeps(objects[i]->nfa);
+    if (saved) {
+        object_free(i);
+    }
+    return object_add_automaton(varname, automaton);
 }
 
 // Calcule un nouveau NFA en supprimant tous les états non-accessibles ou non
 // co-accessibles
-int shell_trim_nfa(char *varname, com_parameters *pars)
-{
-    if (com_nbparams(pars) != 1)
-    {
-        shell_arguments_error();
+int shell_trim_nfa(char* varname, com_parameters* pars) {
+    if (com_nbparams(pars) != 1) {
+        shell_error_nbparams(keywordtostring(KY_TRIMNFA), 1);
         return -1;
     }
-    int i = index_from_string_chain(pars->param->main);
-    if (i == -1)
-    {
-        shell_variable_error();
-        return false;
-    }
-    if (i < 0 || objects[i]->type != AUTOMATA)
-    {
-        fprintf(stderr, "Error: Can only trim an automaton.\n");
+    bool saved;
+    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1) {
         return -1;
     }
-    return object_add_automata(varname, nfa_trim(objects[i]->theob.aut->nfa));
+    if (objects[i]->type != AUTOMATON) {
+        shell_error_autopar(keywordtostring(KY_TRIMNFA), 1);
+        return -1;
+    }
+
+    nfa* automaton = nfa_trim(objects[i]->nfa);
+    if (saved) {
+        object_free(i);
+    }
+    return object_add_automaton(varname, automaton);
 }
 
 // Calcule un nouveau NFA en réalisant l'intersection de deux NFAs existants
-int shell_intersect_nfa(char *varname, com_parameters *pars)
-{
-    if (com_nbparams(pars) != 2)
-    {
-        shell_arguments_error();
+int shell_intersect_nfa(char* varname, com_parameters* pars) {
+    if (com_nbparams(pars) != 2) {
+        shell_error_nbparams(keywordtostring(KY_INTERSEC), 2);
         return -1;
     }
-    int i1 = index_from_string_chain(pars->param->main);
-    int i2 = index_from_string_chain(pars->next->param->main);
-    if (i1 == -1 || i2 == -1)
-    {
-        shell_variable_error();
-        return false;
-    }
-    if (i1 < 0 || i2 < 0 || objects[i1]->type != AUTOMATA || objects[i2]->type != AUTOMATA)
-    {
-        fprintf(stderr, "Error: The intersection algorithm requires two automata as input.\n");
+    bool saved1;
+    bool saved2;
+    int i1 = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved1);
+    int i2 = com_apply_command(pars->next->param, NULL, MODE_DEFAULT, &saved2);
+    if (i1 == -1 || i2 == -1) {
         return -1;
     }
-    return object_add_automata(varname,
-                               nfa_intersect(objects[i1]->theob.aut->nfa,
-                                             objects[i2]->theob.aut->nfa,
-                                             true));
+    if (objects[i1]->type != AUTOMATON) {
+        shell_error_autopar(keywordtostring(KY_INTERSEC), 1);
+        return -1;
+    }
+    if (objects[i2]->type != AUTOMATON) {
+        shell_error_autopar(keywordtostring(KY_INTERSEC), 2);
+        return -1;
+    }
+    nfa* automaton = nfa_intersect(objects[i1]->nfa, objects[i2]->nfa, true);
+    if (saved1) {
+        object_free(i1);
+    }
+    if (saved2) {
+        object_free(i2);
+    }
+    return object_add_automaton(varname, automaton);
 }
 
-// Calcule un nouveau NFA déterministe complet en déterminisant un NFA déjà
-// existant
-int shell_determinize_nfa(char *varname, com_parameters *pars)
-{
-    if (com_nbparams(pars) != 1)
-    {
-        shell_arguments_error();
+// Computes a minimal automaton with the Brzozowski method
+int shell_brzozowski_nfa(char* varname, com_parameters* pars) {
+    if (com_nbparams(pars) != 1) {
+        shell_error_nbparams(keywordtostring(KY_BRZOZO), 1);
         return -1;
     }
-    int i = index_from_string_chain(pars->param->main);
-    if (i == -1)
-    {
-        shell_variable_error();
-        return false;
-    }
-    if (i < 0 || objects[i]->type != AUTOMATA || objects[i]->theob.aut->nfa->etrans != NULL ||
-        objects[i]->theob.aut->nfa->itrans != NULL)
-    {
-        fprintf(stderr,
-                "Error: The subset construction can only be applied to an automaton without epsilon transitions.\n");
+    bool saved;
+    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1) {
         return -1;
     }
-    return object_add_automata(varname, nfa_determinize(objects[i]->theob.aut->nfa, true));
+    if (objects[i]->type != AUTOMATON) {
+        shell_error_autopar(keywordtostring(KY_BRZOZO), 1);
+        return -1;
+    }
+    nfa* automaton = nfa_brzozowski(objects[i]->nfa);
+    if (saved) {
+        object_free(i);
+    }
+    return object_add_automaton(varname, automaton);
 }
 
-// Calcule un automate minimal à partir d'un NFA
-int shell_minimize_nfa(char *varname, com_parameters *pars)
-{
-    if (com_nbparams(pars) != 1)
-    {
-        shell_arguments_error();
+// Extension of a NFA by adding Dyck transitions
+int shell_dycktrans_nfa(char* varname, com_parameters* pars) {
+    if (com_nbparams(pars) != 1) {
+        shell_error_nbparams(keywordtostring(KY_DYCKTRANS), 1);
         return -1;
     }
-    int i = index_from_string_chain(pars->param->main);
-    if (i == -1)
-    {
-        shell_variable_error();
-        return false;
-    }
-    if (i < 0 || objects[i]->type != AUTOMATA)
-    {
-        fprintf(stderr, "Error: the minimization algorithm can only be applied to an automaton.\n");
+    bool saved;
+    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1) {
         return -1;
     }
-    return object_add_automata(varname, nfa_minimize(objects[i]->theob.aut->nfa));
+    if (objects[i]->type != AUTOMATON) {
+        shell_error_autopar(keywordtostring(KY_DYCKTRANS), 1);
+        return -1;
+    }
+    parti* SCCS = nfa_inv_ext(objects[i]->nfa);
+    parti* FOLD = nfa_stal_fold(objects[i]->nfa, SCCS);
+    delete_parti(SCCS);
+    nfa* automaton = nfa_dyck_ext(objects[i]->nfa, FOLD);
+    delete_parti(FOLD);
+    if (saved) {
+        object_free(i);
+    }
+    return object_add_automaton(varname, automaton);
 }
 
-// Links an existing nfa to a nex language
-int shell_linktolang_nfa(char *varname, com_parameters *pars)
-{
-    if (com_nbparams(pars) != 1)
-    {
-        shell_arguments_error();
+// Computes a random NFA
+int shell_random_nfa(char* varname, com_parameters* params) {
+    if (com_nbparams(params) != 3) {
+        shell_error_nbparams(keywordtostring(KY_RNFA), 3);
         return -1;
     }
-    int i = index_from_string_chain(pars->param->main);
-    if (i == -1)
-    {
-        shell_variable_error();
-        return false;
-    }
-    if (i < 0 || objects[i]->type != AUTOMATA)
-    {
-        fprintf(stderr, "Error: the argument should be an automata variable.\n");
+    com_command* arg1 = params->param;
+    com_command* arg2 = params->next->param;
+    com_command* arg3 = params->next->next->param;
+    if (!com_single(arg1)) {
+        shell_error_numpar(keywordtostring(KY_RNFA), 1);
         return -1;
     }
-    return object_add_language_nfa(varname, i);
+
+    if (!com_single(arg2)) {
+        shell_error_numpar(keywordtostring(KY_RNFA), 2);
+        return -1;
+    }
+
+    if (!com_single(arg3)) {
+        shell_error_numpar(keywordtostring(KY_RNFA), 3);
+        return -1;
+    }
+
+    char* end;
+    int nb1 = strtol(arg1->main->string, &end, 10);
+    if (*end != '\0') {
+        shell_error_numpar(keywordtostring(KY_RNFA), 1);
+        return -1;
+    }
+    int nb2 = strtol(arg2->main->string, &end, 10);
+    if (*end != '\0') {
+        shell_error_numpar(keywordtostring(KY_RNFA), 2);
+        return -1;
+    }
+    int nb3 = strtol(arg3->main->string, &end, 10);
+    if (*end != '\0') {
+        shell_error_numpar(keywordtostring(KY_RNFA), 3);
+        return -1;
+    }
+
+    return object_add_automaton(varname, nfa_random(nb1, nb2, nb3));
 }
 
-// Calcul d'une fammille de langages définie récursivement
-bool shell_recursion_lang(com_parameters *params)
-{
-    int nb_params = com_nbparams(params);
-    if (nb_params < 3 || nb_params % 2 != 1)
-    {
-        shell_arguments_error();
-        return false;
+int shell_random_dfa(char* varname, com_parameters* params) {
+    if (com_nbparams(params) != 3) {
+        shell_error_nbparams(keywordtostring(KY_RDFA), 3);
+        return -1;
     }
-    int lcount           = (nb_params - 1) / 2;
-    com_command **partab = com_getparamarray(params);
+    com_command* arg1 = params->param;
+    com_command* arg2 = params->next->param;
+    com_command* arg3 = params->next->next->param;
+    if (!com_single(arg1)) {
+        shell_error_numpar(keywordtostring(KY_RDFA), 1);
+        return -1;
+    }
 
-    // Calcul de la table des indices des langages impliqués dans le calcul
-    int indtab[lcount];
-    for (int i = 0; i < lcount; i++)
-    {
-        if (!com_single(partab[i]))
-        {
-            shell_arguments_error();
-            return false;
+    if (!com_single(arg2)) {
+        shell_error_numpar(keywordtostring(KY_RDFA), 2);
+        return -1;
+    }
+
+    if (!com_single(arg3)) {
+        shell_error_numpar(keywordtostring(KY_RDFA), 3);
+        return -1;
+    }
+
+    char* end;
+    int nb1 = strtol(arg1->main->string, &end, 10);
+    if (*end != '\0') {
+        shell_error_numpar(keywordtostring(KY_RDFA), 1);
+        return -1;
+    }
+    int nb2 = strtol(arg2->main->string, &end, 10);
+    if (*end != '\0') {
+        shell_error_numpar(keywordtostring(KY_RDFA), 2);
+        return -1;
+    }
+    int nb3 = strtol(arg3->main->string, &end, 10);
+    if (*end != '\0') {
+        shell_error_numpar(keywordtostring(KY_RDFA), 3);
+        return -1;
+    }
+
+    return object_add_automaton(varname, dfa_random(nb1, nb2, nb3));
+}
+
+int shell_recursive_init(char* varname, com_parameters* params) {
+    if (com_nbparams(params) < 2) {
+        shell_error_leastparams(keywordtostring(KY_RECDEF), 2);
+        return -1;
+    }
+
+    com_command* arg = params->param;
+
+    if (!com_single(arg)) {
+        shell_error_numpar(keywordtostring(KY_RECDEF), 1);
+        return -1;
+    }
+
+    char* end;
+    ushort nb = strtol(arg->main->string, &end, 10);
+    if (*end != '\0') {
+        shell_error_numpar(keywordtostring(KY_RECDEF), 1);
+        return -1;
+    }
+
+    int i = object_get_from_name(varname);
+    if (i != -1) {
+        object_free(i);
+    }
+
+    grow_objects_array();
+
+    i = nb_objects++;
+
+    if (objects[i]) {
+        shell_error_full();
+        return -1;
+    }
+
+    objects[i] = object_init(varname);
+    objects[i]->type = RECDEF;
+    MALLOC(objects[i]->rec, 1);
+    objects[i]->rec->num = com_nbparams(params) - 1;
+    objects[i]->rec->init = nb + 1;
+    objects[i]->rec->full = false;
+
+    for (uchar j = 0; j < objects[i]->rec->num; j++) {
+        params = params->next;
+        objects[i]->rec->names[j] = strdup(params->param->main->string);
+        objects[i]->rec->def[j] = NULL;
+        MALLOC(objects[i]->rec->regexps[j], nb);
+        for (ushort x = 0; x < nb + 1; x++) {
+            objects[i]->rec->regexps[j][x] = NULL;
         }
-        indtab[i] = object_get_from_name(partab[i]->main->string);
-        if (indtab[i] == -1)
-        {
-            shell_variable_error();
-            return false;
-        }
-    }
-    // Calcul de la table des chaînes représentant les expressions utilisées
-    // dans
-    // la récursion
-    char *expstab[lcount];
-    for (int i = 0; i < lcount; i++)
-    {
-        int j = i + lcount;
-        if (!com_israw(partab[j]))
-        {
-            shell_arguments_error();
-            return false;
-        }
-        expstab[i] = partab[j]->main->string;
     }
 
-    // Récupération du nombre de récursions demandées
-    if (!com_single(partab[nb_params - 1]))
-    {
-        shell_arguments_error();
-        return false;
-    }
-    char *end;
-    int nrec = strtol(partab[nb_params - 1]->main->string, &end, 10);
-    if (*end != '\0')
-    {
-        shell_arguments_error();
-        return false;
-    }
+    fprintf(stdout, "\n#### Initialization of the recursive definition %s.\n", varname);
+    shell_rec_display(objects[i]->rec, stdout);
 
-    // Calcul de la table des noms des langages utilisés dans le calcul
-    // Création des copies initiales
-    char *namestab[lcount];
-    for (int i = 0; i < lcount; i++)
-    {
-        namestab[i] = strdup(partab[i]->main->string);
-        char *tempname;
-        MALLOC(tempname, 20);
-        sprintf(tempname, "%s%03d", namestab[i], 0);
-        object_copy_generic(indtab[i], tempname);
-    }
-
-    for (int j = 0; j <= nrec; j++)
-    {
-        for (int i = 0; i < lcount; i++)
-        {
-            regexp *myexp = parse_string_regexp(expstab[i]);
-            if (myexp == NULL)
-            {
-                return false;
-            }
-            object_add_language_reg(namestab[i], myexp);
-            char *tempname;
-            MALLOC(tempname, 20);
-            sprintf(tempname, "%s%03d", namestab[i], j);
-            object_copy_generic(indtab[i], tempname);
-        }
-    }
-
-    free(partab);
-
-    return true;
+    return i;
 }
 
-// Sauvegarde d'un objet
-bool shell_save_to_file(com_parameters *params)
-{
-    if (com_nbparams(params) != 2)
-    {
-        shell_arguments_error();
-        return false;
+// Save a single object to a file
+int shell_save_to_file(com_parameters* pars) {
+    if (com_nbparams(pars) != 2) {
+        shell_error_nbparams(keywordtostring(KY_SAVE), 2);
+        return -1;
     }
-    com_command **pararray = com_getparamarray(params);
-    int i                  = index_from_string_chain(pararray[0]->main);
-    if (i == -1)
-    {
-        shell_variable_error();
-        return false;
+
+    bool saved;
+    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1) {
+        return -1;
     }
-    if (!com_israw(pararray[1]))
-    {
-        fprintf(stderr, "Error: cannot parse the filename\n");
-        return false;
+    if (!com_israw(pars->next->param)) {
+        shell_error_filepar(keywordtostring(KY_SAVE), 2);
+        return -1;
     }
-    char *filename = pararray[1]->main->string;
-    printf("saving %s in the file: \"%s\".\n", params->param->main->string, filename);
+    char* filename = pars->next->param->main->string;
+    fprintf(stdout, "saving %s in the file: \"%s\".\n", pars->param->main->string, filename);
     files_save_object(objects[i], filename);
-    free(pararray);
-    return true;
+    if (saved) {
+        object_free(i);
+    }
+    return -1;
 }
 
-// Sauvegarde d'une session complète
-bool shell_save_session(com_parameters *params)
-{
-    if (com_nbparams(params) != 1)
-    {
-        shell_arguments_error();
-        return false;
+// Save the current session in a file
+int shell_save_session(com_parameters* params) {
+    if (com_nbparams(params) != 1) {
+        shell_error_nbparams(keywordtostring(KY_SAVESESSION), 1);
+        return -1;
     }
-    if (!com_israw(params->param))
-    {
-        fprintf(stderr, "Error: cannot parse the filename\n");
-        return false;
+    if (!com_israw(params->param)) {
+        shell_error_filepar(keywordtostring(KY_SAVESESSION), 1);
+        return -1;
     }
-    char *filename = params->param->main->string;
+    char* filename = params->param->main->string;
     printf("saving the session in the file: \"%s\".\n", filename);
     files_save_session(filename);
-    return false;
+    return -1;
 }
 
-// Chargement d'une session à partir d'un fichier
-bool shell_load_session(com_parameters *params)
-{
-    if (com_nbparams(params) != 1)
-    {
-        shell_arguments_error();
-        return false;
+// Loading a session from a file
+int shell_load_session(com_parameters* params) {
+    if (com_nbparams(params) != 1) {
+        shell_error_nbparams(keywordtostring(KY_LOADSESSION), 1);
+        return -1;
     }
-    if (!com_israw(params->param))
-    {
-        fprintf(stderr, "Error: cannot parse the filename\n");
-        return false;
+    if (!com_israw(params->param)) {
+        shell_error_filepar(keywordtostring(KY_LOADSESSION), 1);
+        return -1;
     }
-    char *filename = params->param->main->string;
+    char* filename = params->param->main->string;
     printf("loading the session saved in the file: \"%s\".\n", filename);
     files_load_session(filename);
-    return false;
+    return -1;
 }
 
-// Suppression d'un objet
-int shell_delete(com_parameters *params)
-{
-    if (com_nbparams(params) != 1 || !com_single(params->param))
-    {
-        shell_arguments_error();
-        return false;
+// Deleting an object
+int shell_delete(com_parameters* params) {
+    if (com_nbparams(params) != 1) {
+        shell_error_nbparams(keywordtostring(KY_DELETE), 1);
+        return -1;
     }
-    return object_delete_from_name(params->param->main->string);
+    if (!com_single(params->param) || !check_varname(params->param->main->string)) {
+        shell_error_varpar(keywordtostring(KY_DELETE), 1);
+        return -1;
+    }
+    int i = object_get_from_name(params->param->main->string);
+    if (i == -1 || !objects[i]) {
+        shell_error_unknownvar(params->param->main->string);
+        return -1;
+    }
+    object_free(i);
+    return -1;
 }
 
-// Tri des objets
-bool shell_sort(com_parameters *params)
-{
-    if (params != NULL)
-    {
-        shell_arguments_error();
+// Deletion of all objects
+int shell_delete_all(com_parameters* params) {
+    if (com_nbparams(params) != 0) {
+        shell_error_nbparams(keywordtostring(KY_CLEAR), 0);
+        return -1;
+    }
+    object_free_all();
+    return -1;
+}
+
+
+
+// Erases the names of the states of an automaton
+int shell_reset(com_parameters* params) {
+    if (com_nbparams(params) != 1) {
+        shell_error_nbparams(keywordtostring(KY_RESET), 1);
+        return -1;
+    }
+    if (!com_single(params->param) || !check_varname(params->param->main->string)) {
+        shell_error_varpar(keywordtostring(KY_RESET), 1);
+        return -1;
+    }
+    int i = object_get_from_name(params->param->main->string);
+    if (i == -1 || !objects[i]) {
+        shell_error_unknownvar(params->param->main->string);
+        return -1;
+    }
+
+    if (objects[i]->type != AUTOMATON) {
+        shell_error_autopar(keywordtostring(KY_RESET), 1);
+        return -1;
+    }
+    nfa_reset_state_names(objects[i]->nfa);
+    return -1;
+}
+
+// Calcul des transitions inverses dans un NFA
+int shell_invtrans(com_parameters* params) {
+    if (com_nbparams(params) != 1) {
+        shell_error_nbparams(keywordtostring(KY_INVTRANS), 1);
+        return -1;
+    }
+    if (!com_single(params->param) || !check_varname(params->param->main->string)) {
+        shell_error_varpar(keywordtostring(KY_INVTRANS), 1);
+        return -1;
+    }
+    int i = object_get_from_name(params->param->main->string);
+    if (i == -1 || !objects[i]) {
+        shell_error_unknownvar(params->param->main->string);
+        return -1;
+    }
+
+    if (objects[i]->type != AUTOMATON) {
+        shell_error_autopar(keywordtostring(KY_INVTRANS), 1);
         return false;
     }
-    object_sort_array();
+    parti* par = nfa_inv_ext(objects[i]->nfa);
+    delete_parti(par);
     return true;
 }
 
 // Ouverture d'un objet
-bool shell_open_object(char *varname, com_parameters *params)
-{
-    if (com_nbparams(params) != 1 || params->param->thetype != CMT_RAW)
-    {
-        shell_arguments_error();
+bool shell_open_object(char* varname, com_parameters* params) {
+    if (com_nbparams(params) != 1) {
+        shell_error_nbparams(keywordtostring(KY_OPEN), 1);
+        return -1;
+    }
+    if (params->param->thetype != CMT_RAW) {
+        shell_error_filepar(keywordtostring(KY_OPEN), 1);
         return false;
     }
-    printf("reading the file: %s\n", params->param->main->string);
     files_read_object(params->param->main->string, varname);
-    return 1;
+    return true;
 }
 
-// Calcul d'un NFA aléatoire
-bool shell_random_nfa(char *varname, com_parameters *params, bool det)
-{
-    if (com_nbparams(params) != 3)
-    {
-        shell_arguments_error();
-        return false;
+int shell_toggle_optimization(com_parameters* params) {
+    if (com_nbparams(params) != 0) {
+        shell_error_nbparams(keywordtostring(KY_TOGGLE), 0);
+        return -1;
     }
-    com_command *arg1 = params->param;
-    com_command *arg2 = params->next->param;
-    com_command *arg3 = params->next->next->param;
-    if (!com_single(arg1) || !com_single(arg2) || !com_single(arg3))
-    {
-        shell_arguments_error();
-        return false;
+    if (optimization_level == LV_FULL) {
+        optimization_level = LV_REG;
+        fprintf(stdout, "#### Optimization mode for kernels and orbits enabled.\n");
+    }
+    else {
+        optimization_level = LV_FULL;
+        fprintf(stdout, "#### Optimization mode for kernels and orbits disabled.\n");
+    }
+    return -1;
+}
+
+int shell_counterfree(com_parameters* pars) {
+    if (com_nbparams(pars) != 1) {
+        shell_error_nbparams(keywordtostring(KY_COUNTER), 1);
+        return -1;
+    }
+    bool saved;
+    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1) {
+        return -1;
+    }
+    if (objects[i]->type != AUTOMATON) {
+        shell_error_autopar(keywordtostring(KY_COUNTER), 1);
+        return -1;
     }
 
-    char *end;
-    int nb1 = strtol(arg1->main->string, &end, 10);
-    if (*end != '\0')
-    {
-        shell_arguments_error();
-        return false;
-    }
-    int nb2 = strtol(arg2->main->string, &end, 10);
-    if (*end != '\0')
-    {
-        shell_arguments_error();
-        return false;
-    }
-    int nb3 = strtol(arg3->main->string, &end, 10);
-    if (*end != '\0')
-    {
-        shell_arguments_error();
-        return false;
-    }
+    int error = 0;
 
-    if (det)
-    {
-        return object_add_automata(varname, dfa_random(nb1, nb2, nb3));
+    is_counterfree_dfa(objects[i]->nfa, &error, stdout);
+    if (error < 0) {
+        fprintf(stdout, "#### Error received while testing counter-freeness\n");
     }
-    else
-    {
-        return object_add_automata(varname, nfa_random(nb1, nb2, nb3));
+    if (saved) {
+        object_free(i);
     }
+    return -1;
+}
+
+int shell_permutation(com_parameters* pars) {
+    if (com_nbparams(pars) != 1) {
+        shell_error_nbparams(keywordtostring(KY_PERMUT), 1);
+        return -1;
+    }
+    bool saved;
+    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1) {
+        return -1;
+    }
+    if (objects[i]->type != AUTOMATON) {
+        shell_error_autopar(keywordtostring(KY_PERMUT), 1);
+        return -1;
+    }
+    is_permutation_dfa(objects[i]->nfa, stdout);
+    if (saved) {
+        object_free(i);
+    }
+    return -1;
 }
 
 /********************************************************************/
 /* Affichage - fonctions appellées par le gestionnaire de commandes */
 /********************************************************************/
 
-bool shell_view_morphism(morphism *themor, com_parameters *pars)
-{
-    if (pars)
-    {
-        shell_arguments_error();
+bool shell_view_object(object* ob, bool title) {
+    if (!ob) {
         return false;
     }
-    shell_compute_green(themor);
-    print_title_box(100, true, stdout, 1, "The morphism.");
-    view_morphism(themor->cayley, themor->green);
-    return true;
-}
-
-bool shell_view_rcayley(morphism *themor, com_parameters *pars)
-{
-    if (pars)
-    {
-        shell_arguments_error();
-        return false;
-    }
-    print_title_box(100, true, stdout, 1, "Right Cayley graph of the morphism.");
-    view_cayley(themor->cayley);
-    return true;
-}
-
-bool shell_view_lcayley(morphism *themor, com_parameters *pars)
-{
-    if (pars)
-    {
-        shell_arguments_error();
-        return false;
-    }
-    compute_left_cayley(themor->cayley);
-    print_title_box(100, true, stdout, 1, "Left Cayley graph of the morphism.");
-    view_left_cayley(themor->cayley);
-    return true;
-}
-
-bool shell_view_mormult(morphism *themor, com_parameters *pars)
-{
-    if (pars)
-    {
-        shell_arguments_error();
-        return false;
-    }
-    print_title_box(100, true, stdout, 1, "Multiplication of the morphism.");
-    shell_compute_mult(themor);
-    cayley_mult_print(themor->cayley, stdout);
-    return true;
-}
-
-bool shell_view_morder(morphism *themor, com_parameters *pars)
-{
-    if (pars)
-    {
-        shell_arguments_error();
-        return false;
-    }
-    print_title_box(100, true, stdout, 1, "Ordering of the morphism.");
-    shell_compute_order(themor);
-    cayley_print_order(themor->cayley, stdout);
-    return true;
-}
-
-bool shell_view_idems(morphism *themor, com_parameters *pars)
-{
-    if (pars)
-    {
-        shell_arguments_error();
-        return false;
-    }
-    cayley_print_idems(themor->cayley, stdout);
-    return true;
-}
-
-bool shell_view_mkernel(morphism *morp, com_parameters *pars)
-{
-    if (pars)
-    {
-        shell_arguments_error();
-        return false;
-    }
-    shell_compute_mker(morp);
-    print_title_box(100, true, stdout, 1, "MOD-kernel of the morphism.");
-    print_full_green_sub(morp->mker, false, stdout);
-    return true;
-}
-
-bool shell_view_gkernel(morphism *morp, com_parameters *pars)
-{
-    if (pars)
-    {
-        shell_arguments_error();
-        return false;
-    }
-    shell_compute_gker(morp);
-    print_title_box(100, true, stdout, 1, "GR-kernel of the morphism.");
-    print_full_green_sub(morp->gker, false, stdout);
-    return true;
-}
-
-bool shell_view_kernel(morphism *themor, com_parameters *pars)
-{
-    if (com_nbparams(pars) != 1 || !com_single(pars->param))
-    {
-        shell_arguments_error();
-        return false;
-    }
-    com_keyword class = key_from_string_chain_single(pars->param->main);
-
-    switch (class)
-    {
-    case CL_GR:
-        shell_compute_gker(themor);
-        print_title_box(100, true, stdout, 1, "GR-kernel of the morphism.");
-        print_full_green_sub(themor->gker, false, stdout);
+    switch (ob->type) {
+    case REGEXP:
+        if (title) {
+            print_title_box(100, true, stdout, 1, "Regular expression");
+        }
+        reg_print(ob->exp);
         return true;
         break;
-    case CL_MOD:
-        shell_compute_mker(themor);
-        print_title_box(100, true, stdout, 1, "MOD-kernel of the morphism.");
-        print_full_green_sub(themor->mker, false, stdout);
+    case AUTOMATON:
+        if (title) {
+            print_title_box(100, true, stdout, 1, "Automaton");
+        }
+        view_nfa(ob->nfa);
         return true;
+        break;
+    case MORPHISM:
+        if (title) {
+            print_title_box(100, true, stdout, 1, "Morphism");
+        }
+        view_morphism(ob->mor->obj, stdout);
+        /*  {
+             dequeue* test = compute_strict_minidems(ob->mor->obj, ob->mor->green);
+             for (uint i = 0; i < size_dequeue(test);i++) {
+                 mor_fprint_name_utf8(ob->mor->obj, lefread_dequeue(test, i), stdout);
+                 printf("\n");
+             }
+         } */
+        return true;
+        break;
+    case RECDEF:
+        if (title) {
+            print_title_box(100, true, stdout, 1, "Recursive definition of regular expressions");
+            shell_rec_display(ob->rec, stdout);
+        }
+        return true;
+        break;
+
+    default:
+        return false;
+        break;
+    }
+}
+
+int shell_sort(com_parameters* pars) {
+    if (com_nbparams(pars) > 1) {
+        shell_error_rangeparams(keywordtostring(KY_SORT), 0, 1);
+        return -1;
+    }
+
+    if (com_nbparams(pars) == 0) {
+        object_sort_array(object_compare);
+        return -1;
+    }
+
+    if (!com_single(pars->param)) {
+        shell_error_invalidpar(keywordtostring(KY_SORT), pars->param);
+        return -1;
+    }
+
+    switch (string_to_keyword(pars->param->main->string)) {
+    case KY_MINI:
+        object_sort_array(object_compare_mini);
+        break;
+    case KY_SYNT:
+        object_sort_array(object_compare_synt);
         break;
     default:
-        fprintf(stderr, "Error: kernels are not supported for this class.\n");
-        return false;
+        shell_error_invalidpar(keywordtostring(KY_SORT), pars->param);
         break;
     }
-    shell_arguments_error();
-    return false;
+    return -1;
 }
 
-bool shell_view_orbits(morphism *morp, com_parameters *pars)
-{
+int shell_view_rcayley(com_parameters* pars) {
+    if (com_nbparams(pars) != 1) {
+        shell_error_nbparams(keywordtostring(KY_RCAY), 1);
+        return -1;
+    }
+    bool saved;
+    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1) {
+        return -1;
+    }
+    if (objects[i]->type != MORPHISM) {
+        shell_error_morpar(keywordtostring(KY_RCAY), 1);
+        return -1;
+    }
+    print_title_box(100, true, stdout, 1, "Right Cayley graph of the morphism");
+    view_cayley(objects[i]->mor->obj);
+    if (saved) {
+        object_free(i);
+    }
+    return -1;
+}
+
+int shell_view_lcayley(com_parameters* pars) {
+    if (com_nbparams(pars) != 1) {
+        shell_error_nbparams(keywordtostring(KY_LCAY), 1);
+        return -1;
+    }
+    bool saved;
+    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1) {
+        return -1;
+    }
+    if (objects[i]->type != MORPHISM) {
+        shell_error_morpar(keywordtostring(KY_LCAY), 1);
+        return -1;
+    }
+    print_title_box(100, true, stdout, 1, "Left Cayley graph of the morphism");
+    view_left_cayley(objects[i]->mor->obj);
+    if (saved) {
+        object_free(i);
+    }
+    return -1;
+}
+
+int shell_view_mormult(com_parameters* pars) {
+    if (com_nbparams(pars) != 1) {
+        shell_error_nbparams(keywordtostring(KY_MULT), 1);
+        return -1;
+    }
+    bool saved;
+    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1) {
+        return -1;
+    }
+    if (objects[i]->type != MORPHISM) {
+        shell_error_morpar(keywordtostring(KY_MULT), 1);
+        return -1;
+    }
+    mor_compute_mult(objects[i]->mor->obj);
+    print_title_box(100, true, stdout, 1, "Multiplication table of the morphism");
+    mor_mult_print(objects[i]->mor->obj, stdout);
+    if (saved) {
+        object_free(i);
+    }
+    return -1;
+}
+
+int shell_view_morder(com_parameters* pars) {
+    if (com_nbparams(pars) != 1) {
+        shell_error_nbparams(keywordtostring(KY_ORDER), 1);
+        return -1;
+    }
+    bool saved;
+    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1) {
+        return -1;
+    }
+    if (objects[i]->type != MORPHISM) {
+        shell_error_morpar(keywordtostring(KY_ORDER), 1);
+        return -1;
+    }
+    mor_compute_order(objects[i]->mor->obj);
+    print_title_box(100, true, stdout, 1, "Ordering of the morphism.");
+    mor_print_order(objects[i]->mor->obj, stdout);
+    if (saved) {
+        object_free(i);
+    }
+    return -1;
+}
+
+int shell_view_idems(com_parameters* pars) {
+    if (com_nbparams(pars) != 1) {
+        shell_error_nbparams(keywordtostring(KY_IDEMS), 1);
+        return -1;
+    }
+    bool saved;
+    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1) {
+        return -1;
+    }
+    if (objects[i]->type != MORPHISM) {
+        shell_error_morpar(keywordtostring(KY_IDEMS), 1);
+        return -1;
+    }
+    mor_print_idems(objects[i]->mor->obj, stdout);
+    if (saved) {
+        object_free(i);
+    }
+    return -1;
+}
+
+int shell_view_mkernel(com_parameters* pars) {
+    if (com_nbparams(pars) != 1) {
+        shell_error_nbparams(keywordtostring(KY_MKER), 1);
+        return -1;
+    }
+    bool saved;
+    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1) {
+        return -1;
+    }
+    if (objects[i]->type != MORPHISM) {
+        shell_error_morpar(keywordtostring(KY_MKER), 1);
+        return -1;
+    }
+    shell_view_object(objects[i], true);
+
+    print_title_box(100, true, stdout, 1, "MOD-kernel of the morphism.");
+    print_full_subsemi(shell_compute_ker(i, KER_MOD, optimization_level), stdout);
+    if (saved) {
+        object_free(i);
+    }
+    return -1;
+}
+
+int shell_view_akernel(com_parameters* pars) {
+    if (com_nbparams(pars) != 1) {
+        shell_error_nbparams(keywordtostring(KY_AKER), 1);
+        return -1;
+    }
+    bool saved;
+    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1) {
+        return -1;
+    }
+    if (objects[i]->type != MORPHISM) {
+        shell_error_morpar(keywordtostring(KY_AKER), 1);
+        return -1;
+    }
+    shell_view_object(objects[i], true);
+
+    print_title_box(100, true, stdout, 1, "AMT-kernel of the morphism.");
+    //shell_compute_ker(i, KER_AMT, optimization_level);
+    print_full_subsemi(shell_compute_ker(i, KER_AMT, optimization_level), stdout);
+    if (saved) {
+        object_free(i);
+    }
+    return -1;
+}
+
+int shell_view_gkernel(com_parameters* pars) {
+    if (com_nbparams(pars) != 1) {
+        shell_error_nbparams(keywordtostring(KY_GKER), 1);
+        return -1;
+    }
+    bool saved;
+    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1) {
+        return -1;
+    }
+    if (objects[i]->type != MORPHISM) {
+        shell_error_morpar(keywordtostring(KY_GKER), 1);
+        return -1;
+    }
+
+    shell_view_object(objects[i], true);
+
+    print_title_box(100, true, stdout, 1, "GR-kernel of the morphism.");
+    print_full_subsemi(shell_compute_ker(i, KER_GR, optimization_level), stdout);
+    if (saved) {
+        object_free(i);
+    }
+    return -1;
+}
+
+
+static subsemi* shell_compute_orbit_aux(int i, uint e, orbits_type thetype) {
+    switch (thetype)
+    {
+    case ORB_DD:
+        return compute_one_ddorb(objects[i]->mor->obj, e);
+        break;
+    case ORB_MODP:
+        return compute_one_gplusorb(shell_compute_ker(i, KER_MOD, optimization_level), e);
+        break;
+    case ORB_AMTP:
+        return compute_one_gplusorb(shell_compute_ker(i, KER_AMT, optimization_level), e);
+        break;
+    case ORB_GRP:
+        return compute_one_gplusorb(shell_compute_ker(i, KER_GR, optimization_level), e);
+        break;
+    case ORB_PT:
+        return compute_one_ptorb(objects[i]->mor->obj, e);
+        break;
+    case ORB_BPMOD:
+        return compute_one_bpgorb(shell_compute_ker(i, KER_MOD, LV_REG), e, optimization_level);
+        break;
+    case ORB_BPAMT:
+        return compute_one_bpgorb(shell_compute_ker(i, KER_AMT, LV_REG), e, optimization_level);
+        break;
+    case ORB_BPGR:
+        return compute_one_bpgorb(shell_compute_ker(i, KER_GR, LV_REG), e, optimization_level);
+        break;
+    case ORB_BPDD:
+        return compute_one_bpgplusorb(shell_compute_orbits(i, ORB_DD, LV_REG), e, optimization_level);
+        break;
+    case ORB_BPMODP:
+        return compute_one_bpgplusorb(shell_compute_orbits(i, ORB_MODP, LV_REG), e, optimization_level);
+        break;
+    case ORB_BPAMTP:
+        return compute_one_bpgplusorb(shell_compute_orbits(i, ORB_AMTP, LV_REG), e, optimization_level);
+        break;
+    case ORB_BPGRP:
+        return compute_one_bpgplusorb(shell_compute_orbits(i, ORB_GRP, LV_REG), e, optimization_level);
+        break;
+    default:
+        break;
+    }
+    return NULL;
+}
+
+int shell_view_orbits(com_parameters* pars) {
     int n = com_nbparams(pars);
-    if (n < 1 || n > 2)
-    {
-        shell_arguments_error();
+    if (n < 2 || n > 3) {
+        shell_error_rangeparams(keywordtostring(KY_ORB), 2, 3);
+        return -1;
+    }
+
+    orbits_type thetype;
+    classes cl = command_to_class(com_getparam(pars, 0));
+
+    if (cl == CL_END) {
+        fprintf(stdout, "#### The class ");
+        print_command(com_getparam(pars, 0), stdout);
+        fprintf(stdout, " is either unknown or unsupported.\n\n");
         return false;
     }
-    com_keyword arg1 = key_from_string_chain_single(pars->param->main);
-    bool res         = false;
-    if (n == 1)
-    {
-        switch (arg1)
-        {
-        case CL_DD:
-            shell_compute_ddorbs(morp);
-            print_title_box(100, true, stdout, 1, "DD-orbits of the morphism.");
-            print_all_orbs(morp->ddorbs, "DD", stdout);
-            res = true;
-            break;
-        case CL_MODP:
-            shell_compute_mporbs(morp);
-            print_title_box(100, true, stdout, 1, "MOD⁺-orbits of the morphism.");
-            print_all_orbs(morp->mporbs, "MOD⁺", stdout);
-            res = true;
-            break;
-        case CL_AT:
-            shell_compute_atorbs(morp);
-            print_title_box(100, true, stdout, 1, "AT-orbits of the morphism.");
-            print_all_orbs(morp->atorbs, "AT", stdout);
-            res = true;
-            break;
-        default:
-            fprintf(stderr, "Error: orbits are not supported for this class.\n");
-            res = false;
-            break;
+
+    char cl_name[32];
+
+    switch (cl) {
+    case CL_DD:
+        sprintf(cl_name, "DD");
+        thetype = ORB_DD;
+        break;
+    case CL_MODP:
+        sprintf(cl_name, "MOD⁺");
+        thetype = ORB_MODP;
+        break;
+    case CL_AMTP:
+        sprintf(cl_name, "AMT⁺");
+        thetype = ORB_AMTP;
+        break;
+    case CL_GRP:
+        sprintf(cl_name, "GR⁺");
+        thetype = ORB_GRP;
+        break;
+    case CL_AT:
+        sprintf(cl_name, "AT");
+        thetype = ORB_PT;
+        break;
+    case CL_ATT:
+        sprintf(cl_name, "ATT");
+        thetype = ORB_PT;
+        break;
+    case CL_UL:
+        sprintf(cl_name, "UL");
+        thetype = ORB_PT;
+        break;
+    case CL_FLST:
+        sprintf(cl_name, "FL(ST)");
+        thetype = ORB_PT;
+        break;
+    case CL_PLST:
+        sprintf(cl_name, "PL(ST)");
+        thetype = ORB_PT;
+        break;
+    case CL_PT:
+        sprintf(cl_name, "PT");
+        thetype = ORB_PT;
+        break;
+    case CL_LT:
+        sprintf(cl_name, "LT");
+        thetype = ORB_BPDD;
+        break;
+    case CL_LTT:
+        sprintf(cl_name, "LTT");
+        thetype = ORB_BPDD;
+        break;
+    case CL_TLDD:
+        sprintf(cl_name, "TL(DD)");
+        thetype = ORB_BPDD;
+        break;
+    case CL_FLDD:
+        sprintf(cl_name, "FL(DD)");
+        thetype = ORB_BPDD;
+        break;
+    case CL_PLDD:
+        sprintf(cl_name, "PL(DD)");
+        thetype = ORB_BPDD;
+        break;
+    case CL_BPOLDD:
+        sprintf(cl_name, "BPol(DD)");
+        thetype = ORB_BPDD;
+        break;
+    case CL_TLMOD:
+        sprintf(cl_name, "TL(MOD)");
+        thetype = ORB_BPMOD;
+        break;
+    case CL_FLMOD:
+        sprintf(cl_name, "FL(MOD)");
+        thetype = ORB_BPMOD;
+        break;
+    case CL_PLMOD:
+        sprintf(cl_name, "PL(MOD)");
+        thetype = ORB_BPMOD;
+        break;
+    case CL_BPOLMOD:
+        sprintf(cl_name, "BPol(MOD)");
+        thetype = ORB_BPMOD;
+        break;
+    case CL_TLAMT:
+        sprintf(cl_name, "TL(AMT)");
+        thetype = ORB_BPAMT;
+        break;
+    case CL_FLAMT:
+        sprintf(cl_name, "FL(AMT)");
+        thetype = ORB_BPAMT;
+        break;
+    case CL_PLAMT:
+        sprintf(cl_name, "PL(AMT)");
+        thetype = ORB_BPAMT;
+        break;
+    case CL_BPOLAMT:
+        sprintf(cl_name, "BPol(AMT)");
+        thetype = ORB_BPAMT;
+        break;
+    case CL_TLMODP:
+        sprintf(cl_name, "TL(MOD⁺)");
+        thetype = ORB_BPMODP;
+        break;
+    case CL_FLMODP:
+        sprintf(cl_name, "FL(MOD⁺)");
+        thetype = ORB_BPMODP;
+        break;
+    case CL_PLMODP:
+        sprintf(cl_name, "PL(MOD⁺)");
+        thetype = ORB_BPMODP;
+        break;
+    case CL_BPOLMODP:
+        sprintf(cl_name, "BPol(MOD⁺)");
+        thetype = ORB_BPMODP;
+        break;
+    case CL_TLAMTP:
+        sprintf(cl_name, "TL(AMT⁺)");
+        thetype = ORB_BPAMTP;
+        break;
+    case CL_FLAMTP:
+        sprintf(cl_name, "FL(AMT⁺)");
+        thetype = ORB_BPAMTP;
+        break;
+    case CL_PLAMTP:
+        sprintf(cl_name, "PL(AMT⁺)");
+        thetype = ORB_BPAMTP;
+        break;
+    case CL_BPOLAMTP:
+        sprintf(cl_name, "BPol(AMT⁺)");
+        thetype = ORB_BPAMTP;
+        break;
+    case CL_TLGR:
+        sprintf(cl_name, "TL(GR)");
+        thetype = ORB_BPGR;
+        break;
+    case CL_FLGR:
+        sprintf(cl_name, "FL(GR)");
+        thetype = ORB_BPGR;
+        break;
+    case CL_PLGR:
+        sprintf(cl_name, "PL(GR)");
+        thetype = ORB_BPGR;
+        break;
+    case CL_BPOLGR:
+        sprintf(cl_name, "BPol(GR)");
+        thetype = ORB_BPGR;
+        break;
+    case CL_TLGRP:
+        sprintf(cl_name, "TL(GR⁺)");
+        thetype = ORB_BPGRP;
+        break;
+    case CL_FLGRP:
+        sprintf(cl_name, "FL(GR⁺)");
+        thetype = ORB_BPGRP;
+        break;
+    case CL_PLGRP:
+        sprintf(cl_name, "PL(GR⁺)");
+        thetype = ORB_BPGRP;
+        break;
+    case CL_BPOLGRP:
+        sprintf(cl_name, "BPol(GR⁺)");
+        thetype = ORB_BPGRP;
+        break;
+    default:
+        return -1;
+        break;
+    }
+
+    // Récupération du morphisme.
+    bool saved;
+    int i = com_apply_command(pars->next->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1) {
+        return -1;
+    }
+    if (objects[i]->type != MORPHISM) {
+        shell_error_morpar(keywordtostring(KY_ORB), 2);
+        return false;
+    }
+    //shell_view_object(objects[i], true);
+
+    char title[64];
+    sprintf(title, "%s-orbits of the morphism", cl_name);
+    print_title_box(100, true, stdout, 1, title);
+
+    if (n == 2) {
+        print_all_orbs(shell_compute_orbits(i, thetype, optimization_level), cl_name, stdout);
+    }
+    else {
+        regexp* myexp = parse_string_regexp(pars->next->next->param->main->string);
+        if (myexp->op != WORD) {
+            fprintf(stderr, "Error: Parameter 3 of the command \"%s\" has to be an idempotent of the monoid.\n", keywordtostring(KY_ORB));
+            return -1;
         }
-    }
-    else if (n == 2)
-    {
-        com_keyword arg2 = key_from_string_chain_single(pars->next->param->main);
-        switch (arg1)
-        {
-        case OP_BPOL:
-            switch (arg2)
-            {
-            case CL_ST:
-                shell_compute_atorbs(morp);
-                print_title_box(100, true, stdout, 1, "BPol(ST)-orbits of the morphism.");
-                print_all_orbs(morp->atorbs, "BPol(ST)", stdout);
-                res = true;
-                break;
-            case CL_DD:
-                shell_compute_bpddorbs(morp);
-                print_title_box(100, true, stdout, 1, "BPol(DD)-orbits of the morphism.");
-                print_all_orbs(shell_get_bpddorbs(morp), "BPol(DD)", stdout);
-                res = true;
-                break;
-            case CL_MOD:
-                shell_compute_bpmorbs(morp);
-                print_title_box(100, true, stdout, 1, "BPol(MOD)-orbits of the morphism.");
-                print_all_orbs(shell_get_bpmorbs(morp), "BPol(MOD)", stdout);
-                res = true;
-                break;
-            case CL_MODP:
-                shell_compute_bpmporbs(morp);
-                print_title_box(100, true, stdout, 1, "BPol(MOD⁺)-orbits of the morphism.");
-                print_all_orbs(shell_get_bpmporbs(morp), "BPol(MOD⁺)", stdout);
-                res = true;
-                break;
-            case CL_GR:
-                shell_compute_bpgorbs(morp);
-                print_title_box(100, true, stdout, 1, "BPol(GR)-orbits of the morphism.");
-                print_all_orbs(morp->bpgorbs, "BPol(GR)", stdout);
-                res = true;
-                break;
-            default:
-                fprintf(stderr, "Error: orbits are not supported for this class.\n");
-                res = false;
-                break;
-            }
-            break;
-        case OP_TLC:
-            switch (arg2)
-            {
-            case CL_ST:
-                shell_compute_atorbs(morp);
-                print_title_box(100, true, stdout, 1, "TL(ST)-orbits of the morphism.");
-                print_all_orbs(morp->atorbs, "TL(ST)", stdout);
-                res = true;
-                break;
-            case CL_DD:
-                shell_compute_bpddorbs(morp);
-                print_title_box(100, true, stdout, 1, "TL(DD)-orbits of the morphism.");
-                print_all_orbs(shell_get_bpddorbs(morp), "TL(DD)", stdout);
-                res = true;
-                break;
-            case CL_MOD:
-                shell_compute_bpmorbs(morp);
-                print_title_box(100, true, stdout, 1, "TL(MOD)-orbits of the morphism.");
-                print_all_orbs(shell_get_bpmorbs(morp), "TL(MOD)", stdout);
-                res = true;
-                break;
-            case CL_MODP:
-                shell_compute_bpmporbs(morp);
-                print_title_box(100, true, stdout, 1, "TL(MOD⁺)-orbits of the morphism.");
-                print_all_orbs(shell_get_bpmporbs(morp), "TL(MOD⁺)", stdout);
-                res = true;
-                break;
-            case CL_GR:
-                shell_compute_bpgorbs(morp);
-                print_title_box(100, true, stdout, 1, "TL(GR)-orbits of the morphism.");
-                print_all_orbs(morp->bpgorbs, "TL(GR)", stdout);
-                res = true;
-                break;
-            default:
-                fprintf(stderr, "Error: orbits are not supported for this class.\n");
-                res = false;
-                break;
-            }
-            break;
-        default:
-            fprintf(stderr, "Error: orbits are not supported for this operator.\n");
-            res = false;
-            break;
+        uint e = mor_compute_image(objects[i]->mor->obj, myexp->word);
+        reg_free(myexp);
+        if (e >= objects[i]->mor->obj->r_cayley->size_graph || !objects[i]->mor->obj->idem_array[e]) {
+            fprintf(stderr, "Error: Parameter 3 of the command \"%s\" has to be an idempotent of the monoid.\n", keywordtostring(KY_ORB));
+            return false;
         }
-    }
-    return res;
-}
+        subsemi* theorbit = shell_compute_orbit_aux(i, e, thetype);
 
-bool shell_view_oneorbit(morphism *morp, com_parameters *pars)
-{
-    int n = com_nbparams(pars);
-    if (n < 2 || n > 3)
-    {
-        shell_arguments_error();
-        return false;
-    }
-    com_command **pararray = com_getparamarray(pars);
+        fprintf(stdout, "#### %s-orbit of the idempotent ", cl_name);
+        mor_fprint_name_utf8(objects[i]->mor->obj, e, stdout);
+        printf(".\n");
+        print_full_subsemi(theorbit, stdout);
 
-    // Récupération du numéro de l'idempotent dont on doit afficher l'orbite.
-    if (!com_single(pararray[n - 1]))
-    {
-        shell_arguments_error();
-        return false;
-    }
-    uint i;
-    char *word = pararray[n - 1]->main->string;
-    uint s;
-    if (!cayley_elem_from_string(morp->cayley, word, &s))
-    {
-        fprintf(stdout, "Error: this word does not correspond to an element of the monoid.\n");
-        return false;
-    }
-    if (!cayley_num_idem(morp->cayley, s, &i))
-    {
-        fprintf(stdout, "Error: this is not an idempotent element.\n");
-        return false;
-    }
-    char *idemname = cayley_get_name(morp->cayley, s);
-    char message[150];
+        delete_subsemi(theorbit);
 
-    // Affichage
-    bool res         = false;
 
-    com_keyword arg1 = key_from_string_chain_single(pararray[0]->main);
 
-    if (n == 2)
-    {
-        switch (arg1)
-        {
-        case CL_DD:
-            shell_compute_ddorbs(morp);
-            sprintf(message, "DD-orbit of the idempotent %s.", idemname);
-            print_title_box(100, true, stdout, 1, message);
-            print_one_orb(morp->ddorbs, "DD", i, stdout);
-            res = true;
-            break;
-        case CL_MODP:
-            shell_compute_mporbs(morp);
-            sprintf(message, "MOD⁺-orbit of the idempotent %s.", idemname);
-            print_title_box(100, true, stdout, 1, message);
-            print_one_orb(morp->mporbs, "MOD⁺", i, stdout);
-            res = true;
-            break;
-        case CL_AT:
-            shell_compute_atorbs(morp);
-            sprintf(message, "AT-orbit of the idempotent %s.", idemname);
-            print_title_box(100, true, stdout, 1, message);
-            print_one_orb(morp->atorbs, "AT", i, stdout);
-            res = true;
-            break;
-        default:
-            fprintf(stderr, "Error: orbits are not supported for this class.\n");
-            res = false;
-            break;
-        }
-    }
-    else if (n == 3)
-    {
-        com_keyword arg2 = key_from_string_chain_single(pararray[1]->main);
-        free(pararray);
-        switch (arg1)
-        {
-        case OP_BPOL:
-            switch (arg2)
-            {
-            case CL_ST:
-                shell_compute_atorbs(morp);
-                sprintf(message, "BPol(ST)-orbit of the idempotent %s.", idemname);
-                print_title_box(100, true, stdout, 1, message);
-                print_one_orb(morp->atorbs, "BPol(ST)", i, stdout);
-                res = true;
-                break;
-            case CL_DD:
-                shell_compute_bpddorbs(morp);
-                sprintf(message, "BPol(DD)-orbit of the idempotent %s.", idemname);
-                print_title_box(100, true, stdout, 1, message);
-                print_one_orb(shell_get_bpddorbs(morp), "BPol(DD)", i, stdout);
-                res = true;
-                break;
-            case CL_MOD:
-                shell_compute_bpmorbs(morp);
-                sprintf(message, "BPol(MOD)-orbit of the idempotent %s.", idemname);
-                print_title_box(100, true, stdout, 1, message);
-                print_one_orb(shell_get_bpmorbs(morp), "BPol(MOD)", i, stdout);
-                res = true;
-                break;
-            case CL_MODP:
-                shell_compute_bpmporbs(morp);
-                sprintf(message, "BPol(MOD⁺)-orbit of the idempotent %s.", idemname);
-                print_title_box(100, true, stdout, 1, message);
-                print_one_orb(shell_get_bpmporbs(morp), "BPol(MOD⁺)", i, stdout);
-                res = true;
-                break;
-            case CL_GR:
-                shell_compute_bpgorbs(morp);
-                sprintf(message, "BPol(GR)-orbit of the idempotent %s.", idemname);
-                print_title_box(100, true, stdout, 1, message);
-                print_one_orb(morp->bpgorbs, "BPol(GR)", i, stdout);
-                res = true;
-                break;
-            default:
-                fprintf(stderr, "Error: orbits are not supported for this class.\n");
-                res = false;
-                break;
-            }
-            break;
-        case OP_TLC:
-            switch (arg2)
-            {
-            case CL_ST:
-                shell_compute_atorbs(morp);
-                sprintf(message, "TL(ST)-orbit of the idempotent %s.", idemname);
-                print_title_box(100, true, stdout, 1, message);
-                print_one_orb(morp->atorbs, "TL(ST)", i, stdout);
-                res = true;
-                break;
-            case CL_DD:
-                shell_compute_bpddorbs(morp);
-                sprintf(message, "TL(DD)-orbit of the idempotent %s.", idemname);
-                print_title_box(100, true, stdout, 1, message);
-                print_one_orb(shell_get_bpddorbs(morp), "TL(DD)", i, stdout);
-                res = true;
-                break;
-            case CL_MOD:
-                shell_compute_bpmorbs(morp);
-                sprintf(message, "TL(MOD)-orbit of the idempotent %s.", idemname);
-                print_title_box(100, true, stdout, 1, message);
-                print_one_orb(shell_get_bpmorbs(morp), "TL(MOD)", i, stdout);
-                res = true;
-                break;
-            case CL_MODP:
-                shell_compute_bpmporbs(morp);
-                sprintf(message, "TL(MOD⁺)-orbit of the idempotent %s.", idemname);
-                print_title_box(100, true, stdout, 1, message);
-                print_one_orb(shell_get_bpmporbs(morp), "TL(MOD⁺)", i, stdout);
-                res = true;
-                break;
-            case CL_GR:
-                shell_compute_bpgorbs(morp);
-                sprintf(message, "TL(GR)-orbit of the idempotent %s.", idemname);
-                print_title_box(100, true, stdout, 1, message);
-                print_one_orb(morp->bpgorbs, "TL(GR)", i, stdout);
-                res = true;
-                break;
-            default:
-                fprintf(stderr, "Error: orbits are not supported for this class.\n");
-                res = false;
-                break;
-            }
-            break;
-        default:
-            fprintf(stderr, "Error: orbits are not supported for this operator.\n");
-            res = false;
-            break;
-        }
+
+        //print_one_orb(f(i, ORB_ELEM, j), j, stdout);
     }
 
-    free(pararray);
-    free(idemname);
-    return res;
-}
-
-bool shell_compute_image(morphism *themor, com_parameters *pars)
-{
-    if (com_nbparams(pars) != 1 || !com_single(pars->param))
-    {
-        shell_arguments_error();
-        return false;
+    if (saved) {
+        object_free(i);
     }
-    cayley_print_image(themor->cayley, pars->param->main->string, stdout);
     return true;
 }
 
-bool shell_make_nfa_run(automata *aut, com_parameters *pars)
-{
-    if (com_nbparams(pars) != 1 || !com_single(pars->param))
-    {
-        shell_arguments_error();
-        return false;
+int shell_view_nfa_run(com_parameters* pars) {
+    if (com_nbparams(pars) != 2 || pars->next->param->thetype != CMT_RAW) {
+        shell_error_nbparams(keywordtostring(KY_RUN), 2);
+        return -1;
     }
-    p_vertices states = nfa_compute_runs(aut->nfa, pars->param->main->string);
-    if (states == NULL)
-    {
-        printf("Error: this is not a valid word for this automaton.\n");
-        return false;
+    // Calcul de l'automate
+    bool saved;
+    int k = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (k == -1 || objects[k]->type != AUTOMATON) {
+        shell_error_autopar(keywordtostring(KY_RUN), 1);
+        return -1;
     }
-    printf("Set of states reached: ");
-    if (isempty_vertices(states))
-    {
+
+    shell_view_object(objects[k], true);
+    nfa* A = objects[k]->nfa;
+
+    fprintf(stdout, "Running the word %s in this automaton.\n", pars->next->param->main->string);
+
+    regexp* myexp = parse_string_regexp(pars->next->param->main->string);
+    if (myexp->op != WORD) {
+        shell_error_wordpar(keywordtostring(KY_RUN), 2);
+        return -1;
+    }
+
+    dequeue* states = nfa_compute_runs(A, myexp->word);
+
+    reg_free(myexp);
+
+    if (states == NULL) {
+        fprintf(stderr, "Error: This is not a valid word for this automaton.\n");
+        return -1;
+    }
+    fprintf(stdout, "Set of states reached: ");
+    if (isempty_dequeue(states)) {
         printf("∅.\n");
     }
-    else
-    {
+    else {
         printf("{");
-        for (uint i = 0; i < size_vertices(states) - 1; i++)
-        {
-            nfa_print_name(aut->nfa, lefread_vertices(states, i), stdout);
+        for (uint i = 0; i < size_dequeue(states) - 1; i++) {
+            nfa_print_state(A, lefread_dequeue(states, i), stdout);
             printf(",");
         }
-        nfa_print_name(aut->nfa, lefread_vertices(states, size_vertices(states) - 1), stdout);
+        nfa_print_state(A, lefread_dequeue(states, size_dequeue(states) - 1), stdout);
         printf("}.\n");
     }
 
     // On teste si on a atteint un état final
     uint i = 0;
     uint j = 0;
-    while (i < size_vertices(states) && j < size_vertices(aut->nfa->finals))
-    {
-        if (lefread_vertices(states, i) == lefread_vertices(aut->nfa->finals, j))
-        {
+    while (i < size_dequeue(states) && j < size_dequeue(A->finals)) {
+        if (lefread_dequeue(states, i) == lefread_dequeue(A->finals, j)) {
             printf("The word is accepted.\n");
-            return true;
+            return -1;
         }
-        else if (lefread_vertices(states, i) < lefread_vertices(aut->nfa->finals, j))
-        {
+        else if (lefread_dequeue(states, i) < lefread_dequeue(A->finals, j)) {
             i++;
         }
-        else
-        {
+        else {
             j++;
         }
     }
     printf("The word is rejected.\n");
-    return true;
+    if (saved) {
+        object_free(k);
+    }
+    return -1;
 }
 
-/********************************************************/
-/* Test de propriétés sur les automates et les monoides */
-/********************************************************/
-
-bool shell_prop_comm(com_parameters *pars)
-{
-    if (com_nbparams(pars) != 1)
-    {
-        shell_arguments_error();
-        return false;
+int shell_view_mor_image(com_parameters* pars) {
+    if (com_nbparams(pars) != 2 || pars->next->param->thetype != CMT_RAW) {
+        shell_error_nbparams(keywordtostring(KY_IMAGE), 1);
+        return -1;
+    }
+    // Calcul de l'automate
+    bool saved;
+    int k = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (k == -1 || objects[k]->type != MORPHISM) {
+        shell_error_morpar(keywordtostring(KY_IMAGE), 1);
+        return -1;
     }
 
-    p_genob mypar = shell_genob_from_command(pars->param);
-    if (mypar == NULL)
-    {
-        fprintf(stdout, "#### Error: wrong parameter.\n");
-        return false;
-    }
-    bool result = false;
-    switch (mypar->type)
-    {
-    case OG_AUTO:
-        return dfa_is_comm(mypar->theob, stdout);
-        break;
-    case OG_MORP:
-        return is_comm_mono(mypar->theob, stdout);
-        break;
-    case OG_SUBM:
-        return is_comm_submono(mypar->theob, stdout);
-        break;
-    // case OG_ORBS:
-    // {
-    // p_orbits orbs = (p_orbits)mypar->theob;
-    // if (orbs->oneonly) {
+    shell_view_object(objects[k], true);
+    morphism* M = objects[k]->mor->obj;
 
-    // }
-    // }
-    // break;
-    default:
-        fprintf(stdout, "#### Error: comutativity can only be tested for automata and monoids.\n");
-        break;
+    fprintf(stdout, "Computing the image of the word %s by this morphism.\n", pars->next->param->main->string);
+
+    regexp* myexp = parse_string_regexp(pars->next->param->main->string);
+    if (myexp->op != WORD) {
+        shell_error_wordpar(keywordtostring(KY_IMAGE), 2);
+        return -1;
     }
-    return result;
+
+    uint s = mor_compute_image(M, myexp->word);
+
+    reg_free(myexp);
+    if (s >= M->r_cayley->size_graph) {
+        fprintf(stderr, "Error: This is not a valid word for this morphism.\n");
+        return -1;
+    }
+    fprintf(stdout, "Image: ");
+    mor_fprint_name_utf8(M, s, stdout);
+
+    // On teste si ce mot est dans le langage.
+    if (M->accept_array[s]) {
+        fprintf(stdout, "\nThe word belongs to the recognized language.\n");
+    }
+    else {
+        fprintf(stdout, "\nThe word does not belong to the recognized language.\n");
+    }
+    if (saved) {
+        object_free(k);
+    }
+    return -1;
+}
+
+int shell_jep(void) {
+    fprintf(stdout, "Please enter the number of states: ");
+    getchar();
+    return -1;
 }

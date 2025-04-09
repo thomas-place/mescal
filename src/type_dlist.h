@@ -1,68 +1,103 @@
-/***************************************************/
-/* Listes doublement chaînées d'entiers non-signés */
-/***************************************************/
+/**
+ * @file type_dlist.h
+ * @brief
+ * Implementation of doubly linked lists.
+ */
 
 #ifndef DLIST_H_
 #define DLIST_H_
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include "macros_alloc.h"
+/*  ____              _     _         _ _       _            _   _ _     _ */
+/* |  _ \  ___  _   _| |__ | |_   _  | (_)_ __ | | _____  __| | | (_)___| |_ ___
+ */
+/* | | | |/ _ \| | | | '_ \| | | | | | | | '_ \| |/ / _ \/ _` | | | / __| __/
+ * __| */
+/* | |_| | (_) | |_| | |_) | | |_| | | | | | | |   <  __/ (_| | | | \__ \ |_\__
+ * \ */
+/* |____/ \___/ \__,_|_.__/|_|\__, | |_|_|_| |_|_|\_\___|\__,_|
+ * |_|_|___/\__|___/ */
+/*                            |___/ */
+
+#include "alloc.h"
 #include "type_basic.h"
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-struct dcell
-{
+/**
+ * @brief
+ * Type used to represent a single cell inside a doubly linked list.
+ */
+typedef struct dcell {
+    uint val; //!< The value of the cell (not meaningful if the cell is a
+              //!< sentinel).
+    struct dcell *next; //!< Pointer to the next cell (NULL if this is the right
+                        //!< sentinel).
+    struct dcell *previous; //!< Pointer to the previous cell (NULL if this is
+                            //!< the left sentinel).
+} dcell;
 
-    // La valeur de la cellule (non-significatif si il s'agit d'une sentinelle).
-    uint val;
-
-    // Pointeur vers la cellule suivante
-    // NULL si il n'y a pas de cellule suivante (sentinelle droite)
-    struct dcell *next;
-
-    // Pointeur vers la cellule précédente
-    // NULL si il n'y a pas de cellule précédente (sentinelle gauche).
-    struct dcell *previous;
-};
-
-typedef struct dcell *p_dcell;
-
-typedef struct
-{
-    // la taille de la liste
-    uint size;
-
-    // Un pointeur vers la sentinelle gauche
-    p_dcell lsent;
-
-    // Un pointeur vers la sentinelle droite
-    p_dcell rsent;
-
+/**
+ * @brief
+ * Type used to represent a doubly linked list.
+ */
+typedef struct {
+    uint size;    //!< Size of the list.
+    dcell *lsent; //!< A pointer to the left sentinel.
+    dcell *rsent; //!< A pointer to the right sentinel.
 } dlist;
 
-typedef dlist *p_dlist;
+/**
+ * @brief
+ * Creation of an empty list.
+ *
+ * @return
+ * The empty list.
+ */
+dlist *create_dlist(void);
 
-/* Création d'une liste */
-p_dlist create_dlist(void);
+/**
+ * @brief
+ * Release of a list.
+ */
+void delete_dlist(dlist * //!< The list.
+);
 
-/* Suppression d'une liste */
-void delete_dlist(p_dlist);
+/**
+ * @brief
+ * Insertion of a new cell after a given one.
+ */
+void insertnext_dlist(dlist *, //!< The list.
+                      dcell *, //!< The cell.
+                      int      //!< The value of the new cell.
+);
 
-/* Récupération de la valeur d'une cellule */
-int getvalue_dlist(p_dlist, p_dcell);
+/**
+ * @brief
+ * Insertion of a new cell before a given one.
+ */
+void insertprevious_dlist(dlist *, //!< The list.
+                          dcell *, //!< The cell.
+                          int      //!< The value of the new cell.
+);
 
-/* Modification de la valeur d'une cellule */
-void modvalue_dlist(p_dlist, p_dcell, int);
+/**
+ * @brief
+ * Release of a single cell.
+ */
+void deletecell_dlist(dlist *, //!< The list.
+                      dcell *  //!< The cell.
+);
 
-/* Insertion avant/après une cellue existante */
-void insertnext_dlist(p_dlist, p_dcell, int);
-void insertprevious_dlist(p_dlist, p_dcell, int);
-
-/* Suppression d'une cellule */
-void deletecell_dlist(p_dlist, p_dcell);
-
-/* Fusion de deux listes (la second est concaténée à droite de la première) */
-void concat_dlist(p_dlist, p_dlist);
+/**
+ * @brief
+ * Merging of two lists.
+ *
+ * @remark
+ * The merge is done in the first list. The second list is released.
+ */
+void concat_dlist(dlist *, //!< The first list.
+                  dlist *  //!< The second list.
+);
 
 #endif // DLIST_H_

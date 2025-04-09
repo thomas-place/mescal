@@ -3,8 +3,8 @@
 #include <stdlib.h>
 
 #include "main.h"
-#include "macros_error.h"
-#include "macros_alloc.h"
+#include "error.h"
+#include "alloc.h"
 #include "regexp.h"
 #include "shell_commands.h"
 
@@ -16,7 +16,7 @@
 void lex_error(char *s);
 
 void lex_error(char *s){
-  fprintf(stderr,"Lexical error, token %s ignored\n", s);
+  fprintf(stderr,"Lexical error in regexp, token '%s' ignored\n", s);
 }
 
 %}
@@ -25,59 +25,111 @@ void lex_error(char *s){
 
 %option noyywrap
 
-LANGNAME [[:upper:]][[:upper:][:digit:]]*
+LANGNAME \{[[:upper:]][_[:alnum:]]*\}
 
-LETTER_SEQ [[:lower:]][[:lower:]]*
-
-STARS [#*]*[*][#*]*
+%x BRK
 
 %%
-
 
 \n return ';';
 
 [[:space:]] ;
 
-[,!+&.*#/()\\=-] {
-  return regexp_text[0];
+\\["] {
+  regexp_lval.carac = '\"';
+  return LETTER;
 }
 
-1|EPS {
+"\\ " {
+  regexp_lval.carac = ' ';
+  return LETTER;
+}
+
+"++" |
+"#" {
+  return PLUSPLUS_TOK;
+}
+
+"\[" {
+  BEGIN BRK;
+  return BRK_OPEN;
+}
+
+<BRK>"\]" {
+  BEGIN INITIAL;
+  return BRK_CLOSE;
+}
+
+"+" {
+  return PLUS_TOK;
+}
+
+
+"!"  {
+  return COMPL_TOK;
+}
+
+"&"  {
+  return INTER_TOK;
+}
+
+"*" {
+  return STAR_TOK;
+}
+
+"(" {
+  return OPEN_TOK;
+}
+
+")" {
+  return CLOSE_TOK;
+}
+
+"\\1" {
   return EPSILON_TOK;
 }
 
-0 {
+"\\0" {
   return EMPTY_TOK;
 }
 
-"["[[:lower:]]"]" {
-  regexp_lval.carac = regexp_text[1];
-  return ALPHABET;
-}
-
-{LETTER_SEQ}{STARS} {
-  regexp_lval.name = strdup(regexp_text);
-  return WORD_STAR;
-}
-
-{LETTER_SEQ}[#]+ {
-  regexp_lval.name = strdup(regexp_text);
-  return WORD_PLUS;
-}
-
-{LETTER_SEQ} {
-  regexp_lval.name = strdup(regexp_text);
-  return WORD_TOK;
-}
-
 {LANGNAME} {
-  regexp_lval.name = strdup(regexp_text);
+  regexp_text[regexp_leng-1] = 0;
+  regexp_lval.name = strdup(regexp_text + 1);
   return VARIABLE;
 }
 
-. {
-  lex_error(yytext);
+"\\"[#+!&*(){}\]\[] {
+  regexp_lval.carac = regexp_text[1];
+  return LETTER;
 }
+
+. {
+  regexp_lval.carac = regexp_text[0];
+  return LETTER;
+}
+
+<BRK>[0-9]* {
+  regexp_lval.small_int = atoi(regexp_text);
+  return INDEX;
+}
+
+<BRK>[a-z] {
+  return regexp_text[0];
+  //regexp_lval.carac = regexp_text[0];
+  //return PARAM;
+}
+
+<BRK>[-+] {
+  return regexp_text[0];
+}
+
+<BRK>[[:space:]] ;
+
+<BRK>.|\n {
+  return yytext[0];
+}
+
 
 %%
 

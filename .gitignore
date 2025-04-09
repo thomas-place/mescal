@@ -5,6 +5,9 @@ tmp/
 src/.mescal_history
 src/parse_regexp.tab.c
 src/parse_regexp.tab.h
+src/mescal
+src/parse_regexp.output
+src/parser.output
 .ccls-cache/
 .ccls
 .uncrustify

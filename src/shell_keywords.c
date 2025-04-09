@@ -1,4 +1,5 @@
 #include "shell_keywords.h"
+#include "shell_errors.h"
 #include <ctype.h>
 
 /************************/
@@ -10,12 +11,11 @@
 #define KEYWORDS_MAX 512
 uint keywords_count, strings_count;
 com_keyword keywords_keyarray[KEYWORDS_MAX];
-const char *keywords_strarray[KEYWORDS_MAX];
-const char *all_strings[KEYWORDS_MAX];
+const char* keywords_strarray[KEYWORDS_MAX];
+const char* all_strings[KEYWORDS_MAX];
 
 // Ajout d'un keyword
-void keywords_add_key(com_keyword thekey, const char *thename)
-{
+void keywords_add_key(com_keyword thekey, const char* thename) {
     keywords_keyarray[keywords_count] = thekey;
     keywords_strarray[keywords_count] = thename;
     keywords_count++;
@@ -24,204 +24,229 @@ void keywords_add_key(com_keyword thekey, const char *thename)
 }
 
 // Ajout de tous les keywords
-void keywords_add_all_keys(void)
-{
+void keywords_add_all_keys(void) {
     // Interface
-    all_strings[strings_count++] = "exit";
-    all_strings[strings_count++] = "help";
-    all_strings[strings_count++] = "automata";
-    all_strings[strings_count++] = "languages";
-    all_strings[strings_count++] = "morphisms";
+    keywords_add_key(KY_INTERFACE, "exit");
+    keywords_add_key(KY_INTERFACE, "help");
+    keywords_add_key(KY_INTERFACE, "classes");
+    keywords_add_key(KY_INTERFACE, "jep");
+    keywords_add_key(KY_INTERFACE, "timeout");
+    keywords_add_key(KY_INTERFACE, "history");
+    keywords_add_key(KY_INTERFACE, "limit");
+    keywords_add_key(KY_TOGGLE, "toggleopti");
 
-    // Mots-clés
-    // keywords_add_key(CM_COMPLEM, "comp");
-    keywords_add_key(CM_COMPLEM, "complement");
-    // keywords_add_key(CM_CONCAT, "concat");
-    keywords_add_key(CM_CONCAT, "concatenation");
-    // keywords_add_key(CM_DELETE, "del");
-    keywords_add_key(CM_DELETE, "delete");
-    // keywords_add_key(CM_DETERMIN, "det");
-    // keywords_add_key(CM_DETERMIN, "deter");
-    keywords_add_key(CM_DETERMIN, "determinization");
-    // keywords_add_key(CM_ELIMEPS, "elimeps");
-    keywords_add_key(CM_ELIMEPS, "elimepsilon");
-    keywords_add_key(CM_FPHIERA, "fphiera");
-    // keywords_add_key(CM_GKERNEL, "gker");
-    keywords_add_key(CM_GKERNEL, "gkernel");
-    keywords_add_key(CM_GREEN, "green");
-    keywords_add_key(CM_IDEMS, "idempotents");
-    // keywords_add_key(CM_IDEMS, "idems");
-    keywords_add_key(CM_IMAGE, "image");
-    keywords_add_key(CM_INFO, "info");
-    // keywords_add_key(CM_INTERSEC, "inter");
-    keywords_add_key(CM_INTERSEC, "intersection");
-    // keywords_add_key(CM_KERNEL, "ker");
-    keywords_add_key(CM_KERNEL, "kernel");
-    keywords_add_key(CM_KLEENE, "kleene");
-    // keywords_add_key(CM_LCAY, "lcay");
-    keywords_add_key(CM_LCAY, "lcayley");
-    keywords_add_key(CM_LINK, "link");
-    keywords_add_key(CM_LOADSESSION, "loadsession");
-    // keywords_add_key(CM_MEMB, "memb");
-    keywords_add_key(CM_MEMB, "membership");
-    keywords_add_key(CM_MINI, "minimal");
-    // keywords_add_key(CM_MKERNEL, "mker");
-    keywords_add_key(CM_MKERNEL, "mkernel");
-    // keywords_add_key(CM_MULT, "mult");
-    keywords_add_key(CM_MULT, "multiplication");
-    keywords_add_key(CM_NEGHIERA, "neghiera");
-    keywords_add_key(CM_OPEN, "open");
-    // keywords_add_key(CM_ORBIT, "orb");
-    keywords_add_key(CM_ORBIT, "orbit");
-    keywords_add_key(CM_ORBITS, "orbits");
-    // keywords_add_key(CM_ORBITS, "orbs");
-    keywords_add_key(CM_ORDER, "order");
-    // keywords_add_key(CM_RCAY, "rcay");
-    keywords_add_key(CM_RCAY, "rcayley");
-    keywords_add_key(CM_RDFA, "rdfa");
-    keywords_add_key(CM_RECDEF, "recdef");
-    keywords_add_key(CM_RNFA, "rnfa");
-    keywords_add_key(CM_RUN, "run");
-    keywords_add_key(CM_SAVE, "save");
-    keywords_add_key(CM_SAVESESSION, "savesession");
-    // keywords_add_key(CM_SEPAR, "separ");
-    keywords_add_key(CM_SEPAR, "separation");
-    keywords_add_key(CM_SORT, "sort");
-    keywords_add_key(CM_SYNT, "syntactic");
-    // keywords_add_key(CM_THOMSON, "thom");
-    keywords_add_key(CM_THOMSON, "thomson");
-    keywords_add_key(CM_TRIMNFA, "trim");
-    keywords_add_key(CM_UNION, "union");
+    // Commandes sauvegarde et chargement
+    keywords_add_key(KY_LOADSESSION, "loadsession");
+    keywords_add_key(KY_SAVESESSION, "savesession");
+    keywords_add_key(KY_SAVE, "save");
+    keywords_add_key(KY_OPEN, "open");
+    keywords_add_key(KY_DELETE, "delete");
+    keywords_add_key(KY_CLEAR, "clear");
+    keywords_add_key(KY_SORT, "sort");
+    keywords_add_key(KY_INFO, "info");
+    keywords_add_key(KY_EXSEARCH, "exsearch");
+    keywords_add_key(KY_EXALL, "exall");
+    keywords_add_key(KY_INSIDE, "in");
+    keywords_add_key(KY_OUTSIDE, "out");
+    keywords_add_key(KY_LIST, "list");
+    keywords_add_key(KY_AUTOMATA, "automata");
+    keywords_add_key(KY_MORPHISMS, "morphisms");
+    keywords_add_key(KY_GROUPS, "groups");
+    keywords_add_key(KY_REGEXPS, "regexps");
+    keywords_add_key(KY_RECDEFS, "recdefs");
 
-    // Props
-    keywords_add_key(PR_COMM, "comm");
+    keywords_add_key(KY_FILTER, "filter");
+    keywords_add_key(KY_FMSIZE, "sizesynt");
+
+    // Commandes automates
+
+    keywords_add_key(KY_COMPLEM, "complement");
+    keywords_add_key(KY_INTERSEC, "intersection");
+    keywords_add_key(KY_KLEENE, "kleene");
+    keywords_add_key(KY_MINI, "minimal");
+    keywords_add_key(KY_RUN, "run");
+    keywords_add_key(KY_ELIMEPS, "elimepsilon");
+    keywords_add_key(KY_THOMPSON, "thompson");
+    keywords_add_key(KY_GLUSHKOV, "glushkov");
+    keywords_add_key(KY_HOPCROFT, "hopcroft");
+    keywords_add_key(KY_BRZOZO, "brzozowski");
+    keywords_add_key(KY_BMCK, "mccluskey");
+    keywords_add_key(KY_TRIMNFA, "trim");
+    keywords_add_key(KY_CONCAT, "concatenation");
+    keywords_add_key(KY_RESET, "resetnames");
+    keywords_add_key(KY_UNION, "union");
+    keywords_add_key(KY_MIRROR, "mirror");
+    keywords_add_key(KY_INVTRANS, "iextension");
+    keywords_add_key(KY_DYCKTRANS, "dyckextension");
+    keywords_add_key(KY_PERMUT, "permutation");
+    keywords_add_key(KY_COUNTER, "counterfree");
+    keywords_add_key(KY_RNFA, "nfarandom");
+    keywords_add_key(KY_RDFA, "dfarandom");
+
+    // Commandes morphismes
+    keywords_add_key(KY_SYNT, "syntactic");
+    keywords_add_key(KY_IMAGE, "image");
+    keywords_add_key(KY_LCAY, "lcayley");
+    keywords_add_key(KY_RCAY, "rcayley");
+    keywords_add_key(KY_ORDER, "order");
+    keywords_add_key(KY_IDEMS, "idempotents");
+    keywords_add_key(KY_MULT, "multiplication");
+    keywords_add_key(KY_MKER, "mkernel");
+    keywords_add_key(KY_GKER, "gkernel");
+    keywords_add_key(KY_AKER, "akernel");
+    keywords_add_key(KY_ORB, "orbit");
+
+    keywords_add_key(KY_RECINIT, "initrecursion");
+
+    // Tests
+    keywords_add_key(KY_SEPAR, "separation");
+    keywords_add_key(KY_MEMB, "membership");
+    keywords_add_key(KY_CHIERA, "chierarchies");
+    keywords_add_key(KY_NHIERA, "nhierarchies");
+    keywords_add_key(KY_FPHIERA, "fphierarchies");
 
     // Classes
-    keywords_add_key(CL_AT, "AT");
-    keywords_add_key(CL_ATT, "ATT");
-    keywords_add_key(CL_SF, "SF");
-    keywords_add_key(CL_UL, "UL");
-    keywords_add_key(CL_PPT, "PPT");
-    keywords_add_key(CL_PT, "PT");
-    keywords_add_key(CL_LT, "LT");
-    keywords_add_key(CL_LTT, "LTT");
-    keywords_add_key(CL_ST, "ST");
-    keywords_add_key(CL_DD, "DD");
-    keywords_add_key(CL_MOD, "MOD");
-    keywords_add_key(CL_MODP, "MODP");
-    keywords_add_key(CL_AMT, "AMT");
-    keywords_add_key(CL_GR, "GR");
+    keywords_add_key(KY_AT, "AT");
+    keywords_add_key(KY_ATT, "ATT");
+    keywords_add_key(KY_SF, "SF");
+    keywords_add_key(KY_UL, "UL");
+    keywords_add_key(KY_PPT, "PPT");
+    keywords_add_key(KY_PT, "PT");
+    keywords_add_key(KY_LT, "LT");
+    keywords_add_key(KY_LTT, "LTT");
+    keywords_add_key(KY_ST, "ST");
+    keywords_add_key(KY_DD, "DD");
+    keywords_add_key(KY_MOD, "MOD");
+    keywords_add_key(KY_MODP, "MODP");
+    keywords_add_key(KY_AMT, "AMT");
+    keywords_add_key(KY_AMTP, "AMTP");
+    keywords_add_key(KY_GR, "GR");
+    keywords_add_key(KY_GRP, "GRP");
+    keywords_add_key(KY_REG, "REG");
+    keywords_add_key(KY_KNASTAT, "KNASTAT");
 
     // Opérateurs
-    keywords_add_key(OP_POL, "POL");
-    keywords_add_key(OP_POL2, "POL2");
-    keywords_add_key(OP_BPOL, "BPOL");
-    keywords_add_key(OP_BPOL2, "BPOL2");
-    keywords_add_key(OP_UBPOL, "UBPOL");
-    keywords_add_key(OP_UBPOL2, "UBPOL2");
-    keywords_add_key(OP_UPOL, "UPOL");
-    keywords_add_key(OP_LPOL, "LPOL");
-    keywords_add_key(OP_RPOL, "RPOL");
-    keywords_add_key(OP_MPOL, "MPOL");
-    keywords_add_key(OP_SFC, "SFC");
-    keywords_add_key(OP_TLC, "TL");
-    keywords_add_key(OP_TLC2, "TL2");
-    keywords_add_key(OP_FLC, "FL");
-    keywords_add_key(OP_FLC2, "FL2");
-    keywords_add_key(OP_PLC, "PL");
-    keywords_add_key(OP_PLC2, "PL2");
+    keywords_add_key(KY_POL, "POL");
+    keywords_add_key(KY_POL2, "POL2");
+    keywords_add_key(KY_BPOL, "BPOL");
+    keywords_add_key(KY_BPOL2, "BPOL2");
+    keywords_add_key(KY_UBPOL, "UBPOL");
+    keywords_add_key(KY_UBPOL2, "UBPOL2");
+    keywords_add_key(KY_UPOL, "UPOL");
+    keywords_add_key(KY_LPOL, "LPOL");
+    keywords_add_key(KY_RPOL, "RPOL");
+    keywords_add_key(KY_MPOL, "MPOL");
+    keywords_add_key(KY_TLC, "TL");
+    keywords_add_key(KY_TLC2, "TL2");
+    keywords_add_key(KY_FLC, "FL");
+    keywords_add_key(KY_FLC2, "FL2");
+    keywords_add_key(KY_PLC, "PL");
+    keywords_add_key(KY_PLC2, "PL2");
+    keywords_add_key(KY_JORB, "JORB");
 
     all_strings[keywords_count] = NULL;
 }
 
-/********************************/
-/* Messages d'érreur génériques */
-/********************************/
+/****************************/
+/* Generic display commands */
+/****************************/
 
-// Commande invalide
-void shell_command_error(void)
-{
-    fprintf(stderr, "Error: this is not a valid command.\n");
+void print_string_chain(const string_chain* thechain, FILE* out) {
+    if (!thechain) {
+        fprintf(out, "NULL");
+        return;
+    }
+
+    fprintf(out, "%s", thechain->string);
+    thechain = thechain->next;
+    while (thechain) {
+        fprintf(out, ".%s", thechain->string);
+        thechain = thechain->next;
+    }
 }
 
-// Arguments invalides
-void shell_arguments_error(void)
-{
-    fprintf(stderr, "Error: these are not valid arguments.\n");
-}
+void print_command(com_command* thecom, FILE* out) {
+    if (!thecom) {
+        fprintf(out, "NULL");
+        return;
+    }
+    com_parameters* pars;
+    switch (thecom->thetype) {
+    case CMT_RAW:
+        fprintf(out, "\"%s\"", thecom->main->string);
+        return;
+        break;
+    case CMT_IND:
+        print_string_chain(thecom->main, out);
+        fprintf(out, "[%d]", thecom->ind);
+        return;
+    case CMT_KEY:
+        print_string_chain(thecom->main, out);
+        if (com_nbparams(thecom->params) == 0) {
+            return;
+        }
+        pars = thecom->params;
+        fprintf(out, "(");
+        print_command(pars->param, out);
+        for (int i = 1; i < com_nbparams(thecom->params); i++) {
+            pars = pars->next;
+            fprintf(out, ",");
+            print_command(pars->param, out);
+        }
+        fprintf(out, ")");
+        return;
+        break;
 
-// Variable inconnue
-void shell_variable_error(void)
-{
-    fprintf(stderr, "Error: unknown variable.\n");
+    default:
+        break;
+    }
 }
 
 /**************************************/
 /* Conversion d'une chaîne en élement */
 /**************************************/
 
-static bool keywords_comp_chain(const char *s, const char *slow)
-{
+static bool keywords_comp_chain(const char* s, const char* slow) {
     uint len = strlen(s);
-    if (strlen(s) != strlen(slow))
-    {
+    if (strlen(s) != strlen(slow)) {
         return false;
     }
 
-    for (uint i = 0; i < len; i++)
-    {
-        if (tolower(s[i]) != tolower(slow[i]))
-        {
+    for (uint i = 0; i < len; i++) {
+        if (tolower(s[i]) != tolower(slow[i])) {
             return false;
         }
     }
-    // if (!(('a' <= s[i] && s[i] <= 'z') || ('0' <= s[i] && s[i] <= '9') ||
-    // ('A' <= s[i] && s[i] <= 'Z')))
-    // return false;
-    // else if ((('a' <= s[i] && s[i] <= 'z') || ('0' <= s[i] && s[i] <= '9'))
-    // && s[i] != slow[i])
-    // return false;
-    // else if (('A' <= s[i] && s[i] <= 'Z') && s[i] - 'A' + 'a' != slow[i])
-    // return false;
+
     return true;
 }
 
-com_keyword string_to_keyword(char *s)
-{
-    for (uint i = 0; i < keywords_count; i++)
-    {
-        if (keywords_comp_chain(s, keywords_strarray[i]))
-        {
+const char* keywordtostring(com_keyword key) {
+    for (uint i = 0; i < keywords_count; i++) {
+        if (keywords_keyarray[i] == key) {
+            return keywords_strarray[i];
+        }
+    }
+    return NULL;
+}
+
+com_keyword string_to_keyword(const char* s) {
+    for (uint i = 0; i < keywords_count; i++) {
+        if (keywords_comp_chain(s, keywords_strarray[i])) {
             return keywords_keyarray[i];
         }
     }
     return KY_NULL;
 }
 
-// Fonction qui teste si un nom de variable est autorisé
-// Est-ce qu'on évite les keywords ?
-// Est-ce que la première lettre est bien une majuscule ?
-// Est-ce que ce n'est pas une variable protégée?
-bool check_varname(char *name)
-{
-    if (name == NULL || name[0] < 'A' || name[0] > 'Z')
-    {
-        fprintf(stderr, "Error: a variable name must start with an upper case letter.\n");
+bool check_varname(const char* name) {
+    if (name == NULL || name[0] < 'A' || name[0] > 'Z') {
         return false;
     }
-    for (uint i = 0; i < keywords_count; i++)
-    {
-        if (keywords_comp_chain(name, keywords_strarray[i]))
-        {
-            fprintf(stderr, "Error: this variable name is disallowed.\n");
+    for (uint i = 0; i < keywords_count; i++) {
+        if (keywords_comp_chain(name, keywords_strarray[i])) {
             return false;
         }
-    }
-    int i = object_get_from_name(name);
-    if (i != -1 && objects[i]->parent != -1)
-    {
-        fprintf(stderr, "Error: cannot overwrite a protected variable.\n");
-        return false;
     }
     return true;
 }
@@ -230,159 +255,131 @@ bool check_varname(char *name)
 /* Informations sur une commande */
 /*********************************/
 
-// Teste si une commande est constituée d'un maillon correspondant à une chaîne
-// brute
-bool com_israw(com_command *thecom)
-{
-    if (thecom == NULL || thecom->main == NULL || thecom->main->next != NULL ||
-        thecom->params != NULL || thecom->thetype != CMT_RAW)
-    {
+bool com_isclass(com_command* thecom) {
+    if (!thecom || thecom->thetype != CMT_KEY || thecom->main->next) {
+        return false;
+    }
+    com_keyword key = key_from_string_chain_single(thecom->main);
+    if (com_nbparams(thecom->params) == 0) {
+        switch (key) {
+        case KY_AT:
+        case KY_ATT:
+        case KY_SF:
+        case KY_UL:
+        case KY_TLC:
+        case KY_TLX:
+        case KY_PPT:
+        case KY_PT:
+        case KY_LT:
+        case KY_LTT:
+        case KY_ST:
+        case KY_DD:
+        case KY_MOD:
+        case KY_MODP:
+        case KY_AMT:
+        case KY_GR:
+        case KY_GRP:
+            return true;
+            break;
+        default:
+            return false;
+            break;
+        }
+    }
+
+    if (com_nbparams(thecom->params) == 1) {
+        switch (key) {
+        case KY_POL:
+        case KY_POL2:
+        case KY_BPOL:
+        case KY_BPOL2:
+        case KY_UBPOL:
+        case KY_UBPOL2:
+        case KY_UPOL:
+        case KY_LPOL:
+        case KY_RPOL:
+        case KY_MPOL:
+        case KY_TLC:
+        case KY_TLC2:
+        case KY_FLC:
+        case KY_FLC2:
+        case KY_PLC:
+        case KY_PLC2:
+            return com_isclass(thecom->params->param);
+            break;
+        default:
+            return false;
+            break;
+        }
+    }
+    return false;
+}
+
+bool com_israw(const com_command* thecom) {
+    if (thecom == NULL || thecom->main == NULL || thecom->main->next != NULL || thecom->params != NULL || thecom->thetype != CMT_RAW) {
         return false;
     }
     return true;
 }
 
-// Teste si une commande est constituée d'un maillon unique SANS paramètres
-bool com_single(com_command *thecom)
-{
-    if (thecom == NULL || thecom->main == NULL || thecom->main->next != NULL ||
-        thecom->params != NULL)
-    {
+bool com_single(const com_command* thecom) {
+    if (thecom == NULL || thecom->main == NULL || thecom->main->next != NULL || (thecom->params != NULL && thecom->params->count != 0)) {
         return false;
     }
     return true;
 }
 
-// Teste si une commande est constituée d'un maillon unique avec ou sans
-// paramètres
-bool com_single_par(com_command *thecom)
-{
-    if (thecom == NULL || thecom->main == NULL || thecom->main->next != NULL)
-    {
+bool com_single_par(const com_command* thecom) {
+    if (thecom == NULL || thecom->main == NULL || thecom->main->next != NULL) {
         return false;
     }
     return true;
 }
 
-// Récupération du nombre de paramètres d'une commande
-int com_nbparams(com_parameters *thepar)
-{
+int com_nbparams(const com_parameters* thepar) {
     int res = 0;
-    while (thepar != NULL)
-    {
+    while (thepar != NULL) {
         thepar = thepar->next;
         res++;
     }
     return res;
 }
 
-// Retourne le tableau des paramètres d'une commande
-com_command **com_getparamarray(com_parameters *thepar)
-{
-    com_command **array = NULL;
-    int n               = com_nbparams(thepar);
-    if (n != 0)
-    {
-        MALLOC(array, n);
-        for (int i = 0; i < n; i++)
-        {
-            array[i] = thepar->param;
-            thepar   = thepar->next;
-        }
+com_command* com_getparam(const com_parameters* thepar, int n) {
+    if (thepar == NULL) {
+        return NULL;
     }
-    return array;
-}
 
-// Récupération du nième paramètre d'une commande (qui est lui-même une
-// commande)
-com_command *com_getparam(com_parameters *thepar, int n)
-{
-    if (thepar == NULL)
-    {
+    if (thepar->count <= n) {
         return NULL;
     }
-    if (thepar->count <= n)
-    {
-        return NULL;
-    }
-    while (n > 0)
-    {
+
+    while (n > 0) {
         thepar = thepar->next;
         n--;
     }
+
     return thepar->param;
-}
-
-// Retourne l'index de l'objet désigné par une chaîne (-1 si il n'y en a pas)
-int index_from_string_chain(string_chain *thechain)
-{
-    if (thechain == NULL)
-    {
-        return -1;
-    }
-    int i = object_get_from_name(thechain->string);
-    if (i == -1)
-    {
-        return -1;
-    }
-    string_chain *temp = thechain->next;
-    while (temp)
-    {
-        com_keyword key = string_to_keyword(temp->string);
-
-        switch (key)
-        {
-        case CM_MINI:
-            if (objects[i]->type != LANGUAGE)
-            {
-                return -1;
-            }
-            shell_compute_minimal(i);
-            i    = objects[i]->theob.lan->minauto;
-            temp = temp->next;
-            break;
-        case CM_SYNT:
-            if (objects[i]->type != LANGUAGE)
-            {
-                return -1;
-            }
-            shell_compute_syntac(i);
-            i    = objects[i]->theob.lan->syntmor;
-            temp = temp->next;
-            break;
-
-        default:
-            return -1;
-            break;
-        }
-    }
-    return i;
 }
 
 // Retourne le mot-clé associé au premier maillon d'une chaîne (KY_NULL si il
 // n'y en a pas)
-com_keyword key_from_string_chain(string_chain *thechain)
-{
-    if (thechain == NULL)
-    {
+com_keyword key_from_string_chain(const string_chain* thechain) {
+    if (thechain == NULL) {
         return KY_NULL;
     }
-    else
-    {
+    else {
         return string_to_keyword(thechain->string);
     }
 }
 
 // Retourne le mot-clé associé à une chaîne d'un seul maillon (KY_NULL si il n'y
 // en a pas ou si il y a plus d'un maillon)
-com_keyword key_from_string_chain_single(string_chain *thechain)
-{
-    if (thechain == NULL || thechain->next != NULL)
-    {
+com_keyword key_from_string_chain_single(const string_chain* thechain) {
+    if (thechain == NULL || thechain->next != NULL) {
         return KY_NULL;
     }
-    else
-    {
+    else {
         return string_to_keyword(thechain->string);
     }
 }
@@ -391,99 +388,108 @@ com_keyword key_from_string_chain_single(string_chain *thechain)
 /* Récupération d'une commande */
 /*******************************/
 
-string_chain *com_make_string_chain(char *s, string_chain *thechain)
-{
-    string_chain *new;
+string_chain* com_make_string_chain(char* s, string_chain* thechain) {
+    string_chain* new;
     MALLOC(new, 1);
     new->string = s;
-    new->next   = thechain;
+    new->next = thechain;
     return new;
 }
 
-com_parameters *com_make_parameters(com_command *theparam, com_parameters *params)
-{
-    com_parameters *new;
+com_parameters* com_make_parameters(com_command* theparam, com_parameters* params) {
+    com_parameters* new;
     MALLOC(new, 1);
-    if (params)
-    {
+    if (params) {
         new->count = params->count + 1;
     }
-    else
-    {
+    else {
         new->count = 1;
     }
-    new->next  = params;
+    new->next = params;
     new->param = theparam;
     return new;
 }
 
-com_command *com_make_command(char *s, com_command *thecom)
-{
-    string_chain *new;
+com_command* com_make_command(char* s, com_command* thecom) {
+    if (!thecom) {
+        free(s);
+        return NULL;
+    }
+    string_chain* new;
     MALLOC(new, 1);
-    new->string  = s;
-    new->next    = thecom->main;
+    new->string = s;
+    new->next = thecom->main;
     thecom->main = new;
     return thecom;
 }
 
-com_command *com_init_command(char *s, com_parameters *params)
-{
-    string_chain *new;
+com_command* com_init_command(char* s, com_parameters* params) {
+    string_chain* new;
     MALLOC(new, 1);
     new->string = s;
-    new->next   = NULL;
-    com_command *thecom;
+    new->next = NULL;
+    com_command* thecom;
     MALLOC(thecom, 1);
     thecom->thetype = CMT_KEY;
-    thecom->params  = params;
-    thecom->main    = new;
+    thecom->params = params;
+    thecom->main = new;
     return thecom;
 }
 
-com_command *com_init_rawcommand(char *s)
-{
-    string_chain *new;
+com_command* com_init_rawcommand(char* s) {
+    string_chain* new;
     MALLOC(new, 1);
     new->string = s;
-    new->next   = NULL;
-    com_command *thecom;
+    new->next = NULL;
+    com_command* thecom;
     MALLOC(thecom, 1);
     thecom->thetype = CMT_RAW;
-    thecom->params  = NULL;
-    thecom->main    = new;
+    thecom->params = NULL;
+    thecom->main = new;
     return thecom;
 }
 
-//
-void com_free_string_chain(string_chain *thechain)
-{
-    if (thechain)
-    {
+com_command* com_init_indexing(char* s, char* num) {
+    char* end;
+    uint ind = strtol(num, &end, 10);
+    if (*end != '\0') {
+        free(s);
+        free(num);
+        return NULL;
+    }
+    string_chain* new;
+    MALLOC(new, 1);
+    new->string = s;
+    new->next = NULL;
+    com_command* thecom;
+    MALLOC(thecom, 1);
+    thecom->main = new;
+    thecom->thetype = CMT_IND;
+    thecom->ind = ind;
+    thecom->params = NULL;
+    return thecom;
+}
+
+void com_free_string_chain(string_chain* thechain) {
+    if (thechain) {
         com_free_string_chain(thechain->next);
         free(thechain->string);
         free(thechain);
     }
 }
 
-void com_free_parameters(com_parameters *params)
-{
-    if (params)
-    {
+void com_free_parameters(com_parameters* params) {
+    if (params) {
         com_free_parameters(params->next);
         com_free_command(params->param);
         free(params);
     }
 }
 
-void com_free_command(com_command *thecom)
-{
-    if (thecom)
-    {
+void com_free_command(com_command* thecom) {
+    if (thecom) {
         com_free_string_chain(thecom->main);
         com_free_parameters(thecom->params);
         free(thecom);
     }
 }
-
-//

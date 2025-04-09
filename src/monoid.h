@@ -1,9 +1,21 @@
-/****************/
-/* Type monoide */
-/****************/
+/**
+ * @file monoid.h
+ *
+ * @brief
+ * Implementation of morphisms into finite monoids.
+ *
+ * @details
+ * Contains the definition of the types "green" and "morphism".
+ * The type "green" is used to represent the Green relations of a finite monoid.
+ * The type "morphism" is used to represent a morphism into a finite monoid (it
+ * includes the Green relations of this monoid).
+ * Includes the functions used to create new morphisms and their Green relations
+ * from a complete DFA as well as the function manipulating morphisms.
+ *
+ */
 
-#ifndef MONOID
-#define MONOID
+#ifndef _MONOID_H_
+#define _MONOID_H_
 
 #ifndef max
 #define max(a, b) (((a) > (b)) ? (a) : (b))
@@ -13,183 +25,411 @@
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #endif
 
-#include <stdbool.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include "tools.h"
-#include "type_basic.h"
-#include "type_stack.h"
-#include "type_binheap.h"
-#include "type_dequeue.h"
-#include "type_abr.h"
 #include "graphs.h"
 #include "nfa.h"
+#include "tools.h"
+#include "type_abr.h"
+#include "type_basic.h"
+#include "type_binheap.h"
+#include "type_dequeue.h"
+#include "type_dequeue_gen.h"
+#include "graphs_tarjan.h"
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
 
-// 0 nous servira d'élément neutre
+ /*  __  __                   _     _                       _  */
+ /* |  \/  | ___  _ __   ___ (_) __| |___    __ _ _ __   __| | */
+ /* | |\/| |/ _ \| '_ \ / _ \| |/ _` / __|  / _` | '_ \ / _` | */
+ /* | |  | | (_) | | | | (_) | | (_| \__ \ | (_| | | | | (_| | */
+ /* |_|  |_|\___/|_| |_|\___/|_|\__,_|___/  \__,_|_| |_|\__,_| */
+ /*  _ __ ___   ___  _ __ _ __ | |__ (_)___ _ __ ___  ___      */
+ /* | '_ ` _ \ / _ \| '__| '_ \| '_ \| / __| '_ ` _ \/ __|     */
+ /* | | | | | | (_) | |  | |_) | | | | \__ \ | | | | \__ \     */
+ /* |_| |_| |_|\___/|_|  | .__/|_| |_|_|___/_| |_| |_|___/     */
+ /*                      |_|                                   */
+
+ /**
+  * @brief
+  * In every monoid, the neutral element is at index 0.
+  */
 #define ONE 0
 
-// Représentation d'un morphisme dans une monoide sous la forme d'un graph de Cayley
+  /**
+    * @brief
+    * Type used to represent the Green relations of a finite monoid.
+    */
 typedef struct {
-    /* Champs obligatoires (toujours calculé en même temps que le cayley graph) */
 
-    // Le graphe (Right cayley graph)
-    p_dgraph trans;
+    /* Partitions */
+    parti* JCL;            //!< J-classes.
+    parti* LCL;            //!< L-classes.
+    parti* RCL;            //!< R-classes.
+    parti* HCL;            //!< H-classes.
 
-    // Liste des idempotents (triée par ordre croissant)
-    p_vertices idem_list;
+    /* Informations on regular elements */
+    uint nb_regular_jcl;   //!< Number of regular J-classes.
+    uint nb_regular_elems; //!< Number of regular elements.
+    uint* regular_idems;   //!< Array indexed by the regular J-classes (sorted in topological order). Associates a member idempotent to each of them (the one with the least index).
+    bool* regular_set;     //!< Array of Booleans indexed by the elements of the monoid. Marks the regular elements.
 
-    // Tableau de Booléens qui marque les idempotents
-    bool* idem_array;
-
-    // La liste des éléments de l'ensemble acceptant
-    p_vertices accept_list;
-
-    // Tableau de Booléens qui marque les élements acceptant
-    bool* accept_array;
-
-    // Les noms des éléments
-    p_vertices* names;
-
-    // Éventuelle lettre neutre (0 si il n'y a pas de telle lettre)
-    char neutlet;
-
-    /* Champs optionnels (NULL si pas encore calculés) */
-
-    // Le graph symmétrique (Left cayley graph)
-    p_dgraph leftgraph;
-
-    // La table de multiplication
-    uint** mult;
-
-    // L'ordre (NULL si pas calculé)
-    // Le tableau est de la taille du monoide
-    // order[q] contient la liste des éléments plus grands que q
-    p_vertices* order;
-} cayley;
-
-typedef cayley* p_cayley;
-
-// Taille maximale d'un nom (pour l'affichage)
-#define NAMELEN 5000
-
-/*****************************************/
-/* Fonctions génériques pour l'affichage */
-/*****************************************/
-
-// Retourne une chaîne de caractères correspondant au nom d'un élément
-char* cayley_get_name(p_cayley M, uint elem);
-
-// // Retourne une chaîne de caractères correspondant au nom d'un élément (factorisation des puissances)
-// char* cayley_get_name_short(p_cayley M, uint elem);
-
-// Affichage du nom de l'élément q (retourne la longueur utilisée)
-uint cayley_print_name(p_cayley M, uint elem, FILE* out);
-
-// Affichage du nom de l'élément q, version alignée
-// On utilise exactement size caractère en ajoutant des espaces (size doit être suffisament grand)
-void cayley_print_name_aligned(p_cayley M, uint elem, uint size, FILE* out);
-
-// Récupération de la longueur maximale d'un nom parmi un sous-ensemble (si le deuxième argument est NULL,
-// la fonction s'applique à tout les éléments du monoide)
-uint cayley_max_name_size(p_cayley M, p_vertices sub);
-
-// Affichage d'un sous-ensemble d'éléments dans un cayley graph
-void print_sub_cayley(p_cayley, p_vertices, FILE*);
-
-// Affichage d'un sous-ensemble d'éléments dans un cayley graph dans une boite partielle
-// L'alignement est automatique
-void print_sub_cayley_aligned(p_cayley, p_vertices, uint length, uint padding, FILE*);
-
-// Affichage d'un sous-ensemble d'éléments dans un cayley graph dans une boite complète
-// avec un titre (utilise la fonction précédente)
-void print_sub_cayley_titled(p_cayley, p_vertices, uint length, char* name, FILE*);
-
-// Affichage des images de toutes les lettres
-void cayley_print_morphism(p_cayley, FILE*);
+    /* Information on groups */
+    bool* group_set;     //!< Array of Booleans indexed by the elements of the monoid. Marks the ones that belong to a group.
+} green;
 
 
 
+/**
+ * @brief
+ * The type used to represent a morphism into a finite monoid.
+ */
+typedef struct {
+    /* Mandatory fields */
+    letter* alphabet;     //!< An array indexed by the letters indices (generators). Assigns its letter to each index.
+    dequeue** names;      //!< An array of dequeues indexed by the elements. Each element is mapped to a product of generators which evaluates to this element.
+    dgraph* r_cayley;     //!< The right Cayley graph of the morphism (stores the number of elements and the numbers of letters).
+    dgraph* l_cayley;     //!< The left Cayley graph of the morphism.
+    lgraph* j_order;       //!< The J-order on the elements of the monoid: fusion of the two cayley graphs in a single graph.
+    dequeue* idem_list;   //!< The list of all idempotents, sorted in increasing order.
+    bool* idem_array;     //!< An array of Booleans indexed by the elements. Marks the idempotents.
+    dequeue* accept_list; //!< The list of all accepting elements, sorted in increasing order.
+    bool* accept_array;   //!< An array of Booleans indexed by the elements. Marks the accepting elements.
+    green* rels;          //!< The Green relations of the monoid.
+
+    uint nb_min_regular_jcl;      //!< The number of "strict minimal" J-classes (no smaller regular J-class has a nonempty antecedent). 
+    uint* min_regular_idems; //!< Associate a member idempotent to each strict regular J-class.
+
+    /* Optional fields (NULL if not computed) */
+    uint** mult; //!< The multiplication table (`NULL` if not computed).
+    dequeue** order; //!< Ordering on the monoid. An array of dequeues indexed by the elements. Each element is mapped to the list of all larger elements sorted in increasing order (`NULL` if not computed).
+} morphism;
+
+/*******************/
+/* Basic functions */
+/*******************/
+
+/**
+ * @brief
+ * Release of the Green relations.
+ */
+void delete_green(green* //!< The Green relations.
+);
+
+/**
+ * @brief
+ * Release of a morphism.
+ */
+void delete_morphism(morphism* //!< The morphism.
+);
+
+/**
+ * @brief
+ * Copy the alphabet of a morphism.
+ *
+ * @return
+ * A copy of the alphabet array.
+ */
+letter* mor_duplicate_alpha(const morphism* //!< The morphism.
+);
+
+/**
+ * @brief
+ * Retrieves the index of a letter in the alphabet of a morphism.
+ *
+ * @remark
+ * If the letter does not belong to the alphabet the invalid index
+ * UINT_MAX is returned.
+ *
+ * @return
+ * The index of the letter.
+ */
+uint mor_letter_index(const morphism*, //!< The morphism.
+    letter            //!< The letter.
+);
+
+/**
+ * @brief
+ * Given as input a regular element, retrieves the index of the
+ */
+
+uint mor_regular_jclass(const morphism*, //!< The morphism.
+    uint              //!< The element.
+);
 
 
+/**********************************************/
+/* Preliminary functions for the construction */
+/**********************************************/
 
-/****************/
-/* Construction */
-/****************/
+/**
+ * @brief
+ * Computation of the left Cayley graph of a morphism.
+ *
+ * @remark
+ * The right Cayley graph of the morphism must be computed.
+ */
+void mor_compute_leftcayley(morphism* //!< The morphism.
+);
 
-// Ne fonctionne qu'avec un DFA complet.
-p_cayley dfa_to_right_cayley(p_nfa A);
+/**
+ * @brief
+ * Computes an array containing all elements in a given J-class sorted according to
+ * the indices of their R-class (first) and L-classes (second).
+ *
+ * @return
+ * The sorted array.
+ */
+uint* green_sorted_jclass(green*, //!< The Green relations.
+    uint //!< The index of the J-class.
+);
 
-// Conversion d'un cayley en DFA
-p_nfa cayley_to_dfa(p_cayley);
+/**
+ * @brief
+ * Computation of the relation H from J, L and R (which must be already computed).
+ */
+void h_green_compute(green* //!< The Green relations (J, R et L must be computed).
+);
 
-// Conversion d'un cayley gauche en DFA
-p_nfa left_cayley_to_dfa(p_cayley);
-
-// Suppression d'un cayley
-void free_cayley(p_cayley);
-
-/************************************************/
-/* Calculs des informations sur un Cayley graph */
-/************************************************/
-
-// Calcule le graph de Cayley gauche
-void compute_left_cayley(p_cayley);
-
-// Calcule la table de multiplication d'un Cayley graph
-void compute_mult(p_cayley);
-
-// Calcule le mirroir du graphe de Cayley droit
-p_lgraph cayley_rmirror(p_cayley);
-
-// Calcule le mirroir du graphe de Cayley gauche
-p_lgraph cayley_lmirror(p_cayley);
-
-// Calcule le l'ordre syntaxique complet (quadratique)
-void compute_syntac_order(p_cayley);
-
-// Affichage des idempotents
-void cayley_print_idems(p_cayley M, FILE* out);
-
-// Affichage de l'ordre syntaxique
-void cayley_print_order(p_cayley M, FILE* out);
+/**
+ * @brief
+ * Computation of informations on regular elements and groups (the Green relations themselves must be already computed).
+ *
+ * @remark
+ * The computation requires the list of idempotent elements.
+ */
+void gr_green_compute(dequeue*, //!< The list of idempotent elements.
+    green* //!< The Green relations (J, R, L and H must be computed).
+);
 
 
-// Print de la table de multiplication
-void cayley_mult_print(p_cayley M, FILE* out);
+/**
+ * @brief
+ * Allocates and computes the Green relations of a morphism.
+ *
+ * @remark
+ * All other mandatorty fields of the morphism must have been computed.
+ */
+void mor_compute_green(morphism* //!< The morphism.
+);
+
+/**
+ * @brief
+ * Computation of the number of strict J-classes
+ *
+ * @remark
+ * The Green relations must have been computed.
+ */
+void mor_compute_min_regular_jcl(morphism* //!< The morphism.
+);
+
 
 /************************************/
-/* Opérations sur les Cayley graphs */
+/* Construction from a complete DFA */
 /************************************/
 
-// Multiplication de deux élément d'un monoide représenté par un Cayley graph
-// Plus efficace si la table de multiplication a déjà été calculée
-uint cayley_mult(p_cayley thegraph, uint s, uint t);
 
-// Multiplication de n éléments
-uint cayley_mult_gen(p_cayley thegraph, uint n, ...);
+/**
+ * @brief
+ * Computation of the transition morphism associated to a complete DFA.
+ *
+ * @attention
+ * Only works for complete DFAs.
+ *
+ * @return
+ * The transition morphism.
+ */
+morphism* dfa_to_morphism(nfa*, //!< The complete DFA.
+    int*  //!< Error code to be filled if not NULL.
+);
 
-// Calcul de la puissance omega d'un élément dans un monoide représenté par un Cayley graph
-// Ne fonctionne que avec un RIGHT Cayley graph
-uint cayley_omega(p_cayley thegraph, uint s);
+/**
+ * @brief
+ * Computation of a complete DFA from the right Cayley graph of a morphism.
+ *
+ * @return
+ * The complete DFA.
+ */
+nfa* morphism_to_dfa(morphism* //!< The morphism.
+);
 
-//
-bool cayley_elem_from_string(p_cayley M, char* w, uint* res);
+/**
+ * @brief
+ * Computation of a complete DFA from the left Cayley graph of a morphism.
+ *
+ * @return
+ * The complete DFA.
+ */
+nfa* left_morphism_to_dfa(morphism* //!< The morphism.
+);
 
-// Image d'un mot passé sous ma forme d'une chaîne de caractère
-void cayley_print_image(p_cayley, char* w, FILE* out);
+/***************************************/
+/* Computing information on a morphism */
+/***************************************/
 
-//
-bool cayley_num_idem(p_cayley M, uint s, uint* res);
 
-/**********************************/
-/* Tests de propriétés classiques */
-/**********************************/
 
-// Idempotence
-bool is_idem_mono(p_cayley, FILE* out);
+/**
+ * @brief
+ * Computation of the multiplication table of a morphism.
+ *
+ * @remark
+ * The computation is only made if the multiplication table has not already been computed.
+ */
+void mor_compute_mult(morphism* //!< The morphism.
+);
 
-// Commutativité
-bool is_comm_mono(p_cayley, FILE* out);
+/**
+ * @brief
+ * Computation of the mirror of the right Cayley graph.
+ *
+ * @return
+ * The mirror.
+ */
+lgraph* mor_rmirror(morphism* //!< The morphism.
+);
 
-#endif
+/**
+ * @brief
+ * Computation of the mirror of the left Cayley graph.
+ *
+ * @return
+ * The mirror.
+ */
+lgraph* mor_lmirror(morphism* //!< The morphism.
+);
+
+/**
+ * @brief
+ * Computation of the syntactic order table of a morphism.
+ *
+ * @attention
+ * The morphism has to be a syntactic morphism.
+ *
+ * @remark
+ * The computation is only made if the syntactic order has not already been computed.
+ */
+void mor_compute_order(morphism* //!< The morphism.
+);
+
+
+/***************************/
+/* Operations on morphisms */
+/***************************/
+
+/**
+ * @brief
+ * Multiplication of two elements
+ *
+ * @remark
+ * More efficient if the multiplication table has been computed.
+ *
+ * @return
+ * The resulting element.
+ */
+uint mor_mult(morphism*, //!< The morphism.
+    uint,       //!< First element.
+    uint        //!< Second element.
+);
+
+/**
+ * @brief
+ * Multiplication of an arbitrary number of elements.
+ *
+ * @remark
+ * More efficient if the multiplication table has been computed.
+ *
+ * @return
+ * The resulting element.
+ */
+uint mor_mult_gen(morphism*, //!< The morphism.
+    uint,       //!< The number of elements to multiply.
+    ...         //!< The elements.
+);
+
+/**
+ * @brief
+ * Computes the omega power of an element.
+ *
+ * @return
+ * The omega power.
+ */
+uint mor_omega(morphism*, //!< The morphism.
+    uint        //!< The element.
+);
+
+/**
+ * @brief
+ * Computes the index of an idempotent element.
+ *
+ * @details
+ * Returns false if the element given as input is not an idempotent. The index
+ * is returned using the third parameter.
+ *
+ * @return
+ * A Boolean indicating if the element is an idempotent.
+ */
+bool mor_num_idem(morphism*, //!< The morphism.
+    uint,       //!< The element.
+    uint*      //!< A pointer used to return the index of the idempotent.
+);
+
+
+
+
+
+/**************/
+/* Properties */
+/**************/
+
+/**
+ * @brief
+ * Tests if there exists a letter mapped to the neutral element.
+ *
+ * @remark
+ * Can dislpay the results of the test on a stream given as input.
+ *
+ * @return
+ * A Boolean indicating whether there exists a letter mapped to the neutral element.
+ */
+bool mor_neutral_letter(morphism*, //!< The morphism.
+    FILE*      //!< The stream (NULL if no display is desired).
+);
+
+/**
+ * @brief
+ * Tests if there exists a nonempty antecedent of the neutral element in a morphism.
+ *
+ * @return
+ * A Boolean indicating whether there exists a nonempty antecedent of the neutral element.
+ */
+bool mor_nonempty_neutral(morphism* //!< The morphism.
+);
+
+
+
+/**
+ * @brief
+ * Computes the image of a word.
+ *
+ * @remark
+ * If the word is not defined over the alphabet of the morphism, the (invalid)
+ * element M->r_cayley->size_graph is returned.
+ *
+ * @return
+ * The image
+ */
+uint mor_compute_image(morphism*, //!< The morphism.
+    word*      //!< The word.
+);
+
+/*
+
+// Récupération des éléments intersectant chaque alphabet dans un tableau
+dequeue** at_table_cayley(morphism*);
+
+// Affichage du tableau
+void print_at_table(morphism* M, dequeue** table, FILE* out); */
+
+#endif // _MONOID_H_

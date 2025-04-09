@@ -1,75 +1,155 @@
-/***************/
-/* ABRs (AVLs) */
-/***************/
+/**
+ * @file type_abr.h
+ * @brief
+ * Implementation of AVLs for representing sets of objects.
+ *
+ * @remark
+ * Two versions are implemented. The first one is generic and stores void pointers.
+ * The second one is lighter and stores unsigned integers only.
+ */
 
 #ifndef ABR_H
 #define ABR_H
+
+
+ /*     ___     ___          */
+ /*    / \ \   / / |    ___  */
+ /*   / _ \ \ / /| |   / __| */
+ /*  / ___ \ V / | |___\__ \ */
+ /* /_/   \_\_/  |_____|___/ */
 
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include "type_basic.h"
-#include "type_vertices.h"
-#include "macros_alloc.h"
+#include "type_dequeue.h"
+#include "alloc.h"
 
-/****************************************/
-/* Version générique: pointeur sur void */
-/****************************************/
+/*******************/
+/* Generic version */
+/*******************/
 
-struct avlnode
-{
-    int height;
-    void *value;
-    struct avlnode *left;
-    struct avlnode *right;
-};
 
-typedef struct avlnode *p_avlnode;
+/**
+ * @brief
+ * Type used to represent a single node in a generic AVL.
+ */
+typedef struct avlnode {
+    int height;                 //!< Height of the AVL rooted in this node.
+    void* value;                //!< Value of the node.
+    struct avlnode* left;       //!< Pointer to left child (NULL if no left child).
+    struct avlnode* right;      //!< Pointer to right child (NULL if no right child).
+} avlnode;
 
-// Fonction de comparaison pour les entiers
-int avlcomp_int(void *x, void *y);
 
-// Recherche
-p_avlnode avl_search(void *val, p_avlnode p, int (*f)(void *, void *));
 
-// Insertion
-p_avlnode avl_insert(void *val, p_avlnode p, int (*f)(void *, void *));
+/**
+ * @brief
+ * Searches for a value inside an generic AVL tree.
+ *
+ * @return
+ * A pointer to the node containing the searched value or NULL if the
+ * value wad not found.
+ */
+avlnode* avl_search(void*,      //!< The searched value.
+    avlnode*,      //!< Root node of the AVL tree.
+    int (*f)(void*, void*)    //!< Comparison function.
+);
 
-// Calcul de la taille
-int getsize_avl(p_avlnode p);
+/**
+ * @brief
+ * Insertion of a value inside a generic AVL tree.
+ *
+ * @return
+ * A pointer to the new root node of the AVL tree.
+ */
+avlnode* avl_insert(void*,   //!< The value that needs to be inserted.
+    avlnode*,  //!< Root node of the AVL tree.
+    int (*f)(void*, void*), //!< Comparison function.
+    void (*d)(void*)       //!< Function used to release the values when they are already in the tree (NULL if no release is desired).
+);
 
-// Libération (la fonction f prise en paramêtre sert à libérer la valeur des sommets)
-void avl_free_strong(p_avlnode p, void (*f)(void *));
+/**
+ * @brief
+ * Computes the size of a generic AVL tree.
+ *
+ * @return
+ * The size of the AVL tree.
+ */
+int getsize_avl(avlnode* //!< Root node of the AVL tree.
+);
 
-// Fonction de tri (sert pour les tests)
-void avl_sort(int *tab, int size);
 
-/********************************/
-/* Version légère pour les uint */
-/********************************/
+/**
+ * @brief
+ * Release of a generic AVL tree.
+ *
+ * @remark
+ * The input function is used to release the values contained
+ * in the AVL tree.
+ */
+void avl_free_strong(avlnode*, //!< Root node of the AVL tree.
+    void (*f)(void*)        //!< Function used to release the values.
+);
 
-struct uint_avlnode
-{
-    int height;
-    uint value;
-    struct uint_avlnode *left;
-    struct uint_avlnode *right;
-};
 
-typedef struct uint_avlnode *p_uint_avlnode;
+/***********************************************/
+/* Light version specific to unsigned integers */
+/***********************************************/
 
-// Recherche
-p_uint_avlnode uint_avl_search(uint val, p_uint_avlnode p);
 
-// Insertion
-p_uint_avlnode uint_avl_insert(uint val, p_uint_avlnode p);
+/**
+ * @brief
+ * Type used to represent a single node in a light AVL.
+ */
+typedef struct uint_avlnode {
+    int height;                      //!< Height of the AVL rooted in this node.
+    uint value;                      //!< Value of the node.
+    struct uint_avlnode* left;       //!< Pointer to left child (NULL if no left child).
+    struct uint_avlnode* right;      //!< Pointer to right child (NULL if no right child).
+} uint_avlnode;
 
-// Calcul de la taille
-int getsize_uint_avl(p_uint_avlnode p);
+/**
+ * @brief
+ * Searches for a value inside an light AVL tree.
+ *
+ * @return
+ * A pointer to the node containing the searched value or NULL if the
+ * value wad not found.
+ */
+uint_avlnode* uint_avl_search(uint, //!< The searched value.
+    uint_avlnode*                //!< Root node of the AVL tree.
+);
 
-// Récupération de la liste des valeurs dans un p_vertices
-// L'arbre est libéré en même temps
-void uint_avl_to_vertices(p_uint_avlnode p, p_vertices v);
+/**
+ * @brief
+ * Insertion of a value inside a light AVL tree.
+ *
+ * @return
+ * A pointer to the new root node of the AVL tree.
+ */
+uint_avlnode* uint_avl_insert(uint, //!< The value that needs to be inserted.
+    uint_avlnode*                //!< Root node of the AVL tree.
+);
+
+/**
+ * @brief
+ * Computes the size of a light AVL tree.
+ *
+ * @return
+ * The size of the AVL tree.
+ */
+int getsize_uint_avl(uint_avlnode* //!< Root node of the AVL tree.
+);
+
+/**
+ * @brief
+ * Extracts all values in a light AVL tree and stores on the right of the input
+ * dequeue in increasing order.
+ */
+void uint_avl_to_dequeue(uint_avlnode*, //!< Root node of the AVL tree.
+    dequeue*                         //!< The dequeue.
+);
 
 #endif

@@ -5,9 +5,9 @@
 #include "type_dlist.h"
 
 /* Création d'une liste */
-p_dlist create_dlist(void)
+dlist* create_dlist(void)
 {
-    p_dlist new;
+    dlist* new;
     MALLOC(new, 1);
     MALLOC(new->lsent, 1);
     MALLOC(new->rsent, 1);
@@ -20,14 +20,14 @@ p_dlist create_dlist(void)
 }
 
 /* Suppression d'une liste */
-void delete_dlist(p_dlist p)
+void delete_dlist(dlist* p)
 {
     if (p == NULL)
     {
         return;
     }
-    p_dcell c = p->lsent;
-    p_dcell d;
+    dcell* c = p->lsent;
+    dcell* d;
     while (c != NULL)
     {
         d = c;
@@ -38,7 +38,7 @@ void delete_dlist(p_dlist p)
 }
 
 /* Insertion avant/après une cellue existante */
-void insertnext_dlist(p_dlist p, p_dcell c, int newval)
+void insertnext_dlist(dlist* p, dcell* c, int newval)
 {
     CHECK_NULL(4, p, "The list", p->lsent, "The left sentry", p->rsent, "The right sentry", c, "The input cell");
     if (c->next == NULL)
@@ -46,7 +46,7 @@ void insertnext_dlist(p_dlist p, p_dcell c, int newval)
         fprintf(stderr, "Error, cannot insert a cell after the right sentry");
         exit(EXIT_FAILURE);
     }
-    p_dcell d = c->next;
+    dcell* d = c->next;
     MALLOC(c->next, 1);
     c->next->val = newval;
     c->next->previous = c;
@@ -55,7 +55,7 @@ void insertnext_dlist(p_dlist p, p_dcell c, int newval)
     p->size++;
 }
 
-void insertprevious_dlist(p_dlist p, p_dcell c, int newval)
+void insertprevious_dlist(dlist* p, dcell* c, int newval)
 {
     CHECK_NULL(4, p, "The list", p->lsent, "The left sentry", p->rsent, "The right sentry", c, "The input cell");
     if (c->previous == NULL)
@@ -63,7 +63,7 @@ void insertprevious_dlist(p_dlist p, p_dcell c, int newval)
         fprintf(stderr, "Error, cannot insert a cell before the left sentry");
         exit(EXIT_FAILURE);
     }
-    p_dcell d = c->previous;
+    dcell* d = c->previous;
     MALLOC(c->previous, 1);
     c->previous->val = newval;
     c->previous->previous = d;
@@ -73,7 +73,7 @@ void insertprevious_dlist(p_dlist p, p_dcell c, int newval)
 }
 
 /* Suppression d'une cellule */
-void deletecell_dlist(p_dlist p, p_dcell c)
+void deletecell_dlist(dlist* p, dcell* c)
 {
     CHECK_NULL(4, p, "The list", p->lsent, "La left sentry", p->rsent, "The right sentry", c, "The input cell");
     if (c->next == NULL || c->previous == NULL)
@@ -81,8 +81,8 @@ void deletecell_dlist(p_dlist p, p_dcell c)
         fprintf(stderr, "Error, cannot delete the sentries");
         exit(EXIT_FAILURE);
     }
-    p_dcell bc = c->previous;
-    p_dcell ac = c->next;
+    dcell* bc = c->previous;
+    dcell* ac = c->next;
     free(c);
     bc->next = ac;
     ac->previous = bc;
@@ -90,7 +90,7 @@ void deletecell_dlist(p_dlist p, p_dcell c)
 }
 
 /* Fusion de deux listes (la second est concaténée à droite de la première) */
-void concat_dlist(p_dlist l1, p_dlist l2)
+void concat_dlist(dlist* l1, dlist* l2)
 {
     if (l1 != l2)
     {
