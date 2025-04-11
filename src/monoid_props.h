@@ -424,6 +424,23 @@ bool is_da_orbmono(orbits*,    //!< The orbits.
  * A Boolean indicating whether si the morphism satisfies the equation 1 ≤ s.
  */
 bool is_jsat_mono(morphism*, //!< The morphism.
+    dequeue*, //!< The list of elements larger than 1.
+    uint* //!< Pointer on a uint array to return a counterexample.
+);
+
+/**
+ * @brief
+ * Tests if a morphism satisfies the equation 1 ≤ e (for every idempotent e).
+ *
+ * @remark
+ * If the test fails and the second parameter is not NULL, it will be set to a
+ * counterexample: the idempotent e which fails the equation.
+ *
+ * @return
+ * A Boolean indicating whether the morphisme satisfies the equation 1 ≤ e (for every idempotent e).
+ */
+bool is_ejsat_mono(morphism*, //!< The morphism.
+    dequeue*, //!< The list of elements larger than 1.
     uint* //!< Pointer on a uint array to return a counterexample.
 );
 
@@ -432,13 +449,14 @@ bool is_jsat_mono(morphism*, //!< The morphism.
  * Tests if a subsemigroup satisfies the equation 1 ≤ s.
  *
  * @remark
- * If the test fails and the second parameter is not NULL, it will be set to a
+ * If the test fails and the third parameter is not NULL, it will be set to a
  * counterexample: the element s which fails the equation.
  *
  * @return
  * A Boolean indicating whether the subsemigroup satisfies the equation 1 ≤ s.
  */
-bool is_jsat_subsemi(subsemi*,  //!< The subsemigroup. 
+bool is_jsat_subsemi(subsemi*,  //!< The subsemigroup.
+    dequeue*, //!< The list of elements larger than 1 in the original monoid.
     uint* //!< Pointer on a uint array to return a counterexample.
 );
 
@@ -461,20 +479,7 @@ bool is_jsat_orbmono(orbits*,   //!< The orbits.
 
 
 
-/**
- * @brief
- * Tests if a morphism satisfies the equation 1 ≤ e (for every idempotent e).
- *
- * @remark
- * If the test fails and the second parameter is not NULL, it will be set to a
- * counterexample: the idempotent e which fails the equation.
- *
- * @return
- * A Boolean indicating whether the morphisme satisfies the equation 1 ≤ e (for every idempotent e).
- */
-bool is_ejsat_mono(morphism*, //!< The morphism.
-    uint* //!< Pointer on a uint array to return a counterexample.
-);
+
 
 /*********/
 /* Knast */

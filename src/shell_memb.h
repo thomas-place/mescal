@@ -21,6 +21,16 @@ extern bool (*class_membership[CL_END]) (int, FILE*);
  */
 void init_membership(void);
 
+/**
+ * @brief
+ * Checks if testing membership for a classes requires the syntactic ordering
+ *
+ * @return
+ * True if the membership function requires the syntactic ordering, false otherwise.
+ */
+bool shell_membership_needs_order(classes //!< The class to check.
+);
+
 
 /*********************/
 /* General functions */

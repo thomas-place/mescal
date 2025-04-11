@@ -2,6 +2,7 @@
 #include "monoid_display.h"
 #include "interrupt.h"
 #include "shell_errors.h"
+#include "monoid_ideals.h"
 
 
 
@@ -14,9 +15,8 @@ void delete_green(green* G) {
     if (G == NULL) {
         return;
     }
-    free(G->regular_idems);
-    free(G->regular_set);
-    free(G->group_set);
+    free(G->regular_array);
+    free(G->group_array);
 
     delete_parti(G->HCL);
     delete_parti(G->RCL);
@@ -54,9 +54,8 @@ void delete_morphism(morphism* M) {
     // Free jord
     delete_lgraph(M->j_order);
 
-
-
-    free(M->min_regular_idems);
+    // Free the representatives
+    free(M->regular_idems);
 
     /* Optional fields */
 
@@ -70,7 +69,7 @@ void delete_morphism(morphism* M) {
 
     // Free monoid order (if needed)
     if (M->order != NULL) {
-        for (uint i = 0; i < M->r_cayley->size_graph; i++) {
+        for (uint i = 0; i < M->nb_regular_jcl; i++) {
             delete_dequeue(M->order[i]);
         }
     }
@@ -258,49 +257,36 @@ void h_green_compute(green* GREL) {
 
 }
 
+
+
+
 void gr_green_compute(dequeue* idem_list, green* G) {
 
-    // First, we compute the regular j-classes.
-    uint* regular_array;
-    MALLOC(regular_array, G->JCL->size_par);
-    for (uint i = 0; i < G->JCL->size_par; i++) {
-        regular_array[i] = UINT_MAX;
-    }
-
-    // For each J-class index i, if the J-class is regular, we store
-    // a member idempotent e in regular_array[i] (the one with the least index).
-    for (uint i = size_dequeue(idem_list); i > 0; i--) {
-        uint e = lefread_dequeue(idem_list, i - 1);
-        regular_array[G->JCL->numcl[e]] = e;
-    }
-
-    // Building information on regular J-classes.
+    // First, we compute the regular elements.
+    CALLOC(G->regular_array, G->JCL->size_set);
     G->nb_regular_elems = 0;
-    G->nb_regular_jcl = 0;
-    CALLOC(G->regular_set, G->JCL->size_set);
-    MALLOC(G->regular_idems, G->JCL->size_set);
 
+    // For each idempotent, we mark all elements of its J-class has regular. We
+    // skip an idempotent whose J-class has already been marked as regular.
 
-
-    for (uint c = 0; c < G->JCL->size_par; c++) {
-        // For each regular J-class
-        if (regular_array[c] != UINT_MAX) {
-            G->regular_idems[G->nb_regular_jcl] = regular_array[c];
-            G->nb_regular_jcl++;
-            G->nb_regular_elems += size_dequeue(G->JCL->cl[c]);
-            for (uint i = 0; i < size_dequeue(G->JCL->cl[c]); i++) {
-                G->regular_set[lefread_dequeue(G->JCL->cl[c], i)] = true;
-            }
+    for (uint i = 0; i < size_dequeue(idem_list); i++) {
+        uint e = lefread_dequeue(idem_list, i);
+        uint c = G->JCL->numcl[e];
+        if (G->regular_array[lefread_dequeue(G->JCL->cl[c], 0)]) {
+            continue;
         }
+        for (uint j = 0; j < size_dequeue(G->JCL->cl[c]); j++) {
+            G->regular_array[lefread_dequeue(G->JCL->cl[c], j)] = true;
+        }
+        G->nb_regular_elems += size_dequeue(G->JCL->cl[c]);
     }
-    free(regular_array);
 
     // Building information on groups.
-    CALLOC(G->group_set, G->HCL->size_set);
+    CALLOC(G->group_array, G->HCL->size_set);
     for (uint i = 0; i < size_dequeue(idem_list); i++) {
         uint j = G->HCL->numcl[lefread_dequeue(idem_list, i)];
         for (uint k = 0; k < size_dequeue(G->HCL->cl[j]); k++) {
-            G->group_set[lefread_dequeue(G->HCL->cl[j], k)] = true;
+            G->group_array[lefread_dequeue(G->HCL->cl[j], k)] = true;
         }
     }
 }
@@ -332,9 +318,143 @@ void mor_compute_green(morphism* M) {
 }
 
 
+void mor_compute_rep(morphism* M) {
+    if (!M || !M->rels) {
+        fprintf(stderr, "Error in mor_compute_min_regular_jcl.\n");
+        exit(EXIT_FAILURE);
+    }
+
+
+    // For each regular J-class, we compute a member idempotent e in regular_jcls_idems[i] (the one with the least index).
+   // If the J-class is not regular, we store UINT_MAX.
+    uint* regular_jcls_idems;
+    MALLOC(regular_jcls_idems, M->rels->JCL->size_par);
+    for (uint i = 0; i < M->rels->JCL->size_par; i++) {
+        regular_jcls_idems[i] = UINT_MAX;
+    }
+    for (uint i = 0; i < size_dequeue(M->idem_list);i++) {
+        uint e = rigread_dequeue(M->idem_list, i);
+        regular_jcls_idems[M->rels->JCL->numcl[e]] = e;
+    }
 
 
 
+
+    // We compute the "minimal" elements of the monoid for the J-classes.
+    // An element is minimal if there exists no element strictly smaller for J
+    // that is regular and has a nonempty antecedent.
+    // The computation is achieved via a BFS on the J order.
+
+    // Array that will mark the minimal elements. 
+    bool* minimal;
+    CALLOC(minimal, M->r_cayley->size_graph);
+
+    // If the neutral element has a nonempty antecedent, the only miniaml elements are
+    // in the J-class of 1. Otherwise, we do the BFS.
+    if (mor_nonempty_neutral(M)) {
+        for (uint i = 0; i < M->r_cayley->size_graph; i++) {
+            if (M->rels->JCL->numcl[i] == M->rels->JCL->numcl[ONE]) {
+                minimal[i] = true;
+            }
+            else {
+                minimal[i] = false;
+            }
+        }
+    }
+    else {
+        // A queue for the BFS
+        dequeue* queue = create_dequeue();
+
+        // Array memorizing the visited elements in the BFS.
+        bool* visited;
+        CALLOC(visited, M->r_cayley->size_graph);
+
+        // We start the BFS with the neutral element
+        visited[ONE] = true;
+        // 1 is always minimal.
+        minimal[ONE] = true;
+
+        rigins_dequeue(ONE, queue);
+
+        while (!isempty_dequeue(queue)) {
+            uint s = lefpull_dequeue(queue);
+            for (uint a = 0; a < M->j_order->size_alpha; a++) {
+                for (uint j = 0; j < size_dequeue(M->j_order->edges[s][a]); j++) {
+                    uint t = lefread_dequeue(M->j_order->edges[s][a], j);
+                    if (visited[t]) {
+                        continue;
+                    }
+                    visited[t] = true;
+                    rigins_dequeue(t, queue);
+                    // If s J t or t is not regular, then t is minimal iff s was minimal.
+                    if (M->rels->JCL->numcl[t] == M->rels->JCL->numcl[s] || !M->rels->regular_array[t]) {
+                        minimal[t] = minimal[s];
+                    }
+                    // Otherwise, t is minimal iff s was minimal and either s is not regular, or s is 1
+                    else {
+                        minimal[t] = minimal[s] && (!M->rels->regular_array[s] || s == ONE);
+
+                    }
+                }
+            }
+        }
+    }
+
+    // We now count the number of regular J-classes and the number of minimal ones.
+    M->nb_min_regular_jcl = 0;
+    M->nb_regular_jcl = 0;
+    for (uint i = 0; i < M->rels->JCL->size_par;i++) {
+        if (regular_jcls_idems[i] != UINT_MAX) {
+            M->nb_regular_jcl++;
+            uint s = lefread_dequeue(M->rels->JCL->cl[i], 0);
+            if (minimal[s]) {
+                M->nb_min_regular_jcl++;
+            }
+        }
+    }
+
+
+    // We may now construct the array of representative idempotents
+    uint h = 0;
+    uint l = M->nb_min_regular_jcl;
+    MALLOC(M->regular_idems, M->nb_regular_jcl);
+    for (uint c = 0; c < M->rels->JCL->size_par; c++) {
+        if (regular_jcls_idems[c] != UINT_MAX) {
+            uint s = lefread_dequeue(M->rels->JCL->cl[c], 0);
+            if (minimal[s]) {
+                M->regular_idems[h] = regular_jcls_idems[c];
+                h++;
+            }
+            else {
+                M->regular_idems[l] = regular_jcls_idems[c];
+                l++;
+
+            }
+        }
+    }
+
+    free(minimal);
+    free(regular_jcls_idems);
+
+
+    // Building information on groups.
+    CALLOC(M->rels->group_array, M->rels->HCL->size_set);
+    for (uint i = 0; i < size_dequeue(M->idem_list); i++) {
+        uint j = M->rels->HCL->numcl[lefread_dequeue(M->idem_list, i)];
+        for (uint k = 0; k < size_dequeue(M->rels->HCL->cl[j]); k++) {
+            M->rels->group_array[lefread_dequeue(M->rels->HCL->cl[j], k)] = true;
+        }
+    }
+
+
+}
+
+
+
+
+
+
+/*
 void mor_compute_min_regular_jcl(morphism* M) {
     if (!M || !M->rels) {
         fprintf(stderr, "Error in mor_compute_min_regular_jcl.\n");
@@ -403,7 +523,9 @@ void mor_compute_min_regular_jcl(morphism* M) {
         }
     }
     free(min_regjcl);
-}
+}*/
+
+
 
 
 /************************************/
@@ -428,6 +550,14 @@ static void delete_morphism_state(void* p) {
     }
     free(((morphism_state*)p)->state); // Free the permutation
     free(((morphism_state*)p)->next);  // Free the transition table
+    delete_dequeue(((morphism_state*)p)->name); // Free the name
+    free(p);
+}
+
+static void delete_morphism_state_weak(void* p) {
+    if (p == NULL) {
+        return;
+    }
     free(p);
 }
 
@@ -449,13 +579,13 @@ static int comp_morphism_state(void* p1, void* p2) {
 }
 
 // Auxiliary function used in dfa_to_morphism. The AVL contains morphism states.
-static void morphism_avl_to_table(avlnode* tree, nfa* A, morphism* thegraph, bool* newfinals, bool* theidems) {
+static void morphism_avl_to_table(avlnode* tree, nfa* A, morphism* thegraph, uint** permuts, bool* newfinals, bool* theidems) {
     if (tree == NULL) {
         return;
     }
 
-    morphism_avl_to_table(tree->left, A, thegraph, newfinals, theidems);
-    morphism_avl_to_table(tree->right, A, thegraph, newfinals, theidems);
+    morphism_avl_to_table(tree->left, A, thegraph, permuts, newfinals, theidems);
+    morphism_avl_to_table(tree->right, A, thegraph, permuts, newfinals, theidems);
 
     morphism_state* thestate = (morphism_state*)tree->value;
 
@@ -486,10 +616,52 @@ static void morphism_avl_to_table(avlnode* tree, nfa* A, morphism* thegraph, boo
 
     // Store the name of the element in the morphism.
     thegraph->names[thestate->num] = thestate->name;
+
+    // We save the permutation defining the state (might be used for ordering computation).
+    permuts[thestate->num] = thestate->state;
+
+
+    // Release of the tree node (only the elements for which we have no further use).
+    // We don't free the name, as it is used in the morphism.
+    // We don't free the permutation as we saved it in permuts.
+    //free(thestate->next);
+    //free(thestate);
+
+
+}
+
+static void compute_ordering_partial(morphism* M, uint size, bool** order, uint** permuts) {
+    MALLOC(M->order, M->nb_regular_jcl);
+    for (uint i = 0; i < M->nb_regular_jcl; i++) {
+        M->order[i] = create_dequeue();
+        uint e = M->regular_idems[i];
+        dequeue* eM = compute_r_ideal(M, e, NULL);
+        dequeue* Me = compute_l_ideal(M, e, NULL);
+        dequeue* eMe = make_inter_sorted_dequeue(eM, Me);
+        delete_dequeue(eM);
+        delete_dequeue(Me);
+
+        for (uint j = 0; j < size_dequeue(eMe); j++) {
+            uint q = lefread_dequeue(eMe, j);
+            bool found = true;
+            for (uint k = 0; k < size; k++) {
+                if (!order[permuts[e][k]][permuts[q][k]]) {
+                    found = false;
+                    break;
+                }
+            }
+            if (found) {
+                rigins_dequeue(q, M->order[i]);
+            }
+        }
+
+
+    }
+
 }
 
 // Works only with a complete input DFA
-morphism* dfa_to_morphism(nfa* A, int* error) {
+morphism* dfa_to_morphism(nfa* A, bool** order, int* error) {
     if (!nfa_is_det(A) || !nfa_is_comp(A)) {
         fprintf(stderr, "Error: The construction of the transition morphism requires a Complete DFA. Returned NULL\n");
         if (error != NULL) {
@@ -609,12 +781,17 @@ morphism* dfa_to_morphism(nfa* A, int* error) {
     MALLOC(M->names, num);                                          // Element names.
     MALLOC(M->accept_array, num);                                   // Array representing the accepting set.
     MALLOC(M->idem_array, num);                                     // Array of idempotents.
+    M->order = NULL;                                                // Order of the morphism.
+    M->mult = NULL;                                                 // Multiplication table.
 
-    // Creation of transitions, idempotents and detection of accepting elements.
-    morphism_avl_to_table(thetree, A, M, M->accept_array, M->idem_array);
+    uint** permuts;
+    MALLOC(permuts, num); // Array of permutations defining the elements.
+
+    // Creation of transitions, idempotents and detection of accepting elements (simultaneously releases the AVL).
+    morphism_avl_to_table(thetree, A, M, permuts, M->accept_array, M->idem_array);
 
     // Free the AVL
-    avl_free_strong(thetree, &delete_morphism_state);
+    avl_free_strong(thetree, &delete_morphism_state_weak);
 
     // Creation of lists of idempotents and accepting elements.
     M->idem_list = create_dequeue();
@@ -637,15 +814,19 @@ morphism* dfa_to_morphism(nfa* A, int* error) {
     M->j_order = ldgraphs_to_lgraph(0, 2, 2, M->r_cayley, M->l_cayley); // Compute the J-order.
     mor_compute_green(M);
 
-    // for (uint i = 0; i < M->rels->nb_regular_jcl; i++) {
-      //   mor_fprint_name_utf8(M, M->rels->regular_idems[i], stdout);
-        // printf(" ");
-    // }
-     //printf("\n");
+    mor_compute_rep(M);
 
-    mor_compute_min_regular_jcl(M);
+    if (order) {
+        compute_ordering_partial(M, A->trans->size_graph, order, permuts);
 
-    //printf("Number of strict J-classes: %u\n", M->nb_strictj);
+    }
+
+    // Release of the permuts table
+    for (uint i = 0; i < num; i++) {
+        free(permuts[i]);
+    }
+    free(permuts);
+
 
 
     ignore_interrupt();
@@ -729,10 +910,7 @@ lgraph* mor_lmirror(morphism* M) {
 }
 
 
-void mor_compute_order(morphism* M) {
-    if (M->order != NULL) {
-        return;
-    }
+dequeue** mor_compute_order(morphism* M) {
     uint thesize = M->r_cayley->size_graph;
 
     // Array that marks the visited pairs.
@@ -803,13 +981,14 @@ void mor_compute_order(morphism* M) {
         }
     }
 
+    dequeue** order;
     // We may now compute the syntactic order on the elements.
-    MALLOC(M->order, M->r_cayley->size_graph);
+    MALLOC(order, M->r_cayley->size_graph);
     for (uint q = 0; q < M->r_cayley->size_graph; q++) {
-        M->order[q] = create_dequeue();
+        order[q] = create_dequeue();
         for (uint r = 0; r < M->r_cayley->size_graph; r++) {
             if (!visited[q][r]) {
-                rigins_dequeue(r, M->order[q]);
+                rigins_dequeue(r, order[q]);
             }
         }
         free(visited[q]);
@@ -820,6 +999,7 @@ void mor_compute_order(morphism* M) {
     delete_dequeue(stack_two);
     delete_lgraph(rmirror);
     delete_lgraph(lmirror);
+    return order;
 }
 
 

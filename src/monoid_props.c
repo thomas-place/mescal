@@ -241,7 +241,7 @@ bool is_comm_ltt_mono(orbits* L, uint* c) {
 
     // We now check the equation for the cases when (e ≠ f).
     for (uint i = 0; i < M->nb_min_regular_jcl; i++) {
-        uint e = M->min_regular_idems[i];
+        uint e = M->regular_idems[i];
         dequeue* eM = compute_r_ideal(M, e, NULL);
         dequeue* Me = compute_l_ideal(M, e, NULL);
 
@@ -251,7 +251,7 @@ bool is_comm_ltt_mono(orbits* L, uint* c) {
                 continue;
             }
 
-            uint f = M->min_regular_idems[j];
+            uint f = M->regular_idems[j];
 
             dequeue* fM = compute_r_ideal(M, f, NULL);
             dequeue* Mf = compute_l_ideal(M, f, NULL);
@@ -380,8 +380,8 @@ bool is_gtrivial_mono(morphism* M, green_relation P, uint* c) {
     if (c) {
         // We look for a counterexample
         // We consider all idempotents representing a regular J-class
-        for (uint i = 0; i < M->rels->nb_regular_jcl; i++) {
-            uint e = M->rels->regular_idems[i];
+        for (uint i = 0; i < M->nb_regular_jcl; i++) {
+            uint e = M->regular_idems[i];
             // We take the first one that is non-trivial
             if (size_dequeue(thepar->cl[thepar->numcl[e]]) > 1) {
                 uint s = lefread_dequeue(thepar->cl[i], 0);
@@ -410,10 +410,10 @@ bool is_gtrivial_subsemi(subsemi* S, green_relation P, uint* c) {
     }
 
     if (c) {
-        // We look at all P-classes
-        for (uint i = 0; i < S->rels->nb_regular_jcl; i++) {
-            uint e = S->rels->regular_idems[i];
-            // We take the first one that is non-trivial
+        // We look at all idempotents
+        for (uint i = 0; i < size_dequeue(S->idem_list); i++) {
+            uint e = lefread_dequeue(S->idem_list, i);
+            // We take the first one whose P-class is not trivial
             if (size_dequeue(thepar->cl[thepar->numcl[e]]) > 1) {
                 uint s = lefread_dequeue(thepar->cl[i], 0);
                 if (s == e) {
@@ -460,7 +460,7 @@ bool is_da_mono(morphism* M, uint* c) {
         for (uint s = 0; s < M->r_cayley->size_graph; s++) {
 
             // We take the first one that is regular and non-idempotent
-            if (!M->idem_array[s] && G->regular_set[s]) {
+            if (!M->idem_array[s] && G->regular_array[s]) {
                 c[0] = s;
                 break;
             }
@@ -485,7 +485,7 @@ bool is_da_subsemi(subsemi* S, uint* c) {
     if (c) {
         for (uint s = 0; s < S->size; s++) {
             // We take the first one that is regular and non-idempotent
-            if (!S->idem_array[s] && S->rels->regular_set[s]) {
+            if (!S->idem_array[s] && S->rels->regular_array[s]) {
                 c[0] = S->sub_to_mono[s];
                 break;
             }
@@ -511,14 +511,14 @@ bool is_da_orbmono(orbits* L, uint* c) {
 /* J-saturated  */
 /****************/
 
-bool is_jsat_mono(morphism* M, uint* c) {
-    mor_compute_order(M);
-    if (M->r_cayley->size_graph == size_dequeue(M->order[ONE])) {
+bool is_jsat_mono(morphism* M, dequeue* l, uint* c) {
+    //mor_compute_order(M);
+    if (M->r_cayley->size_graph == size_dequeue(l)) {
         return true;
     }
     if (c) {
         uint i = 0;
-        while (i < size_dequeue(M->order[ONE]) && lefread_dequeue(M->order[ONE], i) == i) {
+        while (i < size_dequeue(l) && lefread_dequeue(l, i) == i) {
             i++;
         }
         c[0] = i;
@@ -526,18 +526,22 @@ bool is_jsat_mono(morphism* M, uint* c) {
     return false;
 }
 
-bool is_ejsat_mono(morphism* M, uint* c) {
-    mor_compute_order(M);
+bool is_ejsat_mono(morphism* M, dequeue* l, uint* c) {
+    if (!M->order) {
+        fprintf(stderr, "Error: The order of the morphism is not computed.\n");
+        exit(EXIT_FAILURE);
+    }
+    //mor_compute_order(M);
     uint i = 0;
     uint j = 0;
     while (i < size_dequeue(M->idem_list)) {
-        if (j >= size_dequeue(M->order[ONE]) || lefread_dequeue(M->order[ONE], j) > lefread_dequeue(M->idem_list, i)) {
+        if (j >= size_dequeue(l) || lefread_dequeue(l, j) > lefread_dequeue(M->idem_list, i)) {
             if (c) {
                 c[0] = lefread_dequeue(M->idem_list, i);
             }
             return false;
         }
-        else if (lefread_dequeue(M->order[ONE], j) < lefread_dequeue(M->idem_list, i)) {
+        else if (lefread_dequeue(l, j) < lefread_dequeue(M->idem_list, i)) {
             j++;
         }
         else {
@@ -548,21 +552,20 @@ bool is_ejsat_mono(morphism* M, uint* c) {
     return true;
 }
 
-bool is_jsat_subsemi(subsemi* S, uint* c) {
-    morphism* M = S->original;
-
-    mor_compute_order(M);
+bool is_jsat_subsemi(subsemi* S, dequeue* l, uint* c) {
+    //morphism* M = S->original;
+    //mor_compute_order(M);
 
     uint i = 0;
     uint j = 0;
     while (i < S->size) {
-        if (j >= size_dequeue(M->order[S->sub_to_mono[S->neut]]) || lefread_dequeue(M->order[S->sub_to_mono[S->neut]], j) > S->sub_to_mono[i]) {
+        if (j >= size_dequeue(l) || lefread_dequeue(l, j) > S->sub_to_mono[i]) {
             if (c) {
                 c[0] = S->sub_to_mono[i];
             }
             return false;
         }
-        else if (lefread_dequeue(M->order[S->sub_to_mono[S->neut]], j) < S->sub_to_mono[i]) {
+        else if (lefread_dequeue(l, j) < S->sub_to_mono[i]) {
             j++;
         }
         else {
@@ -575,11 +578,14 @@ bool is_jsat_subsemi(subsemi* S, uint* c) {
 
 
 bool is_jsat_orbmono(orbits* L, uint* c) {
-
+    if (!L->original->order) {
+        fprintf(stderr, "Error: The order of the morphism is not computed.\n");
+        exit(EXIT_FAILURE);
+    }
 
     for (uint i = 0; i < L->nb_computed; i++) {
 
-        if (!is_jsat_subsemi(L->orbits[i], c)) {
+        if (!is_jsat_subsemi(L->orbits[i], L->original->order[i], c)) {
             if (c) {
                 c[1] = L->orbits[i]->sub_to_mono[L->orbits[i]->neut];
             }
@@ -846,13 +852,13 @@ bool is_knast_mono(orbits* L, uint* cexa) {
 
     // Loop over all idempotents e
     for (uint i = 0; i < M->nb_min_regular_jcl; i++) {
-        uint e = M->min_regular_idems[i];
+        uint e = M->regular_idems[i];
 
         // Loop over all idempotents f
         // The case e = f is already handled: we checked if the DD-orbits are J-trivial.
         // The case f < e is treated when e and f are inverted.
         for (uint j = i + 1; j < M->nb_min_regular_jcl; j++) {
-            uint f = M->min_regular_idems[j];
+            uint f = M->regular_idems[j];
 
             // Intersection of MfM and eMe
             dequeue* MfM = compute_j_ideal(M, f, L->orbits[i]->mono_in_sub);
@@ -936,13 +942,13 @@ bool is_knast_ker(orbits* L, subsemi* ker, uint* cexa) {
 
     // Loop over all idempotents e
     for (uint i = 0; i < M->nb_min_regular_jcl; i++) {
-        uint e = M->min_regular_idems[i];
+        uint e = M->regular_idems[i];
 
         // Loop over all idempotents f
         // The case e = f is already handled: we checked if the G⁺-orbits are J-trivial.
         // The case f < e is treated when e and f are inverted.
         for (uint j = i + 1; j < M->nb_min_regular_jcl; j++) {
-            uint f = M->min_regular_idems[j];
+            uint f = M->regular_idems[j];
 
             // Intersection of MfM and eMe
             dequeue* MfM = compute_j_ideal(M, f, L->orbits[i]->mono_in_sub);
@@ -1026,11 +1032,11 @@ bool is_bpolamtp_mono(orbits* L, uint* cexa) {
 
     // Loop over all idempotents e.
     for (uint i = 0; i < M->nb_min_regular_jcl; i++) {
-        uint e = M->min_regular_idems[i];
+        uint e = M->regular_idems[i];
 
         // Loop over all idempotents f (the case f < e is treated when e and f are inverted).
         for (uint j = i; j < M->nb_min_regular_jcl; j++) {
-            uint f = M->min_regular_idems[j];
+            uint f = M->regular_idems[j];
 
             dequeue* MfM = compute_j_ideal(M, f, L->orbits[i]->mono_in_sub);
 
@@ -1124,11 +1130,11 @@ bool is_bpolgrp_mono(orbits* L, uint* cexa) {
 
     // Loop over all idempotents e.
     for (uint i = 0; i < M->nb_min_regular_jcl; i++) {
-        uint e = M->min_regular_idems[i];
+        uint e = M->regular_idems[i];
 
         // Loop over all idempotents f (the case f < e is treated when e and f are inverted).
         for (uint j = i; j < M->nb_min_regular_jcl; j++) {
-            uint f = M->min_regular_idems[j];
+            uint f = M->regular_idems[j];
 
             dequeue* MfM = compute_j_ideal(M, f, L->orbits[i]->mono_in_sub);
 
@@ -1249,8 +1255,8 @@ bool is_knast_at_mono(orbits* L, uint* cexa) {
 
 
             // The sets fM and Mf restricted to the restricted alphabet will be useful.
-            dequeue* fM = compute_r_ideal_alph(M, f, efalph, G->regular_set);
-            dequeue* Mf = compute_l_ideal_alph(M, f, efalph, G->regular_set);
+            dequeue* fM = compute_r_ideal_alph(M, f, efalph, G->regular_array);
+            dequeue* Mf = compute_l_ideal_alph(M, f, efalph, G->regular_array);
 
 
 
@@ -1325,8 +1331,8 @@ bool is_upbp_mono(orbits* L, uint* cexa) {
 
 
         // Computes the restristion of eMe to the regular elements.
-        dequeue* eM = compute_r_ideal(M, e, G->regular_set);
-        dequeue* Me = compute_l_ideal(M, e, G->regular_set);
+        dequeue* eM = compute_r_ideal(M, e, G->regular_array);
+        dequeue* Me = compute_l_ideal(M, e, G->regular_array);
         dequeue* eMe = make_inter_sorted_dequeue(eM, Me);
         delete_dequeue(Me);
         delete_dequeue(eM);

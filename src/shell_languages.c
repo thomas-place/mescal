@@ -325,8 +325,8 @@ int object_compare_synt(int i1, int i2) {
     if (objects[i2]->type == RECDEF) {
         return 1;
     }
-    int j1 = shell_compute_syntac(i1);
-    int j2 = shell_compute_syntac(i2);
+    int j1 = shell_compute_syntac(i1, false);
+    int j2 = shell_compute_syntac(i2, false);
     return objects[j1]->mor->obj->r_cayley->size_graph - objects[j2]->mor->obj->r_cayley->size_graph;
 }
 
@@ -430,18 +430,25 @@ int shell_compute_minimal(int i) {
     return j;
 }
 
-int shell_compute_syntac(int i) {
+int shell_compute_syntac(int i, bool order) {
     if (i < 0 || i > nb_objects - 1 || !objects[i]) {
         fprintf(stderr, "Error: invalid object.\n");
         return INVALID_OBJECT;
     }
 
     if (objects[i]->parent != -1) {
-        return shell_compute_syntac(objects[i]->parent);
+        return shell_compute_syntac(objects[i]->parent, order);
     }
 
     if (objects[i]->depend[OD_SYNT] != -1) {
-        return objects[i]->depend[OD_SYNT];
+        int j = objects[i]->depend[OD_SYNT];
+        if (order && !objects[j]->mor->obj->order) {
+            object_free(j);
+            objects[i]->depend[OD_SYNT] = -1;
+        }
+        else {
+            return objects[i]->depend[OD_SYNT];
+        }
     }
 
     // Start by calculating the object's minimal automaton (if not already done).
@@ -450,9 +457,15 @@ int shell_compute_syntac(int i) {
         return j;
     }
 
+    bool** dfa_order = NULL;
+    if (order) {
+        dfa_order = nfa_mini_canonical_ordering(objects[j]->nfa);
+    }
+
+
+
     int error = 0;
-    morphism* synt = NULL;
-    synt = dfa_to_morphism(objects[j]->nfa, &error);
+    morphism* synt = dfa_to_morphism(objects[j]->nfa, dfa_order, &error);
     if (interrupt_flag) {
         interrupt_flag = false;
     }

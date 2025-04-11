@@ -270,7 +270,7 @@ ufind* iden_knast_mono(orbits* L) {
         // Boucles sur les idempotents f (le cas e = f a été traité avec les orbites et le cas f < e est traité quand e et f sont inversés).
         for (uint j = i + 1; j < M->nb_min_regular_jcl; j++) {
 
-            uint f = M->min_regular_idems[j];
+            uint f = M->regular_idems[j];
 
             // Intersection de MfM et eMe
             dequeue* MfM = compute_j_ideal(M, f, L->orbits[i]->mono_in_sub);
@@ -339,7 +339,7 @@ ufind* iden_qknast_mono(orbits* L, subsemi* mker) {
         }
         // Boucles sur les idempotents f (le cas e = f a été traité avec les orbites et le cas f < e est traité quand e et f sont inversés).
         for (uint j = i + 1; j < M->nb_min_regular_jcl; j++) {
-            uint f = M->min_regular_idems[j];
+            uint f = M->regular_idems[j];
 
             // Intersection de MfM et eMe
             dequeue* MfM = compute_j_ideal(M, f, L->orbits[i]->mono_in_sub);

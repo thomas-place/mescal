@@ -130,7 +130,7 @@ nfa* nfa_hopcroft(nfa*   //!< The NFA.
  * @return
  * The canonical ordering of the states.
  */
-dequeue** nfa_mini_canonical_ordering(nfa*  //!< The NFA to order (must be minimal).
+bool** nfa_mini_canonical_ordering(nfa*  //!< The NFA to order (must be minimal).
 );
 
 #endif

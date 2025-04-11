@@ -70,13 +70,11 @@ typedef struct {
     parti* HCL;            //!< H-classes.
 
     /* Informations on regular elements */
-    uint nb_regular_jcl;   //!< Number of regular J-classes.
-    uint nb_regular_elems; //!< Number of regular elements.
-    uint* regular_idems;   //!< Array indexed by the regular J-classes (sorted in topological order). Associates a member idempotent to each of them (the one with the least index).
-    bool* regular_set;     //!< Array of Booleans indexed by the elements of the monoid. Marks the regular elements.
+    uint nb_regular_elems; //!< Number of regular elements. 
+    bool* regular_array;     //!< Array of Booleans indexed by the elements of the monoid. Marks the regular elements.
 
     /* Information on groups */
-    bool* group_set;     //!< Array of Booleans indexed by the elements of the monoid. Marks the ones that belong to a group.
+    bool* group_array;     //!< Array of Booleans indexed by the elements of the monoid. Marks the ones that belong to a group.
 } green;
 
 
@@ -98,8 +96,9 @@ typedef struct {
     bool* accept_array;   //!< An array of Booleans indexed by the elements. Marks the accepting elements.
     green* rels;          //!< The Green relations of the monoid.
 
-    uint nb_min_regular_jcl;      //!< The number of "strict minimal" J-classes (no smaller regular J-class has a nonempty antecedent). 
-    uint* min_regular_idems; //!< Associate a member idempotent to each strict regular J-class.
+    uint nb_regular_jcl;   //!< Number of regular J-classes.
+    uint nb_min_regular_jcl; //!< The number of "strict minimal" J-classes (no smaller regular J-class has a nonempty antecedent).
+    uint* regular_idems;   //!< Array indexed by the regular J-classes (sorted in topological order). Associates a member idempotent to each of them (the one with the least index). The minimal J-classes are at the beginning.
 
     /* Optional fields (NULL if not computed) */
     uint** mult; //!< The multiplication table (`NULL` if not computed).
@@ -199,8 +198,19 @@ void h_green_compute(green* //!< The Green relations (J, R et L must be computed
  * @remark
  * The computation requires the list of idempotent elements.
  */
-void gr_green_compute(dequeue*, //!< The list of idempotent elements.
-    green* //!< The Green relations (J, R, L and H must be computed).
+void gr_green_compute(dequeue*,    //!< The list of idempotents.
+    green* //!< The Green relations.
+);
+
+
+/**
+ * @brief
+ * Computation of list of representative idempotents for the morphism.
+ *
+ * @remark
+ * The computation requires the full computation of the Green relations.
+ */
+void mor_compute_rep(morphism*
 );
 
 
@@ -234,6 +244,13 @@ void mor_compute_min_regular_jcl(morphism* //!< The morphism.
  * @brief
  * Computation of the transition morphism associated to a complete DFA.
  *
+ * @remark
+ * The ordering on the elements of the DFA is used to compute partial information
+ * on the corresponding ordering on the elements of the morphism. For each J-class,
+ * if e is the idempotent representing this J-class, then all elements larger than
+ * e for the ordering and for the H-order are computed (this is enough for all the
+ * membership tests). If the ordering is NULL, nothing is computed for the morphism.
+ *
  * @attention
  * Only works for complete DFAs.
  *
@@ -241,6 +258,7 @@ void mor_compute_min_regular_jcl(morphism* //!< The morphism.
  * The transition morphism.
  */
 morphism* dfa_to_morphism(nfa*, //!< The complete DFA.
+    bool**, //!< Ordering on the elements of the DFA. (NULL if not used).  
     int*  //!< Error code to be filled if not NULL.
 );
 
@@ -310,7 +328,7 @@ lgraph* mor_lmirror(morphism* //!< The morphism.
  * @remark
  * The computation is only made if the syntactic order has not already been computed.
  */
-void mor_compute_order(morphism* //!< The morphism.
+dequeue** mor_compute_order(morphism* //!< The morphism.
 );
 
 

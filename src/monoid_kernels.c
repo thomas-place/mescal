@@ -3,14 +3,14 @@
 #include "flint/fmpz_mat.h"
 #include "monoid_display.h"
 
-nfa *morphism_to_dfa_kernel(morphism *M) {
-    green *G = M->rels;
-    nfa *A = nfa_init();
+nfa* morphism_to_dfa_kernel(morphism* M) {
+    green* G = M->rels;
+    nfa* A = nfa_init();
     A->alphabet = mor_duplicate_alpha(M);
     A->trans = create_lgraph_noedges(M->r_cayley->size_graph, M->r_cayley->size_alpha);
     for (uint q = 0; q < M->r_cayley->size_graph; q++) {
         for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
-            if (M->rels->RCL->numcl[q] == M->rels->RCL->numcl[M->r_cayley->edges[q][a]] || !G->regular_set[M->r_cayley->edges[q][a]]) {
+            if (M->rels->RCL->numcl[q] == M->rels->RCL->numcl[M->r_cayley->edges[q][a]] || !G->regular_array[M->r_cayley->edges[q][a]]) {
                 rigins_dequeue(M->r_cayley->edges[q][a], A->trans->edges[q][a]);
             }
         }
@@ -18,13 +18,13 @@ nfa *morphism_to_dfa_kernel(morphism *M) {
     return A;
 }
 
-static nfa *morphism_to_dfa_aux(morphism *M, dgraph *C, parti *P) {
-    green *G = M->rels;
-    nfa *A = nfa_init();
+static nfa* morphism_to_dfa_aux(morphism* M, dgraph* C, parti* P) {
+    green* G = M->rels;
+    nfa* A = nfa_init();
     A->alphabet = mor_duplicate_alpha(M);
     A->trans = create_lgraph_noedges(C->size_graph, C->size_alpha);
     for (uint q = 0; q < C->size_graph; q++) {
-        if (G->regular_set[q]) {
+        if (G->regular_array[q]) {
             for (uint a = 0; a < C->size_alpha; a++) {
                 if (P->numcl[q] == P->numcl[C->edges[q][a]]) {
                     rigins_dequeue(C->edges[q][a], A->trans->edges[q][a]);
@@ -35,16 +35,16 @@ static nfa *morphism_to_dfa_aux(morphism *M, dgraph *C, parti *P) {
     return A;
 }
 
-nfa *morphism_to_dfa_rcl(morphism *M) { return morphism_to_dfa_aux(M, M->r_cayley, M->rels->RCL); }
+nfa* morphism_to_dfa_rcl(morphism* M) { return morphism_to_dfa_aux(M, M->r_cayley, M->rels->RCL); }
 
-nfa *morphism_to_dfa_lcl(morphism *M) { return morphism_to_dfa_aux(M, M->l_cayley, M->rels->LCL); }
+nfa* morphism_to_dfa_lcl(morphism* M) { return morphism_to_dfa_aux(M, M->l_cayley, M->rels->LCL); }
 
-static parti *folding_to_green(parti *F, uint *jord, subsemi *S) {
-    parti *ret;
+static parti* folding_to_green(parti* F, uint* jord, subsemi* S) {
+    parti* ret;
     MALLOC(ret, 1);
     ret->size_set = S->size;
     MALLOC(ret->numcl, S->size);
-    bool *done;
+    bool* done;
     CALLOC(done, S->size);
     uint num = 0;
     for (uint i = 0; i < S->size; i++) {
@@ -78,39 +78,40 @@ static parti *folding_to_green(parti *F, uint *jord, subsemi *S) {
     return ret;
 }
 
-static subsemi *get_kernel(morphism *M, sub_level level, bool mod) {
+static subsemi* get_kernel(morphism* M, sub_level level, bool mod) {
 
     // Allocation of the submonoid
-    subsemi *ker = init_subsemi(M);
+    subsemi* ker = init_subsemi(M);
     MALLOC(ker->rels, 1);
     ker->neut = ONE;
 
     // We use the separation algorithm
-    nfa *A;
+    nfa* A;
     if (level == LV_FULL) {
         ker->level = LV_FULL;
         A = morphism_to_dfa_kernel(M);
-    } else {
+    }
+    else {
         ker->level = LV_REG;
         A = morphism_to_dfa_rcl(M);
     }
 
     if (mod) {
         // If we want the MOD-kernel, we project the automaton on the unary alphabet.
-        nfa *U = nfa_proj_unary(A);
+        nfa* U = nfa_proj_unary(A);
         delete_nfa(A);
         A = U;
     }
 
     // We compute the SCCs of the automaton
-    parti *SCCS = nfa_inv_ext(A);
+    parti* SCCS = nfa_inv_ext(A);
 
     // We compute the folding of the automaton
-    parti *FOLD = nfa_stal_fold(A, SCCS);
+    parti* FOLD = nfa_stal_fold(A, SCCS);
     delete_parti(SCCS);
 
     // We compute the Dyck extension of the automaton only necesary if the full kernel has to be computed).
-    nfa *B = NULL;
+    nfa* B = NULL;
     if (level == LV_FULL) {
         B = nfa_dyck_ext(A, FOLD);
     }
@@ -132,7 +133,8 @@ static subsemi *get_kernel(morphism *M, sub_level level, bool mod) {
                     ker->size++;
                 }
             }
-        } else { // If we want all elements, there are the one reachable from an idempotent with an epsilon transition.
+        }
+        else { // If we want all elements, there are the one reachable from an idempotent with an epsilon transition.
             for (uint i = 0; i < size_dequeue(B->trans_e->edges[FOLD->numcl[e]]); i++) {
                 uint c = lefread_dequeue(B->trans_e->edges[FOLD->numcl[e]], i);
                 for (uint j = 0; j < size_dequeue(FOLD->cl[c]); j++) {
@@ -157,7 +159,7 @@ static subsemi *get_kernel(morphism *M, sub_level level, bool mod) {
 
     // We first order the elements of the Kernel according to the J order of the original monoid
     // (useful to have the R,L,J-classes of the Kernel in a topological order)
-    uint *jord = compute_jord_subsemi(ker);
+    uint* jord = compute_jord_subsemi(ker);
 
     // Computing the R-classes (two elements are R-equivalent if they have been folded together).
     ker->rels->RCL = folding_to_green(FOLD, jord, ker);
@@ -169,7 +171,7 @@ static subsemi *get_kernel(morphism *M, sub_level level, bool mod) {
     A = morphism_to_dfa_lcl(M);
     if (mod) {
         // If we want the MOD-kernel, we project the automaton on the unary alphabet.
-        nfa *U = nfa_proj_unary(A);
+        nfa* U = nfa_proj_unary(A);
         delete_nfa(A);
         A = U;
     }
@@ -196,16 +198,16 @@ static subsemi *get_kernel(morphism *M, sub_level level, bool mod) {
     return ker;
 }
 
-subsemi *get_grp_kernel(morphism *M, sub_level level) { return get_kernel(M, level, false); }
+subsemi* get_grp_kernel(morphism* M, sub_level level) { return get_kernel(M, level, false); }
 
-subsemi *get_mod_kernel(morphism *M, sub_level level) { return get_kernel(M, level, true); }
+subsemi* get_mod_kernel(morphism* M, sub_level level) { return get_kernel(M, level, true); }
 
 /*****************/
 /** AMT-kernels **/
 /*****************/
 
 // Solves the system of equations given by the HNF matrix MAT and the target vector.
-static bool solve_system_amt(fmpz_mat_t MAT, int *target, uint nb_rows, uint nb_cols) {
+static bool solve_system_amt(fmpz_mat_t MAT, int* target, uint nb_rows, uint nb_cols) {
 
     // This Boolean will be set to false if we find that s is not in the kernel.
     bool inside = true;
@@ -215,7 +217,8 @@ static bool solve_system_amt(fmpz_mat_t MAT, int *target, uint nb_rows, uint nb_
         int val;
         if (row >= nb_rows) {
             val = 0;
-        } else {
+        }
+        else {
             val = fmpz_get_si(fmpz_mat_entry(MAT, row, a));
         }
 
@@ -240,13 +243,14 @@ static bool solve_system_amt(fmpz_mat_t MAT, int *target, uint nb_rows, uint nb_
     return inside;
 }
 
-num_span_trees *compute_num_span_trees(morphism *M, bool right) {
-    num_span_trees *ret;
+num_span_trees* compute_num_span_trees(morphism* M, bool right) {
+    num_span_trees* ret;
     MALLOC(ret, 1);
     if (right) {
         ret->cay = M->r_cayley;
         ret->P = M->rels->RCL;
-    } else {
+    }
+    else {
         ret->cay = M->l_cayley;
         ret->P = M->rels->LCL;
     }
@@ -260,15 +264,16 @@ num_span_trees *compute_num_span_trees(morphism *M, bool right) {
     // Initialization of the dropped edges.
     MALLOC(ret->dropped, ret->P->size_par);
     for (uint i = 0; i < ret->P->size_par; i++) {
-        if (M->rels->regular_set[lefread_dequeue(ret->P->cl[i], 0)]) {
+        if (M->rels->regular_array[lefread_dequeue(ret->P->cl[i], 0)]) {
             ret->dropped[i] = create_dequeue();
-        } else {
+        }
+        else {
             ret->dropped[i] = NULL;
         }
     }
 
     // Array memorizing the elements already treated.
-    bool *visited;
+    bool* visited;
     CALLOC(visited, ret->cay->size_graph);
 
     // We select one idempotent per R/L-class and build a spanning tree from it.
@@ -288,7 +293,7 @@ num_span_trees *compute_num_span_trees(morphism *M, bool right) {
         // the encountered idempotents as treated.
 
         // Queue for the breadth first search that we will do to build the spanning tree.
-        dequeue *thequeue = create_dequeue();
+        dequeue* thequeue = create_dequeue();
 
         // We first enqueue the edges starting at e, they will be in the spanning tree
         for (uint a = 0; a < ret->cay->size_alpha; a++) {
@@ -334,7 +339,7 @@ num_span_trees *compute_num_span_trees(morphism *M, bool right) {
     return ret;
 }
 
-void delete_num_span_trees(num_span_trees *S) {
+void delete_num_span_trees(num_span_trees* S) {
     if (!S) {
         return;
     }
@@ -351,8 +356,8 @@ void delete_num_span_trees(num_span_trees *S) {
     free(S);
 }
 
-void compute_amt_kernel_regular(morphism *M, bool *mono_in_sub, uint *size) {
-    num_span_trees *spans = compute_num_span_trees(M, true);
+void compute_amt_kernel_regular(morphism* M, bool* mono_in_sub, uint* size) {
+    num_span_trees* spans = compute_num_span_trees(M, true);
 
     for (uint i = 0; i < size_dequeue(M->idem_list); i++) {
         uint e = lefread_dequeue(M->idem_list, i);
@@ -378,7 +383,8 @@ void compute_amt_kernel_regular(morphism *M, bool *mono_in_sub, uint *size) {
             for (uint a = 0; a < spans->cay->size_alpha; a++) {
                 if (a != b) {
                     fmpz_set_si(fmpz_mat_entry(MAT, j, a), spans->span_trees[r][a] - spans->span_trees[s][a]);
-                } else {
+                }
+                else {
                     fmpz_set_si(fmpz_mat_entry(MAT, j, a), spans->span_trees[r][a] - spans->span_trees[s][a] + 1);
                 }
             }
@@ -417,7 +423,7 @@ void compute_amt_kernel_regular(morphism *M, bool *mono_in_sub, uint *size) {
     delete_num_span_trees(spans);
 }
 
-void compute_amt_pairs_regular(num_span_trees *rspans, num_span_trees *lspans, uint e, uint f, dequeue *p1, dequeue *p2) {
+void compute_amt_pairs_regular(num_span_trees* rspans, num_span_trees* lspans, uint e, uint f, dequeue* p1, dequeue* p2) {
 
     // We compute the matrix corresponding to the cycle base (R-class of e + L-class of f).
     uint size_ebase = size_dequeue(rspans->dropped[rspans->P->numcl[e]]);
@@ -437,7 +443,8 @@ void compute_amt_pairs_regular(num_span_trees *rspans, num_span_trees *lspans, u
         for (uint a = 0; a < rspans->cay->size_alpha; a++) {
             if (a != b) {
                 fmpz_set_si(fmpz_mat_entry(MAT, j, a), rspans->span_trees[r][a] - rspans->span_trees[s][a]);
-            } else {
+            }
+            else {
                 fmpz_set_si(fmpz_mat_entry(MAT, j, a), rspans->span_trees[r][a] - rspans->span_trees[s][a] + 1);
             }
         }
@@ -454,7 +461,8 @@ void compute_amt_pairs_regular(num_span_trees *rspans, num_span_trees *lspans, u
         for (uint a = 0; a < lspans->cay->size_alpha; a++) {
             if (a != b) {
                 fmpz_set_si(fmpz_mat_entry(MAT, j + size_ebase, a), lspans->span_trees[r][a] - lspans->span_trees[s][a]);
-            } else {
+            }
+            else {
                 fmpz_set_si(fmpz_mat_entry(MAT, j + size_ebase, a), lspans->span_trees[r][a] - lspans->span_trees[s][a] + 1);
             }
         }
@@ -483,9 +491,9 @@ void compute_amt_pairs_regular(num_span_trees *rspans, num_span_trees *lspans, u
     fmpz_mat_clear(MAT);
 }
 
-subsemi *get_amt_kernel(morphism *M, sub_level) {
+subsemi* get_amt_kernel(morphism* M, sub_level) {
     // Allocation of the submonoid
-    subsemi *ker = init_subsemi(M);
+    subsemi* ker = init_subsemi(M);
     ker->neut = ONE;
 
     // We use the separation algorithm
@@ -513,7 +521,7 @@ subsemi *get_amt_kernel(morphism *M, sub_level) {
     // Computes the J-classes
     // We first order the elements of the Kernel according to the J order of the original monoid
     // (useful to have the J-classes of the Kernel in a topological order)
-    uint *jord = compute_jord_subsemi(ker);
+    uint* jord = compute_jord_subsemi(ker);
     compute_jrel_subsemi(ker, jord);
     free(jord);
 

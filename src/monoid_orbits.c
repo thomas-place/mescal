@@ -89,7 +89,7 @@ orbits* compute_ddorbits(morphism* M) {
     res->nb_computed = M->nb_min_regular_jcl;
     res->level = LV_FULL;
     for (uint j = 0; j < M->nb_min_regular_jcl; j++) {
-        res->orbits[j] = compute_one_ddorb(M, M->min_regular_idems[j]);
+        res->orbits[j] = compute_one_ddorb(M, M->regular_idems[j]);
     }
     return res;
 }
@@ -166,7 +166,7 @@ orbits* compute_gplusorbits(subsemi* S) {
     res->nb_computed = M->nb_min_regular_jcl;
     res->level = S->level;
     for (uint j = 0; j < M->nb_min_regular_jcl; j++) {
-        res->orbits[j] = compute_one_gplusorb(S, M->min_regular_idems[j]);
+        res->orbits[j] = compute_one_gplusorb(S, M->regular_idems[j]);
     }
     return res;
 }
@@ -380,11 +380,11 @@ orbits* compute_ptorbits(morphism* M) {
     orbits* res;
     MALLOC(res, 1);
     res->original = M;
-    MALLOC(res->orbits, M->rels->nb_regular_jcl);
-    res->nb_computed = M->rels->nb_regular_jcl;
+    MALLOC(res->orbits, M->nb_regular_jcl);
+    res->nb_computed = M->nb_regular_jcl;
     res->level = LV_FULL;
-    for (uint j = 0; j < M->rels->nb_regular_jcl; j++) {
-        res->orbits[j] = compute_one_ptorb(M, M->rels->regular_idems[j]);
+    for (uint j = 0; j < M->nb_regular_jcl; j++) {
+        res->orbits[j] = compute_one_ptorb(M, M->regular_idems[j]);
     }
     return res;
 }
@@ -643,16 +643,16 @@ orbits* compute_bpgorbits(subsemi* S, sub_level level) {
     orbits* res;
     MALLOC(res, 1);
     res->original = M;
-    MALLOC(res->orbits, M->rels->nb_regular_jcl);
-    res->nb_computed = M->rels->nb_regular_jcl;
+    MALLOC(res->orbits, M->nb_regular_jcl);
+    res->nb_computed = M->nb_regular_jcl;
     if (level == LV_FULL) {
         res->level = LV_FULL;
     }
     else {
         res->level = LV_GREG;
     }
-    for (uint j = 0; j < M->rels->nb_regular_jcl; j++) {
-        res->orbits[j] = compute_one_bpgorb(S, M->rels->regular_idems[j], level);
+    for (uint j = 0; j < M->nb_regular_jcl; j++) {
+        res->orbits[j] = compute_one_bpgorb(S, M->regular_idems[j], level);
     }
     return res;
 }
@@ -684,7 +684,7 @@ bool** compute_polgpluspairs(orbits* L, dequeue* rideal, uint rcl) {
     dequeue** jc_inorbit;
     MALLOC(jc_inorbit, M->nb_min_regular_jcl);
     for (uint i = 0; i < M->nb_min_regular_jcl; i++) {
-        uint f = M->min_regular_idems[i];
+        uint f = M->regular_idems[i];
         dequeue* Mf = compute_l_ideal(M, f, NULL);
         for (uint j = 0; j < size_dequeue(rideal); j++) {
             if (intersec_dequeue(Mf, rideal)) {
@@ -800,16 +800,16 @@ orbits* compute_bpgplusorbits(orbits* S, sub_level level) {
     orbits* res;
     MALLOC(res, 1);
     res->original = M;
-    MALLOC(res->orbits, M->rels->nb_regular_jcl);
-    res->nb_computed = M->rels->nb_regular_jcl;
+    MALLOC(res->orbits, M->nb_regular_jcl);
+    res->nb_computed = M->nb_regular_jcl;
     if (level == LV_FULL) {
         res->level = LV_FULL;
     }
     else {
         res->level = LV_GREG;
     }
-    for (uint j = 0; j < M->rels->nb_regular_jcl; j++) {
-        res->orbits[j] = compute_one_bpgplusorb(S, M->rels->regular_idems[j], level);
+    for (uint j = 0; j < M->nb_regular_jcl; j++) {
+        res->orbits[j] = compute_one_bpgplusorb(S, M->regular_idems[j], level);
     }
     return res;
 }

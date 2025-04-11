@@ -239,7 +239,7 @@ bool is_counterfree_dfa(nfa* A, int* error, FILE* out) {
 
         *error = 0;
 
-        morphism* M = dfa_to_morphism(SCC, error);
+        morphism* M = dfa_to_morphism(SCC, NULL, error);
         if (*error < 0) {
             return false;
         }

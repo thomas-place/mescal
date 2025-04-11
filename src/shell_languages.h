@@ -368,7 +368,8 @@ int shell_compute_minimal(int //!< The index of the object for which the minimal
  * @return
  * The index of the syntactic morphism in the object array.
  */
-int shell_compute_syntac(int //!< The index of the object for which the syntactic morphism needs to be computed.
+int shell_compute_syntac(int, //!< The index of the object for which the syntactic morphism needs to be computed.
+    bool //!< Boolean indicating if partial information on the syntactic order should be computed.
 );
 
 /**

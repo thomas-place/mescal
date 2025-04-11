@@ -19,7 +19,7 @@ int com_get_object(int i, string_chain* thechain) {
             i = shell_compute_minimal(i);
             break;
         case KY_SYNT:
-            i = shell_compute_syntac(i);
+            i = shell_compute_syntac(i, false);
             break;
         default:
             return -1;
@@ -490,7 +490,7 @@ static bool filter_syntactic(int i, int* vals) {
     if (!objects[i] || objects[i]->type == RECDEF) {
         return false;
     }
-    int j = shell_compute_syntac(i);
+    int j = shell_compute_syntac(i, false);
     if (objects[j]->mor->obj->r_cayley->size_graph >= (uint)vals[0] && (vals[1] == -1 || objects[j]->mor->obj->r_cayley->size_graph <= (uint)vals[1])) {
         return true;
     }
@@ -498,7 +498,7 @@ static bool filter_syntactic(int i, int* vals) {
 }
 
 static void info_syntactic(int i) {
-    int j = shell_compute_syntac(i);
+    int j = shell_compute_syntac(i, false);
     char buffer[64];
     sprintf(buffer, "Syntactic monoid: %d elements", objects[j]->mor->obj->r_cayley->size_graph);
     fprintf(stdout, "%-45s", buffer);
@@ -574,7 +574,7 @@ static bool filter_idems(int i, int* vals) {
     if (!objects[i] || objects[i]->type == RECDEF) {
         return false;
     }
-    int j = shell_compute_syntac(i);
+    int j = shell_compute_syntac(i, false);
     morphism* M = objects[j]->mor->obj;
     if (size_dequeue(M->idem_list) >= (uint)vals[0] && (vals[1] == -1 || size_dequeue(M->idem_list) <= (uint)vals[1])) {
         return true;
@@ -583,7 +583,7 @@ static bool filter_idems(int i, int* vals) {
 }
 
 static void info_idems(int i) {
-    int j = shell_compute_syntac(i);
+    int j = shell_compute_syntac(i, false);
     char buffer[64];
     morphism* M = objects[j]->mor->obj;
     sprintf(buffer, "Idempotents in the syntactic monoid: %d", size_dequeue(M->idem_list));

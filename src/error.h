@@ -1,69 +1,66 @@
 /**
  * @file error.h
- * @brief Macros permettant d'afficher des messages d'erreur.
+ * @brief Macros for displaying error messages.
  *
- * @details Le fichier fournit les macros TRACE(), DEBUG(), INFO(), WARNING(),
- * ERROR(),
- * CRITICAL() et FATAL(), qui permettent d'afficher des messages d'erreur sur la
- * sortie d'erreur, et, pour la macro FATAL(), de terminer le programme. Les
- * messages d'erreur sont affichés avec le nom de la fonction, le nom du fichier
- * et le numéro de la ligne où l'appel à la macro est effectué.
+ * @details This file provides the macros TRACE(), DEBUG(), INFO(), WARNING(),
+ * ERROR(), CRITICAL(), and FATAL(), which allow displaying error messages on
+ * the error output, and, for the FATAL() macro, terminating the program. Error
+ * messages are displayed with the function name, file name, and line number
+ * where the macro call is made.
  *
- * Les autres macros du fichier sont essentiellement destinées à implémenter les
- * macros TRACE(), DEBUG(), INFO(), WARNING(), ERROR(), CRITICAL() et FATAL().
- * Elles ne sont pas destinées à être utilisées directement par l'utilisateur
- * (mais rien ne l'empêche).
+ * The other macros in the file are primarily intended to implement the
+ * TRACE(), DEBUG(), INFO(), WARNING(), ERROR(), CRITICAL(), and FATAL() macros.
+ * They are not intended to be used directly by the user (but nothing prevents
+ * it).
  *
- * Les macros TRACE(), DEBUG(), INFO(), WARNING(), ERROR(), CRITICAL() et
- * FATAL() prennent en argument un message à afficher, qui peut contenir des
- * spécificateurs de conversion comme dans la fonction printf. Elles peuvent
- * prendre des arguments supplémentaires, un par spécificateur de conversion.
+ * The TRACE(), DEBUG(), INFO(), WARNING(), ERROR(), CRITICAL(), and FATAL()
+ * macros take as an argument a message to display, which can contain
+ * conversion specifiers as in the printf function. They can take additional
+ * arguments, one per conversion specifier.
  *
- * **Exemple d'utilisation :**
+ * **Example of use:**
  * @code
  * #include "error.h"
- * ERROR("La variable colors vaut %d, elle devrait être supérieure à %d.",
+ * ERROR("The variable colors is %d, it should be greater than %d.",
  *        colors, MIN_COLORS);
  * @endcode
  *
- * @note Les messages d'un certain type sont affichés en fonction du niveau de
- * debug, fixé par la variable ::DEBUG_LEVEL. Par exemple, si le niveau de
- * debug est à ::ERROR, seules les macros ERROR(), CRITICAL() et FATAL()
- * afficheront leur message. Les autres macros n'afficheront rien. Par défaut,
- * le niveau de debug est ::INFO.\n\n
- * **Niveaux de debug :**\n
- * - ::OFF (seulement les messages FATAL sont affichés),
- * - ::CRITICAL (seulement les messages CRITICAL et FATAL),
- * - ::ERROR  (seulement les messages ERROR, CRITICAL et FATAL),
- * - ::WARNING (seulement les messages WARNING, ERROR, CRITICAL et FATAL),
- * - ::INFO (tous les messages sauf DEBUG et TRACE),
- * - ::DEBUG (tous les messages sauf TRACE),
- * - ::TRACE (tous les messages).
+ * @note Messages of a certain type are displayed depending on the debug level,
+ * set by the ::DEBUG_LEVEL variable. For example, if the debug level is set to
+ * ::ERROR, only the ERROR(), CRITICAL(), and FATAL() macros will display their
+ * message. The other macros will display nothing. By default, the debug level
+ * is ::INFO.\n\n
+ * **Debug levels:**\n
+ * - ::OFF (only FATAL messages are displayed),
+ * - ::CRITICAL (only CRITICAL and FATAL messages),
+ * - ::ERROR  (only ERROR, CRITICAL, and FATAL messages),
+ * - ::WARNING (only WARNING, ERROR, CRITICAL, and FATAL messages),
+ * - ::INFO (all messages except DEBUG and TRACE),
+ * - ::DEBUG (all messages except TRACE),
+ * - ::TRACE (all messages).
  *
- * @note Pour changer le niveau de debug, il faut définir la macro ::DEBUG_LEVEL
- * avant d'inclure error.h, typiquement à la compilation. Par exemple, pour
- * afficher tous les messages de debug, il faut définir ::DEBUG_LEVEL à ::TRACE.
- * Pour cela, on peut compiler le programme ainsi :
+ * @note To change the debug level, you must define the ::DEBUG_LEVEL macro
+ * before including error.h, typically at compilation. For example, to display
+ * all debug messages, you must set ::DEBUG_LEVEL to ::TRACE. To do this, you
+ * can compile the program as follows:
  * ```
  * make -B CFLAGS="-DDEBUG_LEVEL=TRACE"
  * ```
  *
- * @sa DEBUG_LEVEL et les macros TRACE(), DEBUG(), INFO(), WARNING(), ERROR(),
- * CRITICAL() et FATAL().
+ * @sa DEBUG_LEVEL and the macros TRACE(), DEBUG(), INFO(), WARNING(), ERROR(),
+ * CRITICAL(), and FATAL().
  */
-
 #ifndef ERROR_H_
 #define ERROR_H_
-
 
 /** @brief Symbole ❗. */
 #define ATTENTION "\xe2\x9d\x97"
 /** @brief Symbole ✨. */
-#define HINT "\xe2\x9c\xa8"
+#define HINT      "\xe2\x9c\xa8"
 /** @brief Symbole ✅. */
-#define OK "\xE2\x9C\x85"
+#define OK        "\xE2\x9C\x85"
 /** @brief Symbole ❌. */
-#define KO "\xE2\x9D\x8C"
+#define KO        "\xE2\x9D\x8C"
 
 // In X mode, all messages more severe than X are printed.
 // clang-format off
@@ -71,30 +68,29 @@ enum debug_level {OFF,        CRITICAL, ERROR,     WARNING, INFO,    DEBUG, TRAC
 enum msg_level   {CRITICAL_L, ERROR_L,  WARNING_L, INFO_L,  DEBUG_L, TRACE_L};
 // clang-format on
 
-/**
- * @brief Niveau de debug, ::INFO par défaut.
+/** @brief Debug level, ::INFO by default.
  * @details
- * Par défaut, le niveau de debug est INFO.
- * Pour changer le niveau de debug, il faut définir la macro DEBUG_LEVEL
- * avant d'inclure error.h.
+ * By default, the debug level is INFO.
+ * To change the debug level, you must define the DEBUG_LEVEL macro
+ * before including error.h.
  *
- * Cela peut se faire au moment de la compilation :
+ * This can be done at compilation:
  * ```
  * make -B CFLAGS="-DDEBUG_LEVEL=WARNING"
  * ```
  *
- * Par exemple, pour afficher tous les messages de debug, il faut définir
- * ::DEBUG_LEVEL à ::TRACE. Pour n'afficher que les messages de niveau FATAL, il
- * faut définir ::DEBUG_LEVEL à ::OFF.
+ * For example, to display all debug messages, you must set
+ * ::DEBUG_LEVEL to ::TRACE. To display only FATAL-level messages,
+ * you must set ::DEBUG_LEVEL to ::OFF.
  *
- * **Niveaux possibles :**
- * - ::OFF (seulement les messages FATAL sont affichés),
- * - ::CRITICAL (seulement les messages CRITICAL et FATAL),
- * - ::ERROR  (seulement les messages ERROR, CRITICAL et FATAL),
- * - ::WARNING (seulement les messages WARNING, ERROR, CRITICAL et FATAL),
- * - ::INFO (tous les messages sauf DEBUG et TRACE),
- * - ::DEBUG (tous les messages sauf TRACE),
- * - ::TRACE (tous les messages).
+ * **Possible levels:**
+ * - ::OFF (only FATAL messages are displayed),
+ * - ::CRITICAL (only CRITICAL and FATAL messages),
+ * - ::ERROR  (only ERROR, CRITICAL, and FATAL messages),
+ * - ::WARNING (only WARNING, ERROR, CRITICAL, and FATAL messages),
+ * - ::INFO (all messages except DEBUG and TRACE),
+ * - ::DEBUG (all messages except TRACE),
+ * - ::TRACE (all messages).
  *
  * @see enum debug_level
  */
@@ -105,80 +101,65 @@ enum msg_level   {CRITICAL_L, ERROR_L,  WARNING_L, INFO_L,  DEBUG_L, TRACE_L};
 
 // __VA_OPTS__ requires C2x. Clang issues spurious warning.
 
-/** @brief Affiche un message d'erreur sur la sortie d'erreur.
+/** @brief Displays an error message on the error output.
  *
- * @details Cette macro est utilisée par les macros ::TRACE, ::DEBUG, ::INFO,
- * ::WARNING, ::ERROR, ::CRITICAL et ::FATAL.
+ * @details This macro is used by the macros ::TRACE, ::DEBUG, ::INFO,
+ * ::WARNING, ::ERROR, ::CRITICAL, and ::FATAL.
  *
- * @param symbol Symbole à afficher (::ATTENTION, ::HINT, ::OK ou ::KO).
- * @param name Nom du message (comme "TRACE", "DEBUG", "INFO", "WARNING",
- * "ERROR", "CRITICAL" ou "FATAL").
- * @param function Nom de la fonction où le message est affiché.
- * @param file Nom du fichier où le message est affiché.
- * @param line Numéro de la ligne où le message est affiché.
- * @param msg Message à afficher. Ce message peut contenir les mêmes
- * spécificateurs de conversion que la fonction printf (comme `%d`, `%s`, etc.).
- * @param ... Arguments supplémentaires à afficher avec le message, un par
- * spécificateur de conversion.
+ * @param symbol Symbol to display (::ATTENTION, ::HINT, ::OK, or ::KO).
+ * @param name Name of the message (such as "TRACE", "DEBUG", "INFO", "WARNING",
+ * "ERROR", "CRITICAL", or "FATAL").
+ * @param function Name of the function where the message is displayed.
+ * @param file Name of the file where the message is displayed.
+ * @param line Line number where the message is displayed.
+ * @param msg Message to display. This message can contain the same
+ * conversion specifiers as the printf function (such as `%d`, `%s`, etc.).
+ * @param ... Additional arguments to display with the message, one per
+ * conversion specifier.
  */
 
-#define PRINT_ERROR(symbol, name, function, file, line, msg, ...) \
-  do {                                                            \
-    fprintf(stderr,                                               \
-            "\n" symbol                                           \
-            " ["                                                  \
-            name                                                  \
-            "]"                                                   \
-            " - Function %s (%s:%d) -\n  "                        \
-            msg "\n",                                             \
-            function, file, line                                  \
-            __VA_OPT__( , ) __VA_ARGS__);                         \
-  } while (0)
+#define PRINT_ERROR(symbol, name, function, file, line, msg, ...)              \
+    do {                                                                       \
+        fprintf(stderr,                                                        \
+                "\n" symbol " [" name "]"                                      \
+                " - Function %s (%s:%d) -\n  " msg "\n",                       \
+                function, file, line __VA_OPT__(, ) __VA_ARGS__);              \
+    } while (0)
 
-/** @brief Affiche un message de niveau FATAL et termine le programme. */
+/** @brief Print a FATAL message and end the program. */
+#define FATAL(msg, ...)                                                        \
+    do {                                                                       \
+        PRINT_ERROR(KO, "FATAL", __func__, __FILE__, __LINE__,                 \
+                    msg __VA_OPT__(, ) __VA_ARGS__);                           \
+        exit(EXIT_FAILURE);                                                    \
+    } while (0)
 
-#define FATAL(msg, ...)                                    \
-  do {                                                     \
-    PRINT_ERROR(KO, "FATAL", __func__, __FILE__, __LINE__, \
-                msg __VA_OPT__( , ) __VA_ARGS__);          \
-    exit(EXIT_FAILURE);                                    \
-  } while (0)
+#define PRINT_DEBUG(symbol, name, level, msg, ...)                             \
+    do {                                                                       \
+        if ((int)DEBUG_LEVEL > (int)level)                                     \
+            PRINT_ERROR(symbol, name, __func__, __FILE__, __LINE__,            \
+                        msg __VA_OPT__(, ) __VA_ARGS__);                       \
+    } while (0)
 
-#define PRINT_DEBUG(symbol, name, level, msg, ...)          \
-  do {                                                      \
-    if ((int)DEBUG_LEVEL > (int)level)                      \
-    PRINT_ERROR(symbol, name, __func__, __FILE__, __LINE__, \
-                msg __VA_OPT__( , ) __VA_ARGS__);           \
-  } while (0)
+/** @brief Print a TRACE message */
+#define TRACE(msg, ...) PRINT_DEBUG(OK, "TRACE", TRACE_L, msg, __VA_ARGS__)
 
-/** @brief Affiche un message de niveau TRACE */
-#define TRACE(msg, ...)             \
-  PRINT_DEBUG(OK, "TRACE", TRACE_L, \
-              msg, __VA_ARGS__)
+/** @brief Print a DEBUG message */
+#define DEBUG(msg, ...) PRINT_DEBUG(HINT, "DEBUG", DEBUG_L, msg, __VA_ARGS__)
 
-/** @brief Affiche un message de niveau DEBUG */
-#define DEBUG(msg, ...)               \
-  PRINT_DEBUG(HINT, "DEBUG", DEBUG_L, \
-              msg, __VA_ARGS__)
+/** @brief Print an INFO message */
+#define INFO(msg, ...)  PRINT_DEBUG(HINT, "INFO", INFO_L, msg, __VA_ARGS__)
 
-/** @brief Affiche un message de niveau INFO */
-#define INFO(msg, ...)              \
-  PRINT_DEBUG(HINT, "INFO", INFO_L, \
-              msg, __VA_ARGS__)
+/** @brief Print a WARNING message */
+#define WARNING(msg, ...)                                                      \
+    PRINT_DEBUG(ATTENTION, "WARNING", WARNING_L, msg, __VA_ARGS__)
 
-/** @brief Affiche un message de niveau WARNING */
-#define WARNING(msg, ...)                      \
-  PRINT_DEBUG(ATTENTION, "WARNING", WARNING_L, \
-              msg, __VA_ARGS__)
+/** @brief Print an ERROR message */
+#define ERROR(msg, ...)                                                        \
+    PRINT_DEBUG(ATTENTION, "ERROR", ERROR_L, msg, __VA_ARGS__)
 
-/** @brief Affiche un message de niveau ERROR */
-#define ERROR(msg, ...)                    \
-  PRINT_DEBUG(ATTENTION, "ERROR", ERROR_L, \
-              msg, __VA_ARGS__)
-
-/** @brief Affiche un message de niveau CRITICAL */
-#define CRITICAL(msg, ...)                \
-  PRINT_DEBUG(KO, "CRITICAL", CRITICAL_L, \
-              msg, __VA_ARGS__)
+/** @brief Print a CRITICAL message */
+#define CRITICAL(msg, ...)                                                     \
+    PRINT_DEBUG(KO, "CRITICAL", CRITICAL_L, msg, __VA_ARGS__)
 
 #endif // ERROR_H_

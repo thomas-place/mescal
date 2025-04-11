@@ -158,4 +158,5 @@ void green_compute_sub_reg(subsemi* //!< The sub-semigroup.
 
 
 
+
 #endif // _MONOID_SUB_H_

@@ -6,8 +6,9 @@
 /* Manipulating subsemigroups */
 /******************************/
 
-subsemi *init_subsemi(morphism *M) {
-    subsemi *S;
+
+subsemi* init_subsemi(morphism* M) {
+    subsemi* S;
     MALLOC(S, 1);
     S->original = M;
 
@@ -21,7 +22,8 @@ subsemi *init_subsemi(morphism *M) {
     return S;
 }
 
-void compute_maps_subsemi(subsemi *S) {
+
+void compute_maps_subsemi(subsemi* S) {
     if (!S || !S->original || !S->mono_in_sub) {
         fprintf(stderr, "Error: compute_maps_subsemi: The subsemigroup is not correctly initialized.\n");
         exit(EXIT_FAILURE);
@@ -47,7 +49,7 @@ void compute_maps_subsemi(subsemi *S) {
     }
 }
 
-void compute_idems_subsemi(subsemi *S) {
+void compute_idems_subsemi(subsemi* S) {
     if (!S || !S->original || !S->mono_in_sub || !S->sub_to_mono) {
         fprintf(stderr, "Error: compute_idems_subsemi: The subsemigroup is not correctly initialized.\n");
         exit(EXIT_FAILURE);
@@ -68,9 +70,10 @@ void compute_idems_subsemi(subsemi *S) {
     }
 }
 
-uint *compute_jord_subsemi(subsemi *S) {
-    green *G = S->original->rels;
-    uint *jord;
+
+uint* compute_jord_subsemi(subsemi* S) {
+    green* G = S->original->rels;
+    uint* jord;
     MALLOC(jord, S->size);
     uint num = 0;
     for (uint cjo = 0; cjo < G->JCL->size_par; cjo++) {
@@ -84,7 +87,7 @@ uint *compute_jord_subsemi(subsemi *S) {
     return jord;
 }
 
-void compute_jrel_subsemi(subsemi *S, uint *jord) {
+void compute_jrel_subsemi(subsemi* S, uint* jord) {
     if (!S || !S->original || !S->mono_in_sub || !S->sub_to_mono || !S->idem_array || !S->idem_list || !S->rels || !S->rels->RCL || !S->rels->LCL) {
         fprintf(stderr, "Error: compute_jrel_subsemi: The subsemigroup is not correctly initialized.\n");
         exit(EXIT_FAILURE);
@@ -98,7 +101,7 @@ void compute_jrel_subsemi(subsemi *S, uint *jord) {
     S->rels->JCL->size_set = S->size;
     MALLOC(S->rels->JCL->numcl, S->size);
 
-    bool *done;
+    bool* done;
     CALLOC(done, S->size);
 
     uint num = 0;
@@ -131,9 +134,10 @@ void compute_jrel_subsemi(subsemi *S, uint *jord) {
     free(done);
 }
 
+
 // Release of a subsemigroup.
 // Does not release the original morphism and its Green relations.
-void delete_subsemi(subsemi *S) {
+void delete_subsemi(subsemi* S) {
     if (S == NULL) {
         return;
     }
@@ -149,8 +153,8 @@ void delete_subsemi(subsemi *S) {
 
 // Given a list of elements in a monoid and a subsemigroup of a monoid, returns the sublist
 // restricted to the elements inside the subsemigroup.
-dequeue *restrict_list_to_subsemi(subsemi *S, dequeue *l) {
-    dequeue *result = create_dequeue();
+dequeue* restrict_list_to_subsemi(subsemi* S, dequeue* l) {
+    dequeue* result = create_dequeue();
     for (uint i = 0; i < size_dequeue(l); i++) {
         if (S->mono_in_sub == NULL || S->mono_in_sub[lefread_dequeue(l, i)]) {
             rigins_dequeue(lefread_dequeue(l, i), result);
@@ -160,11 +164,16 @@ dequeue *restrict_list_to_subsemi(subsemi *S, dequeue *l) {
     return result;
 }
 
-void green_compute_sub(subsemi *S) {
 
-    graph *cayr = create_graph_noedges(S->size);
-    graph *cayl = create_graph_noedges(S->size);
-    graph *cayj = create_graph_noedges(S->size);
+
+
+
+void green_compute_sub(subsemi* S) {
+
+
+    graph* cayr = create_graph_noedges(S->size);
+    graph* cayl = create_graph_noedges(S->size);
+    graph* cayj = create_graph_noedges(S->size);
 
     // For each element q in N
     for (uint q = 0; q < S->size; q++) {
@@ -207,6 +216,7 @@ void green_compute_sub(subsemi *S) {
     S->rels->JCL = tarjan(cayj);
     delete_graph(cayj);
 
+
     // Computes the H-classes
     h_green_compute(S->rels);
 
@@ -215,21 +225,25 @@ void green_compute_sub(subsemi *S) {
     gr_green_compute(S->idem_list, S->rels);
 }
 
-void green_compute_sub_reg(subsemi *S) {
+
+
+
+void green_compute_sub_reg(subsemi* S) {
 
     // The original Green relations.
-    green *G = S->original->rels;
+    green* G = S->original->rels;
+
 
     // Array of regular R-classes
     // Each regular element will be mapped to an idempotent in its R-class
     // Each non-regular element will be mapped to UINT_MAX
-    uint *rarray;
+    uint* rarray;
     MALLOC(rarray, S->size);
 
     // Array of regular L-classes
     // Each regular element will be mapped to an idempotent in its L-class
     // Each non-regular element will be mapped to UINT_MAX
-    uint *larray;
+    uint* larray;
     MALLOC(larray, S->size);
 
     // Initialization of the arrays
@@ -237,6 +251,7 @@ void green_compute_sub_reg(subsemi *S) {
         rarray[i] = UINT_MAX;
         larray[i] = UINT_MAX;
     }
+
 
     // Filling the arrays: loop over all idempotents in the subsemigroup
     // First, we restrict the regular classes to the elements in the subsemigroup
@@ -258,6 +273,7 @@ void green_compute_sub_reg(subsemi *S) {
                     rarray[S->mono_to_sub[s]] = sube;
                 }
             }
+
         }
 
         // If the idempotent has not already been handled as being part of the L-class of another idempotent
@@ -273,17 +289,18 @@ void green_compute_sub_reg(subsemi *S) {
         }
     }
 
+
     // For each regular element of the subsemigroup
     // We are now going to check whether it remains regular or not
 
     // Array to keep track of the elements that have already been handled
-    bool *done;
+    bool* done;
     CALLOC(done, S->size);
 
     // For each element of the subsemigroup
     for (uint subs = 0; subs < S->size; subs++) {
-        // mor_fprint_name_utf8(S->original, S->sub_to_mono[subs], stdout);
-        // printf("\n");
+        //mor_fprint_name_utf8(S->original, S->sub_to_mono[subs], stdout);
+        //printf("\n");
 
         // If the element has already been handled
         if (done[subs]) {
@@ -302,11 +319,13 @@ void green_compute_sub_reg(subsemi *S) {
             continue;
         }
 
+
         uint e = S->sub_to_mono[sube];
         uint f = S->sub_to_mono[subf];
 
+
         // The R-class of e restricted to the elements in the subsemigroup
-        dequeue *re = create_dequeue();
+        dequeue* re = create_dequeue();
         for (uint i = 0; i < size_dequeue(G->RCL->cl[G->RCL->numcl[e]]); i++) {
             uint s = lefread_dequeue(G->RCL->cl[G->RCL->numcl[e]], i);
             if (S->mono_in_sub[s]) {
@@ -314,7 +333,7 @@ void green_compute_sub_reg(subsemi *S) {
             }
         }
         // The R-class of f restricted to the elements in the subsemigroup
-        dequeue *rf = create_dequeue();
+        dequeue* rf = create_dequeue();
         for (uint i = 0; i < size_dequeue(G->RCL->cl[G->RCL->numcl[f]]); i++) {
             uint s = lefread_dequeue(G->RCL->cl[G->RCL->numcl[f]], i);
             if (S->mono_in_sub[s]) {
@@ -322,7 +341,7 @@ void green_compute_sub_reg(subsemi *S) {
             }
         }
         // The L-class of e restricted to the elements in the subsemigroup
-        dequeue *le = create_dequeue();
+        dequeue* le = create_dequeue();
         for (uint i = 0; i < size_dequeue(G->LCL->cl[G->LCL->numcl[e]]); i++) {
             uint s = lefread_dequeue(G->LCL->cl[G->LCL->numcl[e]], i);
             if (S->mono_in_sub[s]) {
@@ -330,7 +349,7 @@ void green_compute_sub_reg(subsemi *S) {
             }
         }
         // The L-class of e restricted to the elements in the subsemigroup
-        dequeue *lf = create_dequeue();
+        dequeue* lf = create_dequeue();
         for (uint i = 0; i < size_dequeue(G->LCL->cl[G->LCL->numcl[f]]); i++) {
             uint s = lefread_dequeue(G->LCL->cl[G->LCL->numcl[f]], i);
             if (S->mono_in_sub[s]) {
@@ -338,19 +357,24 @@ void green_compute_sub_reg(subsemi *S) {
             }
         }
 
+
         // Intersection of the R-class of e and the L-class of f
         // Nonempty: it contains subs
-        dequeue *reilf = make_inter_sorted_dequeue(re, lf);
+        dequeue* reilf = make_inter_sorted_dequeue(re, lf);
+
 
         // Intersection of the L-class of e and the R-class of f
         // Possibly empty. In this case, none of the elements in reilf are regular
         // Otherwise, all elements in reilf and leirf are regular
-        dequeue *leirf = make_inter_sorted_dequeue(le, rf);
+        dequeue* leirf = make_inter_sorted_dequeue(le, rf);
+
 
         delete_dequeue(re);
         delete_dequeue(rf);
         delete_dequeue(le);
         delete_dequeue(lf);
+
+
 
         // If the intersection leirf is empty, none of the elements in reilf are regular
         if (isempty_dequeue(leirf)) {
@@ -374,6 +398,8 @@ void green_compute_sub_reg(subsemi *S) {
             done[subt] = true;
         }
 
+
+
         delete_dequeue(reilf);
         delete_dequeue(leirf);
     }
@@ -381,8 +407,10 @@ void green_compute_sub_reg(subsemi *S) {
     free(done);
     // We can now compute the Green relations.
 
+
     // Initialization
     MALLOC(S->rels, 1);
+
 
     // Computation of the R-classes and L-classes.
     MALLOC(S->rels->RCL, 1);
@@ -395,6 +423,7 @@ void green_compute_sub_reg(subsemi *S) {
     S->rels->RCL->size_par = 0;
     S->rels->LCL->size_par = 0;
 
+
     // Computation of the classes indices for regular elements (we keep the ordering of the original monoid)
     for (uint i = 0; i < G->RCL->size_par; i++) {
         bool inter = false;
@@ -404,11 +433,13 @@ void green_compute_sub_reg(subsemi *S) {
                 inter = true;
                 S->rels->RCL->numcl[S->mono_to_sub[s]] = S->rels->RCL->size_par;
             }
+
         }
         if (inter) {
             S->rels->RCL->size_par++;
         }
     }
+
 
     for (uint i = 0; i < G->LCL->size_par; i++) {
         bool inter = false;
@@ -418,6 +449,7 @@ void green_compute_sub_reg(subsemi *S) {
                 inter = true;
                 S->rels->LCL->numcl[S->mono_to_sub[s]] = S->rels->LCL->size_par;
             }
+
         }
         if (inter) {
             S->rels->LCL->size_par++;
@@ -425,7 +457,7 @@ void green_compute_sub_reg(subsemi *S) {
     }
 
     // Computation of the classes indices for the non-regular elements (placed at the end)
-    for (uint t = 0; t < S->size; t++) {
+    for (uint t = 0; t < S->size;t++) {
         if (rarray[t] == UINT_MAX) {
             S->rels->RCL->numcl[t] = S->rels->RCL->size_par;
             S->rels->RCL->size_par++;
@@ -455,7 +487,9 @@ void green_compute_sub_reg(subsemi *S) {
 
     // Computes the J-classes
 
-    uint *jord = compute_jord_subsemi(S);
+    uint* jord = compute_jord_subsemi(S);
+
+
 
     MALLOC(S->rels->JCL, 1);
     MALLOC(S->rels->JCL->numcl, S->size);
@@ -484,6 +518,9 @@ void green_compute_sub_reg(subsemi *S) {
         S->rels->JCL->size_par++;
     }
 
+
+
+
     MALLOC(S->rels->JCL->cl, S->rels->JCL->size_par);
     for (uint c = 0; c < S->rels->JCL->size_par; c++) {
         S->rels->JCL->cl[c] = create_dequeue();
@@ -494,9 +531,19 @@ void green_compute_sub_reg(subsemi *S) {
 
     free(jord);
 
+
+
     // Computes the H-classes
     h_green_compute(S->rels);
 
     // Computes the groups and the regular elements.
+
     gr_green_compute(S->idem_list, S->rels);
+
 }
+
+
+
+
+
+

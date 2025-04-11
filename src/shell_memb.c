@@ -142,6 +142,34 @@ void init_membership(void) {
     class_membership[CL_REG] = shell_membership_reg;
 }
 
+bool shell_membership_needs_order(classes cl) {
+    switch (cl)
+    {
+    case CL_PPT:
+    case CL_POLMOD:
+    case CL_POLAMT:
+    case CL_POLGR:
+    case CL_POLDD:
+    case CL_POLMODP:
+    case CL_POLAMTP:
+    case CL_POLGRP:
+    case CL_POL2ST:
+    case CL_POL2MOD:
+    case CL_POL2AMT:
+    case CL_POL2GR:
+    case CL_POL2DD:
+    case CL_POL2MODP:
+    case CL_POL2AMTP:
+    case CL_POL2GRP:
+        return true;
+        break;
+    default:
+        return false;
+        break;
+    }
+}
+
+
 /*********************/
 /* General functions */
 /*********************/
@@ -548,7 +576,7 @@ bool shell_morprop_monojsat(int j, char* name, FILE* out) {
     if (out) {
         fprintf(out, "#### Checking if the %s M satisfies the inequation 1 ⩽ s for all s ∊ M.\n", name);
     }
-    if (is_jsat_mono(objects[j]->mor->obj, get_counter(out))) {
+    if (is_jsat_mono(objects[j]->mor->obj, objects[j]->mor->obj->order[ONE], get_counter(out))) {
         if (out) {
             fprintf(out, "#### The inequation is satisfied.\n");
         }
@@ -566,7 +594,7 @@ bool shell_morprop_monoejsat(int j, char* name, FILE* out) {
     if (out) {
         fprintf(out, "#### Checking if the %s M satisfies the inequation 1 ⩽ e for all e ∊ E(M).\n", name);
     }
-    if (is_ejsat_mono(objects[j]->mor->obj, get_counter(out))) {
+    if (is_ejsat_mono(objects[j]->mor->obj, objects[j]->mor->obj->order[ONE], get_counter(out))) {
         if (out) {
             fprintf(out, "#### The inequation is satisfied.\n");
         }
@@ -585,7 +613,7 @@ bool shell_morprop_kerjsat(int j, kernel_type type, char* ker, char* name, FILE*
         fprintf(out, "#### Checking if the %s-kernel N of the %s satisfies\n", ker, name);
         fprintf(out, "     the inequation 1 ⩽ s for all s ∊ N.\n");
     }
-    if (is_jsat_subsemi(shell_compute_ker(j, type, LV_GREG), get_counter(out))) {
+    if (is_jsat_subsemi(shell_compute_ker(j, type, LV_GREG), objects[j]->mor->obj->order[ONE], get_counter(out))) {
         if (out) {
             fprintf(out, "#### The inequation is satisfied.\n");
         }
@@ -1309,9 +1337,8 @@ bool shell_membership(com_parameters* pars) {
         return false;
     }
     print_info_input(i, stdout);
-
     // Caclcul du morphisme syntactique
-    int j = shell_compute_syntac(i);
+    int j = shell_compute_syntac(i, shell_membership_needs_order(cl));
     if (j == -1) {
         return false;
     }
@@ -1434,7 +1461,7 @@ bool shell_chiera_summary(com_parameters* pars) {
     if (i == -1) {
         return false;
     }
-    int j = shell_compute_syntac(i);
+    int j = shell_compute_syntac(i, true);
     if (j == -1) {
         return false;
     }
@@ -1743,7 +1770,7 @@ bool shell_neghiera(com_parameters* pars) {
     if (i == -1) {
         return false;
     }
-    int j = shell_compute_syntac(i);
+    int j = shell_compute_syntac(i, false);
     if (j == -1) {
         return false;
     }
@@ -1883,7 +1910,7 @@ bool shell_fphiera(com_parameters* pars) {
     if (i == -1) {
         return false;
     }
-    int j = shell_compute_syntac(i);
+    int j = shell_compute_syntac(i, false);
     if (j == -1) {
         return false;
     }
@@ -2082,7 +2109,7 @@ bool shell_exsearch(com_parameters* pars) {
     for (int i = 0; i < cycle; i++) {
         sprintf(buffer, "EXA%04d", count);
         int j = shell_random_dfa(buffer, pars->next->next);
-        int k = shell_compute_syntac(j);
+        int k = shell_compute_syntac(j, false);
         if (k == -1) {
             fprintf(stdout, "#### Test %d: Syntactic monoid too large.\n", i + 1);
             continue;
@@ -2300,6 +2327,23 @@ bool shell_exall(com_parameters* pars) {
         return false;
     }
 
+    bool order = false;
+    for (uint i = 0; i < nblow; i++) {
+        if (shell_membership_needs_order(low[i])) {
+            order = true;
+            break;
+        }
+    }
+    if (!order) {
+        for (uint i = 0; i < nbhigh; i++) {
+            if (shell_membership_needs_order(high[i])) {
+                order = true;
+                break;
+            }
+        }
+    }
+
+
     nfa_enum* E = nfa_enum_init(states, alpha);
     uint count = 0;
     uint exa = 0;
@@ -2316,7 +2360,7 @@ bool shell_exall(com_parameters* pars) {
 
 
         // TODO: Fix when shell_compute_syntac fails
-        int k = shell_compute_syntac(j);
+        int k = shell_compute_syntac(j, order);
 
         if (k == MEMORY_LIMIT) {
             fprintf(stdout, "#### Test %d: Syntactic monoid too large.\n", count);

@@ -341,7 +341,7 @@ nfa* nfa_hopcroft(nfa* A) {
 /** Canonical ordering **/
 /************************/
 
-dequeue** nfa_mini_canonical_ordering(nfa* A) {
+bool** nfa_mini_canonical_ordering(nfa* A) {
     if (!A) {
         return NULL;
     }
@@ -362,13 +362,14 @@ dequeue** nfa_mini_canonical_ordering(nfa* A) {
     dequeue* stack_one = create_dequeue();
     dequeue* stack_two = create_dequeue();
 
+
     // We push the starting pairs (final, non-final) which are clearly incomparable.
     for (uint i = 0; i < size_dequeue(A->finals); i++)
     {
-        int j = 0;
+        uint j = 0;
         for (uint q = 0; q < thesize; q++) {
             // We skip q if it is a final state.
-            if (lefread_dequeue(A->finals, j) == q) {
+            if (j < size_dequeue(A->finals) && lefread_dequeue(A->finals, j) == q) {
                 j++;
                 continue;
             }
@@ -376,6 +377,7 @@ dequeue** nfa_mini_canonical_ordering(nfa* A) {
             rigins_dequeue(q, stack_two);
         }
     }
+
 
     // Computation of the mirror automaton (used in the DFS).
     lgraph* mirror = lgraph_mirror(A->trans);
@@ -408,27 +410,17 @@ dequeue** nfa_mini_canonical_ordering(nfa* A) {
         }
     }
 
-    // We may now compute the canonical ordering of the states.
-    dequeue** order;
-    MALLOC(order, thesize);
+    // We may now inverse the visted array to get the canonical order.
     for (uint q = 0; q < thesize; q++) {
-        order[q] = create_dequeue();
         for (uint r = 0; r < thesize; r++) {
-            if (!visited[q][r]) {
-                rigins_dequeue(r, order[q]);
-            }
+            visited[q][r] = !visited[q][r];
         }
-        free(visited[q]);
     }
-    free(visited);
 
 
     delete_dequeue(stack_one);
     delete_dequeue(stack_two);
     delete_lgraph(mirror);
-
-    return order;
-
-
+    return visited;
 }
 

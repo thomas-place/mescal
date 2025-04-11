@@ -214,7 +214,7 @@ void mor_print_idems(morphism* M, FILE* out) {
 
 // Affichage de l'ordre syntaxique
 void mor_print_order(morphism* M, FILE* out) {
-    mor_compute_order(M); // Calcul (si nécessaire de l'ordre)
+    dequeue** order = mor_compute_order(M); // Calcul 
     print_top_line(100, out);
 
     // Calcul de la longueur maximale d'un nom
@@ -229,9 +229,13 @@ void mor_print_order(morphism* M, FILE* out) {
         fprintf(out, "│Elements larger than ");
         mor_fprint_name_utf8_aligned(M, q, size_max, out);
         fprintf(out, " : ");
-        mor_print_sub_aligned(M, M->order[q], 100, padding, out);
+        mor_print_sub_aligned(M, order[q], 100, padding, out);
+        delete_dequeue(order[q]);
     }
     print_bot_line(100, out);
+
+    free(order);
+
 }
 
 // Print de la table de multiplication
@@ -499,7 +503,7 @@ static void print_jclass_green_aux(morphism* M, green* G, uint* remap, uint jcla
         for (uint i = 0; i < row_length; i++) {
             uint s = thejclass[(j * size_rc) + i * size_hc];
 
-            if (G->group_set[s]) {
+            if (G->group_array[s]) {
                 print_spaces(h_line_size - 1, out);
                 fprintf(out, "*");
             }
@@ -617,7 +621,7 @@ void print_full_subsemi(subsemi* S, FILE* out) {
             fprintf(out, "#### The regular J-classes (ordered using a topological sort).\n");
             for (uint i = S->rels->JCL->size_par; i > 0; i--) {
                 uint s = lefread_dequeue(S->rels->JCL->cl[i - 1], 0);
-                if (S->rels->regular_set[s]) {
+                if (S->rels->regular_array[s]) {
                     print_jclass_subsemi(S, i - 1, 5, out);
                 }
             }
