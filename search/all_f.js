@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['p_0',['P',['../structnum__span__trees.html#a67430f7a494bf5e5ec53c1418bcbbf77',1,'num_span_trees']]],
+  ['param_1',['param',['../structcom__parameters.html#a7ac87f6c2d9efeb0ee25cf41ac4f6af9',1,'com_parameters']]],
+  ['params_2',['params',['../structcom__command.html#a4244189a722bf259fb5715b8166a7e36',1,'com_command']]],
+  ['parent_3',['parent',['../structobject.html#a0fc7b5f1ec95f08692cfbe6e08227ac7',1,'object::parent'],['../structufind.html#af60742b7c1902daed6eba8f9085f9399',1,'ufind::parent']]],
+  ['parray_4',['parray',['../structhopcroft__partition.html#a9697ce9e53e70d93495ce77fd5b086a3',1,'hopcroft_partition']]],
+  ['parray_5fi_5',['parray_i',['../structhopcroft__partition.html#a4f75f8e81548938d40b2b16cca23d748',1,'hopcroft_partition']]],
+  ['parse_5fargv_6',['parse_argv',['../main_8h.html#a26022311ab75e578166932030a411539',1,'main.h']]],
+  ['parsize_7',['parsize',['../structnfa__enum.html#a8ce41551b0eee040d2f7a90e30216fb5',1,'nfa_enum']]],
+  ['parti_8',['parti',['../structparti.html',1,'parti'],['../structnfa__enum.html#afb8397b4499ef03da9c053d9e6abf89d',1,'nfa_enum::parti']]],
+  ['parti_5fto_5fufind_9',['parti_to_ufind',['../type__partitions_8h.html#aae51c6f12433c7a8ae7b1feee494008d',1,'type_partitions.c']]],
+  ['past_20hierarchies_3a_10',['Available input classes 𝒞 for negation hierarchies and future/past hierarchies:',['../index.html#autotoc_md20',1,'']]],
+  ['peekmin_5fbinheap_11',['peekmin_binheap',['../type__binheap_8h.html#aa4f2934905198674e78e603e135e0c35',1,'type_binheap.c']]],
+  ['plus_12',['PLUS',['../regexp_8h.html#a945e1b6cec6225bade72691d362c68faa87fe59ef12c3d13dc2a4d14c9b16c1f9',1,'regexp.h']]],
+  ['popmin_5fbinheap_13',['popmin_binheap',['../type__binheap_8h.html#ab822791090ff4a210f049aa6c3021b30',1,'type_binheap.c']]],
+  ['previous_14',['previous',['../structdcell.html#a072f56daad198c9fce3fdaaa0798a5c0',1,'dcell']]],
+  ['print_5fclasses_15',['print_classes',['../shell__help_8h.html#a007a2e5d29be043cc665e774e775071d',1,'shell_help.c']]],
+  ['print_5fcommand_16',['print_command',['../shell__keywords_8h.html#ad6f0e7ab10a0f087d22e57c8d85b0a10',1,'shell_keywords.c']]],
+  ['print_5fdequeue_17',['print_dequeue',['../type__dequeue_8h.html#a50e37bb5e40b11842febb0cd0b04a1c0',1,'type_dequeue.c']]],
+  ['print_5ferror_18',['PRINT_ERROR',['../error_8h.html#aa9e84097935649043db7912bb37623d4',1,'error.h']]],
+  ['print_5fstring_5fchain_19',['print_string_chain',['../shell__keywords_8h.html#acef8a133f633c9f7f33843ad43c7d32f',1,'shell_keywords.c']]],
+  ['print_5fufind_20',['print_ufind',['../type__partitions_8h.html#acfc5afeeb214b546ebb18a1fe762e12e',1,'type_partitions.c']]],
+  ['push_5fbinheap_21',['push_binheap',['../type__binheap_8h.html#a204817a758dfdbe52c64e7bb8ad0bd82',1,'type_binheap.c']]]
+];

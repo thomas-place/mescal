@@ -1,0 +1,35 @@
+var graphs_8h =
+[
+    [ "graph", "structgraph.html", "structgraph" ],
+    [ "lgraph", "structlgraph.html", "structlgraph" ],
+    [ "dgraph", "structdgraph.html", "structdgraph" ],
+    [ "graph_stype", "graphs_8h.html#af79428132abe4bab1bda312319693dc8", [
+      [ "DFS", "graphs_8h.html#af79428132abe4bab1bda312319693dc8a2b7c6716fdffcec8a334556833e4997c", null ],
+      [ "BFS", "graphs_8h.html#af79428132abe4bab1bda312319693dc8a9c2f133bd60477f2a4ece3dc959fef96", null ]
+    ] ],
+    [ "create_dgraph_noedges", "graphs_8h.html#a1a732d4c9d1a518b14acc8e1516c46a5", null ],
+    [ "create_graph_noedges", "graphs_8h.html#a387700484e72c4cfe219203d5dae8dae", null ],
+    [ "create_graph_selfloops", "graphs_8h.html#a4251bf45eff73ef9edcfcada89b5bcb0", null ],
+    [ "create_lgraph_noedges", "graphs_8h.html#a4a361eb7c35d2a25d872a6850c81a8e4", null ],
+    [ "delete_dgraph", "graphs_8h.html#a3d9b13b4993159a2683f85eeac7d8073", null ],
+    [ "delete_graph", "graphs_8h.html#a8bb6c6479a6b698be6d8b76c67f6687a", null ],
+    [ "delete_lgraph", "graphs_8h.html#a19ffdaeccb79ec238aff6e832b5446b0", null ],
+    [ "dgraph_mirror", "graphs_8h.html#a21fe7ba13afee887bd34de8ec466304d", null ],
+    [ "dgraph_nb_edges", "graphs_8h.html#aa771c03d7e613494b7cb7699790ba003", null ],
+    [ "dgraph_search", "graphs_8h.html#a9c0a43517e0be4fd197a10bd4338d3f9", null ],
+    [ "dgraph_search_update", "graphs_8h.html#a25e1c54a054182ba449641b87f41efdb", null ],
+    [ "dgraph_to_lgraph", "graphs_8h.html#a10ac0ddac7534b40351650bf0c3d90fe", null ],
+    [ "graph_mirror", "graphs_8h.html#a67e75d4e63dee41143abceb6c09fe73c", null ],
+    [ "graph_nb_edges", "graphs_8h.html#aef11eda5e05a1dbfad39933d41742199", null ],
+    [ "graph_search", "graphs_8h.html#af7c2b72480599c777652489a95d5517e", null ],
+    [ "graph_search_update", "graphs_8h.html#aeeb7b7ce09f2240afd39c27d5b4521ea", null ],
+    [ "ldgraphs_to_graph", "graphs_8h.html#ad372b203857f457bd1cee4f0786a050d", null ],
+    [ "ldgraphs_to_lgraph", "graphs_8h.html#a35649adc0b9a583c083acdecd260197a", null ],
+    [ "lgraph_mirror", "graphs_8h.html#a1320dc14ae37171752a32162e7318794", null ],
+    [ "lgraph_nb_edges", "graphs_8h.html#af658f08157b289523d755188a95ebd39", null ],
+    [ "lgraph_reachable", "graphs_8h.html#a65bd76d322515fd370db7c6f98b7510a", null ],
+    [ "lgraph_search", "graphs_8h.html#a621e6cd9609980aa14d2382e210e4825", null ],
+    [ "lgraph_search_update", "graphs_8h.html#a1871ffbe9a1c44bf18edc7a6665deb2b", null ],
+    [ "merge_graphs", "graphs_8h.html#adb17d1bc074506de7625d2c759a07556", null ],
+    [ "merge_lgraphs", "graphs_8h.html#accd55f5ff9f4d520b49c2581686bff03", null ]
+];
