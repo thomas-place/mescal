@@ -3,6 +3,7 @@
 /*********************/
 
 #include "monoid_ideals.h"
+#include "monoid_display.h"
 
 /**************************/
 /* Computations of ideals */
@@ -83,7 +84,7 @@ uint get_rlink(morphism* M, parti* R, uint g, uint r) {
         }
         visited[rs] = true;
         for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
-            if (R->cl[g] == R->cl[M->r_cayley->edges[rs][a]]) {
+            if (R->numcl[g] == R->numcl[M->r_cayley->edges[rs][a]]) {
                 rigins_dequeue(M->r_cayley->edges[rs][a], queue);
                 rigins_dequeue(M->r_cayley->edges[s][a], elems);
             }
@@ -107,6 +108,8 @@ uint get_llink(morphism* M, parti* L, uint h, uint t) {
     while (!isempty_dequeue(queue)) {
         uint st = lefpull_dequeue(queue);
         uint s = lefpull_dequeue(elems);
+
+
         if (st == h) {
             delete_dequeue(queue);
             delete_dequeue(elems);
@@ -118,7 +121,7 @@ uint get_llink(morphism* M, parti* L, uint h, uint t) {
         }
         visited[st] = true;
         for (uint a = 0; a < M->l_cayley->size_alpha; a++) {
-            if (L->cl[h] == L->cl[M->l_cayley->edges[st][a]]) {
+            if (L->numcl[h] == L->numcl[M->l_cayley->edges[st][a]]) {
                 rigins_dequeue(M->l_cayley->edges[st][a], queue);
                 rigins_dequeue(M->l_cayley->edges[s][a], elems);
             }

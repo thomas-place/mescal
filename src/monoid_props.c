@@ -672,6 +672,9 @@ static void make_cexample_from_jtriv(morphism* M, uint* cexa) {
         cexa[1] = ONE;
         cexa[2] = get_llink(M, M->rels->LCL, e, s);
         cexa[3] = s;
+
+        return;
+
     }
 }
 
