@@ -6,23 +6,23 @@
 
 The aim of this program is to implement most of the known algorithms for deciding membership and separation for prominent classes of regular languages.
 
-## Installation
+# Installation
 
 A `Makefile` is provided in the src/ folder. It creates an executable file named `mescal`, which can be executed from that directory with the shell command `./mescal`.
 
-### Required software
+## Requirements
 
-Currently, the program is **experimental**. It works on MacOS and Linux. It depends on the following software, which can be installed through  [homebrew](https://brew.sh).
+Currently, the program is **experimental**. It works on MacOS and Linux. It depends on the following software, which can be installed through  [homebrew](https://brew.sh) on MacOS, or through apt on Ubuntu or Debian Linux.
 
-+ A C compiler (tested on OSX with Apple clang 15.0.0, hardlinked to gcc), with the readline library.
++ A C compiler (tested on OSX with Apple clang 15.0.0 to 17.0.0, hardlinked to gcc), with the readline library.
 + The [json-c](https://github.com/json-c) library.
 + The [flint](https://flintlib.org) library.
 + flex and bison.
-+ [Graphviz](https://graphviz.org)
++ [Graphviz](https://graphviz.org).
 + On MacOS: [iTerm](https://iterm2.com) with [imgcat](https://iterm2.com/utilities/imgcat).
 + On Linux: a [sixel capable terminal](https://www.arewesixelyet.com). Tested with [Konsole](https://konsole.kde.org).
 
-## Source code documentation
+# Source code documentation
 
 A Doxygen documentation of the source code is provided [here](https://thomas-place.github.io/mescal/).
 
