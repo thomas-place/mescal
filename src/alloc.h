@@ -48,7 +48,6 @@
  *
  * @see REALLOC()
  */
-
 #define MALLOC(p, num_objects)                                                 \
     do {                                                                       \
         DEBUG("Allocating  %lu objects.", (unsigned long)(num_objects));       \
