@@ -175,6 +175,62 @@ int dgraph_nb_edges(dgraph* G) {
     return G->size_graph * G->size_alpha;
 }
 
+
+
+/***********/
+/* Mirrors */
+/***********/
+
+
+graph* graph_mirror(graph* G) {
+    if (!G) {
+        return NULL;
+    }
+
+    graph* new = create_graph_noedges(G->size);
+    for (uint q = 0; q < G->size; q++)
+    {
+        for (uint j = 0; j < size_dequeue(G->edges[q]); j++)
+        {
+            rigins_dequeue(q, new->edges[lefread_dequeue(G->edges[q], j)]);
+        }
+    }
+    return new;
+}
+
+lgraph* lgraph_mirror(lgraph* G) {
+    if (!G) {
+        return NULL;
+    }
+    lgraph* new = create_lgraph_noedges(G->size_graph, G->size_alpha);
+    for (uint q = 0; q < G->size_graph; q++)
+    {
+        for (uint a = 0; a < G->size_alpha; a++)
+        {
+            for (uint j = 0; j < size_dequeue(G->edges[q][a]); j++)
+            {
+                rigins_dequeue(q, new->edges[lefread_dequeue(G->edges[q][a], j)][a]);
+            }
+        }
+    }
+    return new;
+}
+
+lgraph* dgraph_mirror(dgraph* G) {
+    if (!G) {
+        return NULL;
+    }
+    lgraph* new = create_lgraph_noedges(G->size_graph, G->size_alpha);
+    for (uint q = 0; q < G->size_graph; q++)
+    {
+        for (uint a = 0; a < G->size_alpha; a++)
+        {
+            rigins_dequeue(q, new->edges[G->edges[q][a]][a]);
+        }
+    }
+    return new;
+}
+
 /************/
 /* Parcours */
 /************/

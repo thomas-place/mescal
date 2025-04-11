@@ -481,7 +481,7 @@ static void print_jclass_green_aux(morphism* M, green* G, uint* remap, uint jcla
     print_spaces(padding, out);
     fprintf(out, "┌");
     for (uint i = 0; i < row_length; i++) {
-        print_char(h_line_size, "─", out);
+        print_copies_string(h_line_size, "─", out);
         if (i == row_length - 1) {
             fprintf(out, "┐\n");
         }
@@ -544,7 +544,7 @@ static void print_jclass_green_aux(morphism* M, green* G, uint* remap, uint jcla
         // Bottom empty line.
         fprintf(out, "│");
         for (uint i = 0; i < row_length; i++) {
-            print_char(h_line_size, " ", out);
+            print_copies_string(h_line_size, " ", out);
             if (i == row_length - 1) {
                 fprintf(out, "│\n");
             }
@@ -558,7 +558,7 @@ static void print_jclass_green_aux(morphism* M, green* G, uint* remap, uint jcla
             // Output of the last line.
             fprintf(out, "└");
             for (uint i = 0; i < row_length; i++) {
-                print_char(h_line_size, "─", out);
+                print_copies_string(h_line_size, "─", out);
                 if (i == row_length - 1) {
                     fprintf(out, "┘\n");
                 }
@@ -571,7 +571,7 @@ static void print_jclass_green_aux(morphism* M, green* G, uint* remap, uint jcla
             // Output of an intermediate line.
             fprintf(out, "├");
             for (uint i = 0; i < row_length; i++) {
-                print_char(h_line_size, "─", out);
+                print_copies_string(h_line_size, "─", out);
                 if (i == row_length - 1) {
                     fprintf(out, "┤\n");
                 }

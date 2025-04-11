@@ -733,8 +733,8 @@ bool shell_morprop_kerknast(int j, kernel_type type, char* ker, char* name, FILE
 
 bool shell_morprop_knastat(int j, char* name, FILE* out) {
     if (out) {
-        fprintf(out, "#### Checking if the %s ⍺:A* → M satisfies the equation (eqfre)ʷ(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ for all\n", name);
-        fprintf(out, "     and q,r,s,t ∊ M such that {q,e,f}, {r,e,f}, {s,e,f} and {t,e,f} are PT-sets and all e,f ∊ E(M).\n");
+        fprintf(out, "#### Checking if the %s ⍺:A* → M satisfies the equation (eqfre)ʷ(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ\n", name);
+        fprintf(out, "     for all q,r,s,t ∊ M such that {q,e,f}, {r,e,f}, {s,e,f} and {t,e,f} are PT-sets and all e,f ∊ E(M).\n");
     }
 
     if (is_knast_at_mono(shell_compute_orbits(j, ORB_PT, LV_REG), get_counter(out))) {
@@ -1329,13 +1329,96 @@ bool shell_membership(com_parameters* pars) {
 /* Summary for all main classes */
 /********************************/
 
-static void summary_answer(bool res) {
-    if (res) {
-        fprintf(stdout, "║" ANSI_COLOR_GREEN "     YES      " ANSI_COLOR_RESET);
+typedef enum {
+    ANS_YES,
+    ANS_NO,
+    ANS_UNKNOWN
+} ans_type;
+
+enum {
+    CLT_BASIS = 0,
+    CLT_POL,
+    CLT_BPOL,
+    CLT_TL,
+    CLT_POL2,
+    CLT_BPOL2,
+    CLT_UBPOL2,
+    CLT_TL2,
+    CLT_SF,
+    CLT_SIZE
+};
+
+enum {
+    BSI_ST = 0,
+    BSI_DD,
+    BSI_MOD,
+    BSI_MODP,
+    BSI_AMT,
+    BSI_AMTP,
+    BSI_GR,
+    BSI_GRP,
+    BSI_SIZE
+};
+
+static void populate_table_star(int j, int op, int bs, bool (*fun) (int, FILE*), ans_type res[CLT_SIZE][BSI_SIZE]) {
+    if (res[op][bs] != ANS_UNKNOWN) {
+        return;
+    }
+    bool val = fun(j, NULL);
+    if (val) {
+        for (int g = op; g < CLT_SIZE; g++) {
+            for (int h = bs; h < BSI_SIZE; h++) {
+                res[g][h] = ANS_YES;
+            }
+        }
 
     }
     else {
+        for (int g = op; g >= 0; g--) {
+            for (int h = bs; h >= 0; h -= 2) {
+                res[g][h] = ANS_NO;
+            }
+        }
+    }
+}
+
+static void populate_table_plus(int j, int op, int bs, bool (*fun) (int, FILE*), ans_type res[CLT_SIZE][BSI_SIZE]) {
+    if (res[op][bs] != ANS_UNKNOWN) {
+        return;
+    }
+    bool val = fun(j, NULL);
+    if (val) {
+        for (int g = op; g < CLT_SIZE; g++) {
+            for (int h = bs; h < BSI_SIZE; h += 2) {
+                res[g][h] = ANS_YES;
+            }
+        }
+
+    }
+    else {
+        for (int g = op; g >= 0; g--) {
+            for (int h = bs; h >= 0; h--) {
+                res[g][h] = ANS_NO;
+            }
+        }
+    }
+}
+
+
+
+static void summary_print_answer(ans_type res) {
+    switch (res) {
+    case ANS_YES:
+        fprintf(stdout, "║" ANSI_COLOR_GREEN "     YES      " ANSI_COLOR_RESET);
+        break;
+    case ANS_NO:
         fprintf(stdout, "║" ANSI_COLOR_RED "     NO       " ANSI_COLOR_RESET);
+        break;
+    case ANS_UNKNOWN:
+        fprintf(stdout, "║" ANSI_COLOR_YELLOW "    UNKNOWN   " ANSI_COLOR_RESET);
+        break;
+    default:
+        break;
     }
 }
 
@@ -1355,33 +1438,29 @@ bool shell_chiera_summary(com_parameters* pars) {
     if (j == -1) {
         return false;
     }
-    /***************************/
-    /* Calculs pour la base ST */
-    /***************************/
 
-    bool res_st = false;
-    bool res_sfst = false;
-    bool res_polst = false;
-    bool res_bpolst = false;
-    bool res_tlst = false;
-    bool res_pol2st = false;
-    bool res_bpol2st = false;
-    bool res_upolbpol2st = false;
-    bool res_tl2st = false;
+    ans_type res[CLT_SIZE][BSI_SIZE];
 
-    res_sfst = shell_membership_sf(j, NULL); // Apériodicité
-    if (res_sfst) {
-        res_st = shell_membership_st(j, NULL);                  // ST
-        res_polst = shell_membership_ppt(j, NULL);              // Pol(ST)
-        res_bpolst = res_polst || shell_membership_pt(j, NULL); // BPol(ST)
-
-        res_tlst = res_bpolst || shell_membership_ul(j, NULL);     // TL(ST)
-        res_pol2st = res_tlst || shell_membership_pol2st(j, NULL); // Pol2(ST)
-
-        res_upolbpol2st = res_pol2st || shell_membership_ubpol2st(j, NULL);
-        res_bpol2st = res_pol2st || (res_upolbpol2st && shell_membership_knastat(j, NULL));
-        res_tl2st = res_upolbpol2st || shell_membership_tl2st(j, NULL);
+    for (int k = 0; k < CLT_SIZE; k++) {
+        for (int l = 0; l < BSI_SIZE; l++) {
+            res[k][l] = ANS_UNKNOWN;
+        }
     }
+
+    /************/
+    /* Basis ST */
+    /************/
+
+    populate_table_star(j, CLT_SF, BSI_ST, shell_membership_sf, res);
+    populate_table_star(j, CLT_BASIS, BSI_ST, shell_membership_st, res);
+    populate_table_star(j, CLT_BPOL, BSI_ST, shell_membership_pt, res);
+    populate_table_star(j, CLT_POL, BSI_ST, shell_membership_ppt, res);
+    populate_table_star(j, CLT_TL, BSI_ST, shell_membership_ul, res);
+    populate_table_star(j, CLT_TL2, BSI_ST, shell_membership_tl2st, res);
+    populate_table_star(j, CLT_UBPOL2, BSI_ST, shell_membership_ubpol2st, res);
+    populate_table_star(j, CLT_BPOL2, BSI_ST, shell_membership_bpol2st, res);
+    populate_table_star(j, CLT_POL2, BSI_ST, shell_membership_pol2st, res);
+
 
     fprintf(stdout, "╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗\n");
     fprintf(stdout, "║                                          Concatenation hierarchies: membership tests summary                                         ║\n");
@@ -1389,445 +1468,173 @@ bool shell_chiera_summary(com_parameters* pars) {
     fprintf(stdout, "║  Basis: ST   ║    Pol(ST)   ║   BPol(ST)   ║    TL(ST)    ║   Pol₂(ST)   ║   BPol₂(ST)  ║  UBPol₂(ST)  ║   TL₂(ST)    ║    SF(ST)    ║\n");
     fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
     // fprintf(stdout, "║             ");
-    summary_answer(res_st);
-    summary_answer(res_polst);
-    summary_answer(res_bpolst);
-    summary_answer(res_tlst);
-
-    summary_answer(res_pol2st);
-
-    summary_answer(res_bpol2st);
-
-    summary_answer(res_upolbpol2st);
-
-    summary_answer(res_tl2st);
-
-    summary_answer(res_sfst);
+    for (uint h = 0; h < CLT_SIZE;h++) {
+        summary_print_answer(res[h][BSI_ST]);
+    }
     fprintf(stdout, "║\n");
 
-    /***************************/
-    /* Calculs pour la base DD */
-    /***************************/
+    /************/
+    /* Basis DD */
+    /************/
 
-    // On initialise les paramètres avec ceux de la base ST
-    bool res_dd = res_st;
-    bool res_sfdd = res_sfst;
-    bool res_poldd = res_polst;
-    bool res_bpoldd = res_bpolst;
-    bool res_tldd = res_tlst;
-    bool res_pol2dd = res_pol2st;
-    bool res_upolbpol2dd = res_upolbpol2st;
-    bool res_tl2dd = res_tl2st;
-
-    // Les résultats ne seront différent de ceux pour la base ST que si le langage est dans SF et que le neutre n'a que le mot vide pour antécédent
-    if (res_sfdd && !mor_nonempty_neutral(objects[j]->mor->obj)) {
-        res_dd = res_st || shell_membership_dd(j, NULL);
-        res_poldd = res_polst || shell_membership_poldd(j, NULL);
-        res_bpoldd = res_bpolst || res_poldd || shell_membership_bpoldd(j, NULL);
-        res_tldd = res_tlst || res_bpoldd || shell_membership_tldd(j, NULL);
-        res_pol2dd = res_pol2st || res_tldd || shell_membership_pol2dd(j, NULL);
-        res_upolbpol2dd = res_upolbpol2st || res_pol2dd || shell_membership_ubpol2dd(j, NULL);
-        res_tl2dd = res_tl2st || res_upolbpol2dd || shell_membership_tl2dd(j, NULL);
-    }
+    res[CLT_SF][BSI_DD] = res[CLT_SF][BSI_ST];
+    populate_table_plus(j, CLT_BASIS, BSI_DD, shell_membership_dd, res);
+    populate_table_plus(j, CLT_BPOL, BSI_DD, shell_membership_bpoldd, res);
+    populate_table_plus(j, CLT_POL, BSI_DD, shell_membership_poldd, res);
+    populate_table_plus(j, CLT_TL, BSI_DD, shell_membership_tldd, res);
+    populate_table_plus(j, CLT_TL2, BSI_DD, shell_membership_tl2dd, res);
+    populate_table_plus(j, CLT_UBPOL2, BSI_DD, shell_membership_ubpol2dd, res);
+    populate_table_plus(j, CLT_POL2, BSI_DD, shell_membership_pol2dd, res);
 
     fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
     fprintf(stdout, "║  Basis: DD   ║    Pol(DD)   ║   BPol(DD)   ║    TL(DD)    ║   Pol₂(DD)   ║   BPol₂(DD)  ║  UBPol₂(DD)  ║   TL₂(DD)    ║    SF(DD)    ║\n");
     fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
-    // fprintf(stdout, "║             ");
-    summary_answer(res_dd);
-    summary_answer(res_poldd);
-    summary_answer(res_bpoldd);
-    summary_answer(res_tldd);
 
-    summary_answer(res_pol2dd);
-
-    if (res_pol2dd || res_bpol2st) {
-        summary_answer(res_pol2dd || res_bpol2st);
-
+    for (uint h = 0; h < CLT_SIZE;h++) {
+        summary_print_answer(res[h][BSI_DD]);
     }
-    else if (!res_upolbpol2dd) {
-        summary_answer(res_upolbpol2dd);
-
-    }
-    else if (mor_nonempty_neutral(objects[j]->mor->obj)) {
-        summary_answer(res_bpol2st);
-    }
-    else {
-        fprintf(stdout, "║  Unavailable ");
-    }
-
-    summary_answer(res_upolbpol2dd);
-
-    summary_answer(res_tl2dd);
-
-    summary_answer(res_sfdd);
     fprintf(stdout, "║\n");
 
-    /***************************/
-    /* Calculs pour la base GR */
-    /***************************/
+    /*************/
+    /* Basis MOD */
+    /*************/
 
-    // On initialise les paramètres avec ceux de la base ST
-    bool res_gr = res_st;
-    bool res_sfgr = res_sfst;
-    bool res_polgr = res_polst;
-    bool res_bpolgr = res_bpolst;
-    bool res_tlgr = res_tlst;
-    bool res_pol2gr = res_pol2st;
-    bool res_upolbpol2gr = res_upolbpol2st;
-    bool res_tl2gr = res_tl2st;
-
-    res_sfgr = res_sfst || shell_membership_sfgr(j, NULL); // Apériodicité
-    if (res_sfgr) {
-        res_gr = res_st || shell_membership_gr(j, NULL);
-        res_polgr = shell_membership_polgr(j, NULL); // Pol(GR)
-        res_bpolgr = res_polgr || shell_membership_bpolgr(j, NULL);
-        res_tlgr = res_bpolgr || shell_membership_tlgr(j, NULL);
-        res_pol2gr = res_tlgr || shell_membership_pol2gr(j, NULL);
-        res_upolbpol2gr = res_pol2gr || shell_membership_ubpol2gr(j, NULL);
-        res_tl2gr = res_upolbpol2gr || shell_membership_tl2gr(j, NULL);
-    }
-
-    /****************************/
-    /* Calculs pour la base MOD */
-    /****************************/
-
-    // On initialise les paramètres avec ceux de la base ST
-    bool res_mod = res_st;
-    bool res_polmod = res_polst;
-    bool res_bpolmod = res_bpolst;
-    bool res_tlmod = res_tlst;
-    bool res_pol2mod = res_pol2st;
-    bool res_upolbpol2mod = res_upolbpol2st;
-    bool res_tl2mod = res_tl2st;
-    bool res_sfmod = res_sfst;
-
-    if (!res_sfst && res_sfgr && !mor_neutral_letter(objects[j]->mor->obj, NULL)) {
-        res_sfmod = shell_membership_sfmod(j, NULL);
-    }
-
-    if (res_sfmod) {
-        res_mod = res_st || shell_membership_mod(j, NULL);
-        res_polmod = res_polgr && (res_polst || shell_membership_polmod(j, NULL));
-        res_tlmod = res_tlgr && (res_tlst || res_polmod || shell_membership_tlmod(j, NULL));
-        res_bpolmod = res_bpolgr && res_tlmod && (res_polmod || res_bpolst || shell_membership_bpolmod(j, NULL));
-        res_pol2mod = res_pol2gr && (res_tlmod || res_pol2st || shell_membership_pol2mod(j, NULL));
-        res_upolbpol2mod = res_upolbpol2gr && (res_pol2mod || res_upolbpol2st || shell_membership_ubpol2mod(j, NULL));
-        res_tl2mod = res_tl2gr && (res_upolbpol2mod || res_tl2st || shell_membership_tl2mod(j, NULL));
-    }
+    populate_table_star(j, CLT_SF, BSI_MOD, shell_membership_sfmod, res);
+    populate_table_star(j, CLT_BASIS, BSI_MOD, shell_membership_mod, res);
+    populate_table_star(j, CLT_BPOL, BSI_MOD, shell_membership_bpolmod, res);
+    populate_table_star(j, CLT_POL, BSI_MOD, shell_membership_polmod, res);
+    populate_table_star(j, CLT_TL, BSI_MOD, shell_membership_tlmod, res);
+    populate_table_star(j, CLT_TL2, BSI_MOD, shell_membership_tl2mod, res);
+    populate_table_star(j, CLT_UBPOL2, BSI_MOD, shell_membership_ubpol2mod, res);
+    populate_table_star(j, CLT_POL2, BSI_MOD, shell_membership_pol2mod, res);
 
     fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
     fprintf(stdout, "║  Basis: MOD  ║   Pol(MOD)   ║  BPol(MOD)   ║   TL(MOD)    ║  Pol₂(MOD)   ║  BPol₂(MOD)  ║ UBPol₂(MOD)  ║  TL₂(MOD)    ║   SF(MOD)    ║\n");
     fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
-    // fprintf(stdout, "║             ");
-    summary_answer(res_mod);
-    summary_answer(res_polmod);
-    summary_answer(res_bpolmod);
-    summary_answer(res_tlmod);
 
-    summary_answer(res_pol2mod);
-
-    if (res_pol2mod || res_bpol2st) {
-        summary_answer(res_pol2mod || res_bpol2st);
-
-    }
-    else if (!res_upolbpol2mod) {
-        summary_answer(res_upolbpol2mod);
-
-    }
-    else if (mor_neutral_letter(objects[j]->mor->obj, NULL)) {
-        summary_answer(res_bpol2st);
-    }
-    else {
-        fprintf(stdout, "║  Unavailable ");
+    for (uint h = 0; h < CLT_SIZE;h++) {
+        summary_print_answer(res[h][BSI_MOD]);
     }
 
-    summary_answer(res_upolbpol2mod);
-
-    summary_answer(res_tl2mod);
-
-    summary_answer(res_sfmod);
     fprintf(stdout, "║\n");
+    /**************/
+    /* Basis MODP */
+    /**************/
 
-    // Calculs pour la base MODP
-
-    bool res_modp = res_mod;
-    bool res_polmodp = res_polmod;
-    bool res_bpolmodp = res_bpolmod;
-    bool res_tlmodp = res_tlmod;
-    bool res_pol2modp = res_pol2mod;
-    bool res_upolbpol2modp = res_upolbpol2mod;
-    bool res_tl2modp = res_tl2mod;
-    bool res_sfmodp = res_sfmod;
-
-    if (res_sfmod && !mor_neutral_letter(objects[j]->mor->obj, NULL)) {
-        res_modp = res_mod || shell_membership_modp(j, NULL);
-        res_polmodp = res_polmod || shell_membership_polmodp(j, NULL);
-        res_bpolmodp = res_bpolmod || res_polmodp || shell_membership_bpolmodp(j, NULL);
-        res_tlmodp = res_tlmod || res_bpolmodp || shell_membership_tlmodp(j, NULL);
-        res_pol2modp = res_pol2mod || res_tlmodp || shell_membership_pol2modp(j, NULL);
-        res_upolbpol2modp = res_upolbpol2mod || res_pol2modp || shell_membership_ubpol2modp(j, NULL);
-        res_tl2modp = res_tl2mod || res_upolbpol2modp || shell_membership_tl2modp(j, NULL);
-    }
+    res[CLT_SF][BSI_MODP] = res[CLT_SF][BSI_MOD];
+    populate_table_plus(j, CLT_BASIS, BSI_MODP, shell_membership_modp, res);
+    populate_table_plus(j, CLT_BPOL, BSI_MODP, shell_membership_bpolmodp, res);
+    populate_table_plus(j, CLT_POL, BSI_MODP, shell_membership_polmodp, res);
+    populate_table_plus(j, CLT_TL, BSI_MODP, shell_membership_tlmodp, res);
+    populate_table_plus(j, CLT_TL2, BSI_MODP, shell_membership_tl2modp, res);
+    populate_table_plus(j, CLT_UBPOL2, BSI_MODP, shell_membership_ubpol2modp, res);
+    populate_table_plus(j, CLT_POL2, BSI_MODP, shell_membership_pol2modp, res);
 
     fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
     fprintf(stdout, "║  Basis: MOD⁺ ║   Pol(MOD⁺)  ║  BPol(MOD⁺)  ║   TL(MOD⁺)   ║  Pol₂(MOD⁺)  ║  BPol₂(MOD⁺) ║ UBPol₂(MOD⁺) ║  TL₂(MOD⁺)   ║   SF(MOD⁺)   ║\n");
     fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
-    // fprintf(stdout, "║             ");
-    summary_answer(res_modp);
-    summary_answer(res_polmodp);
-    summary_answer(res_bpolmodp);
-    summary_answer(res_tlmodp);
 
-    summary_answer(res_pol2modp);
-
-    if (res_pol2modp || res_bpol2st) {
-        summary_answer(res_pol2modp || res_bpol2st);
-
-    }
-    else if (!res_upolbpol2modp) {
-        summary_answer(res_upolbpol2modp);
-
-    }
-    else if (mor_neutral_letter(objects[j]->mor->obj, NULL)) {
-        summary_answer(res_bpol2st);
-    }
-    else {
-        fprintf(stdout, "║  Unavailable ");
+    for (uint h = 0; h < CLT_SIZE;h++) {
+        summary_print_answer(res[h][BSI_MODP]);
     }
 
-    summary_answer(res_upolbpol2modp);
-
-    summary_answer(res_tl2modp);
-
-    summary_answer(res_sfmodp);
     fprintf(stdout, "║\n");
 
+    /*************/
+    /* Basis AMT */
+    /*************/
+
+    populate_table_star(j, CLT_SF, BSI_AMT, shell_membership_sfamt, res);
+    populate_table_star(j, CLT_BASIS, BSI_AMT, shell_membership_amt, res);
+    populate_table_star(j, CLT_BPOL, BSI_AMT, shell_membership_bpolamt, res);
+    populate_table_star(j, CLT_TL, BSI_AMT, shell_membership_tlamt, res);
+    populate_table_star(j, CLT_TL2, BSI_AMT, shell_membership_tl2amt, res);
+    populate_table_star(j, CLT_UBPOL2, BSI_AMT, shell_membership_ubpol2amt, res);
+    populate_table_star(j, CLT_POL2, BSI_AMT, shell_membership_pol2amt, res);
 
 
-    /****************************/
-    /* Calculs pour la base AMT */
-    /****************************/
 
-    // On initialise les paramètres avec ceux de la base MOD
-    bool res_amt = res_mod;
-    bool res_bpolamt = res_bpolmod;
-    bool res_tlamt = res_tlmod;
-    bool res_pol2amt = res_pol2mod;
-    bool res_upolbpol2amt = res_upolbpol2mod;
-    bool res_tl2amt = res_tl2mod;
-    bool res_sfamt = res_sfmod;
+    /**************/
+    /* Basis AMTP */
+    /**************/
 
-    if (!res_sfamt && res_sfgr) {
-        res_sfamt = shell_membership_sfamt(j, NULL);
-    }
+    res[CLT_SF][BSI_AMTP] = res[CLT_SF][BSI_AMT];
+    populate_table_plus(j, CLT_BASIS, BSI_AMTP, shell_membership_amtp, res);
+    populate_table_plus(j, CLT_BPOL, BSI_AMTP, shell_membership_bpolamtp, res);
+    populate_table_plus(j, CLT_TL, BSI_AMTP, shell_membership_tlamtp, res);
+    populate_table_plus(j, CLT_TL2, BSI_AMTP, shell_membership_tl2amtp, res);
+    populate_table_plus(j, CLT_UBPOL2, BSI_AMTP, shell_membership_ubpol2amtp, res);
+    populate_table_plus(j, CLT_POL2, BSI_AMTP, shell_membership_pol2amtp, res);
 
 
-    if (res_sfamt) {
+    /************/
+    /* Basis GR */
+    /************/
 
-        res_amt = res_amt || shell_membership_amt(j, NULL);
-        res_bpolamt = res_bpolgr && (res_amt || res_bpolamt || shell_membership_bpolamt(j, NULL));
-        res_tlamt = res_tlgr && (res_tlamt || shell_membership_tlamt(j, NULL));
-        res_pol2amt = res_pol2gr && (res_tlamt || res_pol2amt || shell_membership_pol2amt(j, NULL));
-        res_upolbpol2amt = res_upolbpol2gr && (res_pol2amt || res_upolbpol2amt || shell_membership_ubpol2amt(j, NULL));
-        res_tl2amt = res_tl2gr && (res_upolbpol2amt || res_tl2amt || shell_membership_tl2amt(j, NULL));
-    }
+
+    populate_table_star(j, CLT_SF, BSI_GR, shell_membership_sfgr, res);
+    populate_table_star(j, CLT_BASIS, BSI_GR, shell_membership_gr, res);
+    populate_table_star(j, CLT_BPOL, BSI_GR, shell_membership_bpolgr, res);
+    populate_table_star(j, CLT_POL, BSI_GR, shell_membership_polgr, res);
+    populate_table_star(j, CLT_TL, BSI_GR, shell_membership_tlgr, res);
+    populate_table_star(j, CLT_TL2, BSI_GR, shell_membership_tl2gr, res);
+    populate_table_star(j, CLT_UBPOL2, BSI_GR, shell_membership_ubpol2gr, res);
+    populate_table_star(j, CLT_POL2, BSI_GR, shell_membership_pol2gr, res);
+
+
+
+    /*************/
+   /* Basis GRP */
+   /*************/
+
+
+    res[CLT_SF][BSI_GRP] = res[CLT_SF][BSI_GR];
+    populate_table_plus(j, CLT_BASIS, BSI_GRP, shell_membership_grp, res);
+    populate_table_plus(j, CLT_BPOL, BSI_GRP, shell_membership_bpolgrp, res);
+    populate_table_plus(j, CLT_POL, BSI_GRP, shell_membership_polgrp, res);
+    populate_table_plus(j, CLT_TL, BSI_GRP, shell_membership_tlgrp, res);
+    populate_table_plus(j, CLT_TL2, BSI_GRP, shell_membership_tl2grp, res);
+    populate_table_plus(j, CLT_UBPOL2, BSI_GRP, shell_membership_ubpol2grp, res);
+    populate_table_plus(j, CLT_POL2, BSI_GRP, shell_membership_pol2grp, res);
 
     fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
     fprintf(stdout, "║  Basis: AMT  ║   Pol(AMT)   ║  BPol(AMT)   ║   TL(AMT)    ║  Pol₂(AMT)   ║  BPol₂(AMT)  ║ UBPol₂(AMT)  ║  TL₂(AMT)    ║   SF(AMT)    ║\n");
     fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
-    // fprintf(stdout, "║             ");
-    summary_answer(res_amt);
 
-    if (res_amt || res_polmod) {
-        summary_answer(true);
-
-    }
-    else if (!res_bpolamt || !res_polgr) {
-        summary_answer(false);
-
-    }
-    else {
-        fprintf(stdout, "║  Unavailable ");
+    for (uint h = 0; h < CLT_SIZE;h++) {
+        summary_print_answer(res[h][BSI_AMT]);
     }
 
-    summary_answer(res_bpolamt);
-
-    summary_answer(res_tlamt);
-
-    summary_answer(res_pol2amt);
-
-    if (res_pol2amt || res_bpol2st) {
-        summary_answer(res_pol2amt || res_bpol2st);
-
-    }
-    else if (!res_upolbpol2amt) {
-        summary_answer(res_upolbpol2amt);
-
-    }
-    else {
-        fprintf(stdout, "║  Unavailable ");
-    }
-
-    summary_answer(res_upolbpol2amt);
-
-    summary_answer(res_tl2amt);
-
-    summary_answer(res_sfamt);
     fprintf(stdout, "║\n");
-
-    /***************************/
-    /* Calculs pour la base GRP */
-    /***************************/
-
-    // On initialise les paramètres avec ceux de la base GR
-    bool res_grp = res_gr;
-    bool res_sfgrp = res_sfgr;
-    bool res_polgrp = res_polgr;
-    bool res_bpolgrp = res_bpolgr;
-    bool res_tlgrp = res_tlgr;
-    bool res_pol2grp = res_pol2gr;
-    bool res_upolbpol2grp = res_upolbpol2gr;
-    bool res_tl2grp = res_tl2gr;
-
-    if (res_sfgrp) {
-        res_grp = res_gr || shell_membership_grp(j, NULL);
-        res_polgrp = res_polgr || res_polmodp || shell_membership_polgrp(j, NULL);
-        res_tlgrp = res_tlgr || res_tlmodp || shell_membership_tlgrp(j, NULL);
-        res_bpolgrp = res_tlgrp && (res_polgrp || res_bpolgr || res_bpolmodp || shell_membership_bpolgr(j, NULL));
-        res_pol2grp = res_tlgrp || res_pol2gr || res_pol2modp || shell_membership_pol2grp(j, NULL);
-        res_upolbpol2grp = res_pol2grp || res_upolbpol2gr || res_upolbpol2modp || shell_membership_ubpol2grp(j, NULL);
-        res_tl2grp = res_upolbpol2grp || res_tl2gr || res_tl2modp || shell_membership_tl2grp(j, NULL);
-    }
-
-    // Calculs pour la base AMTP
-
-    bool res_amtp = res_amt;
-    // bool res_polamtp = res_polamt;
-    bool res_bpolamtp = res_bpolamt;
-    bool res_tlamtp = res_tlamt;
-    bool res_pol2amtp = res_pol2amt;
-    bool res_upolbpol2amtp = res_upolbpol2amt;
-    bool res_tl2amtp = res_tl2amt;
-    bool res_sfamtp = res_sfamt;
-
-    if (res_sfamt) {
-        res_amtp = res_amt || shell_membership_amtp(j, NULL);
-        //res_polamtp = res_polamt || shell_membership_polamtp(j, NULL);
-        res_bpolamtp = res_bpolamt || res_amtp || shell_membership_bpolamtp(j, NULL);
-        res_tlamtp = res_tlamtp || res_tlmodp || shell_membership_tlamtp(j, NULL);
-        res_pol2amtp = res_pol2amtp || res_tlamtp || res_pol2modp || shell_membership_pol2amtp(j, NULL);
-        res_upolbpol2amtp = res_upolbpol2amtp || res_pol2amtp || res_upolbpol2modp || shell_membership_ubpol2amtp(j, NULL);
-        res_tl2amtp = res_tl2amtp || res_tl2modp || res_upolbpol2amtp || shell_membership_tl2amtp(j, NULL);
-    }
 
     fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
     fprintf(stdout, "║  Basis: AMT⁺ ║   Pol(AMT⁺)  ║  BPol(AMT⁺)  ║   TL(AMT⁺)   ║  Pol₂(AMT⁺)  ║  BPol₂(AMT⁺) ║ UBPol₂(AMT⁺) ║  TL₂(AMT⁺)   ║   SF(AMT⁺)   ║\n");
     fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
-    // fprintf(stdout, "║             ");
-    summary_answer(res_amtp);
 
-    if (res_amtp || res_polmodp) {
-        summary_answer(true);
-
-    }
-    else if (!res_bpolamtp || !res_polgrp) {
-        summary_answer(false);
-
-    }
-    else {
-        fprintf(stdout, "║  Unavailable ");
+    for (uint h = 0; h < CLT_SIZE;h++) {
+        summary_print_answer(res[h][BSI_AMTP]);
     }
 
-    summary_answer(res_bpolamtp);
-
-    summary_answer(res_tlamtp);
-
-    summary_answer(res_pol2amtp);
-
-    if (res_pol2amtp || res_bpol2st) {
-        summary_answer(res_pol2amtp || res_bpol2st);
-
-    }
-    else if (!res_upolbpol2amtp) {
-        summary_answer(res_upolbpol2amtp);
-
-    }
-    else {
-        fprintf(stdout, "║  Unavailable ");
-    }
-
-    summary_answer(res_upolbpol2amtp);
-
-    summary_answer(res_tl2amtp);
-
-    summary_answer(res_sfamtp);
     fprintf(stdout, "║\n");
-
-
-
-
 
 
     fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
     fprintf(stdout, "║  Basis: GR   ║    Pol(GR)   ║   BPol(GR)   ║    TL(GR)    ║   Pol₂(GR)   ║   BPol₂(GR)  ║  UBPol₂(GR)  ║   TL₂(GR)    ║    SF(GR)    ║\n");
     fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
-    // fprintf(stdout, "║             ");
-    summary_answer(res_gr);
-    summary_answer(res_polgr);
-    summary_answer(res_bpolgr);
-    summary_answer(res_tlgr);
-
-    summary_answer(res_pol2gr);
-
-    if (res_pol2gr || res_bpol2st) {
-        summary_answer(res_pol2gr || res_bpol2st);
-
-    }
-    else if (!res_upolbpol2gr) {
-        summary_answer(res_upolbpol2gr);
-
-    }
-    else {
-        fprintf(stdout, "║  Unavailable ");
+    for (uint h = 0; h < CLT_SIZE;h++) {
+        summary_print_answer(res[h][BSI_GR]);
     }
 
-    summary_answer(res_upolbpol2gr);
-
-    summary_answer(res_tl2gr);
-
-    summary_answer(res_sfgr);
     fprintf(stdout, "║\n");
-
-
 
     fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
     fprintf(stdout, "║  Basis: GR⁺  ║    Pol(GR⁺)  ║   BPol(GR⁺)  ║    TL(GR⁺)   ║   Pol₂(GR⁺)  ║  BPol₂(GR⁺)  ║  UBPol₂(GR⁺) ║   TL₂(GR⁺)   ║    SF(GR⁺)   ║\n");
     fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
     // fprintf(stdout, "║             ");
-    summary_answer(res_grp);
-    summary_answer(res_polgrp);
-    summary_answer(res_bpolgrp);
-    summary_answer(res_tlgrp);
-    summary_answer(res_pol2grp);
-
-    if (res_pol2grp || res_bpol2st) {
-        summary_answer(true);
-
-    }
-    else if (!res_upolbpol2grp) {
-        summary_answer(false);
-
-    }
-    else {
-        fprintf(stdout, "║  Unavailable ");
+    for (uint h = 0; h < CLT_SIZE;h++) {
+        summary_print_answer(res[h][BSI_GRP]);
     }
 
-    summary_answer(res_upolbpol2grp);
-
-    summary_answer(res_tl2grp);
-
-    summary_answer(res_sfgrp);
     fprintf(stdout, "║\n");
 
     fprintf(stdout, "╚══════════════╩══════════════╩══════════════╩══════════════╩══════════════╩══════════════╩══════════════╩══════════════╩══════════════╝\n");

@@ -14,12 +14,14 @@
 #ifndef FILES_H
 #define FILES_H
 
- /*  __  __                         _               ____                        */
- /* |  \/  | __ _ _ __   __ _  __ _(_)_ __   __ _  / ___|  __ ___   _____  ___  */
- /* | |\/| |/ _` | '_ \ / _` |/ _` | | '_ \ / _` | \___ \ / _` \ \ / / _ \/ __| */
- /* | |  | | (_| | | | | (_| | (_| | | | | | (_| |  ___) | (_| |\ V /  __/\__ \ */
- /* |_|  |_|\__,_|_| |_|\__,_|\__, |_|_| |_|\__, | |____/ \__,_| \_/ \___||___/ */
- /*                           |___/         |___/                               */
+// clang-format off
+/*  __  __                         _               ____                        */
+/* |  \/  | __ _ _ __   __ _  __ _(_)_ __   __ _  / ___|  __ ___   _____  ___  */
+/* | |\/| |/ _` | '_ \ / _` |/ _` | | '_ \ / _` | \___ \ / _` \ \ / / _ \/ __| */
+/* | |  | | (_| | | | | (_| | (_| | | | | | (_| |  ___) | (_| |\ V /  __/\__ \ */
+/* |_|  |_|\__,_|_| |_|\__,_|\__, |_|_| |_|\__, | |____/ \__,_| \_/ \___||___/ */
+/*                           |___/         |___/                               */
+// clang-format on
 
 #include "main.h"
 #include "nfa.h"
@@ -39,18 +41,19 @@
  * @brief
  * Maximal size of a regular expression that can be saved.
  */
-#define EXPSIZE 2048
+#define EXPSIZE    2048
 
- /**
-  * @brief
-  * Converts a regular expression into a string.
-  *
-  * @remark
-  * The string is returned by writing into the second parameter which
-  * has to be large enough.
-  */
-void reg_to_string(regexp*, //!< The regular expression.
-    char* //!< The buffer used to return the string (it needs to be large enough).
+/**
+ * @brief
+ * Converts a regular expression into a string.
+ *
+ * @remark
+ * The string is returned by writing into the second parameter which
+ * has to be large enough.
+ */
+void reg_to_string(regexp *, //!< The regular expression.
+                   char * //!< The buffer used to return the string (it needs to
+                          //!< be large enough).
 );
 
 /**
@@ -60,7 +63,7 @@ void reg_to_string(regexp*, //!< The regular expression.
  * @return
  * The json object
  */
-json_object* files_regexp_to_json(regexp* //!< The regular expression.
+json_object *files_regexp_to_json(regexp * //!< The regular expression.
 );
 
 /************/
@@ -74,7 +77,7 @@ json_object* files_regexp_to_json(regexp* //!< The regular expression.
  * @return
  * The json object
  */
-json_object* files_auto_to_json(nfa* //!< The automaton.
+json_object *files_auto_to_json(nfa * //!< The automaton.
 );
 
 /**
@@ -84,7 +87,7 @@ json_object* files_auto_to_json(nfa* //!< The automaton.
  * @return
  * The automaton (or NULL is the json object does not encode an automaton).
  */
-nfa* files_json_to_nfa(json_object* //!< The json object.
+nfa *files_json_to_nfa(json_object * //!< The json object.
 );
 
 /***********************/
@@ -95,30 +98,32 @@ nfa* files_json_to_nfa(json_object* //!< The json object.
  * @brief
  * Saves a shell object into a file.
  */
-void files_save_object(object*, //!< The object that needs to be saved.
-    char* //!< The path to the file in which the save has to be made.
+void files_save_object(
+    object *, //!< The object that needs to be saved.
+    char *    //!< The path to the file in which the save has to be made.
 );
 
 /**
  * @brief
  * Reads a shell object from a file and assigns it to a variable name.
  */
-void files_read_object(char*, //!< The path to the file that needs to be read.
-    char* //!< The variable name.
+void files_read_object(char *, //!< The path to the file that needs to be read.
+                       char *  //!< The variable name.
 );
 
 /**
  * @brief
  * Saves a complete session in a file.
  */
-void files_save_session(char* //!< The path to the file in which the save has to be made.
+void files_save_session(
+    char * //!< The path to the file in which the save has to be made.
 );
 
 /**
  * @brief
  * Loads a complete session from a file.
  */
-void files_load_session(char* //!< The path to the file that needs to be read.
+void files_load_session(char * //!< The path to the file that needs to be read.
 );
 
 #endif

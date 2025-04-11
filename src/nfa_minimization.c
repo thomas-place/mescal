@@ -335,3 +335,100 @@ nfa* nfa_hopcroft(nfa* A) {
     nfa_hopcroft_free(p);
     return MINI;
 }
+
+
+/************************/
+/** Canonical ordering **/
+/************************/
+
+dequeue** nfa_mini_canonical_ordering(nfa* A) {
+    if (!A) {
+        return NULL;
+    }
+
+
+    uint thesize = A->trans->size_graph;
+
+    // Array that marks the visited pairs.
+    bool** visited;
+    MALLOC(visited, thesize);
+    for (uint i = 0; i < thesize; i++) {
+        CALLOC(visited[i], thesize);
+    }
+
+    // Stacks for the DFS which computes all pairs incomparable of states
+    // A pair (q,r) is incomparable if q is NOT smaller than r for the canonical order.
+    // First stack stores element 1 in the pair, second stack stores element 2 in the pair.
+    dequeue* stack_one = create_dequeue();
+    dequeue* stack_two = create_dequeue();
+
+    // We push the starting pairs (final, non-final) which are clearly incomparable.
+    for (uint i = 0; i < size_dequeue(A->finals); i++)
+    {
+        int j = 0;
+        for (uint q = 0; q < thesize; q++) {
+            // We skip q if it is a final state.
+            if (lefread_dequeue(A->finals, j) == q) {
+                j++;
+                continue;
+            }
+            rigins_dequeue(lefread_dequeue(A->finals, i), stack_one);
+            rigins_dequeue(q, stack_two);
+        }
+    }
+
+    // Computation of the mirror automaton (used in the DFS).
+    lgraph* mirror = lgraph_mirror(A->trans);
+
+    // The DFS
+    while (!isempty_dequeue(stack_one)) {
+
+        // We pop a pair (q, r) from the stacks.
+        uint q = rigpull_dequeue(stack_one);
+        uint r = rigpull_dequeue(stack_two);
+
+        // We skip the pair if it has already been visited.
+        if (visited[q][r]) {
+            continue;
+        }
+
+        // We mark the pair as visited.
+        visited[q][r] = true;
+
+
+        // We push all pairs from which we can reach (q, r) in either the left or right Cayley graph
+        // These pairs are also incomparable.
+        for (uint a = 0; a < A->trans->size_alpha; a++) {
+            for (uint i = 0; i < size_dequeue(mirror->edges[q][a]); i++) {
+                for (uint j = 0; j < size_dequeue(mirror->edges[r][a]); j++) {
+                    rigins_dequeue(lefread_dequeue(mirror->edges[q][a], i), stack_one);
+                    rigins_dequeue(lefread_dequeue(mirror->edges[r][a], j), stack_two);
+                }
+            }
+        }
+    }
+
+    // We may now compute the canonical ordering of the states.
+    dequeue** order;
+    MALLOC(order, thesize);
+    for (uint q = 0; q < thesize; q++) {
+        order[q] = create_dequeue();
+        for (uint r = 0; r < thesize; r++) {
+            if (!visited[q][r]) {
+                rigins_dequeue(r, order[q]);
+            }
+        }
+        free(visited[q]);
+    }
+    free(visited);
+
+
+    delete_dequeue(stack_one);
+    delete_dequeue(stack_two);
+    delete_lgraph(mirror);
+
+    return order;
+
+
+}
+

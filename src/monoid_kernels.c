@@ -271,11 +271,11 @@ num_span_trees *compute_num_span_trees(morphism *M, bool right) {
     bool *visited;
     CALLOC(visited, ret->cay->size_graph);
 
-    // For each idempotent
+    // We select one idempotent per R/L-class and build a spanning tree from it.
     for (uint i = 0; i < size_dequeue(M->idem_list); i++) {
         uint e = lefread_dequeue(M->idem_list, i);
 
-        // If the element has already been treated (there was another previously treated idempotent its class), we skip it.
+        // If the element has already been treated (there was another previously treated idempotent in its class), we skip it.
         if (visited[e]) {
             continue;
         }
@@ -290,9 +290,9 @@ num_span_trees *compute_num_span_trees(morphism *M, bool right) {
         // Queue for the breadth first search that we will do to build the spanning tree.
         dequeue *thequeue = create_dequeue();
 
-        // We first insert the edges starting at e in the spanning tree inside our queue.
-        // (we only consider the edges internal to the R-class of e).
+        // We first enqueue the edges starting at e, they will be in the spanning tree
         for (uint a = 0; a < ret->cay->size_alpha; a++) {
+            // We only consider the edges internal to the R-class of e.
             if (ret->P->numcl[e] == ret->P->numcl[ret->cay->edges[e][a]]) {
                 rigins_dequeue(e * ret->cay->size_alpha + a, thequeue);
             }
@@ -300,7 +300,6 @@ num_span_trees *compute_num_span_trees(morphism *M, bool right) {
 
         // While the queue is not empty
         while (!isempty_dequeue(thequeue)) {
-
             // We take the first edge (r,b,s) in the queue.
             uint p = lefpull_dequeue(thequeue);
             uint r = p / ret->cay->size_alpha;
@@ -315,8 +314,8 @@ num_span_trees *compute_num_span_trees(morphism *M, bool right) {
             }
 
             // If s has not been treated, it is part of the spanning tree. We update the
-            // counts of the letters on the path from e to s and we insert the edges starting
-            // at s in the queue.
+            // counts of the letters on the path from e to s and we insert each edge starting
+            // at s in the queue and that does not leave the class.
             visited[s] = true;
             for (uint a = 0; a < ret->cay->size_alpha; a++) {
                 ret->span_trees[s][a] = ret->span_trees[r][a];
@@ -353,7 +352,6 @@ void delete_num_span_trees(num_span_trees *S) {
 }
 
 void compute_amt_kernel_regular(morphism *M, bool *mono_in_sub, uint *size) {
-
     num_span_trees *spans = compute_num_span_trees(M, true);
 
     for (uint i = 0; i < size_dequeue(M->idem_list); i++) {
@@ -488,7 +486,6 @@ void compute_amt_pairs_regular(num_span_trees *rspans, num_span_trees *lspans, u
 subsemi *get_amt_kernel(morphism *M, sub_level) {
     // Allocation of the submonoid
     subsemi *ker = init_subsemi(M);
-    MALLOC(ker->rels, 1);
     ker->neut = ONE;
 
     // We use the separation algorithm

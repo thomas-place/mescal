@@ -173,6 +173,41 @@ int lgraph_nb_edges(lgraph* //<! The graph.
 int dgraph_nb_edges(dgraph* //<! The graph.
 );
 
+/***********/
+/* Mirrors */
+/***********/
+
+/**
+ * @brief
+ * Computes the mirror of a directed unlabeled graph.
+ *
+ * @return
+ * The mirror of the graph.
+ */
+graph* graph_mirror(graph* //<! The graph.
+);
+
+/**
+ * @brief
+ * Computes the mirror of a directed labeled graph.
+ *
+ * @return
+ * The mirror of the graph.
+ */
+lgraph* lgraph_mirror(lgraph* //<! The graph.
+);
+
+/**
+ * @brief
+ * Computes the mirror of a complete deterministic directed labeled graph.
+ *
+ * @return
+ * The mirror of the graph (an lgraph since the mirror need not be deterministic)
+ */
+lgraph* dgraph_mirror(dgraph* //<! The graph.
+);
+
+
 /************/
 /* Searches */
 /************/

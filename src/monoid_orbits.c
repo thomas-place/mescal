@@ -400,8 +400,11 @@ subsemi* compute_one_orbit_from_pairs(morphism* M, uint e, dequeue* eM, bool** p
     // The R-class of e
     uint rcl = G->RCL->numcl[e];
 
+
     // We compute the set Me.
     dequeue* Me = compute_l_ideal(M, e, NULL);
+
+
 
     // We may now compute the orbit of e
 
@@ -412,6 +415,9 @@ subsemi* compute_one_orbit_from_pairs(morphism* M, uint e, dequeue* eM, bool** p
     else {
         theorb->level = LV_GREG;
     }
+
+
+
     theorb->size = 0; // The size will be computed later
     CALLOC(theorb->mono_in_sub, M->r_cayley->size_graph);
     MALLOC(theorb->mono_to_sub, M->r_cayley->size_graph);
@@ -435,7 +441,7 @@ subsemi* compute_one_orbit_from_pairs(morphism* M, uint e, dequeue* eM, bool** p
         theorb->mono_to_sub[ese] = theorb->size;
         theorb->size++;
     }
-
+    delete_dequeue(protorb);
     delete_dequeue(orbset);
 
     MALLOC(theorb->sub_to_mono, theorb->size);
@@ -787,6 +793,7 @@ subsemi* compute_one_bpgplusorb(orbits* L, uint e, sub_level level) {
 
     return theorb;
 }
+#include "monoid_display.h"
 
 orbits* compute_bpgplusorbits(orbits* S, sub_level level) {
     morphism* M = S->original;

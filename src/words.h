@@ -50,7 +50,7 @@ uint length_letter_utf8(letter //!< The letter.
  * Displays a letter on a given stream: UTF8 version for the subscripts.
  *
  * @return
- * The length of the displayed letter.
+ * The on-screen length of the displayed letter.
  */
 uint fprint_letter_utf8(letter, //!< The letter.
     FILE* //!< The stream.
@@ -61,7 +61,7 @@ uint fprint_letter_utf8(letter, //!< The letter.
  * Prints a letter in a given char array: UTF8 version for the subscripts.
  *
  * @return
- * The length of the displayed letter in bytes.
+ * The length of the displayed letter in bytes (generally larger than the on-screen length if there are UTF8 characters).
  */
 int sprint_letter_utf8(letter, //!< The letter.
     char* //!< The string (must be large enough).

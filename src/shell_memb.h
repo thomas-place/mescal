@@ -110,35 +110,317 @@ bool shell_morprop_semigroup(int, //!< Index of the morphism in the objects arra
  * @return
  * True if the monoid is a group, false otherwise.
  */
-bool shell_morprop_monocom(int, //!< Index of the morphism in the objects array.
-    char*, //!< Name of the object (for the display)
-    FILE* //!< Output stream (NULL is no output is desired).
+bool shell_morprop_monocom(int j, //!< Index of the morphism in the objects array.
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
 );
 
-bool shell_morprop_kercom(int j, kernel_type type, char* ker, char* name, FILE* out);
+/**
+ * @brief
+ * Checks if a kernel is commutative.
+ *
+ * @return
+ * True if the kernel is commutative, false otherwise.
+ */
+bool shell_morprop_kercom(int j, //!< Index of the morphism in the objects array.
+    kernel_type type, //!< The type of kernel to check.
+    char* ker, //!< The name of the kernel (for the display).
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
 
-bool shell_morprop_orbcom(int j, orbits_type type, char* orbs, char* name, FILE* out);
-bool shell_morprop_semigencom(int j, char* name, FILE* out);
-bool shell_morprop_monoidem(int j, char* name, FILE* out);
-bool shell_morprop_keridem(int j, kernel_type type, char* ker, char* name, FILE* out);
-bool shell_morprop_orbidem(int j, orbits_type type, char* orbs, char* name, FILE* out);
-bool shell_morprop_monogreen(int j, green_relation R, char* name, FILE* out);
-bool shell_morprop_kergreen(int j, green_relation R, kernel_type type, char* ker, char* name, FILE* out);
-bool shell_morprop_orbgreen(int j, green_relation R, orbits_type type, char* orbs, char* name, FILE* out);
-bool shell_morprop_monoda(int j, char* name, FILE* out);
-bool shell_morprop_kerda(int j, kernel_type type, char* ker, char* name, FILE* out);
-bool shell_morprop_orbda(int j, orbits_type type, char* orbs, char* name, FILE* out);
-bool shell_morprop_monojsat(int j, char* name, FILE* out);
-bool shell_morprop_monoejsat(int j, char* name, FILE* out);
-bool shell_morprop_kerjsat(int j, kernel_type type, char* ker, char* name, FILE* out);
-bool shell_morprop_orbjsat(int j, orbits_type type, char* orbs, char* name, FILE* out);
-bool shell_morprop_bpgroupeq(int j, kernel_type type, char* ker, char* name, FILE* out);
-bool shell_morprop_blockg(int j, char* name, FILE* out);
-bool shell_mprop_semiknast(int j, char* name, FILE* out);
-bool shell_morprop_kerknast(int j, kernel_type type, char* ker, char* name, FILE* out);
-bool shell_morprop_knastat(int j, char* name, FILE* out);
-bool shell_morprop_bpgroupeqplus(int j, orbits_type type, char* orbs, char* name, FILE* out);
-bool shell_morprop_ubp2eq(int j, orbits_type type, char* orbs, char* name, FILE* out);
+/**
+ * @brief
+ * Checks if orbits are commutative.
+ *
+ * @return
+ * True if the orbits are commutative, false otherwise.
+ */
+bool shell_morprop_orbcom(int j, //!< Index of the morphism in the objects array.
+    orbits_type type, //!< The type of orbits to check.
+    char* orbs, //!< The name of the orbits (for the display).
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
+
+/**
+ * @brief
+ * Checks if a semigroup is commutative.
+ *
+ * @return
+ * True if the semigroup is commutative, false otherwise.
+ */
+bool shell_morprop_semigencom(int j, //!< Index of the morphism in the objects array.
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
+
+/**
+ * @brief
+ * Checks if a monoid is idempotent.
+ *
+ * @return
+ * True if the monoid is idempotent, false otherwise.
+ */
+bool shell_morprop_monoidem(int j, //!< Index of the morphism in the objects array.
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
+
+/**
+ * @brief
+ * Checks if a kernel is idempotent.
+ *
+ * @return
+ * True if the kernel is idempotent, false otherwise.
+ */
+bool shell_morprop_keridem(int j, //!< Index of the morphism in the objects array.
+    kernel_type type, //!< The type of kernel to check.
+    char* ker, //!< The name of the kernel (for the display).
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
+
+/**
+ * @brief
+ * Checks if orbits are idempotent.
+ *
+ * @return
+ * True if the orbits are idempotent, false otherwise.
+ */
+bool shell_morprop_orbidem(int j, //!< Index of the morphism in the objects array.
+    orbits_type type, //!< The type of orbits to check.
+    char* orbs, //!< The name of the orbits (for the display).
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
+
+/**
+ * @brief
+ * Checks if a Green relation is trivial in a monoid.
+ *
+ * @return
+ * True if the relation is trivial, false otherwise.
+ */
+bool shell_morprop_monogreen(int j, //!< Index of the morphism in the objects array.
+    green_relation R, //!< The relation that needs to be checked.
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
+
+/**
+ * @brief
+ * Checks if a Green relation is trivial in a kernel.
+ *
+ * @return
+ * True if the relation is trivial, false otherwise.
+ */
+bool shell_morprop_kergreen(int j, //!< Index of the morphism in the objects array.
+    green_relation R, //!< The relation that needs to be checked.
+    kernel_type type, //!< The type of kernel to check.
+    char* ker, //!< The name of the kernel (for the display).
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
+
+/**
+ * @brief
+ * Checks if a Green relation is trivial in a set of orbits.
+ *
+ * @return
+ * True if the relation is trivial for all orbits, false otherwise.
+ */
+bool shell_morprop_orbgreen(int j, //!< Index of the morphism in the objects array.
+    green_relation R, //!< The relation that needs to be checked.
+    orbits_type type, //!< The type of orbits to check.
+    char* orbs, //!< The name of the orbits (for the display).
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
+
+/**
+ * @brief
+ * Checks if a monoid is in DA.
+ *
+ * @return
+ * True if the monoid is in DA, false otherwise.
+ */
+bool shell_morprop_monoda(int j, //!< Index of the morphism in the objects array.
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
+
+/**
+ * @brief
+ * Checks if a kernel is in DA.
+ *
+ * @return
+ * True if the kernelis in DA, false otherwise.
+ */
+bool shell_morprop_kerda(int j, //!< Index of the morphism in the objects array.
+    kernel_type type, //!< The type of kernel to check.
+    char* ker, //!< The name of the kernel (for the display).
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
+
+/**
+ * @brief
+ * Checks if orbits are in DA.
+ *
+ * @return
+ * True if the orbits are all in DA, false otherwise.
+ */
+bool shell_morprop_orbda(int j, //!< Index of the morphism in the objects array.
+    orbits_type type, //!< The type of orbits to check.
+    char* orbs, //!< The name of the orbits (for the display).
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
+
+/**
+ * @brief
+ * Checks if a monoid satisfies the J-saturation property.
+ *
+ * @return
+ * True if the monoid satisfies the J-saturation property, false otherwise.
+ */
+bool shell_morprop_monojsat(int j, //!< Index of the morphism in the objects array.
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
+
+/**
+ * @brief
+ * Checks if a monoid satisfies J-saturation property restricted to idempotents.
+ *
+ * @return
+ * True if the monoid satisfies the property, false otherwise.
+ */
+bool shell_morprop_monoejsat(int j, //!< Index of the morphism in the objects array.
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
+
+/**
+ * @brief
+ * Checks if a kernel satisfies the J-saturation property.
+ *
+ * @return
+ * True if the kernel satisfies the J-saturation property, false otherwise.
+ */
+bool shell_morprop_kerjsat(int j, //!< Index of the morphism in the objects array.
+    kernel_type type, //!< The type of kernel to check.
+    char* ker, //!< The name of the kernel (for the display).
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
+
+/**
+ * @brief
+ * Checks if orbits satisfy the J-saturation property.
+ *
+ * @return
+ * True if the orbits satisfy the J-saturation property, false otherwise.
+ */
+bool shell_morprop_orbjsat(int j, //!< Index of the morphism in the objects array.
+    orbits_type type, //!< The type of orbits to check.
+    char* orbs, //!< The name of the orbits (for the display).
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
+
+/**
+ * @brief
+ * Checks if a morphism satisfies the BPol(G)-equation.
+ *
+ * @return
+ * True if the morphism satisfies the BPol(G)-equation, false otherwise.
+ */
+bool shell_morprop_bpgroupeq(int j, //!< Index of the morphism in the objects array.
+    kernel_type type, //!< The type of kernel to check.
+    char* ker, //!< The name of the kernel (for the display).
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
+
+/**
+ * @brief
+ * Checks if a monoid satisfies the block-group property.
+ *
+ * @return
+ * True if the monoid satisfies the block-group property, false otherwise.
+ */
+bool shell_morprop_blockg(int j, //!< Index of the morphism in the objects array.
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
+
+/**
+ * @brief
+ * Checks if a semigroup satisfies Knast's equation.
+ *
+ * @return
+ * True if the semigroup satisfies Knast's equation, false otherwise.
+ */
+bool shell_mprop_semiknast(int j, //!< Index of the morphism in the objects array.
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
+
+/**
+ * @brief
+ * Checks if a strict kernel satisfies Knast's equation.
+ *
+ * @return
+ * True if the strict kernel satisfies Knast's equation, false otherwise.
+ */
+bool shell_morprop_kerknast(int j, //!< Index of the morphism in the objects array.
+    kernel_type type, //!< The type of kernel to check.
+    char* ker, //!< The name of the kernel (for the display).
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
+
+/**
+ * @brief
+ * Checks if a monoid satisfies Knast's equation for AT sets.
+ *
+ * @return
+ * True if the monoid satisfies Knast's equation for AT-sets, false otherwise.
+ */
+bool shell_morprop_knastat(int j, //!< Index of the morphism in the objects array.
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
+
+/**
+ * @brief
+ * Checks if a kernel satisfies the BPol(G⁺)-equation.
+ *
+ * @return
+ * True if the kernel satisfies the BPol(G⁺)-equation, false otherwise.
+ */
+bool shell_morprop_bpgroupeqplus(int j, //!< Index of the morphism in the objects array.
+    orbits_type type, //!< The type of orbits to check.
+    char* orbs, //!< The name of the orbits (for the display).
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
+
+/**
+ * @brief
+ * Checks if orbits satisfy the UBP2 equality property.
+ *
+ * @return
+ * True if the orbits satisfy the UBP2 equality property, false otherwise.
+ */
+bool shell_morprop_ubp2eq(int j, //!< Index of the morphism in the objects array.
+    orbits_type type, //!< The type of orbits to check.
+    char* orbs, //!< The name of the orbits (for the display).
+    char* name, //!< Name of the object (for the display)
+    FILE* out //!< Output stream (NULL is no output is desired).
+);
 
 
 /**
@@ -815,7 +1097,7 @@ bool shell_membership_ubpol2dd(int //!< Index of the language in the objects arr
  * Membership function for the class UPol(BPol₂(MOD⁺)).
  *
  * @return
- * True if the language is in UPol(BPol₂(MOD⁺)), false otherwise.
+ * True if the language is in UPol(BPol₂(MOD⁺), false otherwise.
  */
 bool shell_membership_ubpol2modp(int //!< Index of the language in the objects array.
     , FILE*                          //!< Output stream (NULL is no output is desired).
@@ -826,7 +1108,7 @@ bool shell_membership_ubpol2modp(int //!< Index of the language in the objects a
  * Membership function for the class UPol(BPol₂(AMT⁺)).
  *
  * @return
- * True if the language is in UPol(BPol₂(AMT⁺)), false otherwise.
+ * True if the language is in UPol(BPol₂(AMT⁺), false otherwise.
  */
 bool shell_membership_ubpol2amtp(int //!< Index of the language in the objects array.
     , FILE*                          //!< Output stream (NULL is no output is desired).
@@ -837,7 +1119,7 @@ bool shell_membership_ubpol2amtp(int //!< Index of the language in the objects a
  * Membership function for the class UPol(BPol₂(GR⁺)).
  *
  * @return
- * True if the language is in UPol(BPol₂(GR⁺)), false otherwise.
+ * True if the language is in UPol(BPol₂(GR⁺), false otherwise.
  */
 bool shell_membership_ubpol2grp(int //!< Index of the language in the objects array.
     , FILE*                            //!< Output stream (NULL is no output is desired).

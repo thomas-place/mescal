@@ -529,7 +529,6 @@ orbits* shell_compute_orbits(int i, orbits_type type, sub_level level) {
     }
 
 
-
     // If part of the orbits have already been computed and we now want more, we delete the old orbits.
     if (objects[i]->mor->orbs[type] && objects[i]->mor->orbs[type]->level < level) {
         delete_orbits(objects[i]->mor->orbs[type]);
@@ -579,6 +578,8 @@ orbits* shell_compute_orbits(int i, orbits_type type, sub_level level) {
             break;
         }
     }
+
+
     return objects[i]->mor->orbs[type];
 }
 

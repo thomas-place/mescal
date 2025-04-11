@@ -34,69 +34,228 @@
  * @return
  * The length.
  */
-uint num_length(uint //!< The integer.
+uint get_uint_length(uint //!< The integer.
 );
 
 
+/**
+ * @brief
+ * Concatenates multiple strings.
+ *
+ * @remark
+ *  The last string must be NULL.
+ *
+ * @return
+ * The concatenated string.
+ */
+char* multiple_strcat(char* s, //!< The first string.
+    ... //!< The other strings (NULL at the end).
+);
 
+/************************/
+/** Printing functions **/
+/************************/
 
+/**
+ * @brief
+ * Prints the top line of a box (with corners on both ends)
+ */
+void print_top_line(uint length, //!< The length of the line.
+    FILE* out //!< The output stream.
+);
 
+/**
+ * @brief
+ * Prints the middle line of a box (with links for the lower and upper parts on both ends)
+ */
+void print_mid_line(uint length, //!< The length of the line.
+    FILE* out //!< The output stream.
+);
 
+/**
+ * @brief
+ * Prints the bottom line of a box (with corners on both ends)
+ */
+void print_bot_line(uint length, //!< The length of the line.
+    FILE* out //!< The output stream.
+);
 
-char* multiple_strcat(char* s, ...);
+/**
+ * @brief
+ * Prints a separator line (one top line and one bottom line)
+ */
+void print_sep_line(uint length, //!< The length of the line.
+    FILE* out //!< The output stream.
+);
 
-void print_top_line(uint length, FILE* out);
+/**
+ * @brief
+ * Prints the top line of a double box (with corners on both ends)
+ */
+void print_dtop_line(uint length, //!< The length of the line.
+    FILE* out //!< The output stream.
+);
 
-void print_mid_line(uint length, FILE* out);
+/**
+ * @brief
+ * Prints the middle line of a double box (with links for the lower and upper parts on both ends)
+ */
+void print_dmid_line(uint length, //!< The length of the line.
+    FILE* out //!< The output stream.
+);
 
-void print_bot_line(uint length, FILE* out);
+/**
+ * @brief
+ * Prints the bottom line of a double box (with corners on both ends)
+ */
+void print_dbot_line(uint length, //!< The length of the line.
+    FILE* out //!< The output stream.
+);
 
-void print_sep_line(uint length, FILE* out);
+/**
+ * @brief
+ * Prints spaces.
+ */
+void print_spaces(uint number, //!< The number of spaces.
+    FILE* out //!< The output stream.
+);
 
-void print_dtop_line(uint length, FILE* out);
+/**
+ * @brief
+ * Prints several copies of a string.
+ */
+void print_copies_string(uint number, //!< The number of copies.
+    char* s, //!< The string to print.
+    FILE* out //!< The output stream.
+);
 
-void print_dmid_line(uint length, FILE* out);
+/**
+ * @brief
+ * Counts the on-screen length of a UTF-8 string.
+ *
+ * @return
+ * The on-screen length of the string.
+ */
+uint count_utf8_code_points(const char* s //!< The string to count.
+);
 
-void print_dbot_line(uint length, FILE* out);
+/**
+ * @brief
+ * Prints a title box.
+ *
+ * @remark
+ * The minimum length is 100 (if a lower length is passed, it is set to 100).
+ *
+ * @remark
+ * The title is centered in the box.
+ */
+void print_title_box(uint length, //!< The length of the box.
+    bool closed, //!< If true, a bottom line is printed at the bottom. If false, a mid line is printed instead.
+    FILE* out, //!< The output stream.
+    uint nlines, //!< The number of lines to print.
+    ... //!< The lines to print (nlines char*).
+);
 
-void print_spaces(uint number, FILE* out);
+/**
+ * @brief
+ * Prints a double title box.
+ *
+ * @remark
+ * The minimum length is 100 (if a lower length is passed, it is set to 100).
+ *
+ * @remark
+ * The title is centered in the box.
+ */
+void print_dtitle_box(uint length, //!< The length of the box.
+    bool closed, //!< If true, a bottom line is printed at the bottom. If false, a mid line is printed instead.
+    FILE* out, //!< The output stream.
+    uint nlines, //!< The number of lines to print.
+    ... //!< The lines to print (nlines char*).
+);
 
-void print_char(uint number, char* c, FILE* out);
+/**
+ * @brief
+ * Prints a single line in a box.
+ *
+ * @remark
+ * The minimum length is 100 (if a lower length is passed, it is set to 100).
+ */
+void print_line_box(uint length, //!< The length of the box.
+    FILE* out, //!< The output stream.
+    char* s //!< The line to print.
+);
 
-uint count_utf8_code_points(const char* s);
+/**
+ * @brief
+ * Prints a line in a double box.
+ *
+ * @remark
+ * The minimum length is 100 (if a lower length is passed, it is set to 100).
+ */
+void print_dline_box(uint length, //!< The length of the box.
+    FILE* out, //!< The output stream.
+    char* s //!< The line to print.
+);
 
-// Affichage d'un titre dans une boite.
-// La taille minimale autorisée est 100 (le max de length et 100 est utilisé)
-void print_title_box(uint length, bool closed, FILE* out, uint nlines, ...);
+/**
+ * @brief
+ * Prints a natural number as a subscript in UTF-8 on a stream.
+ *
+ * @return
+ * The on-screen length of the number.
+ */
+uint fprint_subsc_utf8(uint n, //!< The number to print.
+    FILE* out //!< The output stream.
+);
 
-void print_title_box_shift(uint length, uint shiftl, uint shiftr, bool closed, FILE* out,
-    uint nlines, ...);
+/**
+ * @brief
+ * Prints a natural number as a power in UTF-8 on a stream.
+ *
+ * @return
+ * The on-screen length of the number.
+ */
+uint fprint_power_utf8(uint n, //!< The number to print.
+    FILE* out //!< The output stream.
+);
 
-void print_dtitle_box(uint length, bool closed, FILE* out, uint nlines, ...);
+/**
+ * @brief
+ * Prints a natural number as a subscript in UTF-8 on a string.
+ *
+ * @return
+ * The length in bytes of the string (larger than the on-screen length).
+ */
+int sprint_subsc_utf8(uint n, //!< The number to print.
+    char* out //!< The output string (must be large enough).
+);
 
-void print_line_box(uint length, FILE* out, char* s);
+/**
+ * @brief
+ * Prints a natural number as a power in UTF-8 on a string.
+ *
+ * @return
+ * The length in bytes of the string (larger than the on-screen length).
+ */
+int sprint_power_utf8(uint n, //!< The number to print.
+    char* out //!< The output string (must be large enough).
+);
 
-void print_dline_box(uint length, FILE* out, char* s);
-
-void print_booltab_alph(bool* alpha_array, uint alph_size, FILE* out);
-
-void append_power(uint n, char* name);
-
-uint fprint_subsc_utf8(uint n, FILE* out);
-uint fprint_power_utf8(uint n, FILE* out);
-int sprint_subsc_utf8(uint n, char* out);
-int sprint_power_utf8(uint n, char* out);
-
-uint get_uint_length(uint n);
-
-void print_facto_word(char* word, FILE* out);
-
-
+/**
+ * @brief
+ * Colors
+ */
 typedef enum { RED, GREEN, YELLOW, BLUE, PURPLE, CYAN, WHITE } color;
 
-void print_color(char* s, color col, FILE* out);
 
+/**
+ * @brief
+ * Prints a string in color on a stream.
+ */
+void print_color(char* s, //!< The string to print.
+    color col, //!< The color to use.
+    FILE* out //!< The output stream.
+);
 
-int dicho_search(uint*, uint, int);
 
 #endif // TOOLS_H_

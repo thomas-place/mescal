@@ -118,4 +118,19 @@ void nfa_hopcroft_free(hopcroft_partition*  //!< The partition.
 nfa* nfa_hopcroft(nfa*   //!< The NFA.
 );
 
+
+/************************/
+/** Canonical ordering **/
+/************************/
+
+/**
+ * @brief
+ * Computes the canonical ordering of the states of a minimal NFA.
+ *
+ * @return
+ * The canonical ordering of the states.
+ */
+dequeue** nfa_mini_canonical_ordering(nfa*  //!< The NFA to order (must be minimal).
+);
+
 #endif

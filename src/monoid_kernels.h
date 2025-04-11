@@ -119,10 +119,15 @@ typedef struct {
     parti *P;    //!< The partition into strongly connected components of the
                  //!< Cayley graph.
     int **span_trees; //!< The spanning trees. Indexed by the elements, then the
-                      //!< letters.
-    dequeue **dropped; //!< The dropped edges (we use them to close the cycles).
-                       //!< Indexed by the classes of the partition. NULL if the
-                       //!< class is not regular.
+                      //!< letters. For each R- or L-class (depending on what we
+                      //!< compute), we fix an idempotent. The value
+                      //!< span_trees[s][a] counts the number of a's on the
+                      //!< branch from e to s in the span_tree associated to the
+                      //!< R- or L-class.
+    dequeue **dropped; //!< The dropped edges, ie, those not in the span tree
+                       //!< (we use them to close the < cycles). Indexed by the
+                       //!< classes of the < partition. NULL if the class is not
+                       //!< regular.
 } num_span_trees;
 
 /**

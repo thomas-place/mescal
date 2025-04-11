@@ -720,179 +720,106 @@ void mor_compute_mult(morphism* M) {
     delete_dequeue(fromone);
 }
 
-
-static lgraph* mor_mirror_aux(dgraph* G) {
-    lgraph* themirror = create_lgraph_noedges(G->size_graph, G->size_alpha);
-    for (uint q = 0; q < themirror->size_graph; q++) {
-        for (uint a = 0; a < themirror->size_alpha; a++) {
-            insert_dequeue(themirror->edges[G->edges[q][a]][a], q);
-        }
-    }
-    return themirror;
-}
-
 lgraph* mor_rmirror(morphism* M) {
-    return mor_mirror_aux(M->r_cayley);
+    return dgraph_mirror(M->r_cayley);
 }
 
 lgraph* mor_lmirror(morphism* M) {
-    return mor_mirror_aux(M->l_cayley);
+    return dgraph_mirror(M->l_cayley);
 }
 
-// Calcule l'ordre syntaxique
 
-// Retourne la valeur du ième bit de mem (en partant de la droite)
-// 1 <= pos <= 8
-static uchar get_nth_bit(uchar mem, uchar pos) {
-    mem = mem >> (pos - 1);
-    return mem & 1;
-}
-
-// Modifier la valeur du ième bit de mem (en partant de la droite)
-// 1 <= pos <= 8, 0 <= val <= 1
-static void set_nth_bit(uchar* mem, uchar val, uchar pos) {
-    uchar mask = 1 << (pos - 1);
-    if (val == 0) {
-        mask = ~mask;
-        *mem = *mem & mask;
-    }
-    else {
-        *mem = *mem | mask;
-    }
-}
-
-// Calcule de l'ordre syntaxique complet
 void mor_compute_order(morphism* M) {
     if (M->order != NULL) {
         return;
     }
     uint thesize = M->r_cayley->size_graph;
 
-    // On utilisera les 4 premiers bits à droite pour
-    // coder les informations nécessaires au parcours
-    // uchar thepairs[thesize][thesize];
-
-    uchar** thepairs;
-    MALLOC(thepairs, thesize);
-
-    // On commence par tout initialiser à 00000011 (c'est-à-dire 3)
-    for (uint q = 0; q < M->r_cayley->size_graph; q++) {
-        MALLOC(thepairs[q], thesize);
-        for (uint r = 0; r < M->r_cayley->size_graph; r++) {
-            thepairs[q][r] = 3;
-        }
+    // Array that marks the visited pairs.
+    bool** visited;
+    MALLOC(visited, thesize);
+    for (uint i = 0; i < thesize; i++) {
+        CALLOC(visited[i], thesize);
     }
 
-    // Stacks for the two DFSs
-    dequeue* first_stack_1 = create_dequeue();
-    dequeue* first_stack_2 = create_dequeue();
-    dequeue* secon_stack_1 = create_dequeue();
-    dequeue* secon_stack_2 = create_dequeue();
+    // Stacks for the DFS which computes all pairs incomparable of elements.
+    // A pair (q, r) is incomparable if q is NOT smaller than r for the syntactic order.
+    // First stack stores element 1 in the pair, second stack stores element 2 in the pair.
+    dequeue* stack_one = create_dequeue();
+    dequeue* stack_two = create_dequeue();
 
-    // On empile les paires (non-acceptant,acceptant) pour le DFS1 et les paires
-    // (acceptant,non-acceptant) pour le DFS2
-    for (uint i = 0; i < size_dequeue(M->accept_list); i++) // Boucle sur les éléments acceptants
+    // We push the starting pairs (accepting, non-accepting) which are clearly incomparable.
+    for (uint i = 0; i < size_dequeue(M->accept_list); i++)
     {
-        uint j = 0;
-        uint r = 0;
-        // Boucle sur tous les éléments en identifiant les acceptants
-        while (r < M->r_cayley->size_graph) {
-            if (size_dequeue(M->accept_list) <= j || r < lefread_dequeue(M->accept_list, j)) {
-                // On marque la paire comme ayant été visitée pour le DFS1 (bit 3)
-                set_nth_bit(&thepairs[r][lefread_dequeue(M->accept_list, i)], 1, 3);
-                rigins_dequeue(r, first_stack_1);
-                rigins_dequeue(lefread_dequeue(M->accept_list, i), first_stack_2);
-
-                // On marque la paire comme ayant été visitée pour le DFS2 (bit 4)
-                set_nth_bit(&thepairs[lefread_dequeue(M->accept_list, i)][r], 1, 4);
-                rigins_dequeue(lefread_dequeue(M->accept_list, i), secon_stack_1);
-                rigins_dequeue(r, secon_stack_2);
-
-                r++;
+        for (uint q = 0; q < thesize; q++) {
+            // We skip q if it is an accepting element.
+            if (M->accept_array[q]) {
+                continue;
             }
-            else {
-                r++;
-                j++;
-            }
+            // We loop over the accepting elements.
+
+            rigins_dequeue(lefread_dequeue(M->accept_list, i), stack_one);
+            rigins_dequeue(q, stack_two);
         }
     }
 
-    // Calcul des graphes miroirs
+    // Computation of the mirror graphs (used in the DFS).
     lgraph* rmirror = mor_rmirror(M);
     lgraph* lmirror = mor_lmirror(M);
 
-    // Premier DFS
-    while (!isempty_dequeue(first_stack_1)) {
-        uint q = rigpull_dequeue(first_stack_1);
-        uint r = rigpull_dequeue(first_stack_2);
+    // The DFS
+    while (!isempty_dequeue(stack_one)) {
 
-        set_nth_bit(&thepairs[q][r], 0, 2); // On met le 2ème bit à 0, DFS1
+        // We pop a pair (q, r) from the stacks.
+        uint q = rigpull_dequeue(stack_one);
+        uint r = rigpull_dequeue(stack_two);
 
+        // We skip the pair if it has already been visited.
+        if (visited[q][r]) {
+            continue;
+        }
+
+        // We mark the pair as visited.
+        visited[q][r] = true;
+
+
+        // We push all pairs from which we can reach (q, r) in either the left or right Cayley graph
+        // These pairs are also incomparable.
         for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
             for (uint i = 0; i < size_dequeue(rmirror->edges[q][a]); i++) {
                 for (uint j = 0; j < size_dequeue(rmirror->edges[r][a]); j++) {
-                    if (get_nth_bit(thepairs[lefread_dequeue(rmirror->edges[q][a], i)][lefread_dequeue(rmirror->edges[r][a], j)], 3) == 0) {
-                        set_nth_bit(&thepairs[lefread_dequeue(rmirror->edges[q][a], i)][lefread_dequeue(rmirror->edges[r][a], j)], 1, 3);
-                        rigins_dequeue(lefread_dequeue(rmirror->edges[q][a], i), first_stack_1);
-                        rigins_dequeue(lefread_dequeue(rmirror->edges[r][a], j), first_stack_2);
-                    }
+                    rigins_dequeue(lefread_dequeue(rmirror->edges[q][a], i), stack_one);
+                    rigins_dequeue(lefread_dequeue(rmirror->edges[r][a], j), stack_two);
                 }
             }
 
             for (uint i = 0; i < size_dequeue(lmirror->edges[q][a]); i++) {
                 for (uint j = 0; j < size_dequeue(lmirror->edges[r][a]); j++) {
-                    if (get_nth_bit(thepairs[lefread_dequeue(lmirror->edges[q][a], i)][lefread_dequeue(lmirror->edges[r][a], j)], 3) == 0) {
-                        set_nth_bit(&thepairs[lefread_dequeue(lmirror->edges[q][a], i)][lefread_dequeue(lmirror->edges[r][a], j)], 1, 3);
-                        rigins_dequeue(lefread_dequeue(lmirror->edges[q][a], i), first_stack_1);
-                        rigins_dequeue(lefread_dequeue(lmirror->edges[r][a], j), first_stack_2);
-                    }
+                    rigins_dequeue(lefread_dequeue(lmirror->edges[q][a], i), stack_one);
+                    rigins_dequeue(lefread_dequeue(lmirror->edges[r][a], j), stack_two);
+
                 }
             }
         }
     }
 
-    // Second DFS
-    while (!isempty_dequeue(secon_stack_1)) {
-        uint q = rigpull_dequeue(secon_stack_1);
-        uint r = rigpull_dequeue(secon_stack_2);
-
-        set_nth_bit(&thepairs[q][r], 0, 1); // On met le 1er bit à 0, DFS2
-
-        for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
-            for (uint i = 0; i < size_dequeue(rmirror->edges[q][a]); i++) {
-                for (uint j = 0; j < size_dequeue(rmirror->edges[r][a]); j++) {
-                    if (get_nth_bit(thepairs[lefread_dequeue(rmirror->edges[q][a], i)][lefread_dequeue(rmirror->edges[r][a], j)], 4) == 0) {
-                        set_nth_bit(&thepairs[lefread_dequeue(rmirror->edges[q][a], i)][lefread_dequeue(rmirror->edges[r][a], j)], 1, 4);
-                        rigins_dequeue(lefread_dequeue(rmirror->edges[q][a], i), secon_stack_1);
-                        rigins_dequeue(lefread_dequeue(rmirror->edges[r][a], j), secon_stack_2);
-                    }
-                }
-            }
-
-            for (uint i = 0; i < size_dequeue(lmirror->edges[q][a]); i++) {
-                for (uint j = 0; j < size_dequeue(lmirror->edges[r][a]); j++) {
-                    if (get_nth_bit(thepairs[lefread_dequeue(lmirror->edges[q][a], i)][lefread_dequeue(lmirror->edges[r][a], j)], 4) == 0) {
-                        set_nth_bit(&thepairs[lefread_dequeue(lmirror->edges[q][a], i)][lefread_dequeue(lmirror->edges[r][a], j)], 1, 4);
-                        rigins_dequeue(lefread_dequeue(lmirror->edges[q][a], i), secon_stack_1);
-                        rigins_dequeue(lefread_dequeue(lmirror->edges[r][a], j), secon_stack_2);
-                    }
-                }
-            }
-        }
-    }
-
-    // Affectation dans la structure de données
+    // We may now compute the syntactic order on the elements.
     MALLOC(M->order, M->r_cayley->size_graph);
     for (uint q = 0; q < M->r_cayley->size_graph; q++) {
         M->order[q] = create_dequeue();
         for (uint r = 0; r < M->r_cayley->size_graph; r++) {
-            if (get_nth_bit(thepairs[q][r], 1) == 1) {
+            if (!visited[q][r]) {
                 rigins_dequeue(r, M->order[q]);
             }
         }
-        free(thepairs[q]);
+        free(visited[q]);
     }
-    free(thepairs);
+    free(visited);
+
+    delete_dequeue(stack_one);
+    delete_dequeue(stack_two);
+    delete_lgraph(rmirror);
+    delete_lgraph(lmirror);
 }
 
 

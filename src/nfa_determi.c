@@ -91,7 +91,7 @@ static void dfa_avl_to_table(avlnode* AVL, nfa* DFA, dequeue* oldfinals, bool* n
                         string_size += strlen(oldnames[lefread_dequeue(thestate->set, i)]);
                     }
                     else {
-                        string_size += num_length(lefread_dequeue(thestate->set, i));
+                        string_size += get_uint_length(lefread_dequeue(thestate->set, i));
                     }
                 }
 

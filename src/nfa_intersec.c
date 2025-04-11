@@ -162,7 +162,7 @@ static void inter_avl_to_table(avlnode* tree, nfa* PROD, bool names, char** oldn
                 size += strlen(oldnames1[thestate->q1]);
             }
             else {
-                size += num_length(thestate->q1);
+                size += get_uint_length(thestate->q1);
             }
 
             if (oldnames2) {
@@ -170,7 +170,7 @@ static void inter_avl_to_table(avlnode* tree, nfa* PROD, bool names, char** oldn
                 size += strlen(oldnames2[thestate->q2]);
             }
             else {
-                size += num_length(thestate->q2);
+                size += get_uint_length(thestate->q2);
             }
             MALLOC(PROD->state_names[thestate->num], size);
 
