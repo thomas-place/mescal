@@ -1,7 +1,7 @@
 var files_dup =
 [
-    [ "alloc.c", "alloc_8c.html", null ],
-    [ "alloc.h", "alloc_8h.html", null ],
+    [ "alloc.c", "alloc_8c.html", "alloc_8c" ],
+    [ "alloc.h", "alloc_8h.html", "alloc_8h" ],
     [ "error.h", "error_8h.html", "error_8h" ],
     [ "files.h", "files_8h.html", "files_8h" ],
     [ "graphs.h", "graphs_8h.html", "graphs_8h" ],

@@ -109,16 +109,90 @@ $(function(){initNavTree('alloc_8c.html',''); initResizable(true); });
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a95dd19b1b2af33029f7ccb78d5f17039" id="r_a95dd19b1b2af33029f7ccb78d5f17039"><td class="memItemLeft" align="right" valign="top"><a id="a95dd19b1b2af33029f7ccb78d5f17039" name="a95dd19b1b2af33029f7ccb78d5f17039"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>multiple_free</b> (void *p,...)</td></tr>
+<tr class="memitem:a95dd19b1b2af33029f7ccb78d5f17039" id="r_a95dd19b1b2af33029f7ccb78d5f17039"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a95dd19b1b2af33029f7ccb78d5f17039">multiple_free</a> (void *p,...)</td></tr>
+<tr class="memdesc:a95dd19b1b2af33029f7ccb78d5f17039"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to free memory using the free() function.  <br /></td></tr>
 <tr class="separator:a95dd19b1b2af33029f7ccb78d5f17039"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4310f3e2cf0b85c13534389cc7479f33" id="r_a4310f3e2cf0b85c13534389cc7479f33"><td class="memItemLeft" align="right" valign="top"><a id="a4310f3e2cf0b85c13534389cc7479f33" name="a4310f3e2cf0b85c13534389cc7479f33"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>check_null</b> (const char *function, char *file, int line, int n,...)</td></tr>
+<tr class="memitem:a4310f3e2cf0b85c13534389cc7479f33" id="r_a4310f3e2cf0b85c13534389cc7479f33"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4310f3e2cf0b85c13534389cc7479f33">check_null</a> (const char *function, char *file, int line, int n,...)</td></tr>
+<tr class="memdesc:a4310f3e2cf0b85c13534389cc7479f33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do not use this function directly; instead, use the macro <a class="el" href="alloc_8h.html#aa44a749b8ec174a5780a521e07b9b86b" title="Macro to test if one or more pointers are NULL.">CHECK_NULL()</a>, which includes the error's location in the source code in the message.  <br /></td></tr>
 <tr class="separator:a4310f3e2cf0b85c13534389cc7479f33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Allocation helpers. Please use the macros of <a class="el" href="alloc_8h.html" title="Macros and functions to help memory allocation.">alloc.h</a> instead of these. </p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Function Documentation</h2>
+<a id="a4310f3e2cf0b85c13534389cc7479f33" name="a4310f3e2cf0b85c13534389cc7479f33"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4310f3e2cf0b85c13534389cc7479f33">&#9670;&#160;</a></span>check_null()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void check_null </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>function</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>file</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>line</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>n</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>...</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Do not use this function directly; instead, use the macro <a class="el" href="alloc_8h.html#aa44a749b8ec174a5780a521e07b9b86b" title="Macro to test if one or more pointers are NULL.">CHECK_NULL()</a>, which includes the error's location in the source code in the message. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="alloc_8h.html#aa44a749b8ec174a5780a521e07b9b86b" title="Macro to test if one or more pointers are NULL.">CHECK_NULL()</a> </dd></dl>
+
+</div>
+</div>
+<a id="a95dd19b1b2af33029f7ccb78d5f17039" name="a95dd19b1b2af33029f7ccb78d5f17039"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95dd19b1b2af33029f7ccb78d5f17039">&#9670;&#160;</a></span>multiple_free()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void multiple_free </td>
+          <td>(</td>
+          <td class="paramtype">void *</td>          <td class="paramname"><span class="paramname"><em>p</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>...</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Function to free memory using the free() function. </p>
+<p>Calls free on a variable number of arguments. The last argument must be NULL.</p>
+<p>Example of use: </p><div class="fragment"><div class="line"><span class="keywordtype">int</span> *p1, *p2, *p3;</div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_define" href="alloc_8h.html#ab1cd6d564a53c48b9fff06fc1b642a06">MALLOC</a>(p1, 10); <span class="comment">// Allocates an array of 10 ints.</span></div>
+<div class="line"><a class="code hl_define" href="alloc_8h.html#ab1cd6d564a53c48b9fff06fc1b642a06">MALLOC</a>(p2, 10);</div>
+<div class="line"><a class="code hl_define" href="alloc_8h.html#ab1cd6d564a53c48b9fff06fc1b642a06">MALLOC</a>(p3, 10);</div>
+<div class="line"><span class="comment">// ...</span></div>
+<div class="line"><a class="code hl_function" href="#a95dd19b1b2af33029f7ccb78d5f17039">multiple_free</a>(p1, p2, p3, NULL);</div>
+<div class="ttc" id="aalloc_8c_html_a95dd19b1b2af33029f7ccb78d5f17039"><div class="ttname"><a href="#a95dd19b1b2af33029f7ccb78d5f17039">multiple_free</a></div><div class="ttdeci">void multiple_free(void *p,...)</div><div class="ttdoc">Function to free memory using the free() function.</div><div class="ttdef"><b>Definition</b> alloc.c:8</div></div>
+<div class="ttc" id="aalloc_8h_html_ab1cd6d564a53c48b9fff06fc1b642a06"><div class="ttname"><a href="alloc_8h.html#ab1cd6d564a53c48b9fff06fc1b642a06">MALLOC</a></div><div class="ttdeci">#define MALLOC(p, num_objects)</div><div class="ttdoc">Macro for allocating memory using the malloc() function.</div><div class="ttdef"><b>Definition</b> alloc.h:51</div></div>
+</div><!-- fragment --><dl class="section attention"><dt>Attention</dt><dd>This function is dangerous and should only be used if you know what you are doing! The pointers to be freed <b>must not</b> be NULL. In the example above, if <code>p2</code> is NULL, <code>p3</code> will not be freed, which can cause a memory leak. </dd></dl>
+
+</div>
+</div>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

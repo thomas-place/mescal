@@ -32,5 +32,6 @@ var searchData=
   ['morphism_5fto_5fdfa_29',['morphism_to_dfa',['../monoid_8h.html#ab005099be059e61183b625ef690498c0',1,'monoid.c']]],
   ['morphism_5fto_5fdfa_5fkernel_30',['morphism_to_dfa_kernel',['../monoid__kernels_8h.html#a847714c8b835ca8e92cef6b27a013aab',1,'monoid_kernels.c']]],
   ['morphism_5fto_5fdfa_5flcl_31',['morphism_to_dfa_lcl',['../monoid__kernels_8h.html#afa9f02aeb0ae1a6eab48e52906ae517a',1,'monoid_kernels.c']]],
-  ['morphism_5fto_5fdfa_5frcl_32',['morphism_to_dfa_rcl',['../monoid__kernels_8h.html#a990ba79cd7a69d344c30b25a5adc108a',1,'monoid_kernels.c']]]
+  ['morphism_5fto_5fdfa_5frcl_32',['morphism_to_dfa_rcl',['../monoid__kernels_8h.html#a990ba79cd7a69d344c30b25a5adc108a',1,'monoid_kernels.c']]],
+  ['multiple_5ffree_33',['multiple_free',['../alloc_8c.html#a95dd19b1b2af33029f7ccb78d5f17039',1,'multiple_free(void *p,...):&#160;alloc.c'],['../alloc_8h.html#a95dd19b1b2af33029f7ccb78d5f17039',1,'multiple_free(void *p,...):&#160;alloc.c']]]
 ];
