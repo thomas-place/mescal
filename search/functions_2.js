@@ -25,7 +25,7 @@ var searchData=
   ['deletecell_5fdlist_22',['deletecell_dlist',['../type__dlist_8h.html#abd07d9056f93fafbaca9accaeb905fb8',1,'type_dlist.c']]],
   ['dequeue_5fto_5findices_23',['dequeue_to_indices',['../type__dequeue_8h.html#acbb0848685e65a0f20b86b8dc3842127',1,'type_dequeue.c']]],
   ['dfa_5frandom_24',['dfa_random',['../nfa_8h.html#a5e2e81fe114c28cbdf7aa236a28c6410',1,'nfa.c']]],
-  ['dfa_5fto_5fmorphism_25',['dfa_to_morphism',['../monoid_8h.html#a77125cdf718d66fe430eceb8821de897',1,'monoid.c']]],
+  ['dfa_5fto_5fmorphism_25',['dfa_to_morphism',['../monoid_8h.html#ae9e3edc4be251bcece4ac6f78cd57670',1,'monoid.c']]],
   ['dgraph_5fmirror_26',['dgraph_mirror',['../graphs_8h.html#a21fe7ba13afee887bd34de8ec466304d',1,'graphs.c']]],
   ['dgraph_5fnb_5fedges_27',['dgraph_nb_edges',['../graphs_8h.html#aa771c03d7e613494b7cb7699790ba003',1,'graphs.c']]],
   ['dgraph_5fsearch_28',['dgraph_search',['../graphs_8h.html#a9c0a43517e0be4fd197a10bd4338d3f9',1,'graphs.c']]],

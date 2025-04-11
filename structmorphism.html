@@ -151,14 +151,18 @@ bool *&#160;</td><td class="memItemRight" valign="bottom"><b>accept_array</b></t
 <a class="el" href="structgreen.html">green</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>rels</b></td></tr>
 <tr class="memdesc:a1dd3e7cce88a026278a28eec623fd541"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Green relations of the monoid. <br /></td></tr>
 <tr class="separator:a1dd3e7cce88a026278a28eec623fd541"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a09fa906fd5f06a273e791a97e674c128" id="r_a09fa906fd5f06a273e791a97e674c128"><td class="memItemLeft" align="right" valign="top"><a id="a09fa906fd5f06a273e791a97e674c128" name="a09fa906fd5f06a273e791a97e674c128"></a>
+uint&#160;</td><td class="memItemRight" valign="bottom"><b>nb_regular_jcl</b></td></tr>
+<tr class="memdesc:a09fa906fd5f06a273e791a97e674c128"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of regular J-classes. <br /></td></tr>
+<tr class="separator:a09fa906fd5f06a273e791a97e674c128"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c898448fea9eae128e78e95e857a05a" id="r_a8c898448fea9eae128e78e95e857a05a"><td class="memItemLeft" align="right" valign="top"><a id="a8c898448fea9eae128e78e95e857a05a" name="a8c898448fea9eae128e78e95e857a05a"></a>
 uint&#160;</td><td class="memItemRight" valign="bottom"><b>nb_min_regular_jcl</b></td></tr>
 <tr class="memdesc:a8c898448fea9eae128e78e95e857a05a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of "strict minimal" J-classes (no smaller regular J-class has a nonempty antecedent). <br /></td></tr>
 <tr class="separator:a8c898448fea9eae128e78e95e857a05a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad954a189630b8e198efa3041c6fb1e6e" id="r_ad954a189630b8e198efa3041c6fb1e6e"><td class="memItemLeft" align="right" valign="top"><a id="ad954a189630b8e198efa3041c6fb1e6e" name="ad954a189630b8e198efa3041c6fb1e6e"></a>
-uint *&#160;</td><td class="memItemRight" valign="bottom"><b>min_regular_idems</b></td></tr>
-<tr class="memdesc:ad954a189630b8e198efa3041c6fb1e6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Associate a member idempotent to each strict regular J-class. <br /></td></tr>
-<tr class="separator:ad954a189630b8e198efa3041c6fb1e6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f04a6fbccdaa02d03929d2d4d38e217" id="r_a1f04a6fbccdaa02d03929d2d4d38e217"><td class="memItemLeft" align="right" valign="top"><a id="a1f04a6fbccdaa02d03929d2d4d38e217" name="a1f04a6fbccdaa02d03929d2d4d38e217"></a>
+uint *&#160;</td><td class="memItemRight" valign="bottom"><b>regular_idems</b></td></tr>
+<tr class="memdesc:a1f04a6fbccdaa02d03929d2d4d38e217"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array indexed by the regular J-classes (sorted in topological order). Associates a member idempotent to each of them (the one with the least index). The minimal J-classes are at the beginning. <br /></td></tr>
+<tr class="separator:a1f04a6fbccdaa02d03929d2d4d38e217"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:add286e2c6935d1ca21c2d857791b6c2f" id="r_add286e2c6935d1ca21c2d857791b6c2f"><td class="memItemLeft" align="right" valign="top"><a id="add286e2c6935d1ca21c2d857791b6c2f" name="add286e2c6935d1ca21c2d857791b6c2f"></a>
 uint **&#160;</td><td class="memItemRight" valign="bottom"><b>mult</b></td></tr>
 <tr class="memdesc:add286e2c6935d1ca21c2d857791b6c2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The multiplication table (<code>NULL</code> if not computed). <br /></td></tr>

@@ -1,13 +1,5 @@
 var NAVTREEINDEX3 =
 {
-"structobject.html#af98c072fdc6e7a2c137f202cb72a644a":[7,0,29,2],
-"structobject.html#afd7600f51dea3038e0db64bd813867ba":[7,0,29,4],
-"structorbits.html":[7,0,30],
-"structorbits.html#a2f9ad9b392be47df10a0cc50c45b74db":[7,0,30,3],
-"structorbits.html#a4252ea7a51132d2f993e2708274ed2cd":[7,0,30,0],
-"structorbits.html#a6595750bae492ffb4d2cca61b04e0625":[7,0,30,2],
-"structorbits.html#a74f266ddb15c7399d9cdd2a9a8806a31":[7,0,30,1],
-"structparti.html":[7,0,31],
 "structparti.html#a217b551155601264d129183015af5d3e":[7,0,31,2],
 "structparti.html#ab37ee370b5865c3f737e89f9c02da753":[7,0,31,3],
 "structparti.html#acf596b7f9886e140bb3797a1fb0d511b":[7,0,31,1],

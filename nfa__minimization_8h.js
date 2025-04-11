@@ -7,5 +7,5 @@ var nfa__minimization_8h =
     [ "nfa_hopcroft_genauto", "nfa__minimization_8h.html#a8983e7468bc971f2d0c426d1a66e35dd", null ],
     [ "nfa_hopcroft_initial", "nfa__minimization_8h.html#a6d9d927752538a048fa0c9f2f3027b99", null ],
     [ "nfa_mini_canonical_copy", "nfa__minimization_8h.html#ac3c99dd46335997b41b509e5b732b8dc", null ],
-    [ "nfa_mini_canonical_ordering", "nfa__minimization_8h.html#a86a7449623137de443102afc148b0daf", null ]
+    [ "nfa_mini_canonical_ordering", "nfa__minimization_8h.html#a2872aa87157e77326ab4b88fdb75f22b", null ]
 ];

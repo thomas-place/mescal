@@ -27,5 +27,5 @@ var searchData=
   ['green_24',['green',['../structgreen.html',1,'']]],
   ['green_5frelation_25',['green_relation',['../monoid__props_8h.html#aac883de93546a5ab139a747b0099bffb',1,'monoid_props.h']]],
   ['green_5fsorted_5fjclass_26',['green_sorted_jclass',['../monoid_8h.html#a74a354e588a47859ea5057f52b727dbc',1,'monoid.c']]],
-  ['group_5fset_27',['group_set',['../structgreen.html#abc717707adaeedc850e0ce8dc3915edb',1,'green']]]
+  ['group_5farray_27',['group_array',['../structgreen.html#a1f353718a9a0fbf11e0c1a95aa6839cb',1,'green']]]
 ];
