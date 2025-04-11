@@ -1,10 +1,10 @@
 #include "regexp.h"
 
-short symbolic_count = 0;
-char** symbolic_names = NULL;
+short symbolic_count  = 0;
+char **symbolic_names = NULL;
 
-short symbolic_index(char* varname) {
-    for (short i = 0; i < symbolic_count;i++) {
+short symbolic_index(char *varname) {
+    for (short i = 0; i < symbolic_count; i++) {
         if (strcmp(varname, symbolic_names[i]) == 0) {
             return i;
         }
@@ -12,8 +12,7 @@ short symbolic_index(char* varname) {
     return -1;
 }
 
-
-uint display_syletter_utf8(syletter l, FILE* out) {
+uint display_syletter_utf8(syletter l, FILE *out) {
     switch (l.lab) {
     case ' ':
         fprintf(out, "␠");
@@ -27,32 +26,29 @@ uint display_syletter_utf8(syletter l, FILE* out) {
     }
     if (l.dec == 0) {
         print_color("ᵢ", BLUE, out);
-    }
-    else {
+    } else {
         print_color("ᵢ₋", BLUE, out);
         fprint_subsc_utf8(l.dec, out);
     }
     return 1;
 }
 
-uint display_syvar_utf8(syvariable v, FILE* out) {
+uint display_syvar_utf8(syvariable v, FILE *out) {
     if (v.ind >= symbolic_count) {
         fprintf(out, "?");
-    }
-    else {
+    } else {
         fprintf(out, "%s", symbolic_names[v.ind]);
     }
     if (v.dec == 0) {
         print_color("ᵢ", BLUE, out);
-    }
-    else {
+    } else {
         print_color("ᵢ₋", BLUE, out);
         fprint_subsc_utf8(v.dec, out);
     }
     return 1;
 }
 
-bool reg_has_symbolic(regexp* exp) {
+bool reg_has_symbolic(regexp *exp) {
     if (!exp) {
         return false;
     }
@@ -81,7 +77,7 @@ bool reg_has_symbolic(regexp* exp) {
     }
 }
 
-bool reg_issimple(regexp* exp) {
+bool reg_issimple(regexp *exp) {
     if (!exp) {
         return false;
     }
@@ -106,7 +102,7 @@ bool reg_issimple(regexp* exp) {
     }
 }
 
-void reg_free(regexp* r) {
+void reg_free(regexp *r) {
     TRACE("reg_free");
 
     if (r == NULL) {
@@ -121,20 +117,20 @@ void reg_free(regexp* r) {
     free(r);
 }
 
-regexp* reg_copy(regexp* r) {
+regexp *reg_copy(regexp *r) {
     TRACE("reg_copy");
     if (r == NULL) {
         return NULL;
     }
 
-    regexp* left = reg_copy(r->left);
-    regexp* right = reg_copy(r->right);
+    regexp *left  = reg_copy(r->left);
+    regexp *right = reg_copy(r->right);
 
-    regexp* copy;
+    regexp *copy;
     MALLOC(copy, 1);
 
-    copy->op = r->op;
-    copy->left = left;
+    copy->op    = r->op;
+    copy->left  = left;
     copy->right = right;
     if (r->op == CHAR) {
         copy->letter = r->letter;
@@ -152,7 +148,7 @@ regexp* reg_copy(regexp* r) {
     return copy;
 }
 
-static regexp* reg_binary(regelem op, regexp* left, regexp* right) {
+static regexp *reg_binary(regelem op, regexp *left, regexp *right) {
     TRACE("reg_binary");
 
     if (left == NULL || right == NULL) {
@@ -162,95 +158,96 @@ static regexp* reg_binary(regelem op, regexp* left, regexp* right) {
         return NULL;
     }
 
-    regexp* nexp;
+    regexp *nexp;
     MALLOC(nexp, 1);
-    nexp->op = op;
-    nexp->left = left;
+    nexp->op    = op;
+    nexp->left  = left;
     nexp->right = right;
     return nexp;
 }
 
-static regexp* reg_unary(regelem op, regexp* left) {
+static regexp *reg_unary(regelem op, regexp *left) {
     TRACE("reg_unary");
 
     if (left == NULL) {
         WARNING("NULL regexp");
         return NULL;
     }
-    regexp* nexp;
+    regexp *nexp;
     MALLOC(nexp, 1);
-    nexp->op = op;
-    nexp->left = left;
+    nexp->op    = op;
+    nexp->left  = left;
     nexp->right = NULL;
     return nexp;
 }
 
-static regexp* reg_nullary(regelem op) {
+static regexp *reg_nullary(regelem op) {
     TRACE("reg_nullary");
-    regexp* r;
+    regexp *r;
     MALLOC(r, 1);
-    r->op = op;
-    r->left = NULL;
+    r->op    = op;
+    r->left  = NULL;
     r->right = NULL;
     return r;
 }
 
-regexp* reg_empty(void) {
+regexp *reg_empty(void) {
     TRACE("reg_empty");
     return reg_nullary(EMPTY);
 }
 
-regexp* reg_epsilon(void) {
+regexp *reg_epsilon(void) {
     TRACE("reg_epsilon");
     return reg_nullary(EPSILON);
 }
 
-regexp* reg_letter(uchar c) {
+regexp *reg_letter(uchar c) {
     TRACE("reg_letter(%c)", c);
 
-    regexp* nr = reg_nullary(CHAR);
+    regexp *nr     = reg_nullary(CHAR);
     nr->letter.lab = c;
     nr->letter.num = -1;
     return nr;
 }
 
-regexp* reg_letter_ext(letter l) {
-    regexp* nr = reg_nullary(CHAR);
+regexp *reg_letter_ext(letter l) {
+    regexp *nr = reg_nullary(CHAR);
     nr->letter = l;
     return nr;
 }
 
-regexp* reg_letter_numbered(uchar c, uchar index) {
-    regexp* nr = reg_nullary(CHAR);
+regexp *reg_letter_numbered(uchar c, uchar index) {
+    regexp *nr     = reg_nullary(CHAR);
     nr->letter.lab = c;
     nr->letter.num = index; // Assumes that info is an integer for now.
     return nr;
 }
 
-regexp* reg_letter_symbolic(uchar c, uchar number) {
+regexp *reg_letter_symbolic(uchar c, uchar number) {
     if (symbolic_count <= 0) {
-        fprintf(stderr, "Error: Symbolic letters can only be used to setup recursive definitions.\n");
+        fprintf(stderr, "Error: Symbolic letters can only be used to setup "
+                        "recursive definitions.\n");
         return NULL;
     }
-    for (uchar i = 0; i < symbolic_count;i++) {
+    for (uchar i = 0; i < symbolic_count; i++) {
         if (strlen(symbolic_names[i]) == 1 && symbolic_names[i][0] == c) {
-            regexp* nr = reg_nullary(SYVAR);
+            regexp *nr    = reg_nullary(SYVAR);
             nr->syvar.ind = i;
             nr->syvar.dec = number; // Assumes that info is an integer for now.
             return nr;
         }
     }
 
-
-    regexp* nr = reg_nullary(SYCHAR);
+    regexp *nr    = reg_nullary(SYCHAR);
     nr->sylet.lab = c;
     nr->sylet.dec = number; // Assumes that info is an integer for now.
     return nr;
 }
 
-regexp* reg_var_symbolic(char* s, uchar number) {
+regexp *reg_var_symbolic(char *s, uchar number) {
     if (symbolic_count <= 0) {
-        fprintf(stderr, "Error: Symbolic variables can only be used to setup recursive definitions.\n");
+        fprintf(stderr, "Error: Symbolic variables can only be used to setup "
+                        "recursive definitions.\n");
         return NULL;
     }
 
@@ -258,16 +255,15 @@ regexp* reg_var_symbolic(char* s, uchar number) {
     if (j == -1) {
         fprintf(stderr, "Error: The symbolic variable \"%s\" is unknown.\n", s);
         return NULL;
-    }
-    else {
-        regexp* nr = reg_nullary(SYVAR);
+    } else {
+        regexp *nr    = reg_nullary(SYVAR);
         nr->syvar.ind = j;
         nr->syvar.dec = number; // Assumes that info is an integer for now.
         return nr;
     }
 }
 
-regexp* reg_union(regexp* left, regexp* right) {
+regexp *reg_union(regexp *left, regexp *right) {
     TRACE("reg_union");
 
     if ((left == NULL) || (right == NULL)) {
@@ -289,7 +285,7 @@ regexp* reg_union(regexp* left, regexp* right) {
     return reg_binary(UNION, left, right);
 }
 
-regexp* reg_inter(regexp* left, regexp* right) {
+regexp *reg_inter(regexp *left, regexp *right) {
     TRACE("reg_inter");
 
     if ((left == NULL) || (right == NULL)) {
@@ -301,7 +297,7 @@ regexp* reg_inter(regexp* left, regexp* right) {
     return reg_binary(INTER, left, right);
 }
 
-regexp* reg_concat(regexp* left, regexp* right) {
+regexp *reg_concat(regexp *left, regexp *right) {
     TRACE("reg_concat");
     ;
     if ((left == NULL) || (right == NULL)) {
@@ -322,10 +318,10 @@ regexp* reg_concat(regexp* left, regexp* right) {
 
     if (left->op == CHAR) {
         if (right->op == CHAR) {
-            word* word = create_empty_word();
+            word *word = create_empty_word();
             rigcon_word(left->letter, word);
             rigcon_word(right->letter, word);
-            left->op = WORD;
+            left->op   = WORD;
             left->word = word;
             reg_free(right);
             return left;
@@ -335,7 +331,8 @@ regexp* reg_concat(regexp* left, regexp* right) {
             reg_free(left);
             return right;
         }
-        if (right->op == CONCAT && (right->left->op == WORD || right->left->op == CHAR)) {
+        if (right->op == CONCAT &&
+            (right->left->op == WORD || right->left->op == CHAR)) {
             right->left = reg_concat(left, right->left);
             return right;
         }
@@ -352,13 +349,15 @@ regexp* reg_concat(regexp* left, regexp* right) {
             reg_free(right);
             return left;
         }
-        if (right->op == CONCAT && (right->left->op == WORD || right->left->op == CHAR)) {
+        if (right->op == CONCAT &&
+            (right->left->op == WORD || right->left->op == CHAR)) {
             right->left = reg_concat(left, right->left);
             return right;
         }
     }
 
-    if (left->op == CONCAT && (left->right->op == WORD || left->right->op == CHAR)) {
+    if (left->op == CONCAT &&
+        (left->right->op == WORD || left->right->op == CHAR)) {
         if (right->op == CHAR || right->op == WORD) {
             left->right = reg_concat(left->right, right->left);
             right->left = left;
@@ -369,7 +368,7 @@ regexp* reg_concat(regexp* left, regexp* right) {
     return reg_binary(CONCAT, left, right);
 }
 
-regexp* reg_star(regexp* left) {
+regexp *reg_star(regexp *left) {
     TRACE("reg_star");
 
     if (left == NULL) {
@@ -384,7 +383,7 @@ regexp* reg_star(regexp* left) {
     return reg_unary(STAR, left);
 }
 
-regexp* reg_plus(regexp* left) {
+regexp *reg_plus(regexp *left) {
     TRACE("reg_plus");
 
     if (left == NULL) {
@@ -398,7 +397,7 @@ regexp* reg_plus(regexp* left) {
     return reg_unary(PLUS, left);
 }
 
-regexp* reg_complement(regexp* left) {
+regexp *reg_complement(regexp *left) {
     TRACE("reg_complement");
 
     if (left == NULL) {
@@ -408,7 +407,7 @@ regexp* reg_complement(regexp* left) {
     return reg_unary(COMPLEMENT, left);
 }
 
-static void reg_print_helper(regexp* r, regelem parent) {
+static void reg_print_helper(regexp *r, regelem parent) {
     TRACE("reg_print_helper");
 
     if (r == NULL) {
@@ -480,13 +479,11 @@ static void reg_print_helper(regexp* r, regelem parent) {
         DEBUG("Star");
         if (parent == STAR) {
             reg_print_helper(r->left, STAR);
-        }
-        else if (r->left->op == WORD && size_word(r->left->word) > 1) {
+        } else if (r->left->op == WORD && size_word(r->left->word) > 1) {
             print_color("(", CYAN, stdout);
             reg_print_helper(r->left, STAR);
             print_color(")*", CYAN, stdout);
-        }
-        else {
+        } else {
             reg_print_helper(r->left, STAR);
             print_color("*", CYAN, stdout);
         }
@@ -496,13 +493,11 @@ static void reg_print_helper(regexp* r, regelem parent) {
         DEBUG("Plus");
         if (parent == PLUS) {
             reg_print_helper(r->left, PLUS);
-        }
-        else if (r->left->op == WORD && size_word(r->left->word) > 1) {
+        } else if (r->left->op == WORD && size_word(r->left->word) > 1) {
             print_color("(", CYAN, stdout);
             reg_print_helper(r->left, PLUS);
             print_color(")⁺", CYAN, stdout);
-        }
-        else {
+        } else {
             reg_print_helper(r->left, PLUS);
             print_color("⁺", CYAN, stdout);
         }
@@ -524,17 +519,14 @@ static void reg_print_helper(regexp* r, regelem parent) {
     }
 }
 
-void reg_print(regexp* r) {
+void reg_print(regexp *r) {
     TRACE("reg_print");
 
     reg_print_helper(r, NONE);
     printf("\n");
 }
 
-
-
-
-bool reg_symbolic_loops(regexp* exp, ushort max, uchar num, bool* cycle) {
+bool reg_symbolic_loops(regexp *exp, ushort max, uchar num, bool *cycle) {
     if (!exp) {
         return true;
     }
@@ -548,7 +540,8 @@ bool reg_symbolic_loops(regexp* exp, ushort max, uchar num, bool* cycle) {
         break;
     case CONCAT:
     case UNION:
-        return reg_symbolic_loops(exp->left, max, num, cycle) && reg_symbolic_loops(exp->right, max, num, cycle);
+        return reg_symbolic_loops(exp->left, max, num, cycle) &&
+               reg_symbolic_loops(exp->right, max, num, cycle);
         break;
     case STAR:
     case PLUS:
