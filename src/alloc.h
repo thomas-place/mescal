@@ -1,3 +1,6 @@
+#ifndef ALLOC_H_
+#define ALLOC_H_
+
 /**
  * @file alloc.h
  * @brief Macros and functions to help memory allocation.
@@ -17,16 +20,12 @@
  * macro CHECK_NULL().
  */
 
-#ifndef ALLOC_H_
-#define ALLOC_H_
-
 #include "error.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-/**
- * @brief Macro for allocating memory using the malloc() function.
+/** @brief Macro for allocating memory using the malloc() function.
  * @param p Pointer to be allocated.
  * @param num_objects Number of objects to allocate.
  *
@@ -37,7 +36,7 @@
  * ```
  * struct foo *p;
  * MALLOC(p, 10); // Allocate an array of 10 struct foo.
- * ``
+ * ```
  *
  * If allocation fails, displays an error message and quits the program.
  *
@@ -48,6 +47,7 @@
  *
  * @see REALLOC()
  */
+
 #define MALLOC(p, num_objects)                                                 \
     do {                                                                       \
         DEBUG("Allocating  %lu objects.", (unsigned long)(num_objects));       \
@@ -80,7 +80,6 @@
  *
  * @sa REALLOC().
  */
-
 #define CALLOC(p, num_objects)                                                 \
     do {                                                                       \
         DEBUG("Callocating  %lu objects.", (unsigned long)(num_objects));      \
@@ -118,7 +117,6 @@
  * dynamically allocated zone.
  * @sa MALLOC(), CALLOC()
  */
-
 #define REALLOC(p, num_objects)                                                \
     do {                                                                       \
         DEBUG("Reallocating  %lu objects.", (unsigned long)(num_objects));     \
