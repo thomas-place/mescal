@@ -140,7 +140,8 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Macros and functions to help memory allocation. </p>
 <p>The macros <a class="el" href="#ab1cd6d564a53c48b9fff06fc1b642a06" title="Macro for allocating memory using the malloc() function.">MALLOC()</a>, <a class="el" href="#a5038968dee3708c3e33a35f818c16452" title="Macro for allocating memory using the calloc() function.">CALLOC()</a> and <a class="el" href="#a698d049d23598a7e3997ecca97ac7e54" title="Macro for reallocating memory using the realloc() function.">REALLOC()</a> from this file make it possible to allocate dynamic memory. If they fail, they print an error message on the standard error, indicating the function, file and line where the allocation failed, and they then quit the program.</p>
-<p>The function <a class="el" href="#a95dd19b1b2af33029f7ccb78d5f17039" title="Function to free memory using the free() function.">multiple_free()</a> is used to free several pointers at once. (warning, none of these pointers should be <code>NULL</code>, and all must have been dynamically allocated before the call.</p>
+<p>The function <a class="el" href="#a95dd19b1b2af33029f7ccb78d5f17039" title="Function to free memory using the free() function.">multiple_free()</a> is used to free several pointers at once.</p>
+<dl class="section attention"><dt>Attention</dt><dd>None of these pointers should be <code>NULL</code>, and all must have been dynamically allocated before the call.</dd></dl>
 <p>The macro <a class="el" href="#aa44a749b8ec174a5780a521e07b9b86b" title="Macro to test if one or more pointers are NULL.">CHECK_NULL()</a> checks whether one or several pointers are non-<code>NULL</code>.</p>
 <p>The function <a class="el" href="#a4310f3e2cf0b85c13534389cc7479f33" title="Do not use this function directly; instead, use the macro CHECK_NULL(), which includes the error&#39;s lo...">check_null()</a> shouldn't be used directly, it is used by the macro <a class="el" href="#aa44a749b8ec174a5780a521e07b9b86b" title="Macro to test if one or more pointers are NULL.">CHECK_NULL()</a>. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
@@ -181,7 +182,7 @@ Functions</h2></td></tr>
 <p>Allocates memory, initialized at 0, to store <code>num_objects</code>, * each of type <code>*p</code>.</p>
 <p><b>Example of use:</b> </p><div class="fragment"><div class="line"><span class="keyword">struct </span>foo *p;</div>
 <div class="line"><a class="code hl_define" href="#a5038968dee3708c3e33a35f818c16452">CALLOC</a>(p, 10); <span class="comment">// Allocates an array of 10 struct foo, initialized to 0.</span></div>
-<div class="ttc" id="aalloc_8h_html_a5038968dee3708c3e33a35f818c16452"><div class="ttname"><a href="#a5038968dee3708c3e33a35f818c16452">CALLOC</a></div><div class="ttdeci">#define CALLOC(p, num_objects)</div><div class="ttdoc">Macro for allocating memory using the calloc() function.</div><div class="ttdef"><b>Definition</b> alloc.h:83</div></div>
+<div class="ttc" id="aalloc_8h_html_a5038968dee3708c3e33a35f818c16452"><div class="ttname"><a href="#a5038968dee3708c3e33a35f818c16452">CALLOC</a></div><div class="ttdeci">#define CALLOC(p, num_objects)</div><div class="ttdoc">Macro for allocating memory using the calloc() function.</div><div class="ttdef"><b>Definition</b> alloc.h:85</div></div>
 </div><!-- fragment --><p>If allocation fails, displays an error message and quits the program.</p>
 <dl class="section attention"><dt>Attention</dt><dd>The pointer <code>p</code> must have been declared, but must not point to an already dynamically allocated area (otherwise a memory leak will occur). If <code>p</code> already points to a dynamically allocated area, use REALLOC.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="#a698d049d23598a7e3997ecca97ac7e54" title="Macro for reallocating memory using the realloc() function.">REALLOC()</a>. </dd></dl>
@@ -220,10 +221,10 @@ Functions</h2></td></tr>
 <p>There must be one pointer to test for each string, and vice versa.</p>
 <p>The string following each pointer allows customizing the error message.</p>
 <p><b>Example of use:</b> </p><div class="fragment"><div class="line"><a class="code hl_define" href="#aa44a749b8ec174a5780a521e07b9b86b">CHECK_NULL</a>(3, p1, <span class="stringliteral">&quot;Name1&quot;</span>, p2, <span class="stringliteral">&quot;Name2&quot;</span>, p3, <span class="stringliteral">&quot;Name3&quot;</span>);</div>
-<div class="ttc" id="aalloc_8h_html_aa44a749b8ec174a5780a521e07b9b86b"><div class="ttname"><a href="#aa44a749b8ec174a5780a521e07b9b86b">CHECK_NULL</a></div><div class="ttdeci">#define CHECK_NULL(n,...)</div><div class="ttdoc">Macro to test if one or more pointers are NULL.</div><div class="ttdef"><b>Definition</b> alloc.h:163</div></div>
+<div class="ttc" id="aalloc_8h_html_aa44a749b8ec174a5780a521e07b9b86b"><div class="ttname"><a href="#aa44a749b8ec174a5780a521e07b9b86b">CHECK_NULL</a></div><div class="ttdeci">#define CHECK_NULL(n,...)</div><div class="ttdoc">Macro to test if one or more pointers are NULL.</div><div class="ttdef"><b>Definition</b> alloc.h:165</div></div>
 </div><!-- fragment --><p> Here, 3 is the number of pointers to check, and <code>p1</code>, <code>p2</code>, and <code>p3</code> are the pointers. If <code>p1</code> and <code>p3</code> are NULL, the macro will display an error message in the following form:</p>
-<p>[CRITICAL] Name1 is NULL!<br  />
- [CRITICAL] Name3 is NULL!</p>
+<p>❌ <span style="color:#ff0000">[CRITICAL]</span> Name1 is NULL!<br  />
+ ❌ <span style="color:#ff0000">[CRITICAL]</span> Name3 is NULL!</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="#a4310f3e2cf0b85c13534389cc7479f33" title="Do not use this function directly; instead, use the macro CHECK_NULL(), which includes the error&#39;s lo...">check_null()</a> </dd></dl>
 
 </div>
@@ -265,7 +266,7 @@ Functions</h2></td></tr>
 <p>Allocates memory to store <code>num_objects</code>, each of type <code>*p</code>.</p>
 <p><b>Example of use:</b> </p><div class="fragment"><div class="line"><span class="keyword">struct </span>foo *p;</div>
 <div class="line"><a class="code hl_define" href="#ab1cd6d564a53c48b9fff06fc1b642a06">MALLOC</a>(p, 10); <span class="comment">// Allocate an array of 10 struct foo.</span></div>
-<div class="ttc" id="aalloc_8h_html_ab1cd6d564a53c48b9fff06fc1b642a06"><div class="ttname"><a href="#ab1cd6d564a53c48b9fff06fc1b642a06">MALLOC</a></div><div class="ttdeci">#define MALLOC(p, num_objects)</div><div class="ttdoc">Macro for allocating memory using the malloc() function.</div><div class="ttdef"><b>Definition</b> alloc.h:51</div></div>
+<div class="ttc" id="aalloc_8h_html_ab1cd6d564a53c48b9fff06fc1b642a06"><div class="ttname"><a href="#ab1cd6d564a53c48b9fff06fc1b642a06">MALLOC</a></div><div class="ttdeci">#define MALLOC(p, num_objects)</div><div class="ttdoc">Macro for allocating memory using the malloc() function.</div><div class="ttdef"><b>Definition</b> alloc.h:53</div></div>
 </div><!-- fragment --><p>If allocation fails, displays an error message and quits the program.</p>
 <dl class="section attention"><dt>Attention</dt><dd>The <code>p</code> pointer must have been declared, but must not point to a zone that has already been dynamically allocated (otherwise a memory leak will occur). If <code>p</code> already points to a dynamically allocated zone, use REALLOC.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="#a698d049d23598a7e3997ecca97ac7e54" title="Macro for reallocating memory using the realloc() function.">REALLOC()</a> </dd></dl>
@@ -315,7 +316,7 @@ Functions</h2></td></tr>
 <div class="line"><a class="code hl_define" href="#a698d049d23598a7e3997ecca97ac7e54">REALLOC</a>(p, 20); <span class="comment">// Re-allocate an array of 20 struct foo by copying the</span></div>
 <div class="line">                <span class="comment">// original array at the begining of the new array, and</span></div>
 <div class="line">                <span class="comment">// assign the address of the first cell in this array to `p`.</span></div>
-<div class="ttc" id="aalloc_8h_html_a698d049d23598a7e3997ecca97ac7e54"><div class="ttname"><a href="#a698d049d23598a7e3997ecca97ac7e54">REALLOC</a></div><div class="ttdeci">#define REALLOC(p, num_objects)</div><div class="ttdoc">Macro for reallocating memory using the realloc() function.</div><div class="ttdef"><b>Definition</b> alloc.h:120</div></div>
+<div class="ttc" id="aalloc_8h_html_a698d049d23598a7e3997ecca97ac7e54"><div class="ttname"><a href="#a698d049d23598a7e3997ecca97ac7e54">REALLOC</a></div><div class="ttdeci">#define REALLOC(p, num_objects)</div><div class="ttdoc">Macro for reallocating memory using the realloc() function.</div><div class="ttdef"><b>Definition</b> alloc.h:122</div></div>
 </div><!-- fragment --><p>If allocation fails, displays an error message and quits the program.</p>
 <dl class="section attention"><dt>Attention</dt><dd>The <code>p</code> pointer must have been declared and point to an already dynamically allocated zone. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="#ab1cd6d564a53c48b9fff06fc1b642a06" title="Macro for allocating memory using the malloc() function.">MALLOC()</a>, <a class="el" href="#a5038968dee3708c3e33a35f818c16452" title="Macro for allocating memory using the calloc() function.">CALLOC()</a> </dd></dl>
@@ -382,7 +383,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Function to free memory using the free() function. </p>
-<p>Calls free on a variable number of arguments. The last argument must be NULL.</p>
+<p>Calls free on a variable number of arguments. The last argument must be <code>NULL</code>.</p>
 <p>Example of use: </p><div class="fragment"><div class="line"><span class="keywordtype">int</span> *p1, *p2, *p3;</div>
 <div class="line"> </div>
 <div class="line"><a class="code hl_define" href="#ab1cd6d564a53c48b9fff06fc1b642a06">MALLOC</a>(p1, 10); <span class="comment">// Allocates an array of 10 ints.</span></div>
