@@ -1,0 +1,73 @@
+# Specific to the project
+# .idea
+*.log
+html/
+latex/
+.mescal_history
+tmp/
+../doc/
+src/.mescal_history
+src/parse_regexp.tab.c
+src/parse_regexp.tab.h
+src/mescal
+src/parse_regexp.output
+src/parser.output
+.ccls-cache/
+.ccls
+.uncrustify
+
+# OSX specific
+.DS_Store
+
+# Prerequisites
+*.d
+
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Linker output
+*.ilk
+*.map
+*.exp
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Kernel Module Compile Results
+*.mod*
+*.cmd
+.tmp_versions/
+modules.order
+Module.symvers
+Mkfile.old
+dkms.conf
