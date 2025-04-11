@@ -324,129 +324,106 @@ void mor_compute_rep(morphism* M) {
         exit(EXIT_FAILURE);
     }
 
-
-    // For each regular J-class, we compute a member idempotent e in regular_jcls_idems[i] (the one with the least index).
-   // If the J-class is not regular, we store UINT_MAX.
+    // We first count the number of regular J-classes. Moreover, for each regular J-class,
+    // we compute a member idempotent e in regular_jcls_idems[i](the one with the least index).
+    // If the J-class is not regular, we store UINT_MAX.
     uint* regular_jcls_idems;
+    M->nb_min_regular_jcl = 0;
     MALLOC(regular_jcls_idems, M->rels->JCL->size_par);
     for (uint i = 0; i < M->rels->JCL->size_par; i++) {
         regular_jcls_idems[i] = UINT_MAX;
     }
     for (uint i = 0; i < size_dequeue(M->idem_list);i++) {
         uint e = rigread_dequeue(M->idem_list, i);
+        if (regular_jcls_idems[M->rels->JCL->numcl[e]] == UINT_MAX) {
+            M->nb_regular_jcl++;
+        }
         regular_jcls_idems[M->rels->JCL->numcl[e]] = e;
     }
 
+    // We may now allocate the table of representatives.
+    MALLOC(M->regular_idems, M->nb_regular_jcl);
+
+    // We may now compute the representatives. We have to put the ones of minimal
+    // strict regular J-classes first. There are two cases.
 
 
-
-    // We compute the "minimal" elements of the monoid for the J-classes.
-    // An element is minimal if there exists no element strictly smaller for J
-    // that is regular and has a nonempty antecedent.
-    // The computation is achieved via a BFS on the J order.
-
-    // Array that will mark the minimal elements. 
-    bool* minimal;
-    CALLOC(minimal, M->r_cayley->size_graph);
-
-    // If the neutral element has a nonempty antecedent, the only miniaml elements are
-    // in the J-class of 1. Otherwise, we do the BFS.
+    // We first handle the case when 1 has a nonempty antecedent.
+    // In this case, the only minimal strict regular J-class is the one of 1.
     if (mor_nonempty_neutral(M)) {
-        for (uint i = 0; i < M->r_cayley->size_graph; i++) {
-            if (M->rels->JCL->numcl[i] == M->rels->JCL->numcl[ONE]) {
-                minimal[i] = true;
-            }
-            else {
-                minimal[i] = false;
+        M->nb_min_regular_jcl = 1;
+        M->regular_idems[0] = ONE;
+        uint j = 1;
+        for (uint i = 1; i < M->rels->JCL->size_par; i++) {
+            if (regular_jcls_idems[i] != UINT_MAX) {
+                M->regular_idems[j] = regular_jcls_idems[i];
+                j++;
             }
         }
+        free(regular_jcls_idems);
+        return;
     }
-    else {
-        // A queue for the BFS
-        dequeue* queue = create_dequeue();
 
-        // Array memorizing the visited elements in the BFS.
-        bool* visited;
-        CALLOC(visited, M->r_cayley->size_graph);
+    // We are now in the case when the only antecedent of 1 is ε
+    // We compute the non-minimal J-classes using a BFS on the J-order.
+    // These are the ones reachable from a regular J-class (which is not the one of 1).
 
-        // We start the BFS with the neutral element
-        visited[ONE] = true;
-        // 1 is always minimal.
-        minimal[ONE] = true;
+    // The queue for the BFS
+    dequeue* queue = create_dequeue();
 
-        rigins_dequeue(ONE, queue);
+    // Array that will mark the visited elements in the BFS.
+    bool* visited;
+    CALLOC(visited, M->r_cayley->size_graph);
 
-        while (!isempty_dequeue(queue)) {
-            uint s = lefpull_dequeue(queue);
-            for (uint a = 0; a < M->j_order->size_alpha; a++) {
-                for (uint j = 0; j < size_dequeue(M->j_order->edges[s][a]); j++) {
-                    uint t = lefread_dequeue(M->j_order->edges[s][a], j);
-                    if (visited[t]) {
-                        continue;
+    // We start from the elements that follow a regular J-class (which is not the one of 1)
+    for (uint i = 1; i < M->rels->JCL->size_par; i++) {
+        if (regular_jcls_idems[i] != UINT_MAX) {
+            for (uint j = 0; j < size_dequeue(M->rels->JCL->cl[i]); j++) {
+                uint s = lefread_dequeue(M->rels->JCL->cl[i], j);
+                for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
+                    if (M->rels->JCL->numcl[s] != M->rels->JCL->numcl[M->r_cayley->edges[s][a]]) {
+                        rigins_dequeue(M->r_cayley->edges[s][a], queue);
                     }
-                    visited[t] = true;
-                    rigins_dequeue(t, queue);
-                    // If s J t or t is not regular, then t is minimal iff s was minimal.
-                    if (M->rels->JCL->numcl[t] == M->rels->JCL->numcl[s] || !M->rels->regular_array[t]) {
-                        minimal[t] = minimal[s];
-                    }
-                    // Otherwise, t is minimal iff s was minimal and either s is not regular, or s is 1
-                    else {
-                        minimal[t] = minimal[s] && (!M->rels->regular_array[s] || s == ONE);
-
+                    if (M->rels->JCL->numcl[s] != M->rels->JCL->numcl[M->l_cayley->edges[s][a]]) {
+                        rigins_dequeue(M->l_cayley->edges[s][a], queue);
                     }
                 }
             }
         }
     }
 
-    // We now count the number of regular J-classes and the number of minimal ones.
+    while (!isempty_dequeue(queue)) {
+        uint s = lefpull_dequeue(queue);
+        if (visited[s]) {
+            continue;
+        }
+        visited[s] = true;
+        for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
+            rigins_dequeue(M->r_cayley->edges[s][a], queue);
+            rigins_dequeue(M->l_cayley->edges[s][a], queue);
+        }
+    }
+
     M->nb_min_regular_jcl = 0;
-    M->nb_regular_jcl = 0;
-    for (uint i = 0; i < M->rels->JCL->size_par;i++) {
-        if (regular_jcls_idems[i] != UINT_MAX) {
-            M->nb_regular_jcl++;
-            uint s = lefread_dequeue(M->rels->JCL->cl[i], 0);
-            if (minimal[s]) {
-                M->nb_min_regular_jcl++;
-            }
+    for (uint i = 0; i < M->rels->JCL->size_par; i++) {
+        uint s = lefread_dequeue(M->rels->JCL->cl[i], 0);
+        if (regular_jcls_idems[i] != UINT_MAX && !visited[s]) {
+            M->regular_idems[M->nb_min_regular_jcl] = regular_jcls_idems[i];
+            M->nb_min_regular_jcl++;
         }
     }
 
-
-    // We may now construct the array of representative idempotents
-    uint h = 0;
-    uint l = M->nb_min_regular_jcl;
-    MALLOC(M->regular_idems, M->nb_regular_jcl);
-    for (uint c = 0; c < M->rels->JCL->size_par; c++) {
-        if (regular_jcls_idems[c] != UINT_MAX) {
-            uint s = lefread_dequeue(M->rels->JCL->cl[c], 0);
-            if (minimal[s]) {
-                M->regular_idems[h] = regular_jcls_idems[c];
-                h++;
-            }
-            else {
-                M->regular_idems[l] = regular_jcls_idems[c];
-                l++;
-
-            }
+    uint j = M->nb_min_regular_jcl;
+    for (uint i = 0; i < M->rels->JCL->size_par; i++) {
+        uint s = lefread_dequeue(M->rels->JCL->cl[i], 0);
+        if (regular_jcls_idems[i] != UINT_MAX && visited[s]) {
+            M->regular_idems[j] = regular_jcls_idems[i];
         }
     }
 
-    free(minimal);
+    free(visited);
+    delete_dequeue(queue);
     free(regular_jcls_idems);
-
-
-    // Building information on groups.
-    CALLOC(M->rels->group_array, M->rels->HCL->size_set);
-    for (uint i = 0; i < size_dequeue(M->idem_list); i++) {
-        uint j = M->rels->HCL->numcl[lefread_dequeue(M->idem_list, i)];
-        for (uint k = 0; k < size_dequeue(M->rels->HCL->cl[j]); k++) {
-            M->rels->group_array[lefread_dequeue(M->rels->HCL->cl[j], k)] = true;
-        }
-    }
-
-
 }
 
 
