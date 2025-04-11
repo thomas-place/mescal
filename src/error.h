@@ -126,7 +126,7 @@ enum msg_level   {CRITICAL_L, ERROR_L,  WARNING_L, INFO_L,  DEBUG_L, TRACE_L};
                 function, file, line __VA_OPT__(, ) __VA_ARGS__);              \
     } while (0)
 
-/** @brief Print a FATAL message and end the program. */
+/** @brief Prints a FATAL message and end the program. */
 #define FATAL(msg, ...)                                                        \
     do {                                                                       \
         PRINT_ERROR(KO, "FATAL", __func__, __FILE__, __LINE__,                 \
@@ -141,7 +141,7 @@ enum msg_level   {CRITICAL_L, ERROR_L,  WARNING_L, INFO_L,  DEBUG_L, TRACE_L};
                         msg __VA_OPT__(, ) __VA_ARGS__);                       \
     } while (0)
 
-/** @brief Print a TRACE message */
+/** @brief Prints a TRACE message */
 #define TRACE(msg, ...) PRINT_DEBUG(OK, "TRACE", TRACE_L, msg, __VA_ARGS__)
 
 /** @brief Print a DEBUG message */

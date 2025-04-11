@@ -11,7 +11,8 @@
  * where the allocation failed, and they then quit the program.
  *
  * The function multiple_free() is used to free several pointers at once.
- * (warning, none of these pointers should be `NULL`, and all must have
+ *
+ * @attention None of these pointers should be `NULL`, and all must have
  * been dynamically allocated before the call.
  *
  * The macro CHECK_NULL() checks whether one or several pointers are non-`NULL`.
@@ -25,7 +26,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/** @brief Macro for allocating memory using the malloc() function.
+/**
+ * @brief Macro for allocating memory using the malloc() function.
  * @param p Pointer to be allocated.
  * @param num_objects Number of objects to allocate.
  *
@@ -154,8 +156,8 @@ void check_null(const char *function, char *file, int line, int n, ...);
  * pointers. If `p1` and `p3` are NULL, the macro will display an error message
  * in the following form:
  ***
-    [CRITICAL] Name1 is NULL!\n
-    [CRITICAL] Name3 is NULL!
+    ❌ <span style="color:#ff0000">[CRITICAL]</span> Name1 is NULL!\n
+    ❌ <span style="color:#ff0000">[CRITICAL]</span> Name3 is NULL!
  ***
  * @sa check_null()
  */
@@ -167,7 +169,7 @@ void check_null(const char *function, char *file, int line, int n, ...);
  * @brief Function to free memory using the free() function.
  *
  * Calls free on a variable number of arguments.
- * The last argument must be NULL.
+ * The last argument must be `NULL`.
  *
  * Example of use:
  * ```
