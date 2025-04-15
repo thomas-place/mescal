@@ -415,9 +415,9 @@ bool is_gtrivial_subsemi(subsemi* S, green_relation P, uint* c) {
             uint e = lefread_dequeue(S->idem_list, i);
             // We take the first one whose P-class is not trivial
             if (size_dequeue(thepar->cl[thepar->numcl[e]]) > 1) {
-                uint s = lefread_dequeue(thepar->cl[i], 0);
+                uint s = lefread_dequeue(thepar->cl[thepar->numcl[e]], 0);
                 if (s == e) {
-                    s = lefread_dequeue(thepar->cl[i], 1);
+                    s = lefread_dequeue(thepar->cl[thepar->numcl[e]], 1);
                 }
                 c[0] = S->sub_to_mono[e];
                 c[1] = S->sub_to_mono[s];
@@ -659,6 +659,8 @@ static void make_cexample_from_jtriv(morphism* M, uint* cexa) {
     }
     uint e = cexa[0];
     uint s = cexa[1];
+
+
 
     if (M->rels->RCL->numcl[e] == M->rels->RCL->numcl[s]) {
         cexa[0] = s;

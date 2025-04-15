@@ -328,7 +328,7 @@ void mor_compute_rep(morphism* M) {
     // we compute a member idempotent e in regular_jcls_idems[i](the one with the least index).
     // If the J-class is not regular, we store UINT_MAX.
     uint* regular_jcls_idems;
-    M->nb_min_regular_jcl = 0;
+    M->nb_regular_jcl = 0;
     MALLOC(regular_jcls_idems, M->rels->JCL->size_par);
     for (uint i = 0; i < M->rels->JCL->size_par; i++) {
         regular_jcls_idems[i] = UINT_MAX;
@@ -418,9 +418,9 @@ void mor_compute_rep(morphism* M) {
         uint s = lefread_dequeue(M->rels->JCL->cl[i], 0);
         if (regular_jcls_idems[i] != UINT_MAX && visited[s]) {
             M->regular_idems[j] = regular_jcls_idems[i];
+            j++;
         }
     }
-
     free(visited);
     delete_dequeue(queue);
     free(regular_jcls_idems);
