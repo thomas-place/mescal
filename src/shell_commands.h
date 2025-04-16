@@ -121,6 +121,10 @@ int shell_random_nfa(char* varname, com_parameters*);
 int shell_random_dfa(char* varname, com_parameters*);
 
 
+// Latex generation
+int shell_latex_gen(com_parameters*);
+
+
 
 
 int shell_recursive_init(char* varname, com_parameters* params);

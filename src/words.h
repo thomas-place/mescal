@@ -67,6 +67,11 @@ int sprint_letter_utf8(letter, //!< The letter.
     char* //!< The string (must be large enough).
 );
 
+
+
+
+
+
 /**
  * @brief
  * Displays a letter on a given stream: graphviz version for the subscript.
@@ -76,6 +81,16 @@ int sprint_letter_utf8(letter, //!< The letter.
  * This is used for the inverse transitions in NFAs.
  */
 void fprint_letter_gviz(letter, //!< The letter.
+    FILE*, //!< The stream.
+    bool //!< True if an inverse power has to be displayed, false otherwise.
+);
+
+
+/**
+ * @brief
+ * Displays a letter on a given stream: latex version for the subscripts.
+ */
+void fprint_letter_latex(letter, //!< The letter.
     FILE*, //!< The stream.
     bool //!< True if an inverse power has to be displayed, false otherwise.
 );

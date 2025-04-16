@@ -1,6 +1,7 @@
 #include "printing.h"
 #include "monoid_display.h"
 #include <sys/utsname.h>
+#include <json-c/json.h>
 
 #define LINUX_VIEW_COMMAND "| convert - -resize 70% sixel:- | cat"
 // #define OSX_VIEW_COMMAND "| ./imgcat -W auto"
@@ -24,18 +25,7 @@ bool external_viewer = false;
 /* Printing functions */
 /**********************/
 
-// Print d'un sommet, version noms contenus dans un deq
-void list_print_state(void* p, FILE* out) {
-    if (isempty_dequeue(p)) {
-        fprintf(out, "E");
-    }
-    else {
-        for (uint j = 0; j < size_dequeue(p) - 1; j++) {
-            fprintf(out, "%d,", lefread_dequeue(p, j));
-        }
-        fprintf(out, "%d", lefread_dequeue(p, size_dequeue(p) - 1));
-    }
-}
+
 
 /********************************************************/
 /*+ Récupération d'une liste d'arêtes pour l'affichage +*/
@@ -450,4 +440,188 @@ void view_left_cayley(morphism* thecayley) {
     // " -o ", png_filename, " && open ", png_filename,
     system(command);
     free(command);
+}
+
+
+/********************/
+/* Latex generation */
+/********************/
+
+
+enum {
+    TIKZ_CAYN,
+    TIKZ_CAYT,
+    TIKZ_AUTN,
+    TIKZ_AUTT,
+};
+
+
+#define TIKZ_SIZE 4
+char tikz_types[4][40];
+char* tikz_types_names[4] = {
+    "CAYLEY_NODE",
+    "CAYLEY_TRANS",
+    "AUTOMATON_NODE",
+    "AUTOMATON_TRANS",
+};
+
+
+void latex_init(void) {
+    json_object* root = json_object_from_file("tikz_params.json");
+    if (!root) {
+        for (int i = 0; i < TIKZ_SIZE; i++) {
+            tikz_types[i][0] = '\0';
+        }
+        return;
+    }
+
+    for (int i = 0; i < TIKZ_SIZE; i++) {
+        json_object* obj;
+        if (!json_object_object_get_ex(root, tikz_types_names[i], &obj) || json_object_get_type(obj) != json_type_string) {
+            tikz_types[i][0] = '\0';
+            return;
+        }
+        const char* str = json_object_get_string(obj);
+        if (strlen(str) >= 40) {
+            tikz_types[i][0] = '\0';
+            return;
+        }
+        strcpy(tikz_types[i], str);
+    }
+
+    json_object_put(root);
+}
+
+
+static void latex_print_mono_elem(const morphism* M, uint q, FILE* out) {
+    if (isempty_dequeue(M->names[q])) {
+        fprintf(out, "1");
+        return;
+    }
+    uint n = 1;
+    fprint_letter_latex(M->alphabet[lefread_dequeue(M->names[q], 0)], out, false);
+    for (uint i = 1; i < size_dequeue(M->names[q]); i++) {
+        if (lefread_dequeue(M->names[q], i) != lefread_dequeue(M->names[q], i - 1)) {
+            if (n > 1) {
+                fprintf(out, "^{%d}", n);
+            }
+            n = 1;
+            fprint_letter_latex(M->alphabet[lefread_dequeue(M->names[q], i)], out, false);
+        }
+        else {
+            n++;
+        }
+    }
+    if (n > 1) {
+        fprintf(out, "^{%d}", n);
+    }
+}
+
+
+static void latex_print_aux(const morphism* M, dgraph* G, FILE* out) {
+    latex_init();
+    fprintf(out, "\\begin{tikzpicture}\n");
+
+    for (uint i = 0; i < G->size_graph; i++) {
+        fprintf(out, "\\node[%s] (n%d) at (%d,0) {$", tikz_types[TIKZ_CAYN], i, 2 * i);
+        latex_print_mono_elem(M, i, out);
+        fprintf(out, "$};\n");
+    }
+
+    dequeue_gen* theedges = dgraph_to_multi_edges(M->r_cayley);
+    while (!isempty_dequeue_gen(theedges)) {
+        multi_edge* new = rigpull_dequeue_gen(theedges);
+
+        fprintf(out, "\\draw[%s] (n%d) to ", tikz_types[TIKZ_CAYT], new->in);
+
+        if (new->in == new->out) {
+            fprintf(out, "[loop above] node[above] {$");
+        }
+        else if (new->in < new->out) {
+            fprintf(out, "[out=0,in=180] node[above] {$");
+        }
+        else {
+            fprintf(out, "[out=180,in=0] node[above] {$");
+        }
+        for (uint j = 0; j < size_dequeue(new->lab); j++) {
+            if (j > 0) {
+                fprintf(out, ",");
+            }
+            fprint_letter_latex(M->alphabet[lefread_dequeue(new->lab, j)], out, false);
+        }
+        fprintf(out, "$} (n%d);\n", new->out);
+        delete_dequeue(new->lab);
+        free(new);
+    }
+    delete_dequeue_gen(theedges);
+    fprintf(out, "\\end{tikzpicture}\n");
+
+}
+
+void latex_print_cayley(morphism* M, FILE* out) {
+    latex_print_aux(M, M->r_cayley, out);
+}
+
+void latex_print_lcayley(morphism* M, FILE* out) {
+    latex_print_aux(M, M->l_cayley, out);
+}
+
+
+void latex_print_automaton(nfa* A, FILE* out) {
+    latex_init();
+    fprintf(out, "\\begin{tikzpicture}\n");
+
+    for (uint i = 0; i < A->trans->size_graph; i++) {
+        fprintf(out, "\\node[%s", tikz_types[TIKZ_AUTN]);
+        if (mem_dequeue_sorted(i, A->initials, NULL)) {
+            fprintf(out, ",initial below");
+        }
+        if (mem_dequeue_sorted(i, A->finals, NULL)) {
+            fprintf(out, ",accepting below");
+        }
+        fprintf(out, "] (n%d) at (%d,0) {$%d$};\n", i, 2 * i, i);
+    }
+
+    dequeue_gen* theedges = nfa_to_multi_edges(A);
+    while (!isempty_dequeue_gen(theedges)) {
+        multi_edge* new = rigpull_dequeue_gen(theedges);
+
+        fprintf(out, "\\draw[%s] (n%d) to ", tikz_types[TIKZ_CAYT], new->in);
+
+        if (new->in == new->out) {
+            fprintf(out, "[loop above] node[above] {$");
+        }
+        else if (new->in < new->out) {
+            fprintf(out, "[out=0,in=180] node[above] {$");
+        }
+        else {
+            fprintf(out, "[out=180,in=0] node[above] {$");
+        }
+
+        if (new->eps) {
+            fprintf(out, "\\varepsilon");
+            if (!isempty_dequeue(new->lab) || !isempty_dequeue(new->lab_i)) {
+                fprintf(out, ",");
+            }
+        }
+        for (uint j = 0; j < size_dequeue(new->lab); j++) {
+            if (j > 0 || !isempty_dequeue(new->lab_i)) {
+                fprintf(out, ",");
+            }
+            fprint_letter_latex(A->alphabet[lefread_dequeue(new->lab, j)], out, false);
+        }
+        for (uint j = 0; j < size_dequeue(new->lab_i); j++) {
+            if (j > 0) {
+                fprintf(out, ",");
+            }
+            fprint_letter_latex(A->alphabet[lefread_dequeue(new->lab, j)], out, true);
+        }
+
+        fprintf(out, "$} (n%d);\n", new->out);
+        delete_dequeue(new->lab);
+        free(new);
+    }
+    delete_dequeue_gen(theedges);
+    fprintf(out, "\\end{tikzpicture}\n");
+
 }

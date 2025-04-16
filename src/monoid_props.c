@@ -384,9 +384,9 @@ bool is_gtrivial_mono(morphism* M, green_relation P, uint* c) {
             uint e = M->regular_idems[i];
             // We take the first one that is non-trivial
             if (size_dequeue(thepar->cl[thepar->numcl[e]]) > 1) {
-                uint s = lefread_dequeue(thepar->cl[i], 0);
+                uint s = lefread_dequeue(thepar->cl[thepar->numcl[e]], 0);
                 if (s == e) {
-                    s = lefread_dequeue(thepar->cl[i], 1);
+                    s = lefread_dequeue(thepar->cl[thepar->numcl[e]], 1);
                 }
                 c[0] = e;
                 c[1] = s;

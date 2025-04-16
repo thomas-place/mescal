@@ -11,86 +11,86 @@
 #include "alloc.h"
 #include "type_basic.h"
 
-/**********************/
-/* Printing functions */
-/**********************/
-
-// Print d'un sommet, version noms contenus dans un deq
-void list_print_state(void* p, FILE* out);
-
-/********************************************************/
-/*+ Récupération d'une liste d'arêtes pour l'affichage +*/
-/********************************************************/
 
 
+/********************************/
+/*+ Computation of multi-edges +*/
+/********************************/
 /**
  * @brief
- * Type utilisé pour représenter une multi-arête pour l'affichage.
+ * Type used to represent a multi-edge in a graph.
  *
  * @remark
- * Une multi-arête est une arête qui peut avoir plusieurs étiquettes. On se sert de
- * ce type pour l'affichage : quand deux sommets sont reliés par plusieurs arêtes, on
- * simplifie la présentation en ne dessinant qu'une seule arête qui porte toutes les
- * étiquettes des vraies arêtes.
+ * A multi-edge is an edge that can have multiple labels. This type is used for
+ * display purposes: when two vertices are connected by multiple edges, we
+ * simplify the presentation by drawing only one edge that carries all the
+ * labels of the actual edges.
  */
 typedef struct {
-    uint in;                          //!< État de départ de l'arête.
-    bool eps;                         //!< Epsilon transition
-    dequeue* lab;                     //!< Liste triée des étiquettes.
-    dequeue* lab_i;                   //!< Liste triée des étiquettes inverses.
-    uint out;                         //!< État de sortie de l'arête
+    uint in;                          //!< Initial state of the edge
+    bool eps;                         //!< Epsilon transition.
+    dequeue* lab;                     //!< Sorted list of labels.
+    dequeue* lab_i;                   //!< Sorted list of inverse labels.
+    uint out;                         //!< Final state of the edge
 } multi_edge;
 
 /**
  * @brief
- * Calcul de la liste des mumti-arêtes d'un automate.
+ * Compute the multi-edges of a NFA.
  *
  * @return
- * La liste des multi-arêtes stockée dans une pile.
+ * The list of multi-edges of the NFA stored in a dequeue.
  */
-dequeue_gen* nfa_to_multi_edges(nfa* //!< Le NFA.
+dequeue_gen* nfa_to_multi_edges(nfa* //!< The NFA.
 );
 
-// Quatre modes:
-// 0: only an lgraph with classic labels
-// 1: an additional graph (eps trans)
-// 2: an additional lgraph(inv trans)
-// 3: an additional lgraph(inv trans) + an additional graph (eps trans)
-// Les transitions epsilon self-loops ne sont pas ajoutées
-//dequeue_gen* dgraph_to_multi_edges(dgraph*);
 
-dequeue_gen* dgraph_to_multi_edges(dgraph*);
+/**
+ * @brief
+ * Compute the multi-edges of a deterministic graph (used for morphisms).
+ *
+ * @return
+ * The list of multi-edges of the graph stored in a dequeue.
+ */
+dequeue_gen* dgraph_to_multi_edges(dgraph* //!< The deterministic graph.
+);
 
-/********************************/
-/* Print des arêtes d'un graphe */
-/********************************/
+/***********************/
+/* Graphviz generation */
+/***********************/
 
 void named_lgedges_print(dequeue_gen* theedges, nfa* A, FILE* out);
 
 void named_dedges_print(dequeue_gen* theedges, morphism* M, FILE* out);
-/******************/
-/* Print d'un NFA */
-/******************/
 
 void nfa_print(nfa* A, FILE* out);
 
-// Print du graphe droit
 void cayley_print(morphism* mor, FILE* out);
 
-// Print du graphe gauche
 void cayley_left_print(morphism* mor, FILE* out);
 
-/**************************/
-/* Affichage sur le shell */
-/**************************/
+/****************/
+/* Shell output */
+/****************/
 
-// Affichage d'un NFA
+
 void view_nfa(nfa* nfa);
 
-// Affichage du Cayley droit
 void view_cayley(morphism* mor);
 
-// Affichage du Cayley gauche
 void view_left_cayley(morphism* mor);
+
+
+/********************/
+/* Latex generation */
+/********************/
+
+void latex_init(void);
+
+void latex_print_automaton(nfa* A, FILE* out);
+
+void latex_print_cayley(morphism* M, FILE* out);
+
+void latex_print_lcayley(morphism* M, FILE* out);
 
 #endif

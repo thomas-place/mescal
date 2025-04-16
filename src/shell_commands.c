@@ -285,6 +285,9 @@ int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* s
         }
 
         switch (key) {
+        case KY_LATEX:
+            return shell_latex_gen(thecom->params);
+            break;
         case KY_SAVE:
             return shell_save_to_file(thecom->params);
             break;
@@ -1202,6 +1205,35 @@ int shell_random_dfa(char* varname, com_parameters* params) {
 
     return object_add_automaton(varname, dfa_random(nb1, nb2, nb3));
 }
+
+// Latex génération
+int shell_latex_gen(com_parameters* pars) {
+    if (com_nbparams(pars) != 1) {
+        shell_error_nbparams(keywordtostring(KY_LATEX), 1);
+        return -1;
+    }
+
+    bool saved;
+    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
+    if (i == -1) {
+        return -1;
+    }
+
+    if (objects[i]->type == AUTOMATON) {
+        latex_print_automaton(objects[i]->nfa, stdout);
+        return -1;
+    }
+
+    if (objects[i]->type == MORPHISM) {
+        latex_print_cayley(objects[i]->mor->obj, stdout);
+        return -1;
+    }
+    if (saved) {
+        object_free(i);
+    }
+    return -1;
+}
+
 
 int shell_recursive_init(char* varname, com_parameters* params) {
     if (com_nbparams(params) < 2) {

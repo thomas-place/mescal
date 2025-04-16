@@ -20,6 +20,13 @@ void test(void) {
     char testc[60];
     int n = sprint_power_utf8(3457, testc);
     printf("testc: %s\n size: %d\n", testc, n);
+
+    regexp* myexp = parse_string_regexp("(ab)*");
+    nfa* aut = reg_glushkov(myexp);
+    nfa* aut2 = nfa_brzozowski(aut);
+    morphism* M = dfa_to_morphism(aut2, NULL, NULL);
+    latex_print_cayley(M, stdout);
+
     /*
     long i, j;
     fmpz_mat_t A;

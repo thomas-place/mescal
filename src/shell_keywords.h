@@ -41,6 +41,7 @@ typedef enum {
     KY_REGEXPS,
     KY_RECDEFS,
     KY_TOGGLE,
+    KY_LATEX,
 
     KY_FILTER,
     KY_FMSIZE,

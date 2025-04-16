@@ -81,6 +81,27 @@ void fprint_letter_gviz(letter l, FILE* out, bool inv) {
     }
 }
 
+void fprint_letter_latex(letter l, FILE* out, bool inv) {
+    switch (l.lab) {
+    case ' ':
+        fprintf(out, "␠");
+        break;
+    case '\n':
+        fprintf(out, "⏎");
+        break;
+    default:
+        fprintf(out, "%c", l.lab);
+        break;
+    }
+    if (l.num >= 0) {
+        fprintf(out, "_{%d}", l.num);
+    }
+    if (inv) {
+        fprintf(out, "^{-1}");
+    }
+}
+
+
 int compare_letters(const void* p1, const void* p2) {
     const letter* l1 = (const letter*)p1;
     const letter* l2 = (const letter*)p2;

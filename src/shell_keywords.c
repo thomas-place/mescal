@@ -34,6 +34,7 @@ void keywords_add_all_keys(void) {
     keywords_add_key(KY_INTERFACE, "history");
     keywords_add_key(KY_INTERFACE, "limit");
     keywords_add_key(KY_TOGGLE, "toggleopti");
+    keywords_add_key(KY_LATEX, "latex");
 
     // Commandes sauvegarde et chargement
     keywords_add_key(KY_LOADSESSION, "loadsession");
