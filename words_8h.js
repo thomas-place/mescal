@@ -8,6 +8,7 @@ var words_8h =
     [ "delete_word", "words_8h.html#a282311627c33a3430899319ab6000831", null ],
     [ "display_word", "words_8h.html#ac37cb104de3d1383de3014cc5ae1fc3c", null ],
     [ "fprint_letter_gviz", "words_8h.html#acc35b232a0c3636bb8644397a7b3b59f", null ],
+    [ "fprint_letter_latex", "words_8h.html#abe45c50ad190aafb8cb431c24220bc6c", null ],
     [ "fprint_letter_utf8", "words_8h.html#a385c2a53d1704920490e6328d5857b1a", null ],
     [ "get_alphabet_word", "words_8h.html#a4b230932531eaa42e105d4e5bf9ac193", null ],
     [ "isempty_word", "words_8h.html#a45e2ee6c1e5e05527a43048b596052d7", null ],

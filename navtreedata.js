@@ -83,8 +83,8 @@ var NAVTREEINDEX =
 [
 "alloc_8c.html",
 "monoid__orbits_8h.html#a750fec17d433ac28dec686e653fedb60",
-"shell__keywords_8h.html#a3c46b9a9ba1b08f7bffde99b45910d53a61316d220dbd18f2d438276f2da10f5c",
-"structobject.html#af98c072fdc6e7a2c137f202cb72a644a"
+"shell__keywords_8h.html#a3c46b9a9ba1b08f7bffde99b45910d53a5dee08f9cad26076f1ceac37ee12937f",
+"structobject.html#ae39393bd51ba4112d2d115ae4cb6d72a"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

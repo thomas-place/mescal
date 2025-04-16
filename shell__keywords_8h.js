@@ -27,6 +27,7 @@ var shell__keywords_8h =
       [ "KY_REGEXPS", "shell__keywords_8h.html#a3c46b9a9ba1b08f7bffde99b45910d53a421c462d9b7ebd7a037c48783d892adf", null ],
       [ "KY_RECDEFS", "shell__keywords_8h.html#a3c46b9a9ba1b08f7bffde99b45910d53ac42f6ea86db29fc4e29fe8ffa5268e9f", null ],
       [ "KY_TOGGLE", "shell__keywords_8h.html#a3c46b9a9ba1b08f7bffde99b45910d53ab3f535bc59e11f6658350dac92e0fd22", null ],
+      [ "KY_LATEX", "shell__keywords_8h.html#a3c46b9a9ba1b08f7bffde99b45910d53a0f4b1b4cee29e2912ff1362f629b7cf6", null ],
       [ "KY_FILTER", "shell__keywords_8h.html#a3c46b9a9ba1b08f7bffde99b45910d53a963accaf66df52ab6b56695f8f2eb86b", null ],
       [ "KY_FMSIZE", "shell__keywords_8h.html#a3c46b9a9ba1b08f7bffde99b45910d53a94d875084da3172991aa7d166f9aa4d5", null ],
       [ "KY_MINI", "shell__keywords_8h.html#a3c46b9a9ba1b08f7bffde99b45910d53a4721d2bf62013b4793ff71c4e2d324d7", null ],

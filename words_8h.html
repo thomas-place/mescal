@@ -137,6 +137,9 @@ Functions</h2></td></tr>
 <tr class="memitem:acc35b232a0c3636bb8644397a7b3b59f" id="r_acc35b232a0c3636bb8644397a7b3b59f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acc35b232a0c3636bb8644397a7b3b59f">fprint_letter_gviz</a> (<a class="el" href="structletter.html">letter</a>, FILE *, bool)</td></tr>
 <tr class="memdesc:acc35b232a0c3636bb8644397a7b3b59f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Displays a letter on a given stream: graphviz version for the subscript.  <br /></td></tr>
 <tr class="separator:acc35b232a0c3636bb8644397a7b3b59f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abe45c50ad190aafb8cb431c24220bc6c" id="r_abe45c50ad190aafb8cb431c24220bc6c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abe45c50ad190aafb8cb431c24220bc6c">fprint_letter_latex</a> (<a class="el" href="structletter.html">letter</a>, FILE *, bool)</td></tr>
+<tr class="memdesc:abe45c50ad190aafb8cb431c24220bc6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Displays a letter on a given stream: latex version for the subscripts.  <br /></td></tr>
+<tr class="separator:abe45c50ad190aafb8cb431c24220bc6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae45298e5143d835204dc00360e5d227d" id="r_ae45298e5143d835204dc00360e5d227d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae45298e5143d835204dc00360e5d227d">compare_letters</a> (const void *, const void *)</td></tr>
 <tr class="memdesc:ae45298e5143d835204dc00360e5d227d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Comparison of two letters for sorting algorithms.  <br /></td></tr>
 <tr class="separator:ae45298e5143d835204dc00360e5d227d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -345,6 +348,42 @@ Functions</h2></td></tr>
 
 <p>Displays a letter on a given stream: graphviz version for the subscript. </p>
 <dl class="section remark"><dt>Remarks</dt><dd>Includes an option for displaying an inverse power "-1" on the letter. This is used for the inverse transitions in NFAs. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">l</td><td>The letter.  </td></tr>
+    <tr><td class="paramname">out</td><td>The stream.  </td></tr>
+    <tr><td class="paramname">inv</td><td>True if an inverse power has to be displayed, false otherwise. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="abe45c50ad190aafb8cb431c24220bc6c" name="abe45c50ad190aafb8cb431c24220bc6c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abe45c50ad190aafb8cb431c24220bc6c">&#9670;&#160;</a></span>fprint_letter_latex()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void fprint_letter_latex </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structletter.html">letter</a></td>          <td class="paramname"><span class="paramname"><em>l</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">FILE *</td>          <td class="paramname"><span class="paramname"><em>out</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>inv</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Displays a letter on a given stream: latex version for the subscripts. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">l</td><td>The letter.  </td></tr>
