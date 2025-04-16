@@ -6,7 +6,7 @@ var searchData=
   ['nb_5fmin_5fregular_5fjcl_3',['nb_min_regular_jcl',['../structmorphism.html#a8c898448fea9eae128e78e95e857a05a',1,'morphism']]],
   ['nb_5fregular_5felems_4',['nb_regular_elems',['../structgreen.html#aa0c470d994307efeb876cd72ec6d51ff',1,'green']]],
   ['nb_5fregular_5fjcl_5',['nb_regular_jcl',['../structmorphism.html#a09fa906fd5f06a273e791a97e674c128',1,'morphism']]],
-  ['negation_20hierarchies_20and_20future_20past_20hierarchies_3a_6',['Available input classes 𝒞 for negation hierarchies and future/past hierarchies:',['../index.html#autotoc_md25',1,'']]],
+  ['negation_20hierarchies_20and_20future_20past_20hierarchies_6',['Available input classes 𝒞 for negation hierarchies and future/past hierarchies',['../index.html#autotoc_md25',1,'']]],
   ['neut_7',['neut',['../structsubsemi.html#a01852dd02de5163fbd3d36c76012cdac',1,'subsemi']]],
   ['next_8',['next',['../structmorphism__state.html#a260f7e038b6ae2fe02b829415180454c',1,'morphism_state::next'],['../structdetstate.html#a8ef9ae0566a99aa66452c2cba06f04db',1,'detstate::next'],['../structstring__chain.html#aeabc295aae83201bab5d06916f13486f',1,'string_chain::next'],['../structcom__parameters.html#a7062e4806182d7c58999cbf1098dd6e7',1,'com_parameters::next'],['../structdcell.html#a681c8936bccbbbe72634ceddbbcf3584',1,'dcell::next']]],
   ['nfa_9',['nfa',['../structnfa.html',1,'nfa'],['../structobject.html#afd7600f51dea3038e0db64bd813867ba',1,'object::nfa']]],

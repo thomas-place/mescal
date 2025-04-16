@@ -12,7 +12,7 @@ var searchData=
   ['decid_5fst_5fsep_9',['decid_st_sep',['../sep__group_8h.html#a43fd25633bb0c3948385e37cb3932ab4',1,'sep_group.c']]],
   ['def_10',['def',['../structob__recursion.html#a4b02743733a7f35325c83e6dd6f47214',1,'ob_recursion']]],
   ['definition_20of_20a_20regular_20expression_11',['Definition, of a regular expression',['../index.html#autotoc_md12',1,'']]],
-  ['definition_20variable_20r_3a_12',['definition variable R:',['../index.html#autotoc_md16',1,'Setup of an initialized recursive definition variable R:'],['../index.html#autotoc_md17',1,'Usage of a recursive definition variable R:']]],
+  ['definition_20variable_20r_12',['definition variable R',['../index.html#autotoc_md16',1,'Setup of an initialized recursive definition variable R'],['../index.html#autotoc_md17',1,'Usage of a recursive definition variable R']]],
   ['definitions_20variables_13',['Using recurvive definitions variables',['../index.html#autotoc_md14',1,'']]],
   ['delete_5fbarray_14',['delete_barray',['../type__boolarray_8h.html#a89919ad213a8de128905bdfb15fab8eb',1,'type_boolarray.c']]],
   ['delete_5fbinheap_15',['delete_binheap',['../type__binheap_8h.html#a64b0ca346d078392d6737c1e6c1b68e2',1,'type_binheap.c']]],

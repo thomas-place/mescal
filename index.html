@@ -126,7 +126,7 @@ Available commands</h1>
 <h2><a class="anchor" id="autotoc_md5"></a>
 Basic commands</h2>
 <h3><a class="anchor" id="autotoc_md6"></a>
-General commands:</h3>
+General commands</h3>
 <pre class="fragment">help                          This help.
 timeout                       Displays the current timeout.
 timeout = &lt;value&gt;             Sets the timeout to &lt;value&gt; seconds.
@@ -137,14 +137,14 @@ history = &lt;value&gt;             Sets the history size to &lt;value&gt; entri
 quit or exit                  Quits.
 classes                       Lists all classes recognized by the program.
 </pre><h3><a class="anchor" id="autotoc_md7"></a>
-Using variables:</h3>
+Using variables</h3>
 <pre class="fragment">&lt;variable&gt; = &lt;command&gt;        Stores a copy of the returned object in the variable.
 delete(&lt;variable&gt;)            Deletes object.
 
     Variable types: regular expression, recursive definition of regular expressions, automaton and morphism.
     Variable names: &lt;upper&gt;&lt;upper|digits&gt;*
 </pre><h3><a class="anchor" id="autotoc_md8"></a>
-Filtering commands:</h3>
+Filtering commands</h3>
 <pre class="fragment">list(&lt;parameters&gt;)            Lists all stored objects according to the parameters.
 regexps(&lt;parameters&gt;)         Lists all stored regular expressions according to the parameters.
 automata(&lt;parameters&gt;)        Lists all stored automata according to the parameters.
@@ -157,13 +157,13 @@ regexps(&lt;parameters&gt;)         Lists all stored recursive definitions accor
 -minimal                      displays the size of the minimal automaton.
 -minimal(&lt;n1&gt;,&lt;n2&gt;)           only lists the objects with a minimal automaton whose size is between n1 and n2.
 </pre><h3><a class="anchor" id="autotoc_md9"></a>
-Sorting commands:</h3>
+Sorting commands</h3>
 <pre class="fragment">sort                          Sorts all objects, lexicographically by variable name.
 sort(&lt;parameter&gt;)             Sorts all objects, according to the ordering given by the parameter.
 </pre><p><b>Available parameters:</b> </p><pre class="fragment">-syntactic                    Size of the syntactic monoid
 -minimal                      Size of the minimal automaton
 </pre><h3><a class="anchor" id="autotoc_md10"></a>
-Saving and loading:</h3>
+Saving and loading</h3>
 <pre class="fragment">save(&lt;command&gt;,"&lt;filename&gt;")  Saves the object returned by a command in a file.
 open("&lt;filename&gt;")            Opens and returns an object stored in a file.
 savesession("&lt;filename&gt;")     Saves all current objects in a file.
@@ -179,7 +179,7 @@ Syntax of regexps:
  where,
    0 = ∅, 1 = ε, ! = complement, &amp; = ∩
 </pre><h3><a class="anchor" id="autotoc_md13"></a>
-Manipulation of a regular expression stored in a variable L:</h3>
+Manipulation of a regular expression stored in a variable L</h3>
 <pre class="fragment">L                             Displays the regular expression.
 L.minimal                     The minimal automaton: works as an automaton variable.
 L.syntactic                   The syntactic morphism: works as a morphism variable.
@@ -188,13 +188,13 @@ glushkov(L)                   Uses the Glushkov algorithm to compute a NFA.
 </pre><h2><a class="anchor" id="autotoc_md14"></a>
 Using recurvive definitions variables</h2>
 <h3><a class="anchor" id="autotoc_md15"></a>
-Initialization:</h3>
+Initialization</h3>
 <pre class="fragment">initrecursion(&lt;n&gt;,&lt;v1&gt;,...)   Returns an initialized recursive definition variable.
                               &lt;n&gt; is the largest index that has to be specified by the user.
                               &lt;v1&gt;,... is a list of variable names denoting the relations used in the recursive definition.
                               Example: R = initrecursion(0,L)
 </pre><h3><a class="anchor" id="autotoc_md16"></a>
-Setup of an initialized recursive definition variable R:</h3>
+Setup of an initialized recursive definition variable R</h3>
 <pre class="fragment">E.&lt;v&gt;[&lt;n&gt;] = &lt;regexp&gt;         Defines the initial case &lt;n&gt; of the relation &lt;v&gt;.
                               (&lt;n&gt; must be smaller than the maximum index specified in the initialization).
                               Example: R.L[0] = "\1"
@@ -206,14 +206,14 @@ E.&lt;v&gt;[i] = &lt;symbolic regexp&gt;  Defines the recursion of the relation 
     where,
 0 = ∅, 1 = ε, ! = complement, &amp; = ∩, a[i - &lt;n&gt;] = symbolic letter, {&lt;v&gt;}[i - &lt;n&gt;] = symbolic variable
 </pre><h3><a class="anchor" id="autotoc_md17"></a>
-Usage of a recursive definition variable R:</h3>
+Usage of a recursive definition variable R</h3>
 <pre class="fragment">R                             Displays the recursive definition and checks if it is well-defined.
 R.&lt;v&gt;[&lt;n&gt;]                    Returns the regular expression of index &lt;n&gt; for the relation &lt;v&gt;.
                               (can be copied into a regular expression variable).
 </pre><h2><a class="anchor" id="autotoc_md18"></a>
 Using variables representing automata</h2>
 <h3><a class="anchor" id="autotoc_md19"></a>
-Manipulation of an automaton stored in a variable A:</h3>
+Manipulation of an automaton stored in a variable A</h3>
 <pre class="fragment">A                             Displays the automaton.
 A.minimal                     The minimal automaton: works as an automaton variable.
 latex(A.minimal)              The minimal automaton, printed in LaTeX.
@@ -238,7 +238,7 @@ permutation(A)                Tests if the automaton is a permutation DFA.
 </pre><h2><a class="anchor" id="autotoc_md20"></a>
 Using morphisms variables</h2>
 <h3><a class="anchor" id="autotoc_md21"></a>
-Manipulation of a morphism stored in a variable M:</h3>
+Manipulation of a morphism stored in a variable M</h3>
 <pre class="fragment">M                             Displays the Green relations of the monoid.
 rcayley(M)                    Displays the right Cayley graph of the morphism.
 lcayley(M)                    Displays the left Cayley graph of the morphism.
@@ -264,7 +264,7 @@ Membership tests</h2>
       Computes and stores in variables all DFAs with at most &lt;n1&gt; states (plus a sink state) 
       and &lt;n2&gt; letters which are outside 𝒞₁,..,𝒞ₙ and inside 𝒟₁,..,𝒟ₘ.
 </pre><h3><a class="anchor" id="autotoc_md23"></a>
-Available classes 𝒞:</h3>
+Available classes 𝒞</h3>
 <pre class="fragment">- ST      Trivial class.
 - DD      Well-suited extension of ST (DD = ST⁺).
 - MOD     Modulo languages.
@@ -301,7 +301,7 @@ chierarchies(&lt;object&gt;)        Summary of membership tests for the language
 nhierarchies(𝒞,&lt;object&gt;)      If the language recognized by the object belongs to TL(𝒞), determines its level in the negation hierarchy of TL(𝒞).
 fphierarchies(𝒞,&lt;object&gt;)     If the language recognized by the object belongs to TL(𝒞), determines its level in the future/past hierarchy of TL(𝒞).
 </pre><h3><a class="anchor" id="autotoc_md25"></a>
-Available input classes 𝒞 for negation hierarchies and future/past hierarchies:</h3>
+Available input classes 𝒞 for negation hierarchies and future/past hierarchies</h3>
 <pre class="fragment">- ST      Trivial class.
 - DD      Well-suited extension of ST (DD = ST⁺).
 - MOD     Modulo languages.
@@ -311,12 +311,12 @@ Available input classes 𝒞 for negation hierarchies and future/past hierarchie
 Separation tests</h2>
 <pre class="fragment">- separ(𝒞,&lt;o1&gt;,&lt;o2&gt;,(info))     Checks if &lt;o1&gt; is 𝒞-separable from &lt;o2&gt; ("info" is an optional parameter, it asks for more details).
 </pre><h3><a class="anchor" id="autotoc_md27"></a>
-Available classes 𝒞:</h3>
+Available classes 𝒞</h3>
 <pre class="fragment">- ST      Trivial class.
 - MOD     Modulo languages.
 - GR      Group languages.
 </pre><h3><a class="anchor" id="autotoc_md28"></a>
-Available operators OP:</h3>
+Available operators OP</h3>
 <pre class="fragment">- Pol     Polynomial closure (𝒞 ↦ Pol(𝒞)).
 </pre> </div></div><!-- PageDoc -->
 <a href="doxygen_crawl.html"></a>

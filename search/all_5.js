@@ -12,16 +12,16 @@ var searchData=
   ['files_5fregexp_5fto_5fjson_9',['files_regexp_to_json',['../files_8h.html#ab80174fe5f2c6b11407ffc57d03d82c7',1,'files.c']]],
   ['files_5fsave_5fobject_10',['files_save_object',['../files_8h.html#a029de89b7a1b4f1b23a9865148a5c4ca',1,'files.c']]],
   ['files_5fsave_5fsession_11',['files_save_session',['../files_8h.html#aaa9ea6ebedab61d6729571f347185377',1,'files.c']]],
-  ['filtering_20commands_3a_12',['Filtering commands:',['../index.html#autotoc_md8',1,'']]],
+  ['filtering_20commands_12',['Filtering commands',['../index.html#autotoc_md8',1,'']]],
   ['final_13',['final',['../structnfa__enum.html#a30e38cd78b99547fc09f741d01b36d77',1,'nfa_enum']]],
   ['finals_14',['finals',['../structnfa.html#aeb454a1ae48eaf855aca560cb151f41a',1,'nfa']]],
   ['find_5fufind_15',['find_ufind',['../type__partitions_8h.html#a481203dffe281af516a68781db0fc014',1,'type_partitions.c']]],
   ['first_16',['first',['../structglushkov__info.html#ad1ff45509bc3add7895ec3bbfeaa54c6',1,'glushkov_info']]],
   ['follow_17',['follow',['../structglushkov__info.html#a53ef0e7e45579a51d2cab0c46f3d5e8c',1,'glushkov_info']]],
-  ['for_20negation_20hierarchies_20and_20future_20past_20hierarchies_3a_18',['Available input classes 𝒞 for negation hierarchies and future/past hierarchies:',['../index.html#autotoc_md25',1,'']]],
+  ['for_20negation_20hierarchies_20and_20future_20past_20hierarchies_18',['Available input classes 𝒞 for negation hierarchies and future/past hierarchies',['../index.html#autotoc_md25',1,'']]],
   ['fprint_5fletter_5fgviz_19',['fprint_letter_gviz',['../words_8h.html#acc35b232a0c3636bb8644397a7b3b59f',1,'words.c']]],
   ['fprint_5fletter_5flatex_20',['fprint_letter_latex',['../words_8h.html#abe45c50ad190aafb8cb431c24220bc6c',1,'words.c']]],
   ['fprint_5fletter_5futf8_21',['fprint_letter_utf8',['../words_8h.html#a385c2a53d1704920490e6328d5857b1a',1,'words.c']]],
   ['full_22',['full',['../structob__recursion.html#aabf0f5bebf29653d681d9bea92550bc2',1,'ob_recursion']]],
-  ['future_20past_20hierarchies_3a_23',['Available input classes 𝒞 for negation hierarchies and future/past hierarchies:',['../index.html#autotoc_md25',1,'']]]
+  ['future_20past_20hierarchies_23',['Available input classes 𝒞 for negation hierarchies and future/past hierarchies',['../index.html#autotoc_md25',1,'']]]
 ];

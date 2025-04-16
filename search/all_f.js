@@ -10,7 +10,7 @@ var searchData=
   ['parsize_7',['parsize',['../structnfa__enum.html#a8ce41551b0eee040d2f7a90e30216fb5',1,'nfa_enum']]],
   ['parti_8',['parti',['../structparti.html',1,'parti'],['../structnfa__enum.html#afb8397b4499ef03da9c053d9e6abf89d',1,'nfa_enum::parti']]],
   ['parti_5fto_5fufind_9',['parti_to_ufind',['../type__partitions_8h.html#aae51c6f12433c7a8ae7b1feee494008d',1,'type_partitions.c']]],
-  ['past_20hierarchies_3a_10',['Available input classes 𝒞 for negation hierarchies and future/past hierarchies:',['../index.html#autotoc_md25',1,'']]],
+  ['past_20hierarchies_10',['Available input classes 𝒞 for negation hierarchies and future/past hierarchies',['../index.html#autotoc_md25',1,'']]],
   ['peekmin_5fbinheap_11',['peekmin_binheap',['../type__binheap_8h.html#aa4f2934905198674e78e603e135e0c35',1,'type_binheap.c']]],
   ['plus_12',['PLUS',['../regexp_8h.html#a945e1b6cec6225bade72691d362c68faa87fe59ef12c3d13dc2a4d14c9b16c1f9',1,'regexp.h']]],
   ['popmin_5fbinheap_13',['popmin_binheap',['../type__binheap_8h.html#ab822791090ff4a210f049aa6c3021b30',1,'type_binheap.c']]],

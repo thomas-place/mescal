@@ -10,11 +10,11 @@ var searchData=
   ['union_7',['UNION',['../regexp_8h.html#a945e1b6cec6225bade72691d362c68faa4cf5e96eb7880eb38df303a6e5759afd',1,'regexp.h']]],
   ['union_5fufind_8',['union_ufind',['../type__partitions_8h.html#a1de9d681c9616322c4d47173e3f81d91',1,'type_partitions.c']]],
   ['usage_9',['usage',['../main_8h.html#acab820e45682cb2b906e71318c90446e',1,'main.h']]],
-  ['usage_20of_20a_20recursive_20definition_20variable_20r_3a_10',['Usage of a recursive definition variable R:',['../index.html#autotoc_md17',1,'']]],
+  ['usage_20of_20a_20recursive_20definition_20variable_20r_10',['Usage of a recursive definition variable R',['../index.html#autotoc_md17',1,'']]],
   ['used_11',['used',['../structnfa__enum.html#a1600a40d86b8d54f98782730b8cef7fa',1,'nfa_enum']]],
   ['using_20morphisms_20variables_12',['Using morphisms variables',['../index.html#autotoc_md20',1,'']]],
   ['using_20recurvive_20definitions_20variables_13',['Using recurvive definitions variables',['../index.html#autotoc_md14',1,'']]],
   ['using_20regular_20expressions_20variables_14',['Using regular expressions variables',['../index.html#autotoc_md11',1,'']]],
-  ['using_20variables_20representing_20automata_15',['Using variables representing automata',['../index.html#autotoc_md18',1,'']]],
-  ['using_20variables_3a_16',['Using variables:',['../index.html#autotoc_md7',1,'']]]
+  ['using_20variables_15',['Using variables',['../index.html#autotoc_md7',1,'']]],
+  ['using_20variables_20representing_20automata_16',['Using variables representing automata',['../index.html#autotoc_md18',1,'']]]
 ];

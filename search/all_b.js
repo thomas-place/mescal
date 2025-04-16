@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['l_3a_0',['Manipulation of a regular expression stored in a variable L:',['../index.html#autotoc_md13',1,'']]],
+  ['l_0',['Manipulation of a regular expression stored in a variable L',['../index.html#autotoc_md13',1,'']]],
   ['l_5fcayley_1',['l_cayley',['../structmorphism.html#a280cb7bbd7fb2ac171e4a01bbf307e32',1,'morphism']]],
   ['lab_2',['lab',['../structmulti__edge.html#a23a92a464c041a99fcf5a74da327226e',1,'multi_edge::lab'],['../structsyletter.html#a13ea7876d137ea5110410ab09db5bd35',1,'syletter::lab'],['../structletter.html#a68f970975cb39fcc853d2c06a88e25c1',1,'letter::lab']]],
   ['lab_5fi_3',['lab_i',['../structmulti__edge.html#a6791072c243305f95be58418d37346ea',1,'multi_edge']]],
@@ -35,7 +35,7 @@ var searchData=
   ['listen_5finterrupt_32',['listen_interrupt',['../interrupt_8h.html#ad9733108dc59f30e1552d275aa704a17',1,'interrupt.c']]],
   ['listen_5ftimeout_33',['listen_timeout',['../interrupt_8h.html#ae22c315569cade11cfad2c1b9e74fc41',1,'interrupt.c']]],
   ['listening_5fmode_34',['listening_mode',['../interrupt_8h.html#af165da926e7da93c5fcc68797aedc20e',1,'interrupt.c']]],
-  ['loading_3a_35',['Saving and loading:',['../index.html#autotoc_md10',1,'']]],
+  ['loading_35',['Saving and loading',['../index.html#autotoc_md10',1,'']]],
   ['lsent_36',['lsent',['../structdlist.html#a52bdbf827bdc6d628a12b06e4ff6db56',1,'dlist']]],
   ['ltarjan_37',['ltarjan',['../graphs__tarjan_8h.html#a1056a2c05386186a2b6acf54a373aa33',1,'graphs_tarjan.c']]],
   ['ltarjan_5falph_38',['ltarjan_alph',['../graphs__tarjan_8h.html#a1ae025020a832977dcc7a63cd3537d02',1,'graphs_tarjan.c']]]

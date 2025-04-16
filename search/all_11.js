@@ -1,12 +1,12 @@
 var searchData=
 [
-  ['r_3a_0',['R:',['../index.html#autotoc_md16',1,'Setup of an initialized recursive definition variable R:'],['../index.html#autotoc_md17',1,'Usage of a recursive definition variable R:']]],
+  ['r_0',['R',['../index.html#autotoc_md16',1,'Setup of an initialized recursive definition variable R'],['../index.html#autotoc_md17',1,'Usage of a recursive definition variable R']]],
   ['r_5fcayley_1',['r_cayley',['../structmorphism.html#a75f6a8f6bc95225ed5eab0f858a3d5e8',1,'morphism']]],
   ['rank_2',['rank',['../structufind.html#a3fe3c4fe1b21dbf8085ccb0a3104a586',1,'ufind']]],
   ['rcl_3',['RCL',['../structgreen.html#ad97a5122cd26d4df48e419feaf9db950',1,'green']]],
   ['realloc_4',['REALLOC',['../alloc_8h.html#a698d049d23598a7e3997ecca97ac7e54',1,'alloc.h']]],
   ['rec_5',['rec',['../structobject.html#acc959cbcf94c9e20a07c04ed6e04d301',1,'object']]],
-  ['recursive_20definition_20variable_20r_3a_6',['recursive definition variable R:',['../index.html#autotoc_md16',1,'Setup of an initialized recursive definition variable R:'],['../index.html#autotoc_md17',1,'Usage of a recursive definition variable R:']]],
+  ['recursive_20definition_20variable_20r_6',['recursive definition variable R',['../index.html#autotoc_md16',1,'Setup of an initialized recursive definition variable R'],['../index.html#autotoc_md17',1,'Usage of a recursive definition variable R']]],
   ['recurvive_20definitions_20variables_7',['Using recurvive definitions variables',['../index.html#autotoc_md14',1,'']]],
   ['reg_5fcomplement_8',['reg_complement',['../regexp_8h.html#a5db57665ab834362e57afb076bb9b55c',1,'regexp.c']]],
   ['reg_5fconcat_9',['reg_concat',['../regexp_8h.html#aaa3711cc9ec44c603335fdf2813edee1',1,'regexp.c']]],
@@ -38,7 +38,7 @@ var searchData=
   ['regexp_5ftonfa_2eh_35',['regexp_tonfa.h',['../regexp__tonfa_8h.html',1,'']]],
   ['regexps_36',['regexps',['../structob__recursion.html#a3e27e9c07cca72bebc45345697a0e31e',1,'ob_recursion']]],
   ['regular_20expression_37',['Definition, of a regular expression',['../index.html#autotoc_md12',1,'']]],
-  ['regular_20expression_20stored_20in_20a_20variable_20l_3a_38',['Manipulation of a regular expression stored in a variable L:',['../index.html#autotoc_md13',1,'']]],
+  ['regular_20expression_20stored_20in_20a_20variable_20l_38',['Manipulation of a regular expression stored in a variable L',['../index.html#autotoc_md13',1,'']]],
   ['regular_20expressions_20variables_39',['Using regular expressions variables',['../index.html#autotoc_md11',1,'']]],
   ['regular_5farray_40',['regular_array',['../structgreen.html#a9ccde72f9ee98f35bcbe6dfff8536065',1,'green']]],
   ['regular_5fidems_41',['regular_idems',['../structmorphism.html#a1f04a6fbccdaa02d03929d2d4d38e217',1,'morphism']]],
