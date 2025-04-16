@@ -11,9 +11,9 @@ var searchData=
   ['decid_5fpolst_5fsep_8',['decid_polst_sep',['../sep__pol_8h.html#a39400d73a0966393cfd09c8c75880450',1,'sep_pol.c']]],
   ['decid_5fst_5fsep_9',['decid_st_sep',['../sep__group_8h.html#a43fd25633bb0c3948385e37cb3932ab4',1,'sep_group.c']]],
   ['def_10',['def',['../structob__recursion.html#a4b02743733a7f35325c83e6dd6f47214',1,'ob_recursion']]],
-  ['definition_20of_20a_20regular_20expression_11',['Definition, of a regular expression',['../index.html#autotoc_md7',1,'']]],
-  ['definition_20variable_20r_3a_12',['definition variable R:',['../index.html#autotoc_md11',1,'Setup of an initialized recursive definition variable R:'],['../index.html#autotoc_md12',1,'Usage of a recursive definition variable R:']]],
-  ['definitions_20variables_13',['Using recurvive definitions variables',['../index.html#autotoc_md9',1,'']]],
+  ['definition_20of_20a_20regular_20expression_11',['Definition, of a regular expression',['../index.html#autotoc_md12',1,'']]],
+  ['definition_20variable_20r_3a_12',['definition variable R:',['../index.html#autotoc_md16',1,'Setup of an initialized recursive definition variable R:'],['../index.html#autotoc_md17',1,'Usage of a recursive definition variable R:']]],
+  ['definitions_20variables_13',['Using recurvive definitions variables',['../index.html#autotoc_md14',1,'']]],
   ['delete_5fbarray_14',['delete_barray',['../type__boolarray_8h.html#a89919ad213a8de128905bdfb15fab8eb',1,'type_boolarray.c']]],
   ['delete_5fbinheap_15',['delete_binheap',['../type__binheap_8h.html#a64b0ca346d078392d6737c1e6c1b68e2',1,'type_binheap.c']]],
   ['delete_5fdequeue_16',['delete_dequeue',['../type__dequeue_8h.html#aef87a3abc9ed8893bd22051b10e7e21e',1,'type_dequeue.c']]],
@@ -48,7 +48,8 @@ var searchData=
   ['display_5fsyvar_5futf8_45',['display_syvar_utf8',['../regexp_8h.html#aa1e30e80bbc958492e10d8bd761ee096',1,'regexp.c']]],
   ['display_5fword_46',['display_word',['../words_8h.html#ac37cb104de3d1383de3014cc5ae1fc3c',1,'words.c']]],
   ['dlist_47',['dlist',['../structdlist.html',1,'']]],
-  ['dropped_48',['dropped',['../structnum__span__trees.html#a7bc3bcedf6b07266b08ed4ea8d7e3623',1,'num_span_trees']]],
-  ['dtarjan_49',['dtarjan',['../graphs__tarjan_8h.html#a82b3e0fa3faa0d631b8597f7b2aec36c',1,'graphs_tarjan.c']]],
-  ['dtarjan_5falph_50',['dtarjan_alph',['../graphs__tarjan_8h.html#a6f81189fc50c4f77b6932df97d122a2c',1,'graphs_tarjan.c']]]
+  ['documentation_48',['Source code documentation',['../index.html#autotoc_md3',1,'']]],
+  ['dropped_49',['dropped',['../structnum__span__trees.html#a7bc3bcedf6b07266b08ed4ea8d7e3623',1,'num_span_trees']]],
+  ['dtarjan_50',['dtarjan',['../graphs__tarjan_8h.html#a82b3e0fa3faa0d631b8597f7b2aec36c',1,'graphs_tarjan.c']]],
+  ['dtarjan_5falph_51',['dtarjan_alph',['../graphs__tarjan_8h.html#a6f81189fc50c4f77b6932df97d122a2c',1,'graphs_tarjan.c']]]
 ];

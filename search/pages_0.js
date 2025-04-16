@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['mescal_0',['Mescal',['../index.html',1,'']]]
+  ['mescal_20🌵_0',['🌵 MeSCaL 🌵',['../index.html',1,'']]]
 ];

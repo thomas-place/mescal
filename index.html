@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.13.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Mescal: Mescal</title>
+<title>Mescal: 🌵 MeSCaL 🌵</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -97,14 +97,36 @@ $(function(){initNavTree('index.html',''); initResizable(true); });
 </div>
 
 <div><div class="header">
-  <div class="headertitle"><div class="title">Mescal </div></div>
+  <div class="headertitle"><div class="title">🌵 MeSCaL 🌵 </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="md_README"></a> </p><h1 style="text-align:center;">Welcome to the help of the MeSCaL program!</h1>
-<h1><a class="anchor" id="autotoc_md0"></a>
-Basic commands</h1>
-<h2><a class="anchor" id="autotoc_md1"></a>
-General commands:</h2>
+<div class="textblock"><p><a class="anchor" id="md_README"></a></p>
+<p>**ME**mbership and **S**eparation for **C**l**A**sses of **L**anguages</p>
+<p>The aim of this program is to implement most of the known algorithms for deciding membership and separation for prominent classes of regular languages.</p>
+<h1><a class="anchor" id="autotoc_md1"></a>
+Installation</h1>
+<p>A <code>Makefile</code> is provided in the src/ folder. It creates an executable file named <code>mescal</code>, which can be executed from that directory with the shell command <code>./mescal</code>.</p>
+<h2><a class="anchor" id="autotoc_md2"></a>
+Requirements</h2>
+<p>Currently, the program is <b>experimental</b>. It works on MacOS and Linux. It depends on the following software, which can be installed through <a href="https://brew.sh">homebrew</a> on MacOS, or through apt on Ubuntu or Debian Linux.</p>
+<ul>
+<li>A C compiler (tested on OSX with Apple clang 15.0.0 to 17.0.0, hardlinked to gcc), with the readline library.</li>
+<li>The <a href="https://github.com/json-c">json-c</a> library.</li>
+<li>The <a href="https://flintlib.org">flint</a> library.</li>
+<li>flex and bison.</li>
+<li><a href="https://graphviz.org">Graphviz</a>.</li>
+<li>On MacOS: <a href="https://iterm2.com">iTerm</a> with <a href="https://iterm2.com/utilities/imgcat">imgcat</a>.</li>
+<li>On Linux: a <a href="https://www.arewesixelyet.com">sixel capable terminal</a>. Tested with <a href="https://konsole.kde.org">Konsole</a>.</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md3"></a>
+Source code documentation</h1>
+<p>A Doxygen documentation of the source code is provided <a href="https://thomas-place.github.io/mescal/">here</a>.</p>
+<h1><a class="anchor" id="autotoc_md4"></a>
+Available commands</h1>
+<h2><a class="anchor" id="autotoc_md5"></a>
+Basic commands</h2>
+<h3><a class="anchor" id="autotoc_md6"></a>
+General commands:</h3>
 <pre class="fragment">help                          This help.
 timeout                       Displays the current timeout.
 timeout = &lt;value&gt;             Sets the timeout to &lt;value&gt; seconds.
@@ -114,15 +136,15 @@ history                       Displays the current history size.
 history = &lt;value&gt;             Sets the history size to &lt;value&gt; entries.
 quit or exit                  Quits.
 classes                       Lists all classes recognized by the program.
-</pre><h2><a class="anchor" id="autotoc_md2"></a>
-Using variables:</h2>
+</pre><h3><a class="anchor" id="autotoc_md7"></a>
+Using variables:</h3>
 <pre class="fragment">&lt;variable&gt; = &lt;command&gt;        Stores a copy of the returned object in the variable.
 delete(&lt;variable&gt;)            Deletes object.
 
     Variable types: regular expression, recursive definition of regular expressions, automaton and morphism.
     Variable names: &lt;upper&gt;&lt;upper|digits&gt;*
-</pre><h2><a class="anchor" id="autotoc_md3"></a>
-Filtering commands:</h2>
+</pre><h3><a class="anchor" id="autotoc_md8"></a>
+Filtering commands:</h3>
 <pre class="fragment">list(&lt;parameters&gt;)            Lists all stored objects according to the parameters.
 regexps(&lt;parameters&gt;)         Lists all stored regular expressions according to the parameters.
 automata(&lt;parameters&gt;)        Lists all stored automata according to the parameters.
@@ -134,45 +156,45 @@ regexps(&lt;parameters&gt;)         Lists all stored recursive definitions accor
 -idempotents(&lt;n1&gt;,&lt;n2&gt;)       only lists the objects with a syntactic monoid has between n1 and n2 idempotents.
 -minimal                      displays the size of the minimal automaton.
 -minimal(&lt;n1&gt;,&lt;n2&gt;)           only lists the objects with a minimal automaton whose size is between n1 and n2.
-</pre><h2><a class="anchor" id="autotoc_md4"></a>
-Sorting commands:</h2>
+</pre><h3><a class="anchor" id="autotoc_md9"></a>
+Sorting commands:</h3>
 <pre class="fragment">sort                          Sorts all objects, lexicographically by variable name.
 sort(&lt;parameter&gt;)             Sorts all objects, according to the ordering given by the parameter.
 </pre><p><b>Available parameters:</b> </p><pre class="fragment">-syntactic                    Size of the syntactic monoid
 -minimal                      Size of the minimal automaton
-</pre><h2><a class="anchor" id="autotoc_md5"></a>
-Saving and loading:</h2>
+</pre><h3><a class="anchor" id="autotoc_md10"></a>
+Saving and loading:</h3>
 <pre class="fragment">save(&lt;command&gt;,"&lt;filename&gt;")  Saves the object returned by a command in a file.
 open("&lt;filename&gt;")            Opens and returns an object stored in a file.
 savesession("&lt;filename&gt;")     Saves all current objects in a file.
 loadsession("&lt;filename&gt;")     Loads all current objects from a file.
-</pre><h1><a class="anchor" id="autotoc_md6"></a>
-Using regular expressions variables</h1>
-<h2><a class="anchor" id="autotoc_md7"></a>
-Definition, of a regular expression</h2>
+</pre><h2><a class="anchor" id="autotoc_md11"></a>
+Using regular expressions variables</h2>
+<h3><a class="anchor" id="autotoc_md12"></a>
+Definition, of a regular expression</h3>
 <pre class="fragment">"&lt;regexp&gt;"
 
 Syntax of regexps:
    e := e + e | e e | e* | !e | (e) | e &amp; e | \1 | \0
  where,
    0 = ∅, 1 = ε, ! = complement, &amp; = ∩
-</pre><h2><a class="anchor" id="autotoc_md8"></a>
-Manipulation of a regular expression stored in a variable L:</h2>
+</pre><h3><a class="anchor" id="autotoc_md13"></a>
+Manipulation of a regular expression stored in a variable L:</h3>
 <pre class="fragment">L                             Displays the regular expression.
-L.minimal                     The minimal automaton: works as an automata variable.
+L.minimal                     The minimal automaton: works as an automaton variable.
 L.syntactic                   The syntactic morphism: works as a morphism variable.
 thomson(L)                    Uses the Thomson algorithm to compute a NFA.
 glushkov(L)                   Uses the Glushkov algorithm to compute a NFA.
-</pre><h1><a class="anchor" id="autotoc_md9"></a>
-Using recurvive definitions variables</h1>
-<h2><a class="anchor" id="autotoc_md10"></a>
-Initialization:</h2>
+</pre><h2><a class="anchor" id="autotoc_md14"></a>
+Using recurvive definitions variables</h2>
+<h3><a class="anchor" id="autotoc_md15"></a>
+Initialization:</h3>
 <pre class="fragment">initrecursion(&lt;n&gt;,&lt;v1&gt;,...)   Returns an initialized recursive definition variable.
                               &lt;n&gt; is the largest index that has to be specified by the user.
                               &lt;v1&gt;,... is a list of variable names denoting the relations used in the recursive definition.
                               Example: R = initrecursion(0,L)
-</pre><h2><a class="anchor" id="autotoc_md11"></a>
-Setup of an initialized recursive definition variable R:</h2>
+</pre><h3><a class="anchor" id="autotoc_md16"></a>
+Setup of an initialized recursive definition variable R:</h3>
 <pre class="fragment">E.&lt;v&gt;[&lt;n&gt;] = &lt;regexp&gt;         Defines the initial case &lt;n&gt; of the relation &lt;v&gt;.
                               (&lt;n&gt; must be smaller than the maximum index specified in the initialization).
                               Example: R.L[0] = "\1"
@@ -183,18 +205,20 @@ E.&lt;v&gt;[i] = &lt;symbolic regexp&gt;  Defines the recursion of the relation 
 </pre><p><b>Syntax of symbolic regexps:</b> </p><pre class="fragment">e := e + e | e e | e* | !e | (e) | e &amp; e | \1 | \0 | a[i - &lt;n&gt;] | {&lt;v&gt;}[i - &lt;n&gt;]
     where,
 0 = ∅, 1 = ε, ! = complement, &amp; = ∩, a[i - &lt;n&gt;] = symbolic letter, {&lt;v&gt;}[i - &lt;n&gt;] = symbolic variable
-</pre><h2><a class="anchor" id="autotoc_md12"></a>
-Usage of a recursive definition variable R:</h2>
+</pre><h3><a class="anchor" id="autotoc_md17"></a>
+Usage of a recursive definition variable R:</h3>
 <pre class="fragment">R                             Displays the recursive definition and checks if it is well-defined.
 R.&lt;v&gt;[&lt;n&gt;]                    Returns the regular expression of index &lt;n&gt; for the relation &lt;v&gt;.
                               (can be copied into a regular expression variable).
-</pre><h1><a class="anchor" id="autotoc_md13"></a>
-Using automata variables</h1>
-<h2><a class="anchor" id="autotoc_md14"></a>
-Manipulation of an automaton stored in a variable A:</h2>
+</pre><h2><a class="anchor" id="autotoc_md18"></a>
+Using variables representing automata</h2>
+<h3><a class="anchor" id="autotoc_md19"></a>
+Manipulation of an automaton stored in a variable A:</h3>
 <pre class="fragment">A                             Displays the automaton.
-A.minimal                     The minimal automaton: works as an automata variable.
+A.minimal                     The minimal automaton: works as an automaton variable.
+latex(A.minimal)              The minimal automaton, printed in LaTeX.
 A.syntactic                   The syntactic morphism: works as a morphism variable.
+latex(A.syntactic)            The right Cayley graph of the minimal automaton, printed in LaTeX.
 elimepsilon(A)                Builds a new automaton by eliminating the epsilon transitions.
 trim(A)                       Builds a new automaton by eliminating the tates that are not accessible or co-accessible.
 union(A1,A2)                  Builds a new automaton by making a nondeterministic union.
@@ -211,10 +235,10 @@ iextension(A)                 Applies inverse extension to the automaton (does n
 dyckextension(A)              Builds a new automaton via Dyck extension.
 counterfree(A)                Tests if the automaton is a counterfree DFA.
 permutation(A)                Tests if the automaton is a permutation DFA.
-</pre><h1><a class="anchor" id="autotoc_md15"></a>
-Using morphisms variables</h1>
-<h2><a class="anchor" id="autotoc_md16"></a>
-Manipulation of a morphism stored in a variable M:</h2>
+</pre><h2><a class="anchor" id="autotoc_md20"></a>
+Using morphisms variables</h2>
+<h3><a class="anchor" id="autotoc_md21"></a>
+Manipulation of a morphism stored in a variable M:</h3>
 <pre class="fragment">M                             Displays the Green relations of the monoid.
 rcayley(M)                    Displays the right Cayley graph of the morphism.
 lcayley(M)                    Displays the left Cayley graph of the morphism.
@@ -229,8 +253,8 @@ orbit(𝒞,M,e)                  Displays the 𝒞-orbit of the idempotent e for
 orbit(OP,𝒞,M)                 Displays the OP(𝒞)-orbits for the morphism (implemented for OP = BPol, TL and 𝒞 = ST, DD, MOD, MOD⁺, GR, GR⁺).
 orbit(OP,𝒞,M,e)               Displays the OP(𝒞)-orbits of the idempotent e for the morphism (implemented for OP = BPol, TL and 𝒞 = ST, DD, MOD, MOD⁺, GR, GR⁺).
 image(M,"&lt;word&gt;")             Computes the image of an input word.
-</pre><h1><a class="anchor" id="autotoc_md17"></a>
-Membership tests</h1>
+</pre><h2><a class="anchor" id="autotoc_md22"></a>
+Membership tests</h2>
 <pre class="fragment">- membership(𝒞,&lt;object&gt;)                            
       Checks if the language recognized by the object belongs to 𝒞 (example: membership(Pol(GR),L)).
 - exall(𝒞,𝒟,&lt;n1&gt;,&lt;n2&gt;)                              
@@ -239,8 +263,8 @@ Membership tests</h1>
 - exall(out(𝒞₁,..,𝒞ₙ),in(𝒟₁,..,𝒟ₘ),&lt;n1&gt;,&lt;n2&gt;)
       Computes and stores in variables all DFAs with at most &lt;n1&gt; states (plus a sink state) 
       and &lt;n2&gt; letters which are outside 𝒞₁,..,𝒞ₙ and inside 𝒟₁,..,𝒟ₘ.
-</pre><h2><a class="anchor" id="autotoc_md18"></a>
-Available classes 𝒞:</h2>
+</pre><h3><a class="anchor" id="autotoc_md23"></a>
+Available classes 𝒞:</h3>
 <pre class="fragment">- ST      Trivial class.
 - DD      Well-suited extension of ST (DD = ST⁺).
 - MOD     Modulo languages.
@@ -257,8 +281,8 @@ Available classes 𝒞:</h2>
 - PT      Piecewise testable languages.
 - SF      Star-free languages.
 - UL      Unambiguous languages.
-</pre><h2><a class="anchor" id="autotoc_md19"></a>
-Available operators OP</h2>
+</pre><h3><a class="anchor" id="autotoc_md24"></a>
+Available operators OP</h3>
 <pre class="fragment">- Pol     Polynomial closure : 𝒞 ↦ Pol(𝒞).
 - BPol    Boolean polynomial closure : 𝒞 ↦ BPol(𝒞).
 - UBPol   Combined operator : 𝒞 ↦ UPol(BPol(𝒞)).
@@ -276,23 +300,23 @@ Available operators OP</h2>
 chierarchies(&lt;object&gt;)        Summary of membership tests for the language recognized by the object in concatenation hierarchies.
 nhierarchies(𝒞,&lt;object&gt;)      If the language recognized by the object belongs to TL(𝒞), determines its level in the negation hierarchy of TL(𝒞).
 fphierarchies(𝒞,&lt;object&gt;)     If the language recognized by the object belongs to TL(𝒞), determines its level in the future/past hierarchy of TL(𝒞).
-</pre><h2><a class="anchor" id="autotoc_md20"></a>
-Available input classes 𝒞 for negation hierarchies and future/past hierarchies:</h2>
+</pre><h3><a class="anchor" id="autotoc_md25"></a>
+Available input classes 𝒞 for negation hierarchies and future/past hierarchies:</h3>
 <pre class="fragment">- ST      Trivial class.
 - DD      Well-suited extension of ST (DD = ST⁺).
 - MOD     Modulo languages.
 - MODP    Well-suited extension of the modulo languages (MODP = MOD⁺).
 - GR      Group languages.
-</pre><h1><a class="anchor" id="autotoc_md21"></a>
-Separation tests</h1>
+</pre><h2><a class="anchor" id="autotoc_md26"></a>
+Separation tests</h2>
 <pre class="fragment">- separ(𝒞,&lt;o1&gt;,&lt;o2&gt;,(info))     Checks if &lt;o1&gt; is 𝒞-separable from &lt;o2&gt; ("info" is an optional parameter, it asks for more details).
-</pre><h2><a class="anchor" id="autotoc_md22"></a>
-Available classes 𝒞:</h2>
+</pre><h3><a class="anchor" id="autotoc_md27"></a>
+Available classes 𝒞:</h3>
 <pre class="fragment">- ST      Trivial class.
 - MOD     Modulo languages.
 - GR      Group languages.
-</pre><h2><a class="anchor" id="autotoc_md23"></a>
-Available operators OP:</h2>
+</pre><h3><a class="anchor" id="autotoc_md28"></a>
+Available operators OP:</h3>
 <pre class="fragment">- Pol     Polynomial closure (𝒞 ↦ Pol(𝒞)).
 </pre> </div></div><!-- PageDoc -->
 <a href="doxygen_crawl.html"></a>

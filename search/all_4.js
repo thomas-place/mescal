@@ -10,8 +10,8 @@ var searchData=
   ['error_2eh_7',['error.h',['../error_8h.html',1,'']]],
   ['evalseq_8',['evalseq',['../structob__recursion.html#a8d798862b76c8ddd6e333107a72b3fdc',1,'ob_recursion']]],
   ['exp_9',['exp',['../structobject.html#ae39393bd51ba4112d2d115ae4cb6d72a',1,'object']]],
-  ['expression_10',['Definition, of a regular expression',['../index.html#autotoc_md7',1,'']]],
-  ['expression_20stored_20in_20a_20variable_20l_3a_11',['Manipulation of a regular expression stored in a variable L:',['../index.html#autotoc_md8',1,'']]],
-  ['expressions_20variables_12',['Using regular expressions variables',['../index.html#autotoc_md6',1,'']]],
+  ['expression_10',['Definition, of a regular expression',['../index.html#autotoc_md12',1,'']]],
+  ['expression_20stored_20in_20a_20variable_20l_3a_11',['Manipulation of a regular expression stored in a variable L:',['../index.html#autotoc_md13',1,'']]],
+  ['expressions_20variables_12',['Using regular expressions variables',['../index.html#autotoc_md11',1,'']]],
   ['expsize_13',['EXPSIZE',['../files_8h.html#a38acc5b2a958ef6a1e7bbe8cfeba86c2',1,'files.h']]]
 ];

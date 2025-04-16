@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['general_20commands_3a_0',['General commands:',['../index.html#autotoc_md1',1,'']]],
+  ['general_20commands_3a_0',['General commands:',['../index.html#autotoc_md6',1,'']]],
   ['get_5falphabet_5fword_1',['get_alphabet_word',['../words_8h.html#a4b230932531eaa42e105d4e5bf9ac193',1,'words.c']]],
   ['get_5famt_5fkernel_2',['get_amt_kernel',['../monoid__kernels_8h.html#a1dfe3ace499a7f927418c7b06b97cd00',1,'monoid_kernels.c']]],
   ['get_5fgrp_5fkernel_3',['get_grp_kernel',['../monoid__kernels_8h.html#aebe5cf3600ecbf357b660ed4c4ef82fd',1,'monoid_kernels.c']]],
