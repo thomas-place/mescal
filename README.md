@@ -100,7 +100,7 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
 ### Manipulation of a regular expression stored in a variable L:
 
     L                             Displays the regular expression.
-    L.minimal                     The minimal automaton: works as an automata variable.
+    L.minimal                     The minimal automaton: works as an automaton variable.
     L.syntactic                   The syntactic morphism: works as a morphism variable.
     thomson(L)                    Uses the Thomson algorithm to compute a NFA.
     glushkov(L)                   Uses the Glushkov algorithm to compute a NFA.
@@ -137,13 +137,15 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
     R.<v>[<n>]                    Returns the regular expression of index <n> for the relation <v>.
                                   (can be copied into a regular expression variable).
 
-## Using automata variables
+## Using variables representing automata
 
 ### Manipulation of an automaton stored in a variable A:
 
     A                             Displays the automaton.
-    A.minimal                     The minimal automaton: works as an automata variable.
+    A.minimal                     The minimal automaton: works as an automaton variable.
+    latex(A.minimal)              The minimal automaton, printed in LaTeX.
     A.syntactic                   The syntactic morphism: works as a morphism variable.
+    latex(A.syntactic)            The right Cayley graph of the minimal automaton, printed in LaTeX.
     elimepsilon(A)                Builds a new automaton by eliminating the epsilon transitions.
     trim(A)                       Builds a new automaton by eliminating the tates that are not accessible or co-accessible.
     union(A1,A2)                  Builds a new automaton by making a nondeterministic union.
