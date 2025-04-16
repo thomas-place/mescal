@@ -1,8 +1,37 @@
-<h1 style="text-align:center;">Welcome to the help of the MeSCaL program!</h1>
 
-# Basic commands
+# 🌵 MeSCaL 🌵
 
-## General commands:
+**ME**mbership and **S**eparation for **C**l**A**sses of **L**anguages 
+
+
+The aim of this program is to implement most of the known algorithms for deciding membership and separation for prominent classes of regular languages.
+
+# Installation
+
+A `Makefile` is provided in the src/ folder. It creates an executable file named `mescal`, which can be executed from that directory with the shell command `./mescal`.
+
+## Requirements
+
+Currently, the program is **experimental**. It works on MacOS and Linux. It depends on the following software, which can be installed through  [homebrew](https://brew.sh) on MacOS, or through apt on Ubuntu or Debian Linux.
+
++ A C compiler (tested on OSX with Apple clang 15.0.0 to 17.0.0, hardlinked to gcc), with the readline library.
++ The [json-c](https://github.com/json-c) library.
++ The [flint](https://flintlib.org) library.
++ flex and bison.
++ [Graphviz](https://graphviz.org).
++ On MacOS: [iTerm](https://iterm2.com) with [imgcat](https://iterm2.com/utilities/imgcat).
++ On Linux: a [sixel capable terminal](https://www.arewesixelyet.com). Tested with [Konsole](https://konsole.kde.org).
+
+# Source code documentation
+
+A Doxygen documentation of the source code is provided [here](https://thomas-place.github.io/mescal/).
+
+# Available commands
+
+
+## Basic commands
+
+### General commands:
 
     help                          This help.
     timeout                       Displays the current timeout.
@@ -14,7 +43,7 @@
     quit or exit                  Quits.
     classes                       Lists all classes recognized by the program.
 
-## Using variables:
+### Using variables:
 
     <variable> = <command>        Stores a copy of the returned object in the variable.
     delete(<variable>)            Deletes object.
@@ -22,7 +51,7 @@
         Variable types: regular expression, recursive definition of regular expressions, automaton and morphism.
         Variable names: <upper><upper|digits>*
 
-## Filtering commands:
+### Filtering commands:
 
     list(<parameters>)            Lists all stored objects according to the parameters.
     regexps(<parameters>)         Lists all stored regular expressions according to the parameters.
@@ -40,7 +69,7 @@
     -minimal(<n1>,<n2>)           only lists the objects with a minimal automaton whose size is between n1 and n2.
 
 
-## Sorting commands:
+### Sorting commands:
 
     sort                          Sorts all objects, lexicographically by variable name.
     sort(<parameter>)             Sorts all objects, according to the ordering given by the parameter.
@@ -50,16 +79,16 @@
     -syntactic                    Size of the syntactic monoid
     -minimal                      Size of the minimal automaton
 
-## Saving and loading:
+### Saving and loading:
 
     save(<command>,"<filename>")  Saves the object returned by a command in a file.
     open("<filename>")            Opens and returns an object stored in a file.
     savesession("<filename>")     Saves all current objects in a file.
     loadsession("<filename>")     Loads all current objects from a file.
 
-# Using regular expressions variables
+## Using regular expressions variables
 
-## Definition, of a regular expression
+### Definition, of a regular expression
 
     "<regexp>"
 
@@ -68,17 +97,17 @@
      where,
        0 = ∅, 1 = ε, ! = complement, & = ∩
 
-## Manipulation of a regular expression stored in a variable L:
+### Manipulation of a regular expression stored in a variable L:
 
     L                             Displays the regular expression.
-    L.minimal                     The minimal automaton: works as an automata variable.
+    L.minimal                     The minimal automaton: works as an automaton variable.
     L.syntactic                   The syntactic morphism: works as a morphism variable.
     thomson(L)                    Uses the Thomson algorithm to compute a NFA.
     glushkov(L)                   Uses the Glushkov algorithm to compute a NFA.
 
-# Using recurvive definitions variables
+## Using recurvive definitions variables
 
-## Initialization:
+### Initialization:
 
     initrecursion(<n>,<v1>,...)   Returns an initialized recursive definition variable.
                                   <n> is the largest index that has to be specified by the user.
@@ -86,7 +115,7 @@
                                   Example: R = initrecursion(0,L)
 
 
-## Setup of an initialized recursive definition variable R:
+### Setup of an initialized recursive definition variable R:
 
     E.<v>[<n>] = <regexp>         Defines the initial case <n> of the relation <v>.
                                   (<n> must be smaller than the maximum index specified in the initialization).
@@ -102,19 +131,21 @@
         where,
     0 = ∅, 1 = ε, ! = complement, & = ∩, a[i - <n>] = symbolic letter, {<v>}[i - <n>] = symbolic variable
 
-## Usage of a recursive definition variable R:
+### Usage of a recursive definition variable R:
 
     R                             Displays the recursive definition and checks if it is well-defined.
     R.<v>[<n>]                    Returns the regular expression of index <n> for the relation <v>.
                                   (can be copied into a regular expression variable).
 
-# Using automata variables
+## Using variables representing automata
 
-## Manipulation of an automaton stored in a variable A:
+### Manipulation of an automaton stored in a variable A:
 
     A                             Displays the automaton.
-    A.minimal                     The minimal automaton: works as an automata variable.
+    A.minimal                     The minimal automaton: works as an automaton variable.
+    latex(A.minimal)              The minimal automaton, printed in LaTeX.
     A.syntactic                   The syntactic morphism: works as a morphism variable.
+    latex(A.syntactic)            The right Cayley graph of the minimal automaton, printed in LaTeX.
     elimepsilon(A)                Builds a new automaton by eliminating the epsilon transitions.
     trim(A)                       Builds a new automaton by eliminating the tates that are not accessible or co-accessible.
     union(A1,A2)                  Builds a new automaton by making a nondeterministic union.
@@ -132,9 +163,9 @@
     counterfree(A)                Tests if the automaton is a counterfree DFA.
     permutation(A)                Tests if the automaton is a permutation DFA.
 
-# Using morphisms variables
+## Using morphisms variables
 
-## Manipulation of a morphism stored in a variable M:
+### Manipulation of a morphism stored in a variable M:
 
     M                             Displays the Green relations of the monoid.
     rcayley(M)                    Displays the right Cayley graph of the morphism.
@@ -151,7 +182,7 @@
     orbit(OP,𝒞,M,e)               Displays the OP(𝒞)-orbits of the idempotent e for the morphism (implemented for OP = BPol, TL and 𝒞 = ST, DD, MOD, MOD⁺, GR, GR⁺).
     image(M,"<word>")             Computes the image of an input word.
 
-# Membership tests
+## Membership tests
 
     - membership(𝒞,<object>)                            
           Checks if the language recognized by the object belongs to 𝒞 (example: membership(Pol(GR),L)).
@@ -162,7 +193,7 @@
           Computes and stores in variables all DFAs with at most <n1> states (plus a sink state) 
           and <n2> letters which are outside 𝒞₁,..,𝒞ₙ and inside 𝒟₁,..,𝒟ₘ.
 
-## Available classes 𝒞:
+### Available classes 𝒞:
 
     - ST      Trivial class.
     - DD      Well-suited extension of ST (DD = ST⁺).
@@ -181,7 +212,7 @@
     - SF      Star-free languages.
     - UL      Unambiguous languages.
 
-## Available operators OP
+### Available operators OP
 
     - Pol     Polynomial closure : 𝒞 ↦ Pol(𝒞).
     - BPol    Boolean polynomial closure : 𝒞 ↦ BPol(𝒞).
@@ -201,7 +232,7 @@
     nhierarchies(𝒞,<object>)      If the language recognized by the object belongs to TL(𝒞), determines its level in the negation hierarchy of TL(𝒞).
     fphierarchies(𝒞,<object>)     If the language recognized by the object belongs to TL(𝒞), determines its level in the future/past hierarchy of TL(𝒞).
 
-## Available input classes 𝒞 for negation hierarchies and future/past hierarchies:
+### Available input classes 𝒞 for negation hierarchies and future/past hierarchies:
 
     - ST      Trivial class.
     - DD      Well-suited extension of ST (DD = ST⁺).
@@ -209,17 +240,17 @@
     - MODP    Well-suited extension of the modulo languages (MODP = MOD⁺).
     - GR      Group languages.
 
-# Separation tests
+## Separation tests
 
     - separ(𝒞,<o1>,<o2>,(info))     Checks if <o1> is 𝒞-separable from <o2> ("info" is an optional parameter, it asks for more details).
 
-## Available classes 𝒞:
+### Available classes 𝒞:
 
     - ST      Trivial class.
     - MOD     Modulo languages.
     - GR      Group languages.
 
-## Available operators OP:
+### Available operators OP:
 
     - Pol     Polynomial closure (𝒞 ↦ Pol(𝒞)).
 
