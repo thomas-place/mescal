@@ -31,7 +31,7 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
 
 ## Basic commands
 
-### General commands:
+### General commands
 
     help                          This help.
     timeout                       Displays the current timeout.
@@ -43,7 +43,7 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
     quit or exit                  Quits.
     classes                       Lists all classes recognized by the program.
 
-### Using variables:
+### Using variables
 
     <variable> = <command>        Stores a copy of the returned object in the variable.
     delete(<variable>)            Deletes object.
@@ -51,7 +51,7 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
         Variable types: regular expression, recursive definition of regular expressions, automaton and morphism.
         Variable names: <upper><upper|digits>*
 
-### Filtering commands:
+### Filtering commands
 
     list(<parameters>)            Lists all stored objects according to the parameters.
     regexps(<parameters>)         Lists all stored regular expressions according to the parameters.
@@ -69,7 +69,7 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
     -minimal(<n1>,<n2>)           only lists the objects with a minimal automaton whose size is between n1 and n2.
 
 
-### Sorting commands:
+### Sorting commands
 
     sort                          Sorts all objects, lexicographically by variable name.
     sort(<parameter>)             Sorts all objects, according to the ordering given by the parameter.
@@ -79,7 +79,7 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
     -syntactic                    Size of the syntactic monoid
     -minimal                      Size of the minimal automaton
 
-### Saving and loading:
+### Saving and loading
 
     save(<command>,"<filename>")  Saves the object returned by a command in a file.
     open("<filename>")            Opens and returns an object stored in a file.
@@ -97,7 +97,7 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
      where,
        0 = ∅, 1 = ε, ! = complement, & = ∩
 
-### Manipulation of a regular expression stored in a variable L:
+### Manipulation of a regular expression stored in a variable L
 
     L                             Displays the regular expression.
     L.minimal                     The minimal automaton: works as an automaton variable.
@@ -107,7 +107,7 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
 
 ## Using recurvive definitions variables
 
-### Initialization:
+### Initialization
 
     initrecursion(<n>,<v1>,...)   Returns an initialized recursive definition variable.
                                   <n> is the largest index that has to be specified by the user.
@@ -115,7 +115,7 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
                                   Example: R = initrecursion(0,L)
 
 
-### Setup of an initialized recursive definition variable R:
+### Setup of an initialized recursive definition variable R
 
     E.<v>[<n>] = <regexp>         Defines the initial case <n> of the relation <v>.
                                   (<n> must be smaller than the maximum index specified in the initialization).
@@ -131,7 +131,7 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
         where,
     0 = ∅, 1 = ε, ! = complement, & = ∩, a[i - <n>] = symbolic letter, {<v>}[i - <n>] = symbolic variable
 
-### Usage of a recursive definition variable R:
+### Usage of a recursive definition variable R
 
     R                             Displays the recursive definition and checks if it is well-defined.
     R.<v>[<n>]                    Returns the regular expression of index <n> for the relation <v>.
@@ -139,7 +139,7 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
 
 ## Using variables representing automata
 
-### Manipulation of an automaton stored in a variable A:
+### Manipulation of an automaton stored in a variable A
 
     A                             Displays the automaton.
     A.minimal                     The minimal automaton: works as an automaton variable.
@@ -165,7 +165,7 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
 
 ## Using morphisms variables
 
-### Manipulation of a morphism stored in a variable M:
+### Manipulation of a morphism stored in a variable M
 
     M                             Displays the Green relations of the monoid.
     rcayley(M)                    Displays the right Cayley graph of the morphism.
@@ -193,7 +193,7 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
           Computes and stores in variables all DFAs with at most <n1> states (plus a sink state) 
           and <n2> letters which are outside 𝒞₁,..,𝒞ₙ and inside 𝒟₁,..,𝒟ₘ.
 
-### Available classes 𝒞:
+### Available classes 𝒞
 
     - ST      Trivial class.
     - DD      Well-suited extension of ST (DD = ST⁺).
@@ -232,7 +232,7 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
     nhierarchies(𝒞,<object>)      If the language recognized by the object belongs to TL(𝒞), determines its level in the negation hierarchy of TL(𝒞).
     fphierarchies(𝒞,<object>)     If the language recognized by the object belongs to TL(𝒞), determines its level in the future/past hierarchy of TL(𝒞).
 
-### Available input classes 𝒞 for negation hierarchies and future/past hierarchies:
+### Available input classes 𝒞 for negation hierarchies and future/past hierarchies
 
     - ST      Trivial class.
     - DD      Well-suited extension of ST (DD = ST⁺).
@@ -244,13 +244,13 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
 
     - separ(𝒞,<o1>,<o2>,(info))     Checks if <o1> is 𝒞-separable from <o2> ("info" is an optional parameter, it asks for more details).
 
-### Available classes 𝒞:
+### Available classes 𝒞
 
     - ST      Trivial class.
     - MOD     Modulo languages.
     - GR      Group languages.
 
-### Available operators OP:
+### Available operators OP
 
     - Pol     Polynomial closure (𝒞 ↦ Pol(𝒞)).
 
