@@ -14,12 +14,14 @@ var searchData=
   ['peekmin_5fbinheap_11',['peekmin_binheap',['../type__binheap_8h.html#aa4f2934905198674e78e603e135e0c35',1,'type_binheap.c']]],
   ['plus_12',['PLUS',['../regexp_8h.html#a945e1b6cec6225bade72691d362c68faa87fe59ef12c3d13dc2a4d14c9b16c1f9',1,'regexp.h']]],
   ['popmin_5fbinheap_13',['popmin_binheap',['../type__binheap_8h.html#ab822791090ff4a210f049aa6c3021b30',1,'type_binheap.c']]],
-  ['previous_14',['previous',['../structdcell.html#a072f56daad198c9fce3fdaaa0798a5c0',1,'dcell']]],
-  ['print_5fclasses_15',['print_classes',['../shell__help_8h.html#a007a2e5d29be043cc665e774e775071d',1,'shell_help.c']]],
-  ['print_5fcommand_16',['print_command',['../shell__keywords_8h.html#ad6f0e7ab10a0f087d22e57c8d85b0a10',1,'shell_keywords.c']]],
-  ['print_5fdequeue_17',['print_dequeue',['../type__dequeue_8h.html#a50e37bb5e40b11842febb0cd0b04a1c0',1,'type_dequeue.c']]],
-  ['print_5ferror_18',['PRINT_ERROR',['../error_8h.html#aa9e84097935649043db7912bb37623d4',1,'error.h']]],
-  ['print_5fstring_5fchain_19',['print_string_chain',['../shell__keywords_8h.html#acef8a133f633c9f7f33843ad43c7d32f',1,'shell_keywords.c']]],
-  ['print_5fufind_20',['print_ufind',['../type__partitions_8h.html#acfc5afeeb214b546ebb18a1fe762e12e',1,'type_partitions.c']]],
-  ['push_5fbinheap_21',['push_binheap',['../type__binheap_8h.html#a204817a758dfdbe52c64e7bb8ad0bd82',1,'type_binheap.c']]]
+  ['pred_5fele_14',['pred_ele',['../structmorphism__state.html#a6b5b00629349c5e7083100de4645537f',1,'morphism_state::pred_ele'],['../structmorphism.html#a9003f9d61aab77deb598cd0310db137b',1,'morphism::pred_ele']]],
+  ['pred_5flab_15',['pred_lab',['../structmorphism__state.html#a3e402974a5f81f261e3e979283dd9df5',1,'morphism_state::pred_lab'],['../structmorphism.html#a2d9aa783afb4af022d013a24b8ec26f4',1,'morphism::pred_lab']]],
+  ['previous_16',['previous',['../structdcell.html#a072f56daad198c9fce3fdaaa0798a5c0',1,'dcell']]],
+  ['print_5fclasses_17',['print_classes',['../shell__help_8h.html#a007a2e5d29be043cc665e774e775071d',1,'shell_help.c']]],
+  ['print_5fcommand_18',['print_command',['../shell__keywords_8h.html#ad6f0e7ab10a0f087d22e57c8d85b0a10',1,'shell_keywords.c']]],
+  ['print_5fdequeue_19',['print_dequeue',['../type__dequeue_8h.html#a50e37bb5e40b11842febb0cd0b04a1c0',1,'type_dequeue.c']]],
+  ['print_5ferror_20',['PRINT_ERROR',['../error_8h.html#aa9e84097935649043db7912bb37623d4',1,'error.h']]],
+  ['print_5fstring_5fchain_21',['print_string_chain',['../shell__keywords_8h.html#acef8a133f633c9f7f33843ad43c7d32f',1,'shell_keywords.c']]],
+  ['print_5fufind_22',['print_ufind',['../type__partitions_8h.html#acfc5afeeb214b546ebb18a1fe762e12e',1,'type_partitions.c']]],
+  ['push_5fbinheap_23',['push_binheap',['../type__binheap_8h.html#a204817a758dfdbe52c64e7bb8ad0bd82',1,'type_binheap.c']]]
 ];

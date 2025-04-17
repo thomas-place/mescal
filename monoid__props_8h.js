@@ -26,6 +26,7 @@ var monoid__props_8h =
     [ "is_gtrivial_mono", "monoid__props_8h.html#a42fa4a242e9607b25fe75134bd62461c", null ],
     [ "is_gtrivial_orbmono", "monoid__props_8h.html#aab1124394cd7f2be183a5d8bc610330d", null ],
     [ "is_gtrivial_subsemi", "monoid__props_8h.html#acac72a33974e7e813a64a4fb4489ad22", null ],
+    [ "is_htrivial_generators", "monoid__props_8h.html#a4d0488c58418ebcc6b819c40cf17666a", null ],
     [ "is_idem_mono", "monoid__props_8h.html#a7d35914f7836be3982414371d9cefb08", null ],
     [ "is_idem_orbmono", "monoid__props_8h.html#ad62f66b209b902e2399f353704b350ef", null ],
     [ "is_idem_subsemi", "monoid__props_8h.html#a359574c8bd11ebe72be7cf0b311a93a2", null ],

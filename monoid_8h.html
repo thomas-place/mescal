@@ -204,6 +204,9 @@ uint&#160;</td><td class="memItemRight" valign="bottom"><b>mor_regular_jclass</b
 <tr class="memitem:a482b68680d6e85a65b3c76a2874ecb2e" id="r_a482b68680d6e85a65b3c76a2874ecb2e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdequeue.html">dequeue</a> **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a482b68680d6e85a65b3c76a2874ecb2e">mor_compute_order</a> (<a class="el" href="structmorphism.html">morphism</a> *)</td></tr>
 <tr class="memdesc:a482b68680d6e85a65b3c76a2874ecb2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computation of the syntactic order table of a morphism.  <br /></td></tr>
 <tr class="separator:a482b68680d6e85a65b3c76a2874ecb2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55a94930d406819cdf607b8eccd48280" id="r_a55a94930d406819cdf607b8eccd48280"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdequeue.html">dequeue</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a55a94930d406819cdf607b8eccd48280">mor_name</a> (<a class="el" href="structmorphism.html">morphism</a> *, uint)</td></tr>
+<tr class="memdesc:a55a94930d406819cdf607b8eccd48280"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the name of an element (product of generators) in a dequeue.  <br /></td></tr>
+<tr class="separator:a55a94930d406819cdf607b8eccd48280"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e19682eb70d4b85aea8d7a49e4ef626" id="r_a9e19682eb70d4b85aea8d7a49e4ef626"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9e19682eb70d4b85aea8d7a49e4ef626">mor_mult</a> (<a class="el" href="structmorphism.html">morphism</a> *, uint, uint)</td></tr>
 <tr class="memdesc:a9e19682eb70d4b85aea8d7a49e4ef626"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multiplication of two elements.  <br /></td></tr>
 <tr class="separator:a9e19682eb70d4b85aea8d7a49e4ef626"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -808,6 +811,37 @@ uint&#160;</td><td class="memItemRight" valign="bottom"><b>mor_regular_jclass</b
     <tr><td class="paramname">M</td><td>The morphism.  </td></tr>
     <tr><td class="paramname">n</td><td>The number of elements to multiply.  </td></tr>
     <tr><td class="paramname">...</td><td>The elements. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a55a94930d406819cdf607b8eccd48280" name="a55a94930d406819cdf607b8eccd48280"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a55a94930d406819cdf607b8eccd48280">&#9670;&#160;</a></span>mor_name()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdequeue.html">dequeue</a> * mor_name </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structmorphism.html">morphism</a> *</td>          <td class="paramname"><span class="paramname"><em>M</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>q</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return the name of an element (product of generators) in a dequeue. </p>
+<dl class="section return"><dt>Returns</dt><dd>The name of the element. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">M</td><td>The morphism.  </td></tr>
+    <tr><td class="paramname">q</td><td>The element. </td></tr>
   </table>
   </dd>
 </dl>

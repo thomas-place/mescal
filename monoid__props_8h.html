@@ -186,6 +186,9 @@ Functions</h2></td></tr>
 <tr class="memitem:aab1124394cd7f2be183a5d8bc610330d" id="r_aab1124394cd7f2be183a5d8bc610330d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aab1124394cd7f2be183a5d8bc610330d">is_gtrivial_orbmono</a> (<a class="el" href="structorbits.html">orbits</a> *, <a class="el" href="#aac883de93546a5ab139a747b0099bffb">green_relation</a>, uint *)</td></tr>
 <tr class="memdesc:aab1124394cd7f2be183a5d8bc610330d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tests if all orbits are P-trivial where P is one of the four Green relations (H,R,L,J).  <br /></td></tr>
 <tr class="separator:aab1124394cd7f2be183a5d8bc610330d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d0488c58418ebcc6b819c40cf17666a" id="r_a4d0488c58418ebcc6b819c40cf17666a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4d0488c58418ebcc6b819c40cf17666a">is_htrivial_generators</a> (<a class="el" href="structmorphism.html">morphism</a> *, uint *)</td></tr>
+<tr class="memdesc:a4d0488c58418ebcc6b819c40cf17666a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tests if the H-classes of 1 and all generators are trivial.  <br /></td></tr>
+<tr class="separator:a4d0488c58418ebcc6b819c40cf17666a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac3de28c75e33a2cea875be78c0a5816b" id="r_ac3de28c75e33a2cea875be78c0a5816b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac3de28c75e33a2cea875be78c0a5816b">is_da_mono</a> (<a class="el" href="structmorphism.html">morphism</a> *, uint *)</td></tr>
 <tr class="memdesc:ac3de28c75e33a2cea875be78c0a5816b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tests if a monoid is in DA.  <br /></td></tr>
 <tr class="separator:ac3de28c75e33a2cea875be78c0a5816b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -910,6 +913,38 @@ If the test fails and the second parameter is not NULL, it will be set to a coun
   <table class="params">
     <tr><td class="paramname">S</td><td>Le subsemigroup.  </td></tr>
     <tr><td class="paramname">P</td><td>The relation to test (H,R,L or J).  </td></tr>
+    <tr><td class="paramname">c</td><td>Pointer on a uint array to return a counterexample. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a4d0488c58418ebcc6b819c40cf17666a" name="a4d0488c58418ebcc6b819c40cf17666a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d0488c58418ebcc6b819c40cf17666a">&#9670;&#160;</a></span>is_htrivial_generators()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool is_htrivial_generators </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structmorphism.html">morphism</a> *</td>          <td class="paramname"><span class="paramname"><em>M</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint *</td>          <td class="paramname"><span class="paramname"><em>c</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Tests if the H-classes of 1 and all generators are trivial. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>If the test fails and the second parameter is not NULL, it will be set to a counterexample.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A Boolean indicating whether the H-classes of 1 and all generators are trivial. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">M</td><td>The morphism.  </td></tr>
     <tr><td class="paramname">c</td><td>Pointer on a uint array to return a counterexample. </td></tr>
   </table>
   </dd>

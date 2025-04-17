@@ -22,6 +22,7 @@ var monoid_8h =
     [ "mor_lmirror", "monoid_8h.html#a68a36c1f4de7bd2c49f5d3b058de696a", null ],
     [ "mor_mult", "monoid_8h.html#a9e19682eb70d4b85aea8d7a49e4ef626", null ],
     [ "mor_mult_gen", "monoid_8h.html#a38c1683b06b0656c66cacc236b0345a6", null ],
+    [ "mor_name", "monoid_8h.html#a55a94930d406819cdf607b8eccd48280", null ],
     [ "mor_neutral_letter", "monoid_8h.html#ac1cad0420fa017dbb90be24ddebc9af8", null ],
     [ "mor_nonempty_neutral", "monoid_8h.html#a9dc67d8f2ddc8e759509280a6b1d0f85", null ],
     [ "mor_num_idem", "monoid_8h.html#a66793ecd3d81578f46f22c2bbdee0abb", null ],

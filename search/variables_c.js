@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['name_0',['name',['../structmorphism__state.html#abe23f2b035482cf595108eef2fdf6cb4',1,'morphism_state::name'],['../structobject.html#a1a8862bbcd3448257bdfc71b7bfa76da',1,'object::name']]],
-  ['names_1',['names',['../structmorphism.html#a33edaa87860e08bce7128d1330f34831',1,'morphism::names'],['../structob__recursion.html#a48e2078d2f9b25b78b8a0da623495f04',1,'ob_recursion::names']]],
+  ['name_0',['name',['../structobject.html#a1a8862bbcd3448257bdfc71b7bfa76da',1,'object']]],
+  ['names_1',['names',['../structob__recursion.html#a48e2078d2f9b25b78b8a0da623495f04',1,'ob_recursion']]],
   ['nb_5fcomputed_2',['nb_computed',['../structorbits.html#a74f266ddb15c7399d9cdd2a9a8806a31',1,'orbits']]],
   ['nb_5fmin_5fregular_5fjcl_3',['nb_min_regular_jcl',['../structmorphism.html#a8c898448fea9eae128e78e95e857a05a',1,'morphism']]],
   ['nb_5fregular_5felems_4',['nb_regular_elems',['../structgreen.html#aa0c470d994307efeb876cd72ec6d51ff',1,'green']]],
