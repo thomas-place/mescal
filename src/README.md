@@ -1,7 +1,7 @@
 
 # 🌵 MeSCaL 🌵
 
-**ME**mbership and **S**eparation for **C**l**A**sses of **L**anguages 
+<b>ME</b>mbership and <b>S</b>eparation for <b>C</b>l<b>A</b>sses of <b>L</b>anguages 
 
 
 The aim of this program is to implement most of the known algorithms for deciding membership and separation for prominent classes of regular languages.
