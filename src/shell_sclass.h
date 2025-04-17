@@ -17,6 +17,10 @@
  * Internal names for all known classes.
  */
 typedef enum {
+    // Ad-Hoc
+    CL_HTGEN,
+
+
     // Star-free
     CL_SF,
     CL_SFMOD,
@@ -194,6 +198,12 @@ classes command_to_class(com_command*);
  * Print information on a class
  */
 void print_class_info(classes, FILE*);
+
+/**********/
+/* AD-HOC */
+/**********/
+
+void info_htgen(FILE*);
 
 /*************/
 /* Star-free */

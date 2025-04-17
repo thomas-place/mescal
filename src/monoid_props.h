@@ -357,6 +357,23 @@ bool is_gtrivial_orbmono(orbits*,    //!< The orbits.
     uint* //!< Pointer on a uint array to return a counterexample.
 );
 
+
+/**
+ * @brief
+ * Tests if the H-classes of 1 and all generators are trivial.
+ *
+ * @remark
+ * If the test fails and the second parameter is not NULL, it will be set to a
+ * counterexample.
+ *
+ * @return
+ * A Boolean indicating whether the H-classes of 1 and all generators are trivial.
+ */
+bool is_htrivial_generators(morphism*, //!< The morphism.
+    uint* //!< Pointer on a uint array to return a counterexample.
+);
+
+
 /******/
 /* DA */
 /******/

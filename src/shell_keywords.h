@@ -95,6 +95,7 @@ typedef enum {
     KY_FPHIERA,
 
     // Classes
+    KY_HTGEN,
     KY_AT,
     KY_ATT,
     KY_SF,

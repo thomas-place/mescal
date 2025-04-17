@@ -493,20 +493,22 @@ void latex_init(void) {
 }
 
 
-static void latex_print_mono_elem(const morphism* M, uint q, FILE* out) {
-    if (isempty_dequeue(M->names[q])) {
+static void latex_print_mono_elem(morphism* M, uint q, FILE* out) {
+    dequeue* name = mor_name(M, q);
+    if (isempty_dequeue(name)) {
         fprintf(out, "1");
+        delete_dequeue(name);
         return;
     }
     uint n = 1;
-    fprint_letter_latex(M->alphabet[lefread_dequeue(M->names[q], 0)], out, false);
-    for (uint i = 1; i < size_dequeue(M->names[q]); i++) {
-        if (lefread_dequeue(M->names[q], i) != lefread_dequeue(M->names[q], i - 1)) {
+    fprint_letter_latex(M->alphabet[lefread_dequeue(name, 0)], out, false);
+    for (uint i = 1; i < size_dequeue(name); i++) {
+        if (lefread_dequeue(name, i) != lefread_dequeue(name, i - 1)) {
             if (n > 1) {
                 fprintf(out, "^{%d}", n);
             }
             n = 1;
-            fprint_letter_latex(M->alphabet[lefread_dequeue(M->names[q], i)], out, false);
+            fprint_letter_latex(M->alphabet[lefread_dequeue(name, i)], out, false);
         }
         else {
             n++;
@@ -515,10 +517,11 @@ static void latex_print_mono_elem(const morphism* M, uint q, FILE* out) {
     if (n > 1) {
         fprintf(out, "^{%d}", n);
     }
+    delete_dequeue(name);
 }
 
 
-static void latex_print_aux(const morphism* M, dgraph* G, FILE* out) {
+static void latex_print_aux(morphism* M, dgraph* G, FILE* out) {
     latex_init();
     fprintf(out, "\\begin{tikzpicture}\n");
 

@@ -441,6 +441,36 @@ bool is_gtrivial_orbmono(orbits* L, green_relation P, uint* c) {
     return true;
 }
 
+bool is_htrivial_generators(morphism* M, uint* c) {
+    parti* H = M->rels->HCL;
+    if (size_dequeue(H->cl[H->numcl[ONE]]) > 1) {
+        if (c) {
+            c[0] = ONE;
+            c[1] = lefread_dequeue(H->cl[H->numcl[ONE]], 0);
+            if (c[1] == ONE) {
+                c[1] = lefread_dequeue(H->cl[H->numcl[ONE]], 1);
+            }
+        }
+        return false;
+    }
+
+
+    for (uint i = 0; i < M->r_cayley->size_alpha; i++) {
+        uint a = M->r_cayley->edges[ONE][i];
+        if (size_dequeue(H->cl[H->numcl[a]]) > 1) {
+            if (c) {
+                c[0] = a;
+                c[1] = lefread_dequeue(H->cl[H->numcl[a]], 0);
+                if (c[1] == a) {
+                    c[1] = lefread_dequeue(H->cl[H->numcl[a]], 1);
+                }
+            }
+            return false;
+        }
+    }
+    return true;
+}
+
 /******/
 /* DA */
 /******/

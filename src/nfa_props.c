@@ -251,7 +251,6 @@ bool is_counterfree_dfa(nfa* A, int* error, FILE* out) {
         if (GREL->HCL->size_set != GREL->HCL->size_par) {
             // Si on doit afficher un exemple de compteur
             if (out != NULL) {
-
                 // On cherche un groupe non-trivial dans le monoide
                 for (uint i = 0; i < size_dequeue(M->idem_list); i++) {
                     uint cl = GREL->HCL->numcl[lefread_dequeue(M->idem_list, i)];
@@ -271,10 +270,13 @@ bool is_counterfree_dfa(nfa* A, int* error, FILE* out) {
                         // On va maintenant trouver le compteur. On prend d'abord le graph obtenu à partir du DFA en ne lisant que word
                         fprintf(out, "#### The counter itself: ");
 
+                        dequeue* name = mor_name(M, s);
+
                         graph* GW = create_graph_noedges(SCC->trans->size_graph);
                         for (uint q = 0; q < GW->size; q++) {
-                            lefins_dequeue(dfa_function(SCC, q, M->names[s]), GW->edges[q]);
+                            lefins_dequeue(dfa_function(SCC, q, name), GW->edges[q]);
                         }
+                        delete_dequeue(name);
                         // graph_printing_test(GW, stdout);
 
                         // Le compteur recherché est une SCC non triviale dans ce graphe (qui sera un cycle)
@@ -285,7 +287,6 @@ bool is_counterfree_dfa(nfa* A, int* error, FILE* out) {
                                 nfa_print_state(A, SCC->ancestors[q], out);
                                 uint r = lefread_dequeue(GW->edges[q], 0);
                                 while (r != q) {
-                                    //  printf(" -> %d", ((uint*)SCC->names)[r]);
                                     fprintf(out, " -> ");
                                     nfa_print_state(A, SCC->ancestors[r], out);
                                     r = lefread_dequeue(GW->edges[r], 0);
@@ -294,7 +295,6 @@ bool is_counterfree_dfa(nfa* A, int* error, FILE* out) {
                                 nfa_print_state(A, SCC->ancestors[q], out);
                                 fprintf(out, "\n");
                                 break;
-                                // printf(" -> %d.\n", ((uint*)SCC->names)[q]);
                             }
                         }
                         delete_parti(CYCLES);
@@ -302,14 +302,12 @@ bool is_counterfree_dfa(nfa* A, int* error, FILE* out) {
                         delete_nfa(SCC);
 
                         delete_morphism(M);
-                        delete_green(GREL);
                         return false;
                     }
                 }
             }
             delete_nfa(SCC);
             delete_morphism(M);
-            delete_green(GREL);
             return false;
         }
     }

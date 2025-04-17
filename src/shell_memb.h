@@ -38,6 +38,21 @@ bool shell_membership_needs_order(classes //!< The class to check.
 
 /**
  * @brief
+ * Checks if the H-classes of 1 and all generators are trivial.
+ *
+ * @return
+ * True if the H-classes of 1 and all generators are trivial, false otherwise.
+ */
+bool shell_morprop_htgentriv(int, //!< Index of the morphism in the objects array.
+    char*, //!< Name of the object (for the display)
+    FILE* //!< Output stream (NULL is no output is desired).
+);
+
+
+
+
+/**
+ * @brief
  * Checks if a monoid is trivial.
  *
  * @return
@@ -449,7 +464,9 @@ bool shell_membership_reg(int //!< Index of the language in the objects array.
 
 
 
-
+bool shell_membership_htgen(int  //!< Index of the language in the objects array.
+    , FILE*                  //!< Output stream (NULL is no output is desired).
+);
 
 
 

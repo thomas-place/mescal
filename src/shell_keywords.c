@@ -107,6 +107,7 @@ void keywords_add_all_keys(void) {
     keywords_add_key(KY_FPHIERA, "fphierarchies");
 
     // Classes
+    keywords_add_key(KY_HTGEN, "HTGEN");
     keywords_add_key(KY_AT, "AT");
     keywords_add_key(KY_ATT, "ATT");
     keywords_add_key(KY_SF, "SF");

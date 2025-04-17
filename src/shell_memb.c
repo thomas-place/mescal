@@ -5,6 +5,8 @@ bool (*class_membership[CL_END])(int, FILE*) = { NULL };
 
 void init_membership(void) {
 
+    class_membership[CL_HTGEN] = shell_membership_htgen;
+
     // Star-free
     class_membership[CL_SF] = shell_membership_sf;
     class_membership[CL_SFMOD] = shell_membership_sfmod;
@@ -188,6 +190,26 @@ char m_buffers[6][100];
 static char* m_sprint(int j, uint i) {
     mor_sprint_name_utf8(objects[j]->mor->obj, m_cexa[i], m_buffers[i]);
     return m_buffers[i];
+}
+
+
+bool shell_morprop_htgentriv(int j, char* name, FILE* out) {
+    if (out) {
+        fprintf(out, "#### Checking if the H-classes of 1 and all generators in the %s are trivial.\n", name);
+    }
+    if (is_htrivial_generators(objects[j]->mor->obj, get_counter(out))) {
+        if (out) {
+            fprintf(out, "#### The H-classes of 1 and all generators in the %s are trivial.\n", name);
+        }
+        return true;
+    }
+    else {
+        if (out) {
+            fprintf(out, "#### The H-classes of %s is not trivial (for instance, it contains %s).\n", m_sprint(j, 0), m_sprint(j, 1));
+        }
+        return false;
+    }
+
 }
 
 
@@ -832,6 +854,10 @@ bool shell_morprop_ubp2eq(int j, orbits_type type, char* orbs, char* name, FILE*
 
 
 bool shell_membership_reg(int, FILE*) { return true; }
+
+bool shell_membership_htgen(int j, FILE* out) {
+    return shell_morprop_htgentriv(j, "syntactic monoid", out);
+}
 
 /*****************/
 /* Group classes */

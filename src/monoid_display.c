@@ -7,19 +7,22 @@
 /**********************************/
 
 uint mor_fprint_name_utf8(morphism* M, uint q, FILE* out) {
-    if (isempty_dequeue(M->names[q])) {
+    dequeue* name = mor_name(M, q);
+
+    if (isempty_dequeue(name)) {
         fprintf(out, "1");
+        delete_dequeue(name);
         return 1;
     }
 
     uint n = 1;
-    uint len = fprint_letter_utf8(M->alphabet[lefread_dequeue(M->names[q], 0)], out);
-    for (uint i = 1; i < size_dequeue(M->names[q]); i++) {
-        if (lefread_dequeue(M->names[q], i) != lefread_dequeue(M->names[q], i - 1)) {
+    uint len = fprint_letter_utf8(M->alphabet[lefread_dequeue(name, 0)], out);
+    for (uint i = 1; i < size_dequeue(name); i++) {
+        if (lefread_dequeue(name, i) != lefread_dequeue(name, i - 1)) {
             if (n > 1) {
                 len += fprint_power_utf8(n, out);
             }
-            len += fprint_letter_utf8(M->alphabet[lefread_dequeue(M->names[q], i)], out);
+            len += fprint_letter_utf8(M->alphabet[lefread_dequeue(name, i)], out);
             n = 1;
         }
         else {
@@ -29,23 +32,26 @@ uint mor_fprint_name_utf8(morphism* M, uint q, FILE* out) {
     if (n > 1) {
         len += fprint_power_utf8(n, out);
     }
+    delete_dequeue(name);
     return len;
 }
 
 
 int mor_sprint_name_utf8(morphism* M, uint q, char* out) {
-    if (isempty_dequeue(M->names[q])) {
+    dequeue* name = mor_name(M, q);
+    if (isempty_dequeue(name)) {
+        delete_dequeue(name);
         return sprintf(out, "1");
     }
 
     uint n = 1;
-    int len = sprint_letter_utf8(M->alphabet[lefread_dequeue(M->names[q], 0)], out);
-    for (uint i = 1; i < size_dequeue(M->names[q]); i++) {
-        if (lefread_dequeue(M->names[q], i) != lefread_dequeue(M->names[q], i - 1)) {
+    int len = sprint_letter_utf8(M->alphabet[lefread_dequeue(name, 0)], out);
+    for (uint i = 1; i < size_dequeue(name); i++) {
+        if (lefread_dequeue(name, i) != lefread_dequeue(name, i - 1)) {
             if (n > 1) {
                 len += sprint_power_utf8(n, out + len);
             }
-            len += sprint_letter_utf8(M->alphabet[lefread_dequeue(M->names[q], i)], out + len);
+            len += sprint_letter_utf8(M->alphabet[lefread_dequeue(name, i)], out + len);
             n = 1;
         }
         else {
@@ -55,6 +61,7 @@ int mor_sprint_name_utf8(morphism* M, uint q, char* out) {
     if (n > 1) {
         len += sprint_power_utf8(n, out + len);
     }
+    delete_dequeue(name);
     return len;
 }
 
@@ -68,20 +75,22 @@ static void display_power_gviz_rec(short n, FILE* out) {
 }
 
 void mor_print_name_gviz(morphism* M, uint q, FILE* out) {
-    if (isempty_dequeue(M->names[q])) {
+    dequeue* name = mor_name(M, q);
+    if (isempty_dequeue(name)) {
+        delete_dequeue(name);
         fprintf(out, "1");
     }
     else {
         uint n = 1;
-        fprint_letter_gviz(M->alphabet[lefread_dequeue(M->names[q], 0)], out, false);
-        for (uint i = 1; i < size_dequeue(M->names[q]); i++) {
-            if (lefread_dequeue(M->names[q], i) != lefread_dequeue(M->names[q], i - 1)) {
+        fprint_letter_gviz(M->alphabet[lefread_dequeue(name, 0)], out, false);
+        for (uint i = 1; i < size_dequeue(name); i++) {
+            if (lefread_dequeue(name, i) != lefread_dequeue(name, i - 1)) {
                 if (n > 1) {
                     fprintf(out, "<SUP>");
                     display_power_gviz_rec(n, out);
                     fprintf(out, "</SUP>");
                 }
-                fprint_letter_gviz(M->alphabet[lefread_dequeue(M->names[q], i)], out, false);
+                fprint_letter_gviz(M->alphabet[lefread_dequeue(name, i)], out, false);
                 n = 1;
             }
             else {
@@ -94,6 +103,7 @@ void mor_print_name_gviz(morphism* M, uint q, FILE* out) {
             fprintf(out, "</SUP>");
         }
     }
+    delete_dequeue(name);
 }
 
 void mor_fprint_name_utf8_aligned(morphism* M, uint q, uint size_max, FILE* out) {
@@ -102,8 +112,10 @@ void mor_fprint_name_utf8_aligned(morphism* M, uint q, uint size_max, FILE* out)
 }
 
 static uint mor_get_name_length(morphism* M, uint q) {
-    if (isempty_dequeue(M->names[q])) {
+    dequeue* name = mor_name(M, q);
+    if (isempty_dequeue(name)) {
         // the length of the identity element is 1 (string "1")
+        delete_dequeue(name);
         return 1;
     }
     // Otherwise, compute the length in a variable.
@@ -112,10 +124,10 @@ static uint mor_get_name_length(morphism* M, uint q) {
     // Temporary variable to store the number of consecutive copies of the same letter.
     uint i = 0;
 
-    while (i < size_dequeue(M->names[q])) {
-        l += length_letter_utf8(M->alphabet[lefread_dequeue(M->names[q], i)]);
+    while (i < size_dequeue(name)) {
+        l += length_letter_utf8(M->alphabet[lefread_dequeue(name, i)]);
         uint j = i + 1;
-        while (j < size_dequeue(M->names[q]) && lefread_dequeue(M->names[q], j) == lefread_dequeue(M->names[q], i)) {
+        while (j < size_dequeue(name) && lefread_dequeue(name, j) == lefread_dequeue(name, i)) {
             j++;
         }
 
@@ -124,6 +136,7 @@ static uint mor_get_name_length(morphism* M, uint q) {
         }
         i = j;
     }
+    delete_dequeue(name);
     return l;
 }
 
@@ -360,7 +373,9 @@ void submono_print_order(subsemi* S, FILE* out) {
     // Computes the maximum size of a name.
     uint size_max = 1;
     for (uint i = 0; i < S->size; i++) {
-        size_max = max(size_max, size_dequeue(M->names[S->sub_to_mono[i]]));
+        dequeue* name = mor_name(M, S->sub_to_mono[i]);
+        size_max = max(size_max, size_dequeue(name));
+        delete_dequeue(name);
     }
 
     uint padding = 24 + size_max;

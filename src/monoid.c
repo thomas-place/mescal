@@ -15,14 +15,18 @@ void delete_green(green* G) {
     if (G == NULL) {
         return;
     }
-    free(G->regular_array);
-    free(G->group_array);
-
+    if (G->regular_array) {
+        free(G->regular_array);
+    }
+    if (G->group_array) {
+        free(G->group_array);
+    }
     delete_parti(G->HCL);
     delete_parti(G->RCL);
     delete_parti(G->LCL);
     delete_parti(G->JCL);
     free(G);
+
 }
 
 void delete_morphism(morphism* M) {
@@ -32,10 +36,13 @@ void delete_morphism(morphism* M) {
     /* Mandatory fields */
 
     // Free all names.
-    for (uint i = 0; i < M->r_cayley->size_graph; i++) {
-        delete_dequeue(M->names[i]);
-    }
-    free(M->names);
+    //for (uint i = 0; i < M->r_cayley->size_graph; i++) {
+    //    delete_dequeue(M->names[i]);
+    //}
+    //free(M->names);
+
+    free(M->pred_ele);
+    free(M->pred_lab);
 
     // Free accepting elements.
     free(M->accept_array);
@@ -514,7 +521,9 @@ void mor_compute_min_regular_jcl(morphism* M) {
 typedef struct morphism_state {
     uint size_graph;              //!< Number of states of the DFA used in the construction.
     uint* state;                  //!< A state: a permutation of {0, ..., size_graph-1}.
-    dequeue* name;                //!< The name of the state.
+    //dequeue* name;                //!< The name of the state.
+    uint pred_ele;                //!< The preceding element of the state.
+    uint pred_lab;                //!< The preceding letter of the state.
     uint size_alpha;              //!< The size of the alphabet.
     uint num;                     //!< The number of the state in the future monoid.
     struct morphism_state** next; //!< Array of size size_alpha containing the transitions, one for each letter.
@@ -527,7 +536,7 @@ static void delete_morphism_state(void* p) {
     }
     free(((morphism_state*)p)->state); // Free the permutation
     free(((morphism_state*)p)->next);  // Free the transition table
-    delete_dequeue(((morphism_state*)p)->name); // Free the name
+    //delete_dequeue(((morphism_state*)p)->name); // Free the name
     free(p);
 }
 
@@ -592,7 +601,9 @@ static void morphism_avl_to_table(avlnode* tree, nfa* A, morphism* thegraph, uin
     }
 
     // Store the name of the element in the morphism.
-    thegraph->names[thestate->num] = thestate->name;
+    //thegraph->names[thestate->num] = thestate->name;
+    thegraph->pred_ele[thestate->num] = thestate->pred_ele;
+    thegraph->pred_lab[thestate->num] = thestate->pred_lab;
 
     // We save the permutation defining the state (might be used for ordering computation).
     permuts[thestate->num] = thestate->state;
@@ -661,7 +672,7 @@ morphism* dfa_to_morphism(nfa* A, bool** order, int* error) {
     MALLOC(neutral, 1);
     neutral->num = num;
     num++;
-    neutral->name = create_dequeue();           // The name of this element is the empty word.
+    //neutral->name = create_dequeue();           // The name of this element is the empty word.
     neutral->size_alpha = A->trans->size_alpha; // Number of letters.
     neutral->size_graph = A->trans->size_graph; // Number of states.
     neutral->next = NULL;                       // The next elements are not yet computed.
@@ -732,9 +743,11 @@ morphism* dfa_to_morphism(nfa* A, bool** order, int* error) {
                 new->next = NULL; // For now, we don't know the next elements.
                 new->num = num;
                 num++;
-                new->name = create_dequeue(); // Create name from the one of the previous element.
-                copy_dequeue_right(new->name, theelem->name, 0);
-                rigins_dequeue(a, new->name);
+                new->pred_ele = theelem->num; // The predecessor of this element is the one we are treating.
+                new->pred_lab = a;           // The predecessor letter is the one we are treating.
+                //new->name = create_dequeue(); // Create name from the one of the previous element.
+                //copy_dequeue_right(new->name, theelem->name, 0);
+                //rigins_dequeue(a, new->name);
                 theelem->next[a] = new;                                         // Assign it as a successor for letter a.
                 thetree = avl_insert(new, thetree, &comp_morphism_state, NULL); // Store it in the set of known elements.
                 lefins_dequeue_gen(new, thequeue);                              // This new element has to be treated in the future..
@@ -755,7 +768,9 @@ morphism* dfa_to_morphism(nfa* A, bool** order, int* error) {
     MALLOC(M, 1);
     M->alphabet = nfa_duplicate_alpha(A);                           // Copy letter names.
     M->r_cayley = create_dgraph_noedges(num, A->trans->size_alpha); // Create the graph.
-    MALLOC(M->names, num);                                          // Element names.
+    //MALLOC(M->names, num);                                          // Element names.
+    MALLOC(M->pred_ele, num);                                         // Predecessor elements.
+    MALLOC(M->pred_lab, num);                                         // Predecessor letters.
     MALLOC(M->accept_array, num);                                   // Array representing the accepting set.
     MALLOC(M->idem_array, num);                                     // Array of idempotents.
     M->order = NULL;                                                // Order of the morphism.
@@ -984,6 +999,16 @@ dequeue** mor_compute_order(morphism* M) {
 /* Opérations sur les morphismes */
 /*********************************/
 
+dequeue* mor_name(morphism* M, uint  q) {
+    dequeue* res = create_dequeue();
+    while (q != ONE) {
+        lefins_dequeue(M->pred_lab[q], res);
+        q = M->pred_ele[q];
+    }
+    return res;
+}
+
+
 uint mor_mult(morphism* M, uint s, uint t) {
     if (s >= M->r_cayley->size_graph || t >= M->r_cayley->size_graph) {
         fprintf(stderr, "Error, these are not elements of the monoid\n");
@@ -992,11 +1017,13 @@ uint mor_mult(morphism* M, uint s, uint t) {
     if (M->mult != NULL) {
         return M->mult[s][t];
     }
-    uint r = s;
-    for (uint i = 0; i < size_dequeue(M->names[t]); i++) {
-        r = M->r_cayley->edges[r][lefread_dequeue(M->names[t], i)];
+    while (s != ONE) {
+        t = M->l_cayley->edges[t][M->pred_lab[s]];
+        s = M->pred_ele[s];
     }
-    return r;
+    return t;
+
+
 }
 
 uint mor_mult_gen(morphism* M, uint n, ...) {

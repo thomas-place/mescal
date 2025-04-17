@@ -11,6 +11,9 @@ const char* class_names[CL_END] = { NULL };
 
 void init_class_info(void) {
 
+    class_infos[CL_HTGEN] = info_htgen;
+    class_names[CL_HTGEN] = "HTGEN";
+
     // Star-free
     class_infos[CL_SF] = info_sf;
     class_names[CL_SF] = "SF";
@@ -295,6 +298,7 @@ static keylist* make_keylist_class(com_command* thecom) {
     if (com_nbparams(thecom->params) == 0) {
         switch (key)
         {
+        case KY_HTGEN:
         case KY_AT:
         case KY_ATT:
         case KY_SF:
@@ -422,6 +426,9 @@ static classes command_to_class_aux(keylist* list) {
     if (!list->next) {
         switch (list->key)
         {
+        case KY_HTGEN:
+            return CL_HTGEN;
+            break;
         case KY_AT:
             return CL_AT;
             break;
@@ -1490,9 +1497,18 @@ void print_class_info(classes class, FILE* out) {
     }
 }
 
+
+void info_htgen(FILE* out) {
+
+    print_dtitle_box(10, false, out, 1, "Languages with a syntactic morphism where 1 and the generators have trivial H-classes : HTGEN.");
+
+}
+
 /*************/
 /* Star-free */
 /*************/
+
+
 
 void info_sf(FILE* out) {
     print_dtitle_box(10, false, out, 1, "Star-free languages : SF.");
