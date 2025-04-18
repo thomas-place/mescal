@@ -88,7 +88,6 @@ typedef struct {
     letter* alphabet;     //!< An array indexed by the letters indices (generators). Assigns its letter to each index.
     uint* pred_ele;       //!< Array of preceding elements (for the naming as a product of generators).
     uint* pred_lab;       //!< Array of preceding letters (for the naming as a product of generators).
-    //dequeue** names;      //!< An array of dequeues indexed by the elements. Each element is mapped to a product of generators which evaluates to this element.
     dgraph* r_cayley;     //!< The right Cayley graph of the morphism (stores the number of elements and the numbers of letters).
     dgraph* l_cayley;     //!< The left Cayley graph of the morphism.
     lgraph* j_order;       //!< The J-order on the elements of the monoid: fusion of the two cayley graphs in a single graph.

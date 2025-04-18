@@ -79,30 +79,30 @@ void mor_print_name_gviz(morphism* M, uint q, FILE* out) {
     if (isempty_dequeue(name)) {
         delete_dequeue(name);
         fprintf(out, "1");
+        return;
     }
-    else {
-        uint n = 1;
-        fprint_letter_gviz(M->alphabet[lefread_dequeue(name, 0)], out, false);
-        for (uint i = 1; i < size_dequeue(name); i++) {
-            if (lefread_dequeue(name, i) != lefread_dequeue(name, i - 1)) {
-                if (n > 1) {
-                    fprintf(out, "<SUP>");
-                    display_power_gviz_rec(n, out);
-                    fprintf(out, "</SUP>");
-                }
-                fprint_letter_gviz(M->alphabet[lefread_dequeue(name, i)], out, false);
-                n = 1;
+    uint n = 1;
+    fprint_letter_gviz(M->alphabet[lefread_dequeue(name, 0)], out, false);
+    for (uint i = 1; i < size_dequeue(name); i++) {
+        if (lefread_dequeue(name, i) != lefread_dequeue(name, i - 1)) {
+            if (n > 1) {
+                fprintf(out, "<SUP>");
+                display_power_gviz_rec(n, out);
+                fprintf(out, "</SUP>");
             }
-            else {
-                n++;
-            }
+            fprint_letter_gviz(M->alphabet[lefread_dequeue(name, i)], out, false);
+            n = 1;
         }
-        if (n > 1) {
-            fprintf(out, "<SUP>");
-            display_power_gviz_rec(n, out);
-            fprintf(out, "</SUP>");
+        else {
+            n++;
         }
     }
+    if (n > 1) {
+        fprintf(out, "<SUP>");
+        display_power_gviz_rec(n, out);
+        fprintf(out, "</SUP>");
+    }
+
     delete_dequeue(name);
 }
 

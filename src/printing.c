@@ -218,7 +218,7 @@ void named_dedges_print(dequeue_gen* theedges, morphism* M, FILE* out) {
 
         if (!isempty_dequeue(oneedge->lab)) {
             for (uint j = 0; j < size_dequeue(oneedge->lab); j++) {
-                mor_print_name_gviz(M, M->r_cayley->edges[ONE][lefread_dequeue(oneedge->lab, j)], out);
+                fprint_letter_gviz(M->alphabet[lefread_dequeue(oneedge->lab, j)], out, false);
                 if (j < size_dequeue(oneedge->lab) - 1) {
                     fprintf(out, ",");
                 }
@@ -312,14 +312,15 @@ void cayley_print(morphism* M, FILE* out) {
         fprintf(out, ">,shape = circle];\n");
     }
 
-    dequeue_gen* theedges = dgraph_to_multi_edges(M->r_cayley);
 
+    dequeue_gen* theedges = dgraph_to_multi_edges(M->r_cayley);
     named_dedges_print(theedges, M, out);
     while (!isempty_dequeue_gen(theedges)) {
         multi_edge* new = rigpull_dequeue_gen(theedges);
         delete_dequeue(new->lab);
         free(new);
     }
+
     delete_dequeue_gen(theedges);
 
     fprintf(out, "}\n");

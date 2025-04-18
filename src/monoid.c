@@ -521,7 +521,6 @@ void mor_compute_min_regular_jcl(morphism* M) {
 typedef struct morphism_state {
     uint size_graph;              //!< Number of states of the DFA used in the construction.
     uint* state;                  //!< A state: a permutation of {0, ..., size_graph-1}.
-    //dequeue* name;                //!< The name of the state.
     uint pred_ele;                //!< The preceding element of the state.
     uint pred_lab;                //!< The preceding letter of the state.
     uint size_alpha;              //!< The size of the alphabet.
@@ -536,7 +535,6 @@ static void delete_morphism_state(void* p) {
     }
     free(((morphism_state*)p)->state); // Free the permutation
     free(((morphism_state*)p)->next);  // Free the transition table
-    //delete_dequeue(((morphism_state*)p)->name); // Free the name
     free(p);
 }
 
@@ -601,19 +599,11 @@ static void morphism_avl_to_table(avlnode* tree, nfa* A, morphism* thegraph, uin
     }
 
     // Store the name of the element in the morphism.
-    //thegraph->names[thestate->num] = thestate->name;
     thegraph->pred_ele[thestate->num] = thestate->pred_ele;
     thegraph->pred_lab[thestate->num] = thestate->pred_lab;
 
     // We save the permutation defining the state (might be used for ordering computation).
     permuts[thestate->num] = thestate->state;
-
-
-    // Release of the tree node (only the elements for which we have no further use).
-    // We don't free the name, as it is used in the morphism.
-    // We don't free the permutation as we saved it in permuts.
-    //free(thestate->next);
-    //free(thestate);
 
 
 }
@@ -745,9 +735,6 @@ morphism* dfa_to_morphism(nfa* A, bool** order, int* error) {
                 num++;
                 new->pred_ele = theelem->num; // The predecessor of this element is the one we are treating.
                 new->pred_lab = a;           // The predecessor letter is the one we are treating.
-                //new->name = create_dequeue(); // Create name from the one of the previous element.
-                //copy_dequeue_right(new->name, theelem->name, 0);
-                //rigins_dequeue(a, new->name);
                 theelem->next[a] = new;                                         // Assign it as a successor for letter a.
                 thetree = avl_insert(new, thetree, &comp_morphism_state, NULL); // Store it in the set of known elements.
                 lefins_dequeue_gen(new, thequeue);                              // This new element has to be treated in the future..
@@ -768,7 +755,6 @@ morphism* dfa_to_morphism(nfa* A, bool** order, int* error) {
     MALLOC(M, 1);
     M->alphabet = nfa_duplicate_alpha(A);                           // Copy letter names.
     M->r_cayley = create_dgraph_noedges(num, A->trans->size_alpha); // Create the graph.
-    //MALLOC(M->names, num);                                          // Element names.
     MALLOC(M->pred_ele, num);                                         // Predecessor elements.
     MALLOC(M->pred_lab, num);                                         // Predecessor letters.
     MALLOC(M->accept_array, num);                                   // Array representing the accepting set.
