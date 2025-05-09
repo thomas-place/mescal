@@ -366,6 +366,12 @@ int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* s
         case KY_EXALL:
             return shell_exall(thecom->params);
             break;
+        case KY_NEXALL:
+            return shell_exall_dethiera(thecom->params, true);
+            break;
+        case KY_FPEXALL:
+            return shell_exall_dethiera(thecom->params, false);
+            break;
         case KY_SORT:
             return shell_sort(thecom->params);
             break;

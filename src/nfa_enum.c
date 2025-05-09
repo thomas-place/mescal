@@ -2,17 +2,17 @@
 
 nfa_enum* nfa_enum_init(short states, short alpha) {
     nfa_enum* A;
-    MALLOC(A, 1);
+    CALLOC(A, 1);
     A->states = states;
     A->alpha = alpha;
     MALLOC(A->graph, states);
     MALLOC(A->used, states);
     MALLOC(A->outlabs, states);
-    MALLOC(A->parti, states);
-    MALLOC(A->parsize, states);
+    CALLOC(A->parti, states);
+    CALLOC(A->parsize, states);
     for (short q = 0; q < states; q++) {
-        MALLOC(A->graph[q], alpha);
-        MALLOC(A->parti[q], alpha);
+        CALLOC(A->graph[q], alpha);
+        CALLOC(A->parti[q], alpha);
         A->used[q] = 1;
         A->outlabs[q] = 0;
         for (short a = 0; a < alpha; a++) {
@@ -214,7 +214,7 @@ short iterate_integer_partition(short* part, short n) {
         end++;
     }
     short j = end;
-    while (part[j] != 0) {
+    while (j < n && part[j] != 0) {
         part[j] = 0;
         j++;
     }

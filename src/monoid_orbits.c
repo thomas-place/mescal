@@ -69,7 +69,7 @@ subsemi* compute_one_ddorb(morphism* M, uint e) {
     compute_idems_subsemi(S);
 
     // Computes the Green's relations (restriction of those of the original monoid)
-    MALLOC(S->rels, 1);
+    CALLOC(S->rels, 1);
     S->rels->RCL = restrict_parti(G->RCL, S->size, S->mono_in_sub, S->mono_to_sub);
     S->rels->LCL = restrict_parti(G->LCL, S->size, S->mono_in_sub, S->mono_to_sub);
     S->rels->JCL = restrict_parti(G->JCL, S->size, S->mono_in_sub, S->mono_to_sub);
@@ -145,7 +145,7 @@ subsemi* compute_one_gplusorb(subsemi* ker, uint e) {
     compute_idems_subsemi(S);
 
     // Computes the Green's relations (restriction of those of the MOD-kernel)
-    MALLOC(S->rels, 1);
+    CALLOC(S->rels, 1);
     S->rels->RCL = restrict_parti_subset(ker->rels->RCL, S->size, S->mono_in_sub, S->mono_to_sub, ker->sub_to_mono);
     S->rels->LCL = restrict_parti_subset(ker->rels->LCL, S->size, S->mono_in_sub, S->mono_to_sub, ker->sub_to_mono);
     S->rels->JCL = restrict_parti_subset(ker->rels->JCL, S->size, S->mono_in_sub, S->mono_to_sub, ker->sub_to_mono);
@@ -357,7 +357,7 @@ subsemi* compute_one_ptorb(morphism* M, uint e) {
     delete_lgraph(jgraph);
 
     // We may now compute the Green's relations in the submonoid
-    MALLOC(S->rels, 1);
+    CALLOC(S->rels, 1);
 
     S->rels->RCL = restrict_parti(right, S->size, S->mono_in_sub, S->mono_to_sub);
     S->rels->LCL = restrict_parti(left, S->size, S->mono_in_sub, S->mono_to_sub);

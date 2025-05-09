@@ -132,13 +132,9 @@ nfa* nfa_hopcroft_genauto(nfa* D, hopcroft_partition* p) {
         return NULL;
     }
 
-    nfa* MINI;
-    MALLOC(MINI, 1);
+    nfa* MINI = nfa_init();
     MINI->alphabet = nfa_duplicate_alpha(D);
-    MINI->state_names = NULL;
-
     MINI->trans = create_lgraph_noedges(p->size_par, D->trans->size_alpha);
-
     for (uint cq = 0; cq < p->size_par;cq++) {
         for (uint a = 0; a < D->trans->size_alpha;a++) {
             uint q = p->parray[p->lindex[cq]];
@@ -146,7 +142,6 @@ nfa* nfa_hopcroft_genauto(nfa* D, hopcroft_partition* p) {
         }
     }
 
-    MINI->initials = create_dequeue();
     rigins_dequeue(p->classes[lefread_dequeue(D->initials, 0)], MINI->initials);
 
 
@@ -156,7 +151,6 @@ nfa* nfa_hopcroft_genauto(nfa* D, hopcroft_partition* p) {
         uint q = lefread_dequeue(D->finals, i);
         finals[p->classes[q]] = true;
     }
-    MINI->finals = create_dequeue();
     for (uint cq = 0; cq < p->size_par;cq++) {
         if (finals[cq]) {
             rigins_dequeue(cq, MINI->finals);
@@ -201,17 +195,13 @@ nfa* nfa_hopcroft(nfa* A) {
 
     // Traitement du cas où l'ensemble des états finaux est trivial (on retourne un automate trivial).
     if (isempty_dequeue(A->finals) || size_dequeue(A->finals) == A->trans->size_graph) {
-        nfa* MINI;
-        MALLOC(MINI, 1);
-        MINI->state_names = NULL;
+        nfa* MINI = nfa_init();
         MINI->alphabet = nfa_duplicate_alpha(A);
         MINI->trans = create_lgraph_noedges(1, A->trans->size_alpha);
         for (uint a = 0; a < A->trans->size_alpha;a++) {
             rigins_dequeue(0, MINI->trans->edges[0][a]);
         }
-        MINI->initials = create_dequeue();
         rigins_dequeue(0, MINI->initials);
-        MINI->finals = create_dequeue();
         if (!isempty_dequeue(A->finals)) {
             rigins_dequeue(0, MINI->finals);
         }

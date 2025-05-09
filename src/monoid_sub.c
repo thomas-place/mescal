@@ -9,7 +9,7 @@
 
 subsemi* init_subsemi(morphism* M) {
     subsemi* S;
-    MALLOC(S, 1);
+    CALLOC(S, 1);
     S->original = M;
 
     // Other members are not initialized at this stage.
@@ -202,7 +202,7 @@ void green_compute_sub(subsemi* S) {
         }
     }
 
-    MALLOC(S->rels, 1);
+    CALLOC(S->rels, 1);
 
     // Computes the R-classes.
     S->rels->RCL = tarjan(cayr);
@@ -409,7 +409,7 @@ void green_compute_sub_reg(subsemi* S) {
 
 
     // Initialization
-    MALLOC(S->rels, 1);
+    CALLOC(S->rels, 1);
 
 
     // Computation of the R-classes and L-classes.

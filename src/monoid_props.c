@@ -3,13 +3,7 @@
 
 
 
-
-//int memb_cexa[20];
-//uint memb_cexa_idem;
-//int memb_orbnum;
-//mono_prop memb_prop = MPROP_NONE;
 char green_rel_array[4] = { 'H', 'L', 'R', 'J' };
-//green_relation green_rel;
 
 
 /***********/
@@ -885,11 +879,11 @@ bool is_knast_mono(orbits* L, uint* cexa) {
     green* G = L->original->rels;
 
 
-    // Loop over all idempotents e
+    // Loop over all minimal idempotents e
     for (uint i = 0; i < M->nb_min_regular_jcl; i++) {
         uint e = M->regular_idems[i];
 
-        // Loop over all idempotents f
+        // Loop over all minimal idempotents f
         // The case e = f is already handled: we checked if the DD-orbits are J-trivial.
         // The case f < e is treated when e and f are inverted.
         for (uint j = i + 1; j < M->nb_min_regular_jcl; j++) {
@@ -926,6 +920,7 @@ bool is_knast_mono(orbits* L, uint* cexa) {
                             uint t = lefread_dequeue(rset, v);
                             if (gh != mor_mult(M, q, t)) {
                                 if (cexa) {
+                                    // Generation of a counterexample if necessary.
                                     cexa[0] = q;
                                     cexa[1] = get_rlink(M, M->rels->RCL, g, q);
                                     cexa[2] = get_llink(M, M->rels->LCL, h, t);
@@ -1358,42 +1353,62 @@ bool is_knast_at_mono(orbits* L, uint* cexa) {
 
 bool is_upbp_mono(orbits* L, uint* cexa) {
     morphism* M = L->original;
-    green* G = L->original->rels;
 
-    // Loop over all idempotents e
+    // Loop over all representative idempotents e
     for (uint i = 0; i < L->nb_computed; i++) {
         uint e = L->orbits[i]->sub_to_mono[L->orbits[i]->neut];
-
-
-        // Computes the restristion of eMe to the regular elements.
-        dequeue* eM = compute_r_ideal(M, e, G->regular_array);
-        dequeue* Me = compute_l_ideal(M, e, G->regular_array);
-        dequeue* eMe = make_inter_sorted_dequeue(eM, Me);
-        delete_dequeue(Me);
-        delete_dequeue(eM);
-
         // For all elements ese in the orbit of e
         for (uint k = 0; k < L->orbits[i]->size; k++) {
             uint ese = L->orbits[i]->sub_to_mono[k];
+            if (ese == e) {
+                // If ese = e, the equation is trivially satsfied for all t
+                continue;
+            }
 
-            // For all elements ete in eMe such that esete is idempotent and satisfies esete J ete
-            for (uint l = 0; l < size_dequeue(eMe); l++) {
-                uint ete = lefread_dequeue(eMe, l);
-                uint esete = mor_mult(M, ese, ete);
-                if (G->JCL->numcl[esete] == G->JCL->numcl[ete] && M->idem_array[esete]) {
-                    if (esete != mor_mult_gen(M, 3, esete, ete, esete)) {
+            // We do a BFS to explore all elements t such that e R t eset is an idempotent
+            dequeue* elem = create_dequeue();
+            dequeue* path = create_dequeue();
+            rigins_dequeue(e, elem);
+            rigins_dequeue(ese, path);
+            bool* visited;
+            CALLOC(visited, M->r_cayley->size_graph);
+            while (!isempty_dequeue(path)) {
+                uint t = lefpull_dequeue(elem);
+                uint p = lefpull_dequeue(path);
+
+                // If t is already visited, we skip it
+                if (visited[t]) {
+                    continue;
+                }
+                visited[t] = true;
+
+                // If p is idempotent, we check the equation for this t
+                if (M->idem_array[p]) {
+                    if (mor_mult_gen(M, 3, p, t, p) != p) {
                         if (cexa) {
                             cexa[0] = ese;
-                            cexa[1] = ete;
+                            cexa[1] = t;
                             cexa[2] = e;
                         }
-                        delete_dequeue(eMe);
+                        free(visited);
+                        delete_dequeue(elem);
+                        delete_dequeue(path);
                         return false;
                     }
                 }
+
+                // We continue the BFS
+                for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
+                    rigins_dequeue(M->r_cayley->edges[t][a], elem);
+                    rigins_dequeue(M->r_cayley->edges[p][a], path);
+                }
             }
+            delete_dequeue(elem);
+            delete_dequeue(path);
+            free(visited);
+
+
         }
-        delete_dequeue(eMe);
     }
     return true;
 }

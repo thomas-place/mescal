@@ -8,7 +8,7 @@
 void help(void) {
     // FILE *p = popen("less", "w");
     // if (p == NULL)
-    FILE *p = stdout;
+    FILE* p = stdout;
 
     print_dtitle_box(100, true, p, 1, "\"Welcome to the help of the MeSCaL program! ");
     print_title_box(100, true, p, 1, "Basic commands");
@@ -70,7 +70,7 @@ void help(void) {
     fprintf(p, "%12s0 = ∅, 1 = ε, ! = complement, & = ∩\n\n", "");
     fprintf(p, "\n#### Manipulation of a regular expression stored in a variable L:\n\n");
     fprintf(p, "%4s%-*sDisplays the regular expression.\n", "", PAD1, "L");
-    fprintf(p, "%4s%-*sThe minimal automaton: works as an automaton variable.\n", "", PAD1, "L.minimal");
+    fprintf(p, "%4s%-*sThe minimal automaton: works as an automata variable.\n", "", PAD1, "L.minimal");
     fprintf(p, "%4s%-*sThe syntactic morphism: works as a morphism variable.\n", "", PAD1, "L.syntactic");
     fprintf(p, "%4s%-*sUses the Thomson algorithm to compute a NFA.\n", "", PAD1, "thomson(L)");
     fprintf(p, "%4s%-*sUses the Glushkov algorithm to compute a NFA.\n", "", PAD1, "glushkov(L)");
@@ -106,13 +106,11 @@ void help(void) {
 
     fprintf(p, "\n");
 
-    print_title_box(100, true, p, 1, "Using variables representing automata");
+    print_title_box(100, true, p, 1, "Using automata variables");
     fprintf(p, "\n#### Manipulation of an automaton stored in a variable A:\n\n");
     fprintf(p, "%4s%-*sDisplays the automaton.\n", "", PAD1, "A");
-    fprintf(p, "%4s%-*sThe minimal automaton: works as an automaton variable.\n", "", PAD1, "A.minimal");
-    fprintf(p, "%4s%-*sThe minimal automaton, printed in LaTeX.\n", "", PAD1, "latex(A.minimal)");
+    fprintf(p, "%4s%-*sThe minimal automaton: works as an automata variable.\n", "", PAD1, "A.minimal");
     fprintf(p, "%4s%-*sThe syntactic morphism: works as a morphism variable.\n", "", PAD1, "A.syntactic");
-    fprintf(p, "%4s%-*sThe right Cayley graph of the minimal automaton, printed in LaTeX.\n", "", PAD1, "latex(A.syntactic)");
     fprintf(p, "%4s%-*sBuilds a new automaton by eliminating the epsilon transitions.\n", "", PAD1, "elimepsilon(A)");
     fprintf(p, "%4s%-*sBuilds a new automaton by eliminating the tates that are not accessible or co-accessible.\n", "", PAD1, "trim(A)");
     fprintf(p, "%4s%-*sBuilds a new automaton by making a nondeterministic union.\n", "", PAD1, "union(A1,A2)");
@@ -153,10 +151,8 @@ void help(void) {
 
     print_title_box(100, true, p, 1, "Membership tests");
 
-    fprintf(p, "%4s%-*sChecks if the language recognized by the object belongs to 𝒞 (example: membership(Pol(GR),L)).\n", "", 53, "membership(𝒞,<object>)");
-    fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state) and <n2> letters which are outside 𝒞 and inside 𝒟.\n", "", 56, "exall(𝒞,𝒟,<n1>,<n2>)");
-    fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state) and <n2> letters which are outside 𝒞₁,..,𝒞ₙ and inside 𝒟₁,..,𝒟ₘ.\n\n", "", 70,
-            "exall(out(𝒞₁,..,𝒞ₙ),in(𝒟₁,..,𝒟ₘ),<n1>,<n2>)");
+    fprintf(p, "%4s%-*sChecks if the language recognized by the object belongs to 𝒞 (example: membership(Pol(GR),L)).\n\n", "", 53, "membership(𝒞,<object>)");
+
     fprintf(p, "%6sAvailable classes 𝒞:\n", "");
     fprintf(p, "%8s%-*sTrivial class.\n", "", PADC, "ST");
     fprintf(p, "%8s%-*sWell-suited extension of ST (DD = ST⁺).\n", "", PADC, "DD");
@@ -195,19 +191,26 @@ void help(void) {
     fprintf(p, "\n");
 
     fprintf(p, "%4s%-*sSummary of membership tests for the language recognized by the object in concatenation hierarchies.\n", "", PAD1, "chierarchies(<object>)");
-    fprintf(p, "%4s%-*sIf the language recognized by the object belongs to TL(𝒞), determines its level in the negation hierarchy of TL(𝒞).\n", "", PAD2, "nhierarchies(𝒞,<object>)");
+    fprintf(p, "%4s%-*sIf the language recognized by the object belongs to TL(𝒞), determines its level in the negation hierarchy of TL(𝒞).\n", "", PAD2, "neghierarchies(𝒞,<object>)");
     fprintf(p, "%4s%-*sIf the language recognized by the object belongs to TL(𝒞), determines its level in the future/past hierarchy of TL(𝒞).\n\n", "", PAD2, "fphierarchies(𝒞,<object>)");
     fprintf(p, "%6sAvailable input classes 𝒞 for negation hierarchies and future/past hierarchies:\n", "");
     fprintf(p, "%8s%-*sTrivial class.\n", "", PADC, "ST");
     fprintf(p, "%8s%-*sWell-suited extension of ST (DD = ST⁺).\n", "", PADC, "DD");
     fprintf(p, "%8s%-*sModulo languages.\n", "", PADC, "MOD");
     fprintf(p, "%8s%-*sWell-suited extension of the modulo languages (MODP = MOD⁺).\n", "", PADC, "MODP");
-    // fprintf(p, "%8s%-*sAlphabet modulo testable languages.\n", "", PADC, "AMT");
-    // fprintf(p, "%8s%-*sWell-suited extension of the alphabet modulo testable languages (AMTP = AMT⁺).\n", "", PADC, "AMTP");
+    fprintf(p, "%8s%-*sAlphabet modulo testable languages.\n", "", PADC, "AMT");
+    fprintf(p, "%8s%-*sWell-suited extension of the alphabet modulo languages (AMTP = AMT⁺).\n", "", PADC, "AMTP");
     fprintf(p, "%8s%-*sGroup languages.\n", "", PADC, "GR");
-    // fprintf(p, "%8s%-*sWell-suited extension of the group languages (GRP = GR⁺).\n", "", PADC, "GRP");
+    fprintf(p, "%8s%-*sWell-suited extension of the group languages (GRP = GR⁺).\n", "", PADC, "GRP");
 
     fprintf(p, "\n");
+
+    fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state) and <n2> letters which are outside 𝒞 and inside 𝒟.\n", "", 56, "exall(𝒞,𝒟,<n1>,<n2>)");
+    fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state) and <n2> letters which are outside 𝒞₁,..,𝒞ₙ and inside 𝒟₁,..,𝒟ₘ.\n", "", 70,
+        "exall(out(𝒞₁,..,𝒞ₙ),in(𝒟₁,..,𝒟ₘ),<n1>,<n2>)");
+    fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state) and <n2> letters which are at level <n0> in the negation hierarchy of TL(𝒞).\n", "", 53, "negexall(𝒞,<n0>,<n1>,<n2>)");
+    fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state) and <n2> letters which are at level <n0> in the future/past hierarchy of TL(𝒞).\n\n", "", 53, "fpexall(𝒞,<n0>,<n1>,<n2>)");
+
 
     print_title_box(100, true, p, 1, "Separation tests");
 
@@ -227,19 +230,21 @@ void help(void) {
     // fclose(p);
 }
 
-static void print_class_info_status(classes class, FILE *out) {
+static void print_class_info_status(classes class, FILE* out) {
     if (class_infos[class]) {
         class_infos[class](out);
 
         print_dmid_line(100, out);
         if (class_membership[class]) {
             print_dline_box(109, out, " Membership : " ANSI_COLOR_GREEN "Implemented.   " ANSI_COLOR_RESET);
-        } else {
+        }
+        else {
             print_dline_box(109, out, " Membership : " ANSI_COLOR_RED "Not implemented." ANSI_COLOR_RESET);
         }
         if (class_separation[class]) {
             print_dline_box(109, out, " Separation : " ANSI_COLOR_GREEN "Implemented." ANSI_COLOR_RESET);
-        } else {
+        }
+        else {
             print_dline_box(109, out, " Separation : " ANSI_COLOR_RED "Not implemented." ANSI_COLOR_RESET);
         }
         print_dbot_line(100, out);

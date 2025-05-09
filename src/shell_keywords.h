@@ -32,6 +32,8 @@ typedef enum {
     KY_INFO,
     KY_EXSEARCH,
     KY_EXALL,
+    KY_NEXALL,
+    KY_FPEXALL,
     KY_INSIDE,
     KY_OUTSIDE,
     KY_LIST,

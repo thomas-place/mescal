@@ -47,6 +47,8 @@ void keywords_add_all_keys(void) {
     keywords_add_key(KY_INFO, "info");
     keywords_add_key(KY_EXSEARCH, "exsearch");
     keywords_add_key(KY_EXALL, "exall");
+    keywords_add_key(KY_NEXALL, "negexall");
+    keywords_add_key(KY_FPEXALL, "fpexall");
     keywords_add_key(KY_INSIDE, "in");
     keywords_add_key(KY_OUTSIDE, "out");
     keywords_add_key(KY_LIST, "list");
@@ -103,7 +105,7 @@ void keywords_add_all_keys(void) {
     keywords_add_key(KY_SEPAR, "separation");
     keywords_add_key(KY_MEMB, "membership");
     keywords_add_key(KY_CHIERA, "chierarchies");
-    keywords_add_key(KY_NHIERA, "nhierarchies");
+    keywords_add_key(KY_NHIERA, "neghierarchies");
     keywords_add_key(KY_FPHIERA, "fphierarchies");
 
     // Classes

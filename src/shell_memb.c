@@ -691,12 +691,12 @@ bool shell_morprop_bpgroupeq(int j, kernel_type type, char* ker, char* name, FIL
     }
     if (res) {
         if (out) {
-            fprintf(out, "#### The equation is satsfied.\n");
+            fprintf(out, "#### The equation is satisfied.\n");
         }
     }
     else {
         if (out) {
-            fprintf(out, "#### The equation fails for the %s-pair (q,s) = (%s,%s), r = %s and t = %s.\n", ker, m_sprint(j, 0), m_sprint(j, 1), m_sprint(j, 2), m_sprint(j, 3));
+            fprintf(out, "#### The equation fails for the %s-pair (q,s) = (%s,%s), r = %s and t = %s.\n", ker, m_sprint(j, 0), m_sprint(j, 2), m_sprint(j, 1), m_sprint(j, 3));
         }
         return false;
     }
@@ -784,7 +784,7 @@ bool shell_morprop_kerknast(int j, kernel_type type, char* ker, char* name, FILE
 bool shell_morprop_knastat(int j, char* name, FILE* out) {
     if (out) {
         fprintf(out, "#### Checking if the %s ⍺:A* → M satisfies the equation (eqfre)ʷ(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ\n", name);
-        fprintf(out, "     for all q,r,s,t ∊ M such that {q,e,f}, {r,e,f}, {s,e,f} and {t,e,f} are PT-sets and all e,f ∊ E(M).\n");
+        fprintf(out, "     for all q,r,s,t ∊ M such that {q,e,f}, {r,e,f}, {s,e,f} and {t,e,f} are AT-sets and all e,f ∊ E(M).\n");
     }
 
     if (is_knast_at_mono(shell_compute_orbits(j, ORB_PT, LV_REG), get_counter(out))) {
@@ -814,17 +814,18 @@ bool shell_morprop_bpgroupeqplus(int j, orbits_type type, char* orbs, char* name
         break;
     case ORB_GRP:
         res = is_bpolgrp_mono(shell_compute_orbits(j, type, LV_REG), get_counter(out));
+        break;
     default:
         res = false;
     }
     if (res) {
         if (out) {
-            fprintf(out, "#### The equation is satsfied.\n");
+            fprintf(out, "#### The equation is satisfied.\n");
         }
     }
     else {
         if (out) {
-            fprintf(out, "#### The equation fails for the %s-pair (q,s) = (%s,%s), r = %s and t = %s.\n", orbs, m_sprint(j, 0), m_sprint(j, 1), m_sprint(j, 2), m_sprint(j, 3));
+            fprintf(out, "#### The equation fails for the %s-pair (q,s) = (%s,%s), r = %s, t = %s, e = %s and f = %s.\n", orbs, m_sprint(j, 0), m_sprint(j, 2), m_sprint(j, 1), m_sprint(j, 3), m_sprint(j, 4), m_sprint(j, 5));
         }
         return false;
     }
@@ -945,7 +946,7 @@ bool shell_membership_ppt(int j, FILE* out) {
 }
 
 bool shell_membership_polmod(int j, FILE* out) {
-    return shell_morprop_kerjsat(j, KER_MOD, "MOD-kernel", "syntactic morphism", out);
+    return shell_morprop_kerjsat(j, KER_MOD, "MOD", "syntactic morphism", out);
 }
 
 bool shell_membership_polgr(int j, FILE* out) {
@@ -1134,15 +1135,15 @@ bool shell_membership_ul(int j, FILE* out) {
 }
 
 bool shell_membership_tlmod(int j, FILE* out) {
-    return shell_morprop_kerda(j, KER_MOD, "MOD-kernel", "syntactic morphism", out);
+    return shell_morprop_kerda(j, KER_MOD, "MOD", "syntactic morphism", out);
 }
 
 bool shell_membership_tlamt(int j, FILE* out) {
-    return shell_morprop_kerda(j, KER_AMT, "AMT-kernel", "syntactic morphism", out);
+    return shell_morprop_kerda(j, KER_AMT, "AMT", "syntactic morphism", out);
 }
 
 bool shell_membership_tlgr(int j, FILE* out) {
-    return shell_morprop_kerda(j, KER_GR, "GR-kernel", "syntactic morphism", out);
+    return shell_morprop_kerda(j, KER_GR, "GR", "syntactic morphism", out);
 }
 
 bool shell_membership_tldd(int j, FILE* out) {
@@ -1699,97 +1700,95 @@ bool shell_chiera_summary(com_parameters* pars) {
     return 1;
 }
 
-static void make_subscript_index(uint n, char* message) {
-    if (n != 0) {
-        uint d = n % 10;
-        make_subscript_index(n / 10, message);
-        switch (d) {
-        case 0:
-            strcat(message, "₀");
-            break;
-        case 1:
-            strcat(message, "₁");
-            break;
-        case 2:
-            strcat(message, "₂");
-            break;
-        case 3:
-            strcat(message, "₃");
-            break;
-        case 4:
-            strcat(message, "₄");
-            break;
-        case 5:
-            strcat(message, "₅");
-            break;
-        case 6:
-            strcat(message, "₆");
-            break;
-        case 7:
-            strcat(message, "₇");
-            break;
-        case 8:
-            strcat(message, "₈");
-            break;
-        case 9:
-            strcat(message, "₉");
-            break;
-        default:
+
+static short shell_neghiera_aux(int j, classes cl) {
+    ufind* theuf = NULL;
+
+
+    switch (cl) {
+    case CL_ST:
+        if (!shell_membership_ul(j, NULL)) {
+            return -1;
+        }
+        theuf = iden_green_mono(objects[j]->mor->obj, J_GREEN);
+        break;
+    case CL_MOD:
+        if (!shell_membership_tlmod(j, NULL)) {
+            return -1;
+        }
+        theuf = iden_bpolmod_mono(objects[j]->mor->obj);
+        break;
+    case CL_AMT:
+        if (!shell_membership_tlamt(j, NULL)) {
+            return -1;
+        }
+        theuf = iden_bpolamt_mono(objects[j]->mor->obj);
+        break;
+    case CL_GR:
+        if (!shell_membership_tlgr(j, NULL)) {
+            return -1;
+        }
+        theuf = iden_blockg_mono(objects[j]->mor->obj);
+        break;
+    case CL_DD:
+        if (!shell_membership_tldd(j, NULL)) {
+            return -1;
+        }
+        theuf = iden_knast_mono(shell_compute_orbits(j, ORB_DD, LV_REG));
+        break;
+    case CL_MODP:
+        if (!shell_membership_tlmodp(j, NULL)) {
+            return -1;
+        }
+        theuf = iden_qknast_mono(shell_compute_orbits(j, ORB_MODP, LV_REG), shell_compute_ker(j, KER_MOD, LV_REG));
+        break;
+    case CL_AMTP:
+        if (!shell_membership_tlamtp(j, NULL)) {
+            return -1;
+        }
+        theuf = iden_bpolamtp_mono(shell_compute_orbits(j, ORB_AMTP, LV_REG));
+        break;
+    case CL_GRP:
+        if (!shell_membership_tlgrp(j, NULL)) {
+            return -1;
+        }
+        theuf = iden_bpolgrp_mono(shell_compute_orbits(j, ORB_GRP, LV_REG));
+        break;
+    default:
+        return -1;
+        break;
+    }
+
+
+    short level = 1;
+    parti* thepr;
+    while (true) {
+        if (theuf->size_par == theuf->size_set) {
             break;
         }
+        level++;
+        thepr = ufind_to_parti(theuf);
+        delete_ufind(theuf);
+        theuf = iden_mpolc_mono(objects[j]->mor->obj, thepr);
+        delete_parti(thepr);
     }
+    delete_ufind(theuf);
+    return level;
 }
 
-static void make_superscript_index(uint n, char* message) {
-    if (n != 0) {
-        uint d = n % 10;
-        make_subscript_index(n / 10, message);
-        switch (d) {
-        case 0:
-            strcat(message, "⁰");
-            break;
-        case 1:
-            strcat(message, "¹");
-            break;
-        case 2:
-            strcat(message, "²");
-            break;
-        case 3:
-            strcat(message, "³");
-            break;
-        case 4:
-            strcat(message, "⁴");
-            break;
-        case 5:
-            strcat(message, "⁵");
-            break;
-        case 6:
-            strcat(message, "⁶");
-            break;
-        case 7:
-            strcat(message, "⁷");
-            break;
-        case 8:
-            strcat(message, "⁸");
-            break;
-        case 9:
-            strcat(message, "⁹");
-            break;
-        default:
-            break;
-        }
-    }
-}
 
 bool shell_neghiera(com_parameters* pars) {
-    // Il doit y avoir deux arguments:
-    // - la classe de base
-    // - la variable qui donne le langage ou le morphisme input
+
+    // There should be two arguments:
+    // - the base class
+    // - the variable that gives the language or the input morphism.
     if (com_nbparams(pars) != 2) {
         shell_error_nbparams(keywordtostring(KY_NHIERA), 2);
         return false;
     }
-    // Récupération de l'input et de son morphisme syntactique.
+
+
+    // Getting the input and its syntactic morphism.
     bool saved;
     int i = com_apply_command(pars->next->param, NULL, MODE_DEFAULT, &saved);
 
@@ -1801,135 +1800,170 @@ bool shell_neghiera(com_parameters* pars) {
         return false;
     }
 
-    // On prend le nom de la classe
-    com_keyword key = key_from_string_chain_single(pars->param->main);
+    // The name of the base class is given by the first argument.
+  // La classe
+    classes cl = command_to_class(com_getparam(pars, 0));
 
-    // short level;
-    bool inunion;
-    switch (key) {
-    case KY_ST:
-        print_infooper_neghiera(key, stdout);
-        print_info_input(i, stdout);
-        print_start_comp(stdout, "TL");
-        inunion = shell_membership_ul(j, stdout);
-        print_conclusion_comp(stdout, inunion, "TL");
-        if (inunion) {
-            fprintf(stdout, "#### We can now determine the least n such that the input belongs to TLₙ.\n");
-            fprintf(stdout, "#### The algorithm is based on the characterizationss of BPol(ST) and MPol.\n\n");
-            ufind* C = parti_to_ufind(objects[j]->mor->obj->rels->JCL);
-            uint level = hdet_mpol_level(objects[j]->mor->obj, C, stdout);
-            delete_ufind(C);
-            char subscript[10];
-            subscript[0] = '\0';
-            make_subscript_index(level, subscript);
-            char message[150];
-            sprintf(message, "Conclusion: the least level containing the input is TL%s.", subscript);
-            print_dtitle_box(100, true, stdout, 1, message);
-        }
-        break;
-    case KY_DD:
-        print_infooper_neghiera(key, stdout);
-        print_info_input(i, stdout);
-        print_start_comp(stdout, "TL(DD)");
-        inunion = shell_membership_tldd(j, stdout);
-        print_conclusion_comp(stdout, inunion, "TL(DD)");
-        if (inunion) {
-            fprintf(stdout, "#### We can now determine the least n such that the input belongs to TLₙ(DD).\n");
-            fprintf(stdout, "#### The algorithm is based on the characterizationss of BPol(DD) and MPol.\n\n");
-            ufind* C = iden_knast_mono(shell_compute_orbits(j, ORB_DD, LV_REG));
-            uint level = hdet_mpol_level(objects[j]->mor->obj, C, stdout);
-            delete_ufind(C);
-            char subscript[10];
-            subscript[0] = '\0';
-            make_subscript_index(level, subscript);
-            char message[150];
-            sprintf(message, "Conclusion: the least level containing the input is TL%s(DD).", subscript);
-            print_dtitle_box(100, true, stdout, 1, message);
-        }
-        break;
-    case KY_MOD:
-        print_infooper_neghiera(key, stdout);
-        print_info_input(i, stdout);
-        print_start_comp(stdout, "TL(MOD)");
-        inunion = shell_membership_tlmod(j, stdout);
-        print_conclusion_comp(stdout, inunion, "TL(MOD)");
-        if (inunion) {
-            fprintf(stdout, "#### We can now determine the least n such that the input belongs to TLₙ(MOD).\n");
-            fprintf(stdout, "#### The algorithm is based on the characterizationss of BPol(MOD) and MPol.\n\n");
-            ufind* C = iden_bpolmod_mono(objects[j]->mor->obj);
-            uint level = hdet_mpol_level(objects[j]->mor->obj, C, stdout);
-            delete_ufind(C);
-            char subscript[10];
-            subscript[0] = '\0';
-            make_subscript_index(level, subscript);
-            char message[150];
-            sprintf(message, "Conclusion: the least level containing the input is TL%s(MOD).", subscript);
-            print_dtitle_box(100, true, stdout, 1, message);
-        }
-        break;
-    case KY_MODP:
-        print_infooper_neghiera(key, stdout);
-        print_info_input(i, stdout);
-        print_start_comp(stdout, "TL(MOD⁺)");
-        inunion = shell_membership_tlmodp(j, stdout);
-        print_conclusion_comp(stdout, inunion, "TL(MOD⁺)");
-        if (inunion) {
-            fprintf(stdout, "#### We can now determine the least n such that the input belongs to TLₙ(MOD⁺).\n");
-            fprintf(stdout, "#### The algorithm is based on the characterizationss of BPol(MOD⁺) and MPol.\n\n");
-            ufind* C = iden_qknast_mono(shell_compute_orbits(j, ORB_MODP, LV_REG), shell_compute_ker(j, KER_MOD, LV_REG));
-            uint level = hdet_mpol_level(objects[j]->mor->obj, C, stdout);
-            delete_ufind(C);
-            char subscript[10];
-            subscript[0] = '\0';
-            make_subscript_index(level, subscript);
-            char message[150];
-            sprintf(message, "Conclusion: the least level containing the input is TL%s(MOD⁺).", subscript);
-            print_dtitle_box(100, true, stdout, 1, message);
-        }
-        break;
-    case KY_GR:
-        print_infooper_neghiera(key, stdout);
-        print_info_input(i, stdout);
-        print_start_comp(stdout, "TL(GR)");
-        fprintf(stdout, "#### Checking if the GR-kernel belongs to DA.\n");
-        inunion = shell_membership_tlgr(j, stdout);
-        print_conclusion_comp(stdout, inunion, "TL(GR)");
-        if (inunion) {
-            fprintf(stdout, "#### We can now determine the least n such that the input belongs to TLₙ(GR).\n");
-            fprintf(stdout, "#### The algorithm is based on the characterizationss of BPol(GR) and MPol.\n\n");
-            ufind* C = iden_blockg_mono(objects[j]->mor->obj);
-            uint level = hdet_mpol_level(objects[j]->mor->obj, C, stdout);
-            delete_ufind(C);
-            char subscript[10];
-            subscript[0] = '\0';
-            make_subscript_index(level, subscript);
-            char message[150];
-            sprintf(message, "Conclusion: the least level containing the input is TL%s(GR).", subscript);
-            print_dtitle_box(100, true, stdout, 1, message);
-        }
-        break;
-    default:
-        if (saved) {
-            object_free(i);
-        }
+    if (cl == CL_END) {
+        fprintf(stdout, "#### The class ");
+        print_command(com_getparam(pars, 0), stdout);
+        fprintf(stdout, " is either unknown or unsupported.\n\n");
         return false;
-        break;
     }
+
+    if (!class_is_basis(cl)) {
+        fprintf(stdout, "#### The class %s is not a valid input class for negation hierarchies.\n", class_names[cl]);
+        return false;
+    }
+
+    print_infooper_neghiera(cl, stdout);
+    print_info_input(i, stdout);
+
+    fprintf(stdout, "#### Checking if the input belongs to TL(%s).\n", class_names[cl]);
+    fprintf(stdout, "#### If so, computing the least level n such that the input belongs to TLⁿ(%s).\n", class_names[cl]);
+    fprintf(stdout, "#### The algorithm is based on the characterizations of TL(%s), BPol(%s) and MPol.\n", class_names[cl], class_names[cl]);
+
+    short level = shell_neghiera_aux(j, cl);
+    char message[150];
+    if (level == -1) {
+        sprintf(message, "The input does not belong to TL(%s).", class_names[cl]);
+    }
+    else {
+        char supscript[20];
+        sprint_power_utf8(level, supscript);
+        sprintf(message, "The least level containing the input is TL%s(%s).", supscript, class_names[cl]);
+    }
+
+
+    print_dtitle_box(100, true, stdout, 1, message);
+
+
+
+
+
     if (saved) {
         object_free(i);
     }
     return true;
 }
 
+static void shell_fphiera_aux(int j, classes cl, short* fllv, short* pllv) {
+    *fllv = -1;
+    *pllv = -1;
+
+
+    ufind* pluf = NULL;
+    ufind* fluf = NULL;
+
+
+    switch (cl) {
+    case CL_ST:
+        if (!shell_membership_ul(j, NULL)) {
+            return;
+        }
+        fluf = iden_green_mono(objects[j]->mor->obj, L_GREEN);
+        pluf = iden_green_mono(objects[j]->mor->obj, R_GREEN);
+        break;
+    case CL_MOD:
+        if (!shell_membership_tlmod(j, NULL)) {
+            return;
+        }
+        fluf = iden_green_subsemi(shell_compute_ker(j, KER_MOD, LV_REG), L_GREEN);
+        pluf = iden_green_subsemi(shell_compute_ker(j, KER_MOD, LV_REG), R_GREEN);
+        break;
+    case CL_AMT:
+        if (!shell_membership_tlamt(j, NULL)) {
+            return;
+        }
+        fluf = iden_green_subsemi(shell_compute_ker(j, KER_AMT, LV_REG), L_GREEN);
+        pluf = iden_green_subsemi(shell_compute_ker(j, KER_AMT, LV_REG), R_GREEN);
+        break;
+    case CL_GR:
+        if (!shell_membership_tlgr(j, NULL)) {
+            return;
+        }
+        fluf = iden_green_subsemi(shell_compute_ker(j, KER_GR, LV_REG), L_GREEN);
+        pluf = iden_green_subsemi(shell_compute_ker(j, KER_GR, LV_REG), R_GREEN);
+        break;
+    case CL_DD:
+        if (!shell_membership_tldd(j, NULL)) {
+            return;
+        }
+        fluf = iden_green_orbmono(shell_compute_orbits(j, ORB_DD, LV_REG), L_GREEN);
+        pluf = iden_green_orbmono(shell_compute_orbits(j, ORB_DD, LV_REG), R_GREEN);
+        break;
+    case CL_MODP:
+        if (!shell_membership_tlmodp(j, NULL)) {
+            return;
+        }
+        fluf = iden_green_orbmono(shell_compute_orbits(j, ORB_MODP, LV_REG), L_GREEN);
+        pluf = iden_green_orbmono(shell_compute_orbits(j, ORB_MODP, LV_REG), R_GREEN);
+        break;
+    case CL_AMTP:
+        if (!shell_membership_tlamtp(j, NULL)) {
+            return;
+        }
+        fluf = iden_green_orbmono(shell_compute_orbits(j, ORB_AMTP, LV_REG), L_GREEN);
+        pluf = iden_green_orbmono(shell_compute_orbits(j, ORB_AMTP, LV_REG), R_GREEN);
+        break;
+    case CL_GRP:
+        if (!shell_membership_tlgrp(j, NULL)) {
+            return;
+        }
+        fluf = iden_green_orbmono(shell_compute_orbits(j, ORB_GRP, LV_REG), L_GREEN);
+        pluf = iden_green_orbmono(shell_compute_orbits(j, ORB_GRP, LV_REG), R_GREEN);
+        break;
+    default:
+        return;
+        break;
+    }
+
+    *fllv = 1;
+    *pllv = 1;
+
+    parti* flpr;
+    parti* plpr;
+    while (true) {
+        if (fluf->size_par != fluf->size_set) {
+            (*fllv)++;
+        }
+        if (pluf->size_par != pluf->size_set) {
+            (*pllv)++;
+        }
+        if (fluf->size_par == fluf->size_set || pluf->size_par == pluf->size_set) {
+            break;
+        }
+        flpr = ufind_to_parti(fluf);
+        plpr = ufind_to_parti(pluf);
+        delete_ufind(fluf);
+        delete_ufind(pluf);
+        if (*fllv % 2 == 0) {
+            fluf = iden_lpolc_mono(objects[j]->mor->obj, flpr);
+            pluf = iden_rpolc_mono(objects[j]->mor->obj, plpr);
+        }
+        else {
+            fluf = iden_rpolc_mono(objects[j]->mor->obj, flpr);
+            pluf = iden_lpolc_mono(objects[j]->mor->obj, plpr);
+        }
+        delete_parti(flpr);
+        delete_parti(plpr);
+    }
+    delete_ufind(fluf);
+    delete_ufind(pluf);
+
+}
+
 bool shell_fphiera(com_parameters* pars) {
-    // Il doit y avoir deux arguments:
-    // - la classe de base
-    // - la variable qui donne le langage ou le morphisme input
+
+    // There should be two arguments:
+    // - the base class
+    // - the variable that gives the language or the input morphism.
     if (com_nbparams(pars) != 2) {
         shell_error_nbparams(keywordtostring(KY_FPHIERA), 2);
         return false;
     }
-    // Récupération de l'input et de son morphisme syntactique.
+
+    // Getting the input and its syntactic morphism.
     bool saved;
     int i = com_apply_command(pars->next->param, NULL, MODE_DEFAULT, &saved);
 
@@ -1941,139 +1975,75 @@ bool shell_fphiera(com_parameters* pars) {
         return false;
     }
 
-    // On prend le nom de la classe
-    com_keyword key = key_from_string_chain_single(pars->param->main);
+    // The name of the base class is given by the first argument.
+ // La classe
+    classes cl = command_to_class(com_getparam(pars, 0));
 
-    // short level;
-    short minf;
-    short minp;
-    bool inunion;
-    switch (key) {
-    case KY_ST:
-        print_infooper_fphiera(key, stdout);
-        print_info_input(i, stdout);
-        print_start_comp(stdout, "TL");
-        inunion = shell_membership_ul(j, stdout);
-        print_conclusion_comp(stdout, inunion, "TL");
-        if (inunion) {
-            fprintf(stdout, "#### We can now determine the least level FLⁿ and PLⁿ containing the input.\n");
-            fprintf(stdout, "#### The algorithm is based on the characterizations of LPol and RPol.\n\n");
-            ufind* C = parti_to_ufind(objects[j]->mor->obj->rels->JCL);
-            hdet_lrpol_level(objects[j]->mor->obj, C, stdout, &minf, &minp);
-            delete_ufind(C);
-            char fscript[10];
-            char pscript[10];
-            fscript[0] = '\0';
-            pscript[0] = '\0';
-            make_superscript_index(minf, fscript);
-            make_superscript_index(minp, pscript);
-            char message[150];
-            sprintf(message, "Conclusion: the least levels containing the input are FL%s and PL%s", fscript, pscript);
-            print_dtitle_box(100, true, stdout, 1, message);
-        }
-        break;
-
-    case KY_DD:
-        print_infooper_fphiera(key, stdout);
-        print_info_input(i, stdout);
-        print_start_comp(stdout, "TL(DD)");
-        inunion = shell_membership_tldd(j, stdout);
-        print_conclusion_comp(stdout, inunion, "TL(DD)");
-        if (inunion) {
-            fprintf(stdout, "#### We can now determine the least level FLⁿ(DD) and PLⁿ(DD) containing the input.\n");
-            fprintf(stdout, "#### The algorithm is based on the characterizations of LPol and RPol.\n\n");
-            ufind* C = iden_knast_mono(shell_compute_orbits(j, ORB_DD, LV_REG));
-            hdet_lrpol_level(objects[j]->mor->obj, C, stdout, &minf, &minp);
-            delete_ufind(C);
-            char fscript[10];
-            char pscript[10];
-            fscript[0] = '\0';
-            pscript[0] = '\0';
-            make_superscript_index(minf, fscript);
-            make_superscript_index(minp, pscript);
-            char message[150];
-            sprintf(message, "Conclusion: the least levels containing the input are FL%s(DD) and PL%s(DD)", fscript, pscript);
-            print_dtitle_box(100, true, stdout, 1, message);
-        }
-
-        break;
-    case KY_MOD:
-        print_infooper_fphiera(key, stdout);
-        print_info_input(i, stdout);
-        print_start_comp(stdout, "TL(MOD)");
-        inunion = shell_membership_tlmod(j, stdout);
-        print_conclusion_comp(stdout, inunion, "TL(MOD)");
-        if (inunion) {
-            fprintf(stdout, "#### We can now determine the least level FLⁿ(MOD) and PLⁿ(MOD) containing the input.\n");
-            fprintf(stdout, "#### The algorithm is based on the characterizations of LPol and RPol.\n\n");
-            ufind* C = iden_bpolmod_mono(objects[j]->mor->obj);
-            hdet_lrpol_level(objects[j]->mor->obj, C, stdout, &minf, &minp);
-            delete_ufind(C);
-            char fscript[10];
-            char pscript[10];
-            fscript[0] = '\0';
-            pscript[0] = '\0';
-            make_superscript_index(minf, fscript);
-            make_superscript_index(minp, pscript);
-            char message[150];
-            sprintf(message, "Conclusion: the least levels containing the input are FL%s(MOD) and PL%s(MOD)", fscript, pscript);
-            print_dtitle_box(100, true, stdout, 1, message);
-        }
-        break;
-    case KY_MODP:
-        print_infooper_fphiera(key, stdout);
-        print_info_input(i, stdout);
-        print_start_comp(stdout, "TL(MOD⁺)");
-        inunion = shell_membership_tlmodp(j, stdout);
-        print_conclusion_comp(stdout, inunion, "TL(MOD⁺)");
-        if (inunion) {
-            fprintf(stdout, "#### We can now determine the least level FLⁿ(MOD⁺) and PLⁿ(MOD⁺) containing the input.\n");
-            fprintf(stdout, "#### The algorithm is based on the characterizations of LPol and RPol.\n\n");
-            ufind* C = iden_qknast_mono(shell_compute_orbits(j, ORB_MODP, LV_REG), shell_compute_ker(j, KER_MOD, LV_REG));
-            hdet_lrpol_level(objects[j]->mor->obj, C, stdout, &minf, &minp);
-            delete_ufind(C);
-            char fscript[10];
-            char pscript[10];
-            fscript[0] = '\0';
-            pscript[0] = '\0';
-            make_superscript_index(minf, fscript);
-            make_superscript_index(minp, pscript);
-            char message[150];
-            sprintf(message, "Conclusion: the least levels containing the input are FL%s(MOD⁺) and PL%s(MOD⁺)", fscript, pscript);
-            print_dtitle_box(100, true, stdout, 1, message);
-        }
-        break;
-    case KY_GR:
-        print_infooper_fphiera(key, stdout);
-        print_info_input(i, stdout);
-        print_start_comp(stdout, "TL(GR)");
-        fprintf(stdout, "#### Checking if the GR-kernel belongs to DA.\n");
-        inunion = shell_membership_tlgr(j, stdout);
-        print_conclusion_comp(stdout, inunion, "TL(GR)");
-        if (inunion) {
-            fprintf(stdout, "#### We can now determine the least level FLⁿ(GR) and PLⁿ(GR) containing the input.\n");
-            fprintf(stdout, "#### The algorithm is based on the characterizations of LPol and RPol.\n\n");
-            ufind* C = iden_blockg_mono(objects[j]->mor->obj);
-            hdet_lrpol_level(objects[j]->mor->obj, C, stdout, &minf, &minp);
-            delete_ufind(C);
-            char fscript[10];
-            char pscript[10];
-            fscript[0] = '\0';
-            pscript[0] = '\0';
-            make_superscript_index(minf, fscript);
-            make_superscript_index(minp, pscript);
-            char message[150];
-            sprintf(message, "Conclusion: the least levels containing the input are FL%s(GR) and PL%s(GR)", fscript, pscript);
-            print_dtitle_box(100, true, stdout, 1, message);
-        }
-        break;
-    default:
+    if (cl == CL_END) {
+        fprintf(stdout, "#### The class ");
+        print_command(com_getparam(pars, 0), stdout);
+        fprintf(stdout, " is either unknown or unsupported.\n\n");
         return false;
-        break;
     }
 
+    if (!class_is_basis(cl)) {
+        fprintf(stdout, "#### The class %s is not a valid input class for future/past hierarchies.\n", class_names[cl]);
+        return false;
+    }
+
+    print_infooper_fphiera(cl, stdout);
+    print_info_input(i, stdout);
+
+
+    fprintf(stdout, "#### Checking if the input belongs to TL(%s).\n", class_names[cl]);
+    fprintf(stdout, "#### If so, computing the least level containing the input in the future/past hierarchy of TL(%s).\n", class_names[cl]);
+    fprintf(stdout, "#### The algorithm is based on the characterizations of TL(%s), LPol and RPol.\n", class_names[cl]);
+
+
+
+    short lvfl;
+    short lvpl;
+    shell_fphiera_aux(j, cl, &lvfl, &lvpl);
+
+
+
+
+
+
+    char supscript[10];
+    char message[150];
+    if (lvfl == -1) {
+        sprintf(message, "The input does not belong to TL(%s).", class_names[cl]);
+    }
+    else if (lvfl == lvpl) {
+        sprint_power_utf8(lvfl, supscript);
+        sprintf(message, "The least level containing the input is FL%s(%s) ⋂ PL%s(%s).", supscript, class_names[cl], supscript, class_names[cl]);
+    }
+    else if (lvfl < lvpl) {
+        sprint_power_utf8(lvfl, supscript);
+        sprintf(message, "The least level containing the input is FL%s(%s).", supscript, class_names[cl]);
+    }
+    else {
+        sprint_power_utf8(lvpl, supscript);
+        sprintf(message, "The least level containing the input is PL%s(%s).", supscript, class_names[cl]);
+
+    }
+    print_dtitle_box(100, true, stdout, 1, message);
+
+
+
+
+
+    if (saved) {
+        object_free(i);
+    }
     return true;
 }
+
+
+/***********************/
+/* Examples generators */
+/***********************/
 
 bool shell_exsearch(com_parameters* pars) {
     int n = com_nbparams(pars);
@@ -2159,40 +2129,7 @@ bool shell_exsearch(com_parameters* pars) {
     return false;
 }
 
-/*
-static bool shell_exall_aux(dgraph* arrow) {
 
-    for (uint a = 0; a < arrow->size_alpha - 1;a++) {
-        if (arrow->edges[0][a] == arrow->edges[0][a + 1]) {
-            arrow->edges[0][a] = 0;
-        }
-        else {
-            arrow->edges[0][a]++;
-            return true;
-        }
-    }
-    if (arrow->edges[0][arrow->size_alpha - 1] == arrow->size_graph) {
-        arrow->edges[0][arrow->size_alpha - 1] = 0;
-    }
-    else {
-        arrow->edges[0][arrow->size_alpha - 1]++;
-        return true;
-    }
-
-
-    for (uint q = 1; q < arrow->size_graph;q++) {
-        for (uint a = 0; a < arrow->size_alpha;a++) {
-            if (arrow->edges[q][a] == arrow->size_graph) {
-                arrow->edges[q][a] = 0;
-            }
-            else {
-                arrow->edges[q][a]++;
-                return true;
-            }
-        }
-    }
-    return false;
-} */
 
 static int nfa_compare_minimal(void* N1, void* N2) {
     nfa* A1 = (nfa*)N1;
@@ -2412,7 +2349,7 @@ bool shell_exall(com_parameters* pars) {
         }
 
         count++;
-        // view_nfa(objects[j]->nfa);
+
 
         if (j != -1 && res) {
             set = avl_insert(nfa_mini_canonical_copy(objects[shell_compute_minimal(j)]->nfa), set, nfa_compare_minimal, nfa_release);
@@ -2436,3 +2373,135 @@ bool shell_exall(com_parameters* pars) {
 
     return false;
 }
+
+
+
+
+
+
+
+
+
+bool shell_exall_dethiera(com_parameters* pars, bool neg) {
+    int n = com_nbparams(pars);
+    if (n != 4) {
+        shell_error_nbparams(keywordtostring(KY_EXALL), 4);
+        return false;
+    }
+
+    // Input class for the hierarchy
+    classes cl = command_to_class(com_getparam(pars, 0));
+    if (cl == CL_END) {
+        fprintf(stdout, "#### The class ");
+        print_command(com_getparam(pars, 0), stdout);
+        fprintf(stdout, " is either unknown or unsupported.\n\n");
+        return false;
+    }
+    if (!class_is_basis(cl)) {
+        fprintf(stdout, "#### The class %s is not a valid input class for negation hierarchies.\n", class_names[cl]);
+        return false;
+    }
+
+    if (!com_single(com_getparam(pars, 1))) {
+        shell_error_numpar(keywordtostring(KY_EXALL), 2);
+        return false;
+    }
+    char* end;
+    short level = strtol(com_getparam(pars, 1)->main->string, &end, 10);
+    if (*end != '\0') {
+        shell_error_numpar(keywordtostring(KY_EXALL), 2);
+        return false;
+    }
+
+    if (!com_single(com_getparam(pars, 2))) {
+        shell_error_numpar(keywordtostring(KY_EXALL), 3);
+        return false;
+    }
+    uint states = strtol(com_getparam(pars, 2)->main->string, &end, 10);
+    if (*end != '\0') {
+        shell_error_numpar(keywordtostring(KY_EXALL), 3);
+        return false;
+    }
+
+    if (!com_single(com_getparam(pars, 3))) {
+        shell_error_numpar(keywordtostring(KY_EXALL), 4);
+        return false;
+    }
+    uint alpha = strtol(com_getparam(pars, 3)->main->string, &end, 10);
+    if (*end != '\0') {
+        shell_error_numpar(keywordtostring(KY_EXALL), 4);
+        return false;
+    }
+
+
+
+
+    nfa_enum* E = nfa_enum_init(states, alpha);
+    uint count = 0;
+    uint exa = 0;
+    avlnode* set = NULL;
+
+    //    nfa_enum_print(E);
+
+    while (nfa_enum_next(E)) {
+
+        //       nfa_enum_print(E);
+        nfa* A = nfa_enum_to_nfa(E);
+
+        int j = object_add_automaton(NULL, A);
+
+
+        // TODO: Fix when shell_compute_syntac fails
+        int k = shell_compute_syntac(j, false);
+
+        if (k == MEMORY_LIMIT) {
+            fprintf(stdout, "#### Test %d: Syntactic monoid too large.\n", count);
+            continue;
+        }
+        if (k == TIMEOUT_OCCURRED) {
+            fprintf(stdout, "#### Test %d: timeout occurred.\n", count);
+            continue;
+        }
+        if (k == INTERRUPTION) {
+            fprintf(stdout, "#### Test %d: user interruption.\n", count);
+            break;
+        }
+        short levelj;
+        if (neg) {
+            levelj = shell_neghiera_aux(k, cl);
+        }
+        else {
+            short pllv;
+            short fllv;
+            shell_fphiera_aux(k, cl, &fllv, &pllv);
+            levelj = max(pllv, fllv);
+        }
+
+
+        count++;
+        // view_nfa(objects[j]->nfa);
+
+        if (j != -1 && levelj >= level) {
+            set = avl_insert(nfa_mini_canonical_copy(objects[shell_compute_minimal(j)]->nfa), set, nfa_compare_minimal, nfa_release);
+            exa++;
+        }
+
+        if (count % 20000 == 0) {
+            fprintf(stdout, "#### %d tests done so far. %d were positive\n", count, exa);
+        }
+
+        object_free(j);
+    }
+
+    nfa_enum_free(E);
+
+    int found = getsize_avl(set);
+    fprintf(stdout, "#### %d tests in total. Found %d example languages.\n", count, found);
+
+    uint num = 0;
+    avl_to_objarray(set, &num);
+
+    return false;
+}
+
+

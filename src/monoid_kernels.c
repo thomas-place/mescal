@@ -82,12 +82,12 @@ static subsemi* get_kernel(morphism* M, sub_level level, bool mod) {
 
     // Allocation of the submonoid
     subsemi* ker = init_subsemi(M);
-    MALLOC(ker->rels, 1);
+    CALLOC(ker->rels, 1);
     ker->neut = ONE;
 
     // We use the separation algorithm
     nfa* A;
-    if (level == LV_FULL) {
+    if (level != LV_REG) {
         ker->level = LV_FULL;
         A = morphism_to_dfa_kernel(M);
     }
@@ -393,7 +393,7 @@ void compute_amt_kernel_regular(morphism* M, bool* mono_in_sub, uint* size) {
         // We put the matrix in HNF.
         fmpz_mat_hnf(MAT, MAT);
 
-        // It remains to solve the sytem of equations given by the HNF for each element of the R-class
+        // It remains to solve the system of equations given by the HNF for each element of the R-class
         // of the idempotent e. This checks whether the element is in the kernel or not.
         for (uint k = 0; k < size_dequeue(M->rels->RCL->cl[M->rels->RCL->numcl[e]]); k++) {
 
@@ -514,7 +514,7 @@ subsemi* get_amt_kernel(morphism* M, sub_level) {
     compute_idems_subsemi(ker);
 
     // Computes the Green's relations R and L (restriction of those of the original monoid)
-    MALLOC(ker->rels, 1);
+    CALLOC(ker->rels, 1);
     ker->rels->RCL = restrict_parti(M->rels->RCL, ker->size, ker->mono_in_sub, ker->mono_to_sub);
     ker->rels->LCL = restrict_parti(M->rels->LCL, ker->size, ker->mono_in_sub, ker->mono_to_sub);
 

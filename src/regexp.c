@@ -1,6 +1,6 @@
 #include "regexp.h"
 
-short symbolic_count  = 0;
+short symbolic_count = 0;
 char **symbolic_names = NULL;
 
 short symbolic_index(char *varname) {
@@ -123,14 +123,14 @@ regexp *reg_copy(regexp *r) {
         return NULL;
     }
 
-    regexp *left  = reg_copy(r->left);
+    regexp *left = reg_copy(r->left);
     regexp *right = reg_copy(r->right);
 
     regexp *copy;
     MALLOC(copy, 1);
 
-    copy->op    = r->op;
-    copy->left  = left;
+    copy->op = r->op;
+    copy->left = left;
     copy->right = right;
     if (r->op == CHAR) {
         copy->letter = r->letter;
@@ -160,8 +160,8 @@ static regexp *reg_binary(regelem op, regexp *left, regexp *right) {
 
     regexp *nexp;
     MALLOC(nexp, 1);
-    nexp->op    = op;
-    nexp->left  = left;
+    nexp->op = op;
+    nexp->left = left;
     nexp->right = right;
     return nexp;
 }
@@ -175,8 +175,8 @@ static regexp *reg_unary(regelem op, regexp *left) {
     }
     regexp *nexp;
     MALLOC(nexp, 1);
-    nexp->op    = op;
-    nexp->left  = left;
+    nexp->op = op;
+    nexp->left = left;
     nexp->right = NULL;
     return nexp;
 }
@@ -185,8 +185,8 @@ static regexp *reg_nullary(regelem op) {
     TRACE("reg_nullary");
     regexp *r;
     MALLOC(r, 1);
-    r->op    = op;
-    r->left  = NULL;
+    r->op = op;
+    r->left = NULL;
     r->right = NULL;
     return r;
 }
@@ -204,7 +204,7 @@ regexp *reg_epsilon(void) {
 regexp *reg_letter(uchar c) {
     TRACE("reg_letter(%c)", c);
 
-    regexp *nr     = reg_nullary(CHAR);
+    regexp *nr = reg_nullary(CHAR);
     nr->letter.lab = c;
     nr->letter.num = -1;
     return nr;
@@ -217,7 +217,7 @@ regexp *reg_letter_ext(letter l) {
 }
 
 regexp *reg_letter_numbered(uchar c, uchar index) {
-    regexp *nr     = reg_nullary(CHAR);
+    regexp *nr = reg_nullary(CHAR);
     nr->letter.lab = c;
     nr->letter.num = index; // Assumes that info is an integer for now.
     return nr;
@@ -231,14 +231,14 @@ regexp *reg_letter_symbolic(uchar c, uchar number) {
     }
     for (uchar i = 0; i < symbolic_count; i++) {
         if (strlen(symbolic_names[i]) == 1 && symbolic_names[i][0] == c) {
-            regexp *nr    = reg_nullary(SYVAR);
+            regexp *nr = reg_nullary(SYVAR);
             nr->syvar.ind = i;
             nr->syvar.dec = number; // Assumes that info is an integer for now.
             return nr;
         }
     }
 
-    regexp *nr    = reg_nullary(SYCHAR);
+    regexp *nr = reg_nullary(SYCHAR);
     nr->sylet.lab = c;
     nr->sylet.dec = number; // Assumes that info is an integer for now.
     return nr;
@@ -256,7 +256,7 @@ regexp *reg_var_symbolic(char *s, uchar number) {
         fprintf(stderr, "Error: The symbolic variable \"%s\" is unknown.\n", s);
         return NULL;
     } else {
-        regexp *nr    = reg_nullary(SYVAR);
+        regexp *nr = reg_nullary(SYVAR);
         nr->syvar.ind = j;
         nr->syvar.dec = number; // Assumes that info is an integer for now.
         return nr;
@@ -318,11 +318,11 @@ regexp *reg_concat(regexp *left, regexp *right) {
 
     if (left->op == CHAR) {
         if (right->op == CHAR) {
-            word *word = create_empty_word();
-            rigcon_word(left->letter, word);
-            rigcon_word(right->letter, word);
-            left->op   = WORD;
-            left->word = word;
+            word *the_word = create_empty_word();
+            rigcon_word(left->letter, the_word);
+            rigcon_word(right->letter, the_word);
+            left->op = WORD;
+            left->word = the_word;
             reg_free(right);
             return left;
         }
@@ -331,8 +331,7 @@ regexp *reg_concat(regexp *left, regexp *right) {
             reg_free(left);
             return right;
         }
-        if (right->op == CONCAT &&
-            (right->left->op == WORD || right->left->op == CHAR)) {
+        if (right->op == CONCAT && (right->left->op == WORD || right->left->op == CHAR)) {
             right->left = reg_concat(left, right->left);
             return right;
         }
@@ -349,15 +348,13 @@ regexp *reg_concat(regexp *left, regexp *right) {
             reg_free(right);
             return left;
         }
-        if (right->op == CONCAT &&
-            (right->left->op == WORD || right->left->op == CHAR)) {
+        if (right->op == CONCAT && (right->left->op == WORD || right->left->op == CHAR)) {
             right->left = reg_concat(left, right->left);
             return right;
         }
     }
 
-    if (left->op == CONCAT &&
-        (left->right->op == WORD || left->right->op == CHAR)) {
+    if (left->op == CONCAT && (left->right->op == WORD || left->right->op == CHAR)) {
         if (right->op == CHAR || right->op == WORD) {
             left->right = reg_concat(left->right, right->left);
             right->left = left;
@@ -540,8 +537,7 @@ bool reg_symbolic_loops(regexp *exp, ushort max, uchar num, bool *cycle) {
         break;
     case CONCAT:
     case UNION:
-        return reg_symbolic_loops(exp->left, max, num, cycle) &&
-               reg_symbolic_loops(exp->right, max, num, cycle);
+        return reg_symbolic_loops(exp->left, max, num, cycle) && reg_symbolic_loops(exp->right, max, num, cycle);
         break;
     case STAR:
     case PLUS:

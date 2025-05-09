@@ -1497,6 +1497,25 @@ void print_class_info(classes class, FILE* out) {
     }
 }
 
+bool class_is_basis(classes cl) {
+    switch (cl)
+    {
+    case CL_ST:
+    case CL_DD:
+    case CL_MOD:
+    case CL_MODP:
+    case CL_AMT:
+    case CL_AMTP:
+    case CL_GR:
+    case CL_GRP:
+        return true;
+        break;
+    default:
+        return false;
+        break;
+    }
+}
+
 
 void info_htgen(FILE* out) {
 
@@ -2724,98 +2743,84 @@ void print_conclusion_separ(FILE* out, bool res, const char* namec)
 
 
 
-static void print_input_name(com_keyword c, FILE* out)
-{
-    switch (c)
-    {
-    case KY_ST:
-        print_dline_box(0, out, " Applied to the input class ST : trivial class consisting of the languages ∅ and A*.");
-        break;
-    case KY_DD:
-        print_dline_box(0, out, " Applied to the input class DD : class consisting of the languages ∅, {ε}, A⁺ and A*.");
-        break;
-    case KY_AT:
-        print_dline_box(0, out, " Applied to the input class AT : alphabet testable languages, membership of a word in the language");
-        print_dline_box(0, out, "    depends only on the set of letters occuring inside this word.");
-        break;
-    case KY_MOD:
-        print_dline_box(0, out, " Applied to the input class MOD : modulo languages, membership of a word in the language depends");
-        print_dline_box(0, out, "    only on its length modulo a fixed number.");
-        break;
-    case KY_MODP:
-        print_dline_box(0, out, " Applied to the input class MOD⁺ : well-suited extension of the modulo languages, membership of a");
-        print_dline_box(0, out, "    word in the language depends only on its length modulo a fixed number and on whether this word");
-        print_dline_box(0, out, "    is empty or not. In this case, SF(MOD⁺) = SF(MOD).");
-        break;
-    case KY_GR:
-        print_dline_box(0, out, " Applied to the input class GR : group languages (recognized by a finite group).");
-        break;
-    default:
-        fprintf(out, "#### This input class is not supported.\n\n");
-        break;
-    }
-}
 
 
 
 // Negation hierarchies
-void print_infooper_neghiera(com_keyword c, FILE* out)
+void print_infooper_neghiera(classes c, FILE* out)
 {
     switch (c)
     {
-    case KY_ST:
+    case CL_ST:
         print_dtitle_box(10, false, out, 1, "Negation hierarchy of unary temporal logic (TL = TL(ST)).");
-        print_input_name(c, out);
-        print_dmid_line(100, out);
         print_dline_box(0, out, " For each natural number n ≥ 1, the level n corresponds to the following classes:");
-        print_dline_box(0, out, "  - Level TLₙ in the negation hierarchy of TL.");
+        print_dline_box(0, out, "  - Level TLⁿ in the negation hierarchy of TL.");
         print_dline_box(0, out, "  - Level BΣ²ₙ(<) in the alternation hierarchy of two-variable first-order logic with");
         print_dline_box(0, out, "    the linear order.");
         print_dline_box(0, out, "  - Level MPolₖ(BPol(ST)) for k = n - 1 in the deterministic hierarchy of basis BPol(ST).");
         print_dbot_line(100, out);
         break;
-    case KY_DD:
+    case CL_DD:
         print_dtitle_box(10, false, out, 1, "Negation hierarchy of the unary temporal logic closure of DD (TL(DD)).");
-        print_input_name(c, out);
-        print_dmid_line(100, out);
         print_dline_box(0, out, " For each natural number n ≥ 1, the level n corresponds to the following classes:");
-        print_dline_box(0, out, "  - Level TLₙ(DD) in the negation hierarchy of TL(DD).");
+        print_dline_box(0, out, "  - Level TLⁿ(DD) in the negation hierarchy of TL(DD).");
         print_dline_box(0, out, "  - Level BΣ²ₙ(<,+1) in the alternation hierarchy of two-variable first-order logic with");
         print_dline_box(0, out, "    the linear order and the successor.");
         print_dline_box(0, out, "  - Level MPolₖ(BPol(DD)) for k = n - 1 in the deterministic hierarchy of basis BPol(DD).");
         print_dbot_line(100, out);
         break;
-    case KY_MOD:
+    case CL_MOD:
         print_dtitle_box(10, false, out, 1, "Negation hierarchy of the unary temporal logic closure of MOD (TL(MOD)).");
-        print_input_name(c, out);
-        print_dmid_line(100, out);
         print_dline_box(0, out, " For each natural number n ≥ 1, the level n corresponds to the following classes:");
-        print_dline_box(0, out, "  - Level TLₙ(MOD) in the negation hierarchy of TL(MOD).");
+        print_dline_box(0, out, "  - Level TLⁿ(MOD) in the negation hierarchy of TL(MOD).");
         print_dline_box(0, out, "  - Level BΣ²ₙ(<,MOD) in the alternation hierarchy of two-variable first-order logic with");
         print_dline_box(0, out, "    the linear order and the modular predicates.");
         print_dline_box(0, out, "  - Level MPolₖ(BPol(MOD)) for k = n - 1 in the deterministic hierarchy of basis BPol(MOD).");
         print_dbot_line(100, out);
         break;
-    case KY_MODP:
-        print_dtitle_box(10, false, out, 1, "Negation hierarchy of the unary temporal logic closure of MOD (TL(MOD⁺)).");
-        print_input_name(c, out);
-        print_dmid_line(100, out);
+    case CL_AMT:
+        print_dtitle_box(10, false, out, 1, "Negation hierarchy of the unary temporal logic closure of AMT (TL(AMT)).");
         print_dline_box(0, out, " For each natural number n ≥ 1, the level n corresponds to the following classes:");
-        print_dline_box(0, out, "  - Level TLₙ(MOD⁺) in the negation hierarchy of TL(MOD⁺).");
+        print_dline_box(0, out, "  - Level TLⁿ(AMT) in the negation hierarchy of TL(AMT).");
+        print_dline_box(0, out, "  - Level BΣ²ₙ(<,AMOD) in the alternation hierarchy of two-variable first-order logic with");
+        print_dline_box(0, out, "    the linear order and the alphabetic modular predicates.");
+        print_dline_box(0, out, "  - Level MPolₖ(BPol(AMT)) for k = n - 1 in the deterministic hierarchy of basis BPol(AMT).");
+        print_dbot_line(100, out);
+        break;
+    case CL_MODP:
+        print_dtitle_box(10, false, out, 1, "Negation hierarchy of the unary temporal logic closure of MOD⁺ (TL(MOD⁺)).");
+        print_dline_box(0, out, " For each natural number n ≥ 1, the level n corresponds to the following classes:");
+        print_dline_box(0, out, "  - Level TLⁿ(MOD⁺) in the negation hierarchy of TL(MOD⁺).");
         print_dline_box(0, out, "  - Level BΣ²ₙ(<,+1,MOD) in the alternation hierarchy of two-variable first-order logic with");
         print_dline_box(0, out, "    the linear order, the successor and the modular predicates.");
         print_dline_box(0, out, "  - Level MPolₖ(BPol(MOD⁺)) for k = n - 1 in the deterministic hierarchy of basis BPol(MOD⁺).");
         print_dbot_line(100, out);
         break;
-    case KY_GR:
-        print_dtitle_box(10, false, out, 1, "Negation hierarchy of the unary temporal logic closure of GR (TL(GR)).");
-        print_input_name(c, out);
-        print_dmid_line(100, out);
+    case CL_AMTP:
+        print_dtitle_box(10, false, out, 1, "Negation hierarchy of the unary temporal logic closure of AMT⁺ (TL(AMT⁺)).");
         print_dline_box(0, out, " For each natural number n ≥ 1, the level n corresponds to the following classes:");
-        print_dline_box(0, out, "  - Level TLₙ(GR) in the negation hierarchy of TL(MOD).");
+        print_dline_box(0, out, "  - Level TLⁿ(AMT⁺) in the negation hierarchy of TL(AMT⁺).");
+        print_dline_box(0, out, "  - Level BΣ²ₙ(<,+1,AMOD) in the alternation hierarchy of two-variable first-order logic with");
+        print_dline_box(0, out, "    the linear order, the successor and the alphabetic modular predicates.");
+        print_dline_box(0, out, "  - Level MPolₖ(BPol(AMT⁺)) for k = n - 1 in the deterministic hierarchy of basis BPol(AMT⁺).");
+        print_dbot_line(100, out);
+        break;
+    case CL_GR:
+        print_dtitle_box(10, false, out, 1, "Negation hierarchy of the unary temporal logic closure of GR (TL(GR)).");
+        print_dline_box(0, out, " For each natural number n ≥ 1, the level n corresponds to the following classes:");
+        print_dline_box(0, out, "  - Level TLⁿ(GR) in the negation hierarchy of TL(GR).");
         print_dline_box(0, out, "  - Level BΣ²ₙ(<,GR) in the alternation hierarchy of two-variable first-order logic with");
         print_dline_box(0, out, "    the linear order and the group predicates.");
         print_dline_box(0, out, "  - Level MPolₖ(BPol(GR)) for k = n - 1 in the deterministic hierarchy of basis BPol(GR).");
+        print_dbot_line(100, out);
+        break;
+    case CL_GRP:
+        print_dtitle_box(10, false, out, 1, "Negation hierarchy of the unary temporal logic closure of GR⁺ (TL(GR⁺)).");
+        print_dline_box(0, out, " For each natural number n ≥ 1, the level n corresponds to the following classes:");
+        print_dline_box(0, out, "  - Level TLⁿ(GR⁺) in the negation hierarchy of TL(GR⁺).");
+        print_dline_box(0, out, "  - Level BΣ²ₙ(<,+1,GR) in the alternation hierarchy of two-variable first-order logic with");
+        print_dline_box(0, out, "    the linear order, the successor and the group predicates.");
+        print_dline_box(0, out, "  - Level MPolₖ(BPol(GR⁺)) for k = n - 1 in the deterministic hierarchy of basis BPol(GR⁺).");
         print_dbot_line(100, out);
         break;
     default:
@@ -2824,72 +2829,89 @@ void print_infooper_neghiera(com_keyword c, FILE* out)
 }
 
 // Future/past hierarchies
-void print_infooper_fphiera(com_keyword c, FILE* out)
+void print_infooper_fphiera(classes c, FILE* out)
 {
     switch (c)
     {
-    case KY_ST:
-        print_dtitle_box(10, false, stdout, 1, "Future/Past hierarchy of unary temporal logic (TL = TL(ST)).");
-        print_input_name(c, out);
-        print_dmid_line(100, stdout);
-        print_dline_box(0, stdout, " Characterization of the level FLⁿ (for n ≥ 1):");
-        print_dline_box(0, stdout, "  - If n is odd, level RPolₙ(BPol(ST)) in the deterministic hierarchy of basis BPol(ST).");
-        print_dline_box(0, stdout, "  - If n is even, level LPolₙ(BPol(ST)) in the deterministic hierarchy of basis BPol(ST).");
-        print_dline_box(0, stdout, " Characterization of the level PLⁿ (for n ≥ 1):");
-        print_dline_box(0, stdout, "  - If n is odd, level LPolₙ(BPol(ST)) in the deterministic hierarchy of basis BPol(ST).");
-        print_dline_box(0, stdout, "  - If n is even, level RPolₙ(BPol(ST)) in the deterministic hierarchy of basis BPol(ST).");
-        print_dbot_line(100, stdout);
+    case CL_ST:
+        print_dtitle_box(10, false, out, 1, "Future/Past hierarchy of unary temporal logic (TL = TL(ST)).");
+        print_dline_box(0, out, " Characterization of the level FLⁿ (for n ≥ 1):");
+        print_dline_box(0, out, "  - If n is odd, level RPolₙ(BPol(ST)) in the deterministic hierarchy of basis BPol(ST).");
+        print_dline_box(0, out, "  - If n is even, level LPolₙ(BPol(ST)) in the deterministic hierarchy of basis BPol(ST).");
+        print_dline_box(0, out, " Characterization of the level PLⁿ (for n ≥ 1):");
+        print_dline_box(0, out, "  - If n is odd, level LPolₙ(BPol(ST)) in the deterministic hierarchy of basis BPol(ST).");
+        print_dline_box(0, out, "  - If n is even, level RPolₙ(BPol(ST)) in the deterministic hierarchy of basis BPol(ST).");
+        print_dbot_line(100, out);
         break;
-    case KY_DD:
-        print_dtitle_box(10, false, stdout, 1, "Future/Past hierarchy of the unary temporal logic closure of DD (TL(DD)).");
-        print_input_name(c, out);
-        print_dmid_line(100, stdout);
-        print_dline_box(0, stdout, " Characterization of the level FLⁿ (for n ≥ 1):");
-        print_dline_box(0, stdout, "  - If n is odd, level RPolₙ(BPol(DD)) in the deterministic hierarchy of basis BPol(DD).");
-        print_dline_box(0, stdout, "  - If n is even, level LPolₙ(BPol(DD)) in the deterministic hierarchy of basis BPol(DD).");
-        print_dline_box(0, stdout, " Characterization of the level PLⁿ (for n ≥ 1):");
-        print_dline_box(0, stdout, "  - If n is odd, level LPolₙ(BPol(DD)) in the deterministic hierarchy of basis BPol(DD).");
-        print_dline_box(0, stdout, "  - If n is even, level RPolₙ(BPol(DD)) in the deterministic hierarchy of basis BPol(DD).");
-        print_dbot_line(100, stdout);
+    case CL_DD:
+        print_dtitle_box(10, false, out, 1, "Future/Past hierarchy of the unary temporal logic closure of DD (TL(DD)).");
+        print_dline_box(0, out, " Characterization of the level FLⁿ (for n ≥ 1):");
+        print_dline_box(0, out, "  - If n is odd, level RPolₙ(BPol(DD)) in the deterministic hierarchy of basis BPol(DD).");
+        print_dline_box(0, out, "  - If n is even, level LPolₙ(BPol(DD)) in the deterministic hierarchy of basis BPol(DD).");
+        print_dline_box(0, out, " Characterization of the level PLⁿ (for n ≥ 1):");
+        print_dline_box(0, out, "  - If n is odd, level LPolₙ(BPol(DD)) in the deterministic hierarchy of basis BPol(DD).");
+        print_dline_box(0, out, "  - If n is even, level RPolₙ(BPol(DD)) in the deterministic hierarchy of basis BPol(DD).");
+        print_dbot_line(100, out);
         break;
-    case KY_MOD:
-        print_dtitle_box(10, false, stdout, 1,
-            "Future/Past hierarchy of the unary temporal logic "
-            "closure of MOD (TL(MOD)).");
-        print_input_name(c, out);
-        print_dmid_line(100, stdout);
-        print_dline_box(0, stdout,
-            " Characterization of the level FLⁿ (for n ≥ 1):");
-        print_dline_box(0, stdout, "  - If n is odd, level RPolₙ(BPol(MOD)) in the deterministic hierarchy of basis BPol(MOD).");
-        print_dline_box(0, stdout, "  - If n is even, level LPolₙ(BPol(MOD)) in the deterministic hierarchy of basis BPol(MOD).");
-        print_dline_box(0, stdout, " Characterization of the level PLⁿ (for n ≥ 1):");
-        print_dline_box(0, stdout, "  - If n is odd, level LPolₙ(BPol(MOD)) in the deterministic hierarchy of basis BPol(MOD).");
-        print_dline_box(0, stdout, "  - If n is even, level RPolₙ(BPol(MOD)) in the deterministic hierarchy of basis BPol(MOD).");
-        print_dbot_line(100, stdout);
+    case CL_MOD:
+        print_dtitle_box(10, false, out, 1, "Future/Past hierarchy of the unary temporal logic closure of MOD (TL(MOD)).");
+        print_dline_box(0, out, " Characterization of the level FLⁿ (for n ≥ 1):");
+        print_dline_box(0, out, "  - If n is odd, level RPolₙ(BPol(MOD)) in the deterministic hierarchy of basis BPol(MOD).");
+        print_dline_box(0, out, "  - If n is even, level LPolₙ(BPol(MOD)) in the deterministic hierarchy of basis BPol(MOD).");
+        print_dline_box(0, out, " Characterization of the level PLⁿ (for n ≥ 1):");
+        print_dline_box(0, out, "  - If n is odd, level LPolₙ(BPol(MOD)) in the deterministic hierarchy of basis BPol(MOD).");
+        print_dline_box(0, out, "  - If n is even, level RPolₙ(BPol(MOD)) in the deterministic hierarchy of basis BPol(MOD).");
+        print_dbot_line(100, out);
         break;
-    case KY_MODP:
-        print_dtitle_box(10, false, stdout, 1, "Future/Past hierarchy of the unary temporal logic closure of MOD⁺ (TL(MOD⁺)).");
-        print_input_name(c, out);
-        print_dmid_line(100, stdout);
-        print_dline_box(0, stdout, " Characterization of the level FLⁿ (for n ≥ 1):");
-        print_dline_box(0, stdout, "  - If n is odd, level RPolₙ(BPol(MOD⁺)) in the deterministic hierarchy of basis BPol(MOD⁺).");
-        print_dline_box(0, stdout, "  - If n is even, level LPolₙ(BPol(MOD⁺)) in the deterministic hierarchy of basis BPol(MOD⁺).");
-        print_dline_box(0, stdout, " Characterization of the level PLⁿ (for n ≥ 1):");
-        print_dline_box(0, stdout, "  - If n is odd, level LPolₙ(BPol(MOD⁺)) in the deterministic hierarchy of basis BPol(MOD⁺).");
-        print_dline_box(0, stdout, "  - If n is even, level RPolₙ(BPol(MOD⁺)) in the deterministic hierarchy of basis BPol(MOD⁺).");
-        print_dbot_line(100, stdout);
+    case CL_MODP:
+        print_dtitle_box(10, false, out, 1, "Future/Past hierarchy of the unary temporal logic closure of MOD⁺ (TL(MOD⁺)).");
+        print_dline_box(0, out, " Characterization of the level FLⁿ (for n ≥ 1):");
+        print_dline_box(0, out, "  - If n is odd, level RPolₙ(BPol(MOD⁺)) in the deterministic hierarchy of basis BPol(MOD⁺).");
+        print_dline_box(0, out, "  - If n is even, level LPolₙ(BPol(MOD⁺)) in the deterministic hierarchy of basis BPol(MOD⁺).");
+        print_dline_box(0, out, " Characterization of the level PLⁿ (for n ≥ 1):");
+        print_dline_box(0, out, "  - If n is odd, level LPolₙ(BPol(MOD⁺)) in the deterministic hierarchy of basis BPol(MOD⁺).");
+        print_dline_box(0, out, "  - If n is even, level RPolₙ(BPol(MOD⁺)) in the deterministic hierarchy of basis BPol(MOD⁺).");
+        print_dbot_line(100, out);
         break;
-    case KY_GR:
-        print_dtitle_box(10, false, stdout, 1, "Future/Past hierarchy of the unary temporal logic closure of GR (TL(GR)).");
-        print_input_name(c, out);
-        print_dmid_line(100, stdout);
-        print_dline_box(0, stdout, " Characterization of the level FLⁿ (for n ≥ 1):");
-        print_dline_box(0, stdout, "  - If n is odd, level RPolₙ(BPol(GR)) in the deterministic hierarchy of basis BPol(GR).");
-        print_dline_box(0, stdout, "  - If n is even, level LPolₙ(BPol(GR)) in the deterministic hierarchy of basis BPol(GR).");
-        print_dline_box(0, stdout, " Characterization of the level PLⁿ (for n ≥ 1):");
-        print_dline_box(0, stdout, "  - If n is odd, level LPolₙ(BPol(GR)) in the deterministic hierarchy of basis BPol(GR).");
-        print_dline_box(0, stdout, "  - If n is even, level RPolₙ(BPol(GR)) in the deterministic hierarchy of basis BPol(GR).");
-        print_dbot_line(100, stdout);
+    case CL_AMT:
+        print_dtitle_box(10, false, out, 1, "Future/Past hierarchy of the unary temporal logic closure of AMT (TL(AMT)).");
+        print_dline_box(0, out, " Characterization of the level FLⁿ (for n ≥ 1):");
+        print_dline_box(0, out, "  - If n is odd, level RPolₙ(BPol(AMT)) in the deterministic hierarchy of basis BPol(AMT).");
+        print_dline_box(0, out, "  - If n is even, level LPolₙ(BPol(AMT)) in the deterministic hierarchy of basis BPol(AMT).");
+        print_dline_box(0, out, " Characterization of the level PLⁿ (for n ≥ 1):");
+        print_dline_box(0, out, "  - If n is odd, level LPolₙ(BPol(AMT)) in the deterministic hierarchy of basis BPol(AMT).");
+        print_dline_box(0, out, "  - If n is even, level RPolₙ(BPol(AMT)) in the deterministic hierarchy of basis BPol(AMT).");
+        print_dbot_line(100, out);
+        break;
+    case CL_AMTP:
+        print_dtitle_box(10, false, out, 1, "Future/Past hierarchy of the unary temporal logic closure of AMT⁺ (TL(AMT⁺)).");
+        print_dline_box(0, out, " Characterization of the level FLⁿ (for n ≥ 1):");
+        print_dline_box(0, out, "  - If n is odd, level RPolₙ(BPol(AMT⁺)) in the deterministic hierarchy of basis BPol(AMT⁺).");
+        print_dline_box(0, out, "  - If n is even, level LPolₙ(BPol(AMT⁺)) in the deterministic hierarchy of basis BPol(AMT⁺).");
+        print_dline_box(0, out, " Characterization of the level PLⁿ (for n ≥ 1):");
+        print_dline_box(0, out, "  - If n is odd, level LPolₙ(BPol(AMT⁺)) in the deterministic hierarchy of basis BPol(AMT⁺).");
+        print_dline_box(0, out, "  - If n is even, level RPolₙ(BPol(AMT⁺)) in the deterministic hierarchy of basis BPol(AMT⁺).");
+        print_dbot_line(100, out);
+        break;
+    case CL_GR:
+        print_dtitle_box(10, false, out, 1, "Future/Past hierarchy of the unary temporal logic closure of GR (TL(GR)).");
+        print_dline_box(0, out, " Characterization of the level FLⁿ (for n ≥ 1):");
+        print_dline_box(0, out, "  - If n is odd, level RPolₙ(BPol(GR)) in the deterministic hierarchy of basis BPol(GR).");
+        print_dline_box(0, out, "  - If n is even, level LPolₙ(BPol(GR)) in the deterministic hierarchy of basis BPol(GR).");
+        print_dline_box(0, out, " Characterization of the level PLⁿ (for n ≥ 1):");
+        print_dline_box(0, out, "  - If n is odd, level LPolₙ(BPol(GR)) in the deterministic hierarchy of basis BPol(GR).");
+        print_dline_box(0, out, "  - If n is even, level RPolₙ(BPol(GR)) in the deterministic hierarchy of basis BPol(GR).");
+        print_dbot_line(100, out);
+        break;
+    case CL_GRP:
+        print_dtitle_box(10, false, out, 1, "Future/Past hierarchy of the unary temporal logic closure of GR⁺ (TL(GR⁺)).");
+        print_dline_box(0, out, " Characterization of the level FLⁿ (for n ≥ 1):");
+        print_dline_box(0, out, "  - If n is odd, level RPolₙ(BPol(GR⁺)) in the deterministic hierarchy of basis BPol(GR⁺).");
+        print_dline_box(0, out, "  - If n is even, level LPolₙ(BPol(GR⁺)) in the deterministic hierarchy of basis BPol(GR⁺).");
+        print_dline_box(0, out, " Characterization of the level PLⁿ (for n ≥ 1):");
+        print_dline_box(0, out, "  - If n is odd, level LPolₙ(BPol(GR⁺)) in the deterministic hierarchy of basis BPol(GR⁺).");
+        print_dline_box(0, out, "  - If n is even, level RPolₙ(BPol(GR⁺)) in the deterministic hierarchy of basis BPol(GR⁺).");
+        print_dbot_line(100, out);
         break;
     default:
         break;

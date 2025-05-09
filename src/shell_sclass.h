@@ -199,6 +199,15 @@ classes command_to_class(com_command*);
  */
 void print_class_info(classes, FILE*);
 
+/**
+ * @brief
+ * Checks if a class is a basis class (ST, MOD, AMT, GR and their well-suited extensions).
+ *
+ * @return
+ * True if the class is a basis class, false otherwise.
+ */
+bool class_is_basis(classes cl);
+
 /**********/
 /* AD-HOC */
 /**********/
@@ -395,9 +404,9 @@ void print_conclusion_separ(FILE* out, bool res, const char* namec);
 
 
 // Negation hierarchies
-void print_infooper_neghiera(com_keyword c, FILE* out);
+void print_infooper_neghiera(classes c, FILE* out);
 
 // Future/past hierarchies
-void print_infooper_fphiera(com_keyword c, FILE* out);
+void print_infooper_fphiera(classes c, FILE* out);
 
 #endif

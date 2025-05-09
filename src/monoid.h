@@ -273,6 +273,8 @@ morphism* dfa_to_morphism(nfa*, //!< The complete DFA.
 nfa* morphism_to_dfa(morphism* //!< The morphism.
 );
 
+int dfa_to_morphism_opti(nfa* A);
+
 /**
  * @brief
  * Computation of a complete DFA from the left Cayley graph of a morphism.

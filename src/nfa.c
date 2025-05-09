@@ -154,7 +154,7 @@ nfa *create_sing_epsilon(void) {
     return A;
 }
 
-nfa *create_sing_letter(letter letter) {
+nfa *create_sing_letter(letter the_letter) {
     nfa *A = nfa_init();
 
     // Graphe des transitions (un seul état)
@@ -165,26 +165,26 @@ nfa *create_sing_letter(letter letter) {
 
     // Alphabet
     MALLOC(A->alphabet, 1);
-    A->alphabet[0] = letter;
+    A->alphabet[0] = the_letter;
 
     return A;
 }
 
-nfa *create_sing_word(word *word) {
+nfa *create_sing_word(word *the_word) {
     nfa *A = nfa_init();
 
     // Graphe des transitions (un seul état)
 
     lefins_dequeue(0, A->initials);
-    lefins_dequeue(size_word(word), A->finals);
+    lefins_dequeue(size_word(the_word), A->finals);
     uint alpha_size;
 
-    A->alphabet = get_alphabet_word(word, &alpha_size);
+    A->alphabet = get_alphabet_word(the_word, &alpha_size);
 
-    A->trans = create_lgraph_noedges(size_word(word) + 1, alpha_size);
+    A->trans = create_lgraph_noedges(size_word(the_word) + 1, alpha_size);
 
-    for (uint i = 0; i < size_word(word); i++) {
-        letter l = lefread_word(word, i);
+    for (uint i = 0; i < size_word(the_word); i++) {
+        letter l = lefread_word(the_word, i);
         letter *p = bsearch(&l, A->alphabet, alpha_size, sizeof(letter), compare_letters);
         lefins_dequeue(i + 1, A->trans->edges[i][p - A->alphabet]);
     }

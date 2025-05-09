@@ -1689,7 +1689,7 @@ bool shell_membership_pl2grp(int //!< Index of the language in the objects array
 
 
 /***********************/
-/* Procédures globales */
+/* Global procedures */
 /***********************/
 
 /**
@@ -1709,6 +1709,13 @@ bool shell_membership(com_parameters* //!< Command parameters (should include th
 bool shell_chiera_summary(com_parameters* //!< Command parameters (should include the input language).
 );
 
+
+/*****************************/
+/* Deterministic hierarchies */
+/*****************************/
+
+
+
 /**
  * @brief
  * Computes the level of a language inside a negation hierarchy.
@@ -1723,6 +1730,11 @@ bool shell_neghiera(com_parameters* //!< Command parameters (should include the 
 bool shell_fphiera(com_parameters* //!< Command parameters (should include the base class and the input language).
 );
 
+
+/***********************/
+/* Examples generators */
+/***********************/
+
 /**
  * @brief
  * Searches for all DFAs of a given size satisfying a given set of membership constraints.
@@ -1736,6 +1748,8 @@ bool shell_exall(com_parameters* //!< Command parameters (should include the siz
  */
 bool shell_exsearch(com_parameters* //!< Command parameters (should include the size of the DFAs and the membership constraints).
 );
+
+bool shell_exall_dethiera(com_parameters* pars, bool neg);
 
 
 

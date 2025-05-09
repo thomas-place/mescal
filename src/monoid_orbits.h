@@ -233,7 +233,7 @@ subsemi* compute_one_orbit_from_pairs(morphism*, //!< The morphism.
  *
  * @remark
  * The returned multiplication table is indexed by the indices of the elements of the subset
- * in the input list (first) and by the indices of the J-class (second).  Its cells contains
+ * in the input list (first) and by the indices of the J-class (second).  Its cells contain
  * the result of every product in the original monoid. If a product does not fall within the
  * J-class, it is given the value ->M->r_cayley->size_graph (which is not a valid element).
  *

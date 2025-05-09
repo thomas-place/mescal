@@ -306,7 +306,7 @@ void mor_compute_green(morphism* M) {
     }
 
     // Initialization of the structure.
-    MALLOC(M->rels, 1);
+    CALLOC(M->rels, 1);
 
     // Computing the R equivalence (strongly connected components of the right cayley graph).
     M->rels->RCL = dtarjan(M->r_cayley);
@@ -317,9 +317,9 @@ void mor_compute_green(morphism* M) {
     // Computing the J equivalence (strongly connected components of the J order).
     M->rels->JCL = ltarjan(M->j_order);
 
-
     // Computing the relation H.
     h_green_compute(M->rels);
+
     // Computing the regular elements and the groups.
     gr_green_compute(M->idem_list, M->rels);
 }
@@ -542,8 +542,20 @@ static void delete_morphism_state_weak(void* p) {
     if (p == NULL) {
         return;
     }
+    free(((morphism_state*)p)->next);
     free(p);
 }
+
+static void delete_morphism_state_strong(void* p) {
+    if (p == NULL) {
+
+        return;
+    }
+    free(((morphism_state*)p)->state);
+    free(((morphism_state*)p)->next);
+    free(p);
+}
+
 
 // Function comparing two objects of type morphism_state. Useful for comparing states in AVLs.
 static int comp_morphism_state(void* p1, void* p2) {
@@ -752,15 +764,13 @@ morphism* dfa_to_morphism(nfa* A, bool** order, int* error) {
 
     // Construction of the morphism.
     morphism* M;
-    MALLOC(M, 1);
+    CALLOC(M, 1);
     M->alphabet = nfa_duplicate_alpha(A);                           // Copy letter names.
     M->r_cayley = create_dgraph_noedges(num, A->trans->size_alpha); // Create the graph.
     MALLOC(M->pred_ele, num);                                         // Predecessor elements.
     MALLOC(M->pred_lab, num);                                         // Predecessor letters.
     MALLOC(M->accept_array, num);                                   // Array representing the accepting set.
     MALLOC(M->idem_array, num);                                     // Array of idempotents.
-    M->order = NULL;                                                // Order of the morphism.
-    M->mult = NULL;                                                 // Multiplication table.
 
     uint** permuts;
     MALLOC(permuts, num); // Array of permutations defining the elements.
@@ -810,6 +820,105 @@ morphism* dfa_to_morphism(nfa* A, bool** order, int* error) {
     ignore_interrupt();
     normal_mode();
     return M;
+}
+
+
+
+
+
+
+int dfa_to_morphism_opti(nfa* A) {
+
+    // Fifo containing the elements to be processed.
+    dequeue_gen* thequeue = create_dequeue_gen();
+
+    // AVL containing all elements already constructed.
+    avlnode* thetree = NULL;
+
+    // Count the number of elements constructed.
+    uint num = 0;
+
+    // Stack the first element: the identity (which has number 0).
+    morphism_state* neutral;
+    MALLOC(neutral, 1);
+    neutral->num = num;
+    num++;
+    //neutral->name = create_dequeue();           // The name of this element is the empty word.
+    neutral->size_alpha = A->trans->size_alpha; // Number of letters.
+    neutral->size_graph = A->trans->size_graph; // Number of states.
+    neutral->next = NULL;                       // The next elements are not yet computed.
+    MALLOC(neutral->state, neutral->size_graph);
+    for (uint q = 0; q < neutral->size_graph; q++) // This element is the identity.
+    {
+        neutral->state[q] = q;
+    }
+
+    // Insertion in the set of already met elements.
+    thetree = avl_insert(neutral, thetree, &comp_morphism_state, NULL);
+
+    // Treat this element.
+    lefins_dequeue_gen(neutral, thequeue);
+
+
+    while (!isempty_dequeue_gen(thequeue)) {
+        // Free allocated memory if the limit is reached, or if a yser
+        // interruption occurs, or if the timeout is reached.
+
+
+        // Get the element to be processed.
+        morphism_state* theelem = (morphism_state*)rigpull_dequeue_gen(thequeue);
+
+        // Compute the transitions from this element.
+        MALLOC(theelem->next, theelem->size_alpha);
+
+        for (uint a = 0; a < theelem->size_alpha; a++) {
+            // Create the (potential) new element, computed by multiplying the old one on the right.
+            morphism_state* new;
+            MALLOC(new, 1);
+            new->size_graph = A->trans->size_graph;
+            MALLOC(new->state, new->size_graph);
+
+            // Compute the corresponding permutation.
+            for (uint q = 0; q < neutral->size_graph; q++) {
+                new->state[q] = lefread_dequeue(A->trans->edges[theelem->state[q]][a], 0);
+            }
+
+            // Check if this state already exists.
+            avlnode* thenode = avl_search(new, thetree, &comp_morphism_state);
+
+            // If not, initialize a new element.
+            if (thenode == NULL) {
+                new->size_alpha = A->trans->size_alpha;
+                new->next = NULL; // For now, we don't know the next elements.
+                new->num = num;
+                num++;
+                new->pred_ele = theelem->num; // The predecessor of this element is the one we are treating.
+                new->pred_lab = a;           // The predecessor letter is the one we are treating.
+                theelem->next[a] = new;                                         // Assign it as a successor for letter a.
+                thetree = avl_insert(new, thetree, &comp_morphism_state, NULL); // Store it in the set of known elements.
+                lefins_dequeue_gen(new, thequeue);                              // This new element has to be treated in the future..
+            }
+            else
+                // The element was already constructed.
+            {
+                theelem->next[a] = ((morphism_state*)thenode->value); // We assign the version already built as an a-successor.
+                free(new->state);                                      // We free the copy we've just created.
+                free(new);
+            }
+        }
+    }
+    delete_dequeue_gen(thequeue);
+
+
+
+
+
+    // Free the AVL
+    avl_free_strong(thetree, &delete_morphism_state_strong);
+
+
+
+    return num;
 }
 
 nfa* morphism_to_dfa(morphism* M) {

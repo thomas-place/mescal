@@ -127,6 +127,10 @@ static void dfa_avl_to_table(avlnode* AVL, nfa* DFA, dequeue* oldfinals, bool* n
 // (sets of states of the old NFA) should be saved in the DFA.
 nfa* nfa_determinize(nfa* A, bool names) {
 
+    if (!A) {
+        return NULL;
+    }
+
     // First we eliminate the (possible) epsilon transitions
     A = nfa_elimeps(A);
 

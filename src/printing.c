@@ -534,7 +534,7 @@ static void latex_print_aux(morphism* M, dgraph* G, FILE* out) {
 
     dequeue_gen* theedges = dgraph_to_multi_edges(M->r_cayley);
     while (!isempty_dequeue_gen(theedges)) {
-        multi_edge* new = rigpull_dequeue_gen(theedges);
+        multi_edge* new = lefpull_dequeue_gen(theedges);
 
         fprintf(out, "\\draw[%s] (n%d) to ", tikz_types[TIKZ_CAYT], new->in);
 
@@ -542,10 +542,10 @@ static void latex_print_aux(morphism* M, dgraph* G, FILE* out) {
             fprintf(out, "[loop above] node[above] {$");
         }
         else if (new->in < new->out) {
-            fprintf(out, "[out=0,in=180] node[above] {$");
+            fprintf(out, "[bend left=15] node[above] {$");
         }
         else {
-            fprintf(out, "[out=180,in=0] node[above] {$");
+            fprintf(out, "[bend left=15] node[above] {$");
         }
         for (uint j = 0; j < size_dequeue(new->lab); j++) {
             if (j > 0) {
@@ -588,7 +588,7 @@ void latex_print_automaton(nfa* A, FILE* out) {
 
     dequeue_gen* theedges = nfa_to_multi_edges(A);
     while (!isempty_dequeue_gen(theedges)) {
-        multi_edge* new = rigpull_dequeue_gen(theedges);
+        multi_edge* new = lefpull_dequeue_gen(theedges);
 
         fprintf(out, "\\draw[%s] (n%d) to ", tikz_types[TIKZ_CAYT], new->in);
 
@@ -596,10 +596,10 @@ void latex_print_automaton(nfa* A, FILE* out) {
             fprintf(out, "[loop above] node[above] {$");
         }
         else if (new->in < new->out) {
-            fprintf(out, "[out=0,in=180] node[above] {$");
+            fprintf(out, "[bend left=15] node[above] {$");
         }
         else {
-            fprintf(out, "[out=180,in=0] node[above] {$");
+            fprintf(out, "[bend left=15] node[above] {$");
         }
 
         if (new->eps) {
