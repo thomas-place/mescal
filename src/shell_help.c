@@ -8,18 +8,19 @@
 void help(void) {
     // FILE *p = popen("less", "w");
     // if (p == NULL)
-    FILE* p = stdout;
+    FILE *p = stdout;
 
     print_dtitle_box(100, true, p, 1, "\"Welcome to the help of the MeSCaL program! ");
     print_title_box(100, true, p, 1, "Basic commands");
     fprintf(p, "\n#### General commands:\n\n");
     fprintf(p, "%4s%-*sThis help.\n", "", PAD1, "help");
     fprintf(p, "%4s%-*sDisplays the current timeout.\n", "", PAD1, "timeout");
-    fprintf(p, "%4s%-*sSets the timeout to <value> seconds.\n", "", PAD1, "timeout = <value>");
+    fprintf(p, "%4s%-*sSets the timeout to <value> seconds (0 to cancel timeout).\n", "", PAD1, "timeout = <value>");
     fprintf(p, "%4s%-*sDisplays the current limit.\n", "", PAD1, "limit");
     fprintf(p, "%4s%-*sSets the limit to <value>.\n", "", PAD1, "limit = <value>");
     fprintf(p, "%4s%-*sDisplays the current history size.\n", "", PAD1, "history");
     fprintf(p, "%4s%-*sSets the history size to <value> entries.\n", "", PAD1, "history = <value>");
+    fprintf(p, "%4s%-*sCalls the test() function.\n", "", PAD1, "test");
     fprintf(p, "%4s%-*sQuits.\n", "", PAD1, "quit or exit");
     fprintf(p, "%4s%-*sLists all classes recognized by the program.\n", "", PAD1, "classes");
 
@@ -143,8 +144,6 @@ void help(void) {
     fprintf(p, "%4s%-*sDisplays the GR-kernel of the morphism.\n", "", PAD1, "gkernel(M)");
     fprintf(p, "%4s%-*sDisplays the 𝒞-orbits for the morphism (implemented for 𝒞 = DD, MOD⁺, AT).\n", "", PAD2, "orbit(𝒞,M)");
     fprintf(p, "%4s%-*sDisplays the 𝒞-orbit of the idempotent e for the morphism (implemented for 𝒞 = DD, MOD⁺, AT).\n", "", PAD2, "orbit(𝒞,M,e)");
-    fprintf(p, "%4s%-*sDisplays the OP(𝒞)-orbits for the morphism (implemented for OP = BPol, TL and 𝒞 = ST, DD, MOD, MOD⁺, GR, GR⁺).\n", "", PAD2, "orbit(OP,𝒞,M)");
-    fprintf(p, "%4s%-*sDisplays the OP(𝒞)-orbits of the idempotent e for the morphism (implemented for OP = BPol, TL and 𝒞 = ST, DD, MOD, MOD⁺, GR, GR⁺).\n", "", PAD2, "orbit(OP,𝒞,M,e)");
     fprintf(p, "%4s%-*sComputes the image of an input word.\n", "", PAD1, "image(M,\"<word>\")");
 
     fprintf(p, "\n");
@@ -207,10 +206,11 @@ void help(void) {
 
     fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state) and <n2> letters which are outside 𝒞 and inside 𝒟.\n", "", 56, "exall(𝒞,𝒟,<n1>,<n2>)");
     fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state) and <n2> letters which are outside 𝒞₁,..,𝒞ₙ and inside 𝒟₁,..,𝒟ₘ.\n", "", 70,
-        "exall(out(𝒞₁,..,𝒞ₙ),in(𝒟₁,..,𝒟ₘ),<n1>,<n2>)");
-    fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state) and <n2> letters which are at level <n0> in the negation hierarchy of TL(𝒞).\n", "", 53, "negexall(𝒞,<n0>,<n1>,<n2>)");
-    fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state) and <n2> letters which are at level <n0> in the future/past hierarchy of TL(𝒞).\n\n", "", 53, "fpexall(𝒞,<n0>,<n1>,<n2>)");
-
+            "exall(out(𝒞₁,..,𝒞ₙ),in(𝒟₁,..,𝒟ₘ),<n1>,<n2>)");
+    fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state) and <n2> letters which are at level <n0> in the negation hierarchy of TL(𝒞).\n", "", 53,
+            "negexall(𝒞,<n0>,<n1>,<n2>)");
+    fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state) and <n2> letters which are at level <n0> in the future/past hierarchy of TL(𝒞).\n\n", "",
+            53, "fpexall(𝒞,<n0>,<n1>,<n2>)");
 
     print_title_box(100, true, p, 1, "Separation tests");
 
@@ -230,21 +230,19 @@ void help(void) {
     // fclose(p);
 }
 
-static void print_class_info_status(classes class, FILE* out) {
+static void print_class_info_status(classes class, FILE *out) {
     if (class_infos[class]) {
         class_infos[class](out);
 
         print_dmid_line(100, out);
         if (class_membership[class]) {
             print_dline_box(109, out, " Membership : " ANSI_COLOR_GREEN "Implemented.   " ANSI_COLOR_RESET);
-        }
-        else {
+        } else {
             print_dline_box(109, out, " Membership : " ANSI_COLOR_RED "Not implemented." ANSI_COLOR_RESET);
         }
         if (class_separation[class]) {
             print_dline_box(109, out, " Separation : " ANSI_COLOR_GREEN "Implemented." ANSI_COLOR_RESET);
-        }
-        else {
+        } else {
             print_dline_box(109, out, " Separation : " ANSI_COLOR_RED "Not implemented." ANSI_COLOR_RESET);
         }
         print_dbot_line(100, out);

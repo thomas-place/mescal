@@ -52,7 +52,7 @@ void init_membership(void) {
     class_membership[CL_JORBMOD] = shell_membership_jorbmod;
     class_membership[CL_JORBAMT] = shell_membership_jorbamt;
     class_membership[CL_JORBMODP] = shell_membership_jorbmodp;
-    class_membership[CL_JORBAMTP] = shell_membership_amtp;
+    class_membership[CL_JORBAMTP] = shell_membership_jorbamtp;
     class_membership[CL_JORBGRP] = shell_membership_jorbgrp;
     class_membership[CL_JORBDD] = shell_membership_jorbdd;
     class_membership[CL_JORBAT] = shell_membership_jorbat;
@@ -1458,6 +1458,16 @@ static void populate_table_plus(int j, int op, int bs, bool (*fun) (int, FILE*),
     }
 }
 
+static void populate_line_from_sf(int bs, ans_type ans, ans_type res[CLT_SIZE][BSI_SIZE]) {
+    if (ans == ANS_YES) {
+        res[CLT_SF][bs] = ANS_YES;
+        return;
+    }
+    for (int g = 0; g < CLT_SIZE; g++) {
+        res[g][bs] = ANS_NO;
+    }
+}
+
 
 
 static void summary_print_answer(ans_type res) {
@@ -1531,7 +1541,8 @@ bool shell_chiera_summary(com_parameters* pars) {
     /* Basis DD */
     /************/
 
-    res[CLT_SF][BSI_DD] = res[CLT_SF][BSI_ST];
+    populate_line_from_sf(BSI_DD, res[CLT_SF][BSI_ST], res);
+
     populate_table_plus(j, CLT_BASIS, BSI_DD, shell_membership_dd, res);
     populate_table_plus(j, CLT_BPOL, BSI_DD, shell_membership_bpoldd, res);
     populate_table_plus(j, CLT_POL, BSI_DD, shell_membership_poldd, res);
@@ -1574,8 +1585,7 @@ bool shell_chiera_summary(com_parameters* pars) {
     /**************/
     /* Basis MODP */
     /**************/
-
-    res[CLT_SF][BSI_MODP] = res[CLT_SF][BSI_MOD];
+    populate_line_from_sf(BSI_MODP, res[CLT_SF][BSI_MOD], res);
     populate_table_plus(j, CLT_BASIS, BSI_MODP, shell_membership_modp, res);
     populate_table_plus(j, CLT_BPOL, BSI_MODP, shell_membership_bpolmodp, res);
     populate_table_plus(j, CLT_POL, BSI_MODP, shell_membership_polmodp, res);
@@ -1612,7 +1622,7 @@ bool shell_chiera_summary(com_parameters* pars) {
     /* Basis AMTP */
     /**************/
 
-    res[CLT_SF][BSI_AMTP] = res[CLT_SF][BSI_AMT];
+    populate_line_from_sf(BSI_AMTP, res[CLT_SF][BSI_AMT], res);
     populate_table_plus(j, CLT_BASIS, BSI_AMTP, shell_membership_amtp, res);
     populate_table_plus(j, CLT_BPOL, BSI_AMTP, shell_membership_bpolamtp, res);
     populate_table_plus(j, CLT_TL, BSI_AMTP, shell_membership_tlamtp, res);
@@ -1641,8 +1651,7 @@ bool shell_chiera_summary(com_parameters* pars) {
    /* Basis GRP */
    /*************/
 
-
-    res[CLT_SF][BSI_GRP] = res[CLT_SF][BSI_GR];
+    populate_line_from_sf(BSI_GRP, res[CLT_SF][BSI_GR], res);
     populate_table_plus(j, CLT_BASIS, BSI_GRP, shell_membership_grp, res);
     populate_table_plus(j, CLT_BPOL, BSI_GRP, shell_membership_bpolgrp, res);
     populate_table_plus(j, CLT_POL, BSI_GRP, shell_membership_polgrp, res);

@@ -35,7 +35,7 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
 
     help                          This help.
     timeout                       Displays the current timeout.
-    timeout = <value>             Sets the timeout to <value> seconds.
+    timeout = <value>             Sets the timeout to <value> seconds (0 to cancel timeout).
     limit                         Displays the current limit.
     limit = <value>               Sets the limit to <value>.
     history                       Displays the current history size.

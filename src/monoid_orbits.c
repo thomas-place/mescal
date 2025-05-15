@@ -488,7 +488,7 @@ uint** compute_jmult(morphism* M, dequeue* set, dequeue* jcl) {
         // The element.
         uint s = lefread_dequeue(set, i);
 
-        // Allocation of the line of the table: multiplication of this elements with the J-class.
+        // Allocation of the line of the table: multiplication of this element with the J-class.
         MALLOC(table[i], size_dequeue(jcl));
 
         // Initializing the structures for the computation.
@@ -532,6 +532,77 @@ uint** compute_jmult(morphism* M, dequeue* set, dequeue* jcl) {
     return table;
 }
 
+
+
+
+static dequeue** compute_jmult_kernel(morphism* M, dequeue* set, dequeue* jcl, subsemi* ker) {
+    green* G = M->rels;
+
+    // The table of multiplication we are going to fill.
+    dequeue** table;
+    MALLOC(table, size_dequeue(set));
+
+    // A Boolean array for the DFS.
+    bool* visited;
+    MALLOC(visited, size_dequeue(jcl));
+
+    // Two stacks for the DFS.
+    dequeue* fromcur = create_dequeue();
+    dequeue* fromone = create_dequeue();
+
+    // For every index of an element in set
+    for (uint i = 0; i < size_dequeue(set); i++) {
+
+        // The element.
+        uint s = lefread_dequeue(set, i);
+
+        // Allocation of the line of the table: multiplications of this element with the J-class.
+        table[i] = create_dequeue();
+
+
+        // Initializing the structures for the computation.
+        for (uint j = 0; j < size_dequeue(jcl); j++) {
+            visited[j] = false;
+        }
+
+        // For every element e of the J-class
+        for (uint j = 0; j < size_dequeue(jcl); j++) {
+            uint e = lefread_dequeue(jcl, j);
+
+            // If e is an idempotent such that e L s (we have s = se)
+            // We compute the multiplications with all elements in the R-class.
+            if (M->idem_array[e] && G->LCL->numcl[e] == G->LCL->numcl[s]) {
+
+                rigins_dequeue(e, fromone);
+                rigins_dequeue(s, fromcur);
+                while (!isempty_dequeue(fromone)) {
+                    uint t = rigpull_dequeue(fromone);
+                    uint st = rigpull_dequeue(fromcur);
+
+                    uint ist, jt;
+
+                    if (!mem_dequeue_sorted(st, set, &ist) || !mem_dequeue_sorted(t, jcl, &jt) || visited[jt]) {
+                        continue;
+                    }
+                    visited[jt] = true;
+                    if (ker->mono_in_sub[t]) {
+                        rigins_dequeue(st, table[i]);
+                    }
+                    for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
+                        rigins_dequeue(M->r_cayley->edges[t][a], fromone);
+                        rigins_dequeue(M->r_cayley->edges[st][a], fromcur);
+                    }
+                }
+            }
+        }
+        sort_dequeue_norepeat(table[i]);
+    }
+    delete_dequeue(fromcur);
+    delete_dequeue(fromone);
+    free(visited);
+    return table;
+}
+
 bool** compute_polgpairs(subsemi* S, dequeue* rideal, uint rcl) {
     morphism* M = S->original;
     green* G = S->original->rels;
@@ -541,17 +612,7 @@ bool** compute_polgpairs(subsemi* S, dequeue* rideal, uint rcl) {
     uint jcl = G->JCL->numcl[lefread_dequeue(G->RCL->cl[rcl], 0)];
 
     // Computes the multiplication table between the R-class and the J-class.
-    uint** table = compute_jmult(M, G->RCL->cl[rcl], G->JCL->cl[jcl]);
-
-
-
-    dequeue* jc_inker = create_dequeue();
-    for (uint i = 0; i < size_dequeue(G->JCL->cl[jcl]); i++) {
-        if (S->mono_in_sub[lefread_dequeue(G->JCL->cl[jcl], i)]) {
-
-            rigins_dequeue(i, jc_inker);
-        }
-    }
+    dequeue** table = compute_jmult_kernel(M, G->RCL->cl[rcl], G->JCL->cl[jcl], S);
 
     // Preparation of the array to return
     bool** visited;
@@ -559,6 +620,7 @@ bool** compute_polgpairs(subsemi* S, dequeue* rideal, uint rcl) {
     for (uint i = 0; i < size_dequeue(rideal); i++) {
         CALLOC(visited[i], size_dequeue(G->RCL->cl[rcl]));
     }
+
 
     // Stacks that store the new pairs to treat
     dequeue* topstack = create_dequeue();
@@ -568,19 +630,16 @@ bool** compute_polgpairs(subsemi* S, dequeue* rideal, uint rcl) {
     rigins_dequeue(lefread_dequeue(G->RCL->cl[rcl], 0), topstack);
     rigins_dequeue(lefread_dequeue(G->RCL->cl[rcl], 0), botstack);
 
-
-
     // DFS
     while (!isempty_dequeue(topstack)) {
         uint q = rigpull_dequeue(topstack);
         uint r = rigpull_dequeue(botstack);
-
         uint iq, ir;
-
         if (!mem_dequeue_sorted(q, rideal, &iq) || !mem_dequeue_sorted(r, G->RCL->cl[rcl], &ir) || visited[iq][ir]) {
             continue;
         }
         visited[iq][ir] = true;
+
 
         // For each letter a, we add the pair (qa,ra) 
         for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
@@ -588,23 +647,23 @@ bool** compute_polgpairs(subsemi* S, dequeue* rideal, uint rcl) {
             rigins_dequeue(M->r_cayley->edges[r][a], botstack);
         }
 
-
-        // For each element s in the kernel such that s J e, we take the pair (q,rs)
-        for (uint j = 0; j < size_dequeue(jc_inker); j++) {
-            uint s = table[ir][lefread_dequeue(jc_inker, j)];
-
-            // We are only intersted in this pair if rs R e
-            if (s != M->r_cayley->size_graph) {
-                rigins_dequeue(q, topstack);
-                rigins_dequeue(s, botstack);
+        // Multiplication with the kernel
+        for (uint j = 0; j < size_dequeue(table[ir]); j++) {
+            uint s = lefread_dequeue(table[ir], j);
+            uint is;
+            mem_dequeue_sorted(s, G->RCL->cl[rcl], &is);
+            visited[iq][is] = true;
+            for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
+                rigins_dequeue(M->r_cayley->edges[q][a], topstack);
+                rigins_dequeue(M->r_cayley->edges[s][a], botstack);
             }
         }
     }
-    delete_dequeue(jc_inker);
+
     delete_dequeue(topstack);
     delete_dequeue(botstack);
     for (uint i = 0; i < size_dequeue(G->RCL->cl[rcl]); i++) {
-        free(table[i]);
+        delete_dequeue(table[i]);
     }
     free(table);
     return visited;
@@ -663,6 +722,85 @@ orbits* compute_bpgorbits(subsemi* S, sub_level level) {
 /* BPol(G⁺)-orbits */
 /*******************/
 
+
+
+static dequeue*** compute_jmult_orbits(morphism* M, dequeue* set, dequeue* jcl, orbits* L) {
+    green* G = M->rels;
+
+    // The table of multiplication we are going to fill.
+    dequeue*** table;
+    MALLOC(table, size_dequeue(set));
+
+    for (uint i = 0; i < size_dequeue(set); i++) {
+        MALLOC(table[i], L->nb_computed);
+        for (uint j = 0; j < L->nb_computed; j++) {
+            table[i][j] = create_dequeue();
+        }
+    }
+
+    // A Boolean array for the DFS.
+    bool* visited;
+    MALLOC(visited, size_dequeue(jcl));
+
+    // Two stacks for the DFS.
+    dequeue* fromcur = create_dequeue();
+    dequeue* fromone = create_dequeue();
+
+    // For every index of an element in set
+    for (uint i = 0; i < size_dequeue(set); i++) {
+
+        // The element.
+        uint s = lefread_dequeue(set, i);
+
+        // Initializing the structure for the computation.
+        for (uint j = 0; j < size_dequeue(jcl); j++) {
+            visited[j] = false;
+        }
+
+        // For every element e of the J-class
+        for (uint j = 0; j < size_dequeue(jcl); j++) {
+            uint e = lefread_dequeue(jcl, j);
+
+            // If e is an idempotent such that e L s (we have s = se)
+            // We compute the multiplications with all elements in the R-class.
+            if (M->idem_array[e] && G->LCL->numcl[e] == G->LCL->numcl[s]) {
+
+                rigins_dequeue(e, fromone);
+                rigins_dequeue(s, fromcur);
+                while (!isempty_dequeue(fromone)) {
+                    uint t = rigpull_dequeue(fromone);
+                    uint st = rigpull_dequeue(fromcur);
+
+                    uint ist, jt;
+
+                    if (!mem_dequeue_sorted(st, set, &ist) || !mem_dequeue_sorted(t, jcl, &jt) || visited[jt]) {
+                        continue;
+                    }
+                    visited[jt] = true;
+                    for (uint k = 0; k < L->nb_computed; k++) {
+                        if (L->orbits[k]->mono_in_sub[t]) {
+                            rigins_dequeue(st, table[i][k]);
+                        }
+                    }
+
+                    for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
+                        rigins_dequeue(M->r_cayley->edges[t][a], fromone);
+                        rigins_dequeue(M->r_cayley->edges[st][a], fromcur);
+                    }
+                }
+            }
+        }
+        for (uint k = 0; k < L->nb_computed; k++) {
+            sort_dequeue_norepeat(table[i][k]);
+        }
+    }
+    delete_dequeue(fromcur);
+    delete_dequeue(fromone);
+    free(visited);
+    return table;
+}
+
+
 bool** compute_polgpluspairs(orbits* L, dequeue* rideal, uint rcl) {
     morphism* M = L->original;
     green* G = L->original->rels;
@@ -672,33 +810,7 @@ bool** compute_polgpluspairs(orbits* L, dequeue* rideal, uint rcl) {
     uint jcl = G->JCL->numcl[lefread_dequeue(G->RCL->cl[rcl], 0)];
 
     // Computes the multiplication table between the R-class and the J-class.
-    uint** table = compute_jmult(M, G->RCL->cl[rcl], G->JCL->cl[jcl]);
-
-
-    dequeue** right_idems;
-    MALLOC(right_idems, size_dequeue(rideal));
-    for (uint i = 0; i < size_dequeue(rideal); i++) {
-        right_idems[i] = create_dequeue();
-    }
-
-    dequeue** jc_inorbit;
-    MALLOC(jc_inorbit, M->nb_min_regular_jcl);
-    for (uint i = 0; i < M->nb_min_regular_jcl; i++) {
-        uint f = M->regular_idems[i];
-        dequeue* Mf = compute_l_ideal(M, f, NULL);
-        for (uint j = 0; j < size_dequeue(rideal); j++) {
-            if (intersec_dequeue(Mf, rideal)) {
-                rigins_dequeue(i, right_idems[j]);
-            }
-        }
-        delete_dequeue(Mf);
-        jc_inorbit[i] = create_dequeue();
-        for (uint j = 0; j < size_dequeue(G->JCL->cl[jcl]); j++) {
-            if (L->orbits[i]->mono_in_sub[lefread_dequeue(G->JCL->cl[jcl], j)]) {
-                rigins_dequeue(j, jc_inorbit[i]);
-            }
-        }
-    }
+    dequeue*** table = compute_jmult_orbits(M, G->RCL->cl[rcl], G->JCL->cl[jcl], L);
 
     // Preparation of the array to return.
     bool** visited;
@@ -710,16 +822,19 @@ bool** compute_polgpluspairs(orbits* L, dequeue* rideal, uint rcl) {
     // Stacks to store the new pairs to treat.
     dequeue* topstack = create_dequeue();
     dequeue* botstack = create_dequeue();
+    dequeue* rigidem = create_dequeue();
 
     // We start from a trivial pair built from an element in the R-class.
     rigins_dequeue(lefread_dequeue(G->RCL->cl[rcl], 0), topstack);
     rigins_dequeue(lefread_dequeue(G->RCL->cl[rcl], 0), botstack);
+    rigins_dequeue(L->nb_computed, rigidem);
 
 
     // DFS
     while (!isempty_dequeue(topstack)) {
         uint q = rigpull_dequeue(topstack);
         uint r = rigpull_dequeue(botstack);
+        uint l = rigpull_dequeue(rigidem);
 
         uint iq, ir;
 
@@ -733,33 +848,38 @@ bool** compute_polgpluspairs(orbits* L, dequeue* rideal, uint rcl) {
         for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
             rigins_dequeue(M->r_cayley->edges[q][a], topstack);
             rigins_dequeue(M->r_cayley->edges[r][a], botstack);
+            rigins_dequeue(L->nb_computed, rigidem);
         }
 
-        // For each idempotent that stabilizes q to the right.
-        for (uint k = 0; k < size_dequeue(right_idems[iq]); k++) {
-            uint num = lefread_dequeue(right_idems[iq], k);
-            for (uint j = 0; j < size_dequeue(jc_inorbit[num]); j++) {
-                uint s = table[ir][lefread_dequeue(jc_inorbit[num], j)];
-
-                // We are only interested in this pair if rs R e
-                if (s != M->r_cayley->size_graph) {
-                    rigins_dequeue(q, topstack);
-                    rigins_dequeue(s, botstack);
-                }
+        for (uint k = 0; k < L->nb_computed; k++) {
+            if (l == k) {
+                continue;
+            }
+            uint e = L->orbits[k]->sub_to_mono[L->orbits[k]->neut];
+            uint qe = mor_mult(M, q, e);
+            uint re = mor_mult(M, r, e);
+            if (qe != q || re != r) {
+                continue;
+            }
+            for (uint j = 0; j < size_dequeue(table[ir][k]); j++) {
+                uint s = lefread_dequeue(table[ir][k], j);
+                // uint is;
+                // mem_dequeue_sorted(s, G->RCL->cl[rcl], &is);
+                // visited[iq][is] = true;
+                rigins_dequeue(q, topstack);
+                rigins_dequeue(s, botstack);
+                rigins_dequeue(k, rigidem);
             }
         }
     }
-    for (uint i = 0; i < size_dequeue(rideal); i++) {
-        delete_dequeue(right_idems[i]);
-    }
-    free(right_idems);
-    for (uint i = 0; i < M->nb_min_regular_jcl; i++) {
-        delete_dequeue(jc_inorbit[i]);
-    }
-    free(jc_inorbit);
+
     delete_dequeue(topstack);
     delete_dequeue(botstack);
+    delete_dequeue(rigidem);
     for (uint i = 0; i < size_dequeue(G->RCL->cl[rcl]); i++) {
+        for (uint k = 0; k < L->nb_computed; k++) {
+            delete_dequeue(table[i][k]);
+        }
         free(table[i]);
     }
     free(table);

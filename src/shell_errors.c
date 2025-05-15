@@ -19,7 +19,7 @@ void shell_error_dispatch(int err) {
         fprintf(stderr, "#### Memory limit reached.\n");
         break;
     case TIMEOUT_OCCURRED:
-        fprintf(stderr, "#### Timeout after %d seconds.\n#### You can change the timeout value with 'timeout = <seconds>.'\n", timeout_value);
+        fprintf(stderr, "#### Timeout after %d seconds.\n#### You can change the timeout value with 'timeout = <seconds> (0 to cancel timeout).'\n", timeout_value);
         break;
     default:
         fprintf(stderr, "#### Unknown error.\n");

@@ -1438,6 +1438,10 @@ static classes command_to_class_aux(keylist* list) {
         case CL_POLMOD:
             return CL_JORBMOD;
             break;
+        case CL_MODP:
+        case CL_POLMODP:
+            return CL_JORBMODP;
+            break;
         case CL_SFMOD:
             return CL_SFMOD;
             break;

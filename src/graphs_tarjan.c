@@ -259,6 +259,7 @@ parti* ltarjan(lgraph* g)
     MALLOC(lowlink, g->size_graph);
     MALLOC(thestack, g->size_graph);
 
+
     for (uint v = 0; v < g->size_graph; v++)
     {
         lowlink[v] = index[v] = -1;
@@ -278,6 +279,7 @@ parti* ltarjan(lgraph* g)
     result->size_par = 0;
     result->size_set = g->size_graph;
 
+
     for (uint v = 0; v < g->size_graph; v++)
     {
         if (index[v] == -1)
@@ -286,6 +288,7 @@ parti* ltarjan(lgraph* g)
                 result->numcl);
         }
     }
+
 
     // Création du tableau des classes
     MALLOC(result->cl, result->size_par);
@@ -299,11 +302,13 @@ parti* ltarjan(lgraph* g)
         rigins_dequeue(v, result->cl[result->numcl[v]]);
     }
 
+
     free(index);
     free(lowlink);
     free(thestack);
     free(onStack);
     free(id);
+
 
     return result;
 }

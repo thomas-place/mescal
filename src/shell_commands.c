@@ -11,7 +11,7 @@ sub_level optimization_level = LV_REG;
 /* Récupération des automates désignés par une commande */
 /******************************************************************************/
 
-int com_get_object(int i, string_chain* thechain) {
+int com_get_object(int i, string_chain *thechain) {
     // Tant qu'il y a des maillons
     while (thechain != NULL && i != -1) {
         switch (string_to_keyword(thechain->string)) {
@@ -35,7 +35,7 @@ int com_get_object(int i, string_chain* thechain) {
 /* Application d'une commande */
 /******************************/
 
-void com_setrec_command(char* varname, char* subname, char* par, com_command* thecom) {
+void com_setrec_command(char *varname, char *subname, char *par, com_command *thecom) {
 
     int i = object_get_from_name(varname);
     if (i == -1) {
@@ -59,7 +59,7 @@ void com_setrec_command(char* varname, char* subname, char* par, com_command* th
         }
         symbolic_count = objects[i]->rec->num;
         symbolic_names = objects[i]->rec->names;
-        regexp* myexp = parse_string_regexp(thecom->main->string);
+        regexp *myexp = parse_string_regexp(thecom->main->string);
         symbolic_count = 0;
         symbolic_names = NULL;
         if (myexp == NULL) {
@@ -70,7 +70,7 @@ void com_setrec_command(char* varname, char* subname, char* par, com_command* th
         return;
     }
 
-    char* end;
+    char *end;
     ushort nb = strtol(par, &end, 10);
     if (*end != '\0') {
         shell_error_syntax();
@@ -97,8 +97,7 @@ void com_setrec_command(char* varname, char* subname, char* par, com_command* th
     }
 }
 
-int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* saved) {
-
+int com_apply_command(com_command *thecom, char *varname, com_mode mode, bool *saved) {
 
     if (thecom == NULL || thecom->main == NULL) {
         shell_error_syntax();
@@ -139,7 +138,7 @@ int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* s
         // Premier cas: la commmande est un texte à traiter comme une regexp
         if (thecom->thetype == CMT_RAW) {
 
-            regexp* myexp = parse_string_regexp(thecom->main->string);
+            regexp *myexp = parse_string_regexp(thecom->main->string);
             if (myexp == NULL) {
                 shell_error_notregexp(thecom);
                 return -1;
@@ -200,8 +199,7 @@ int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* s
             default:
                 break;
             }
-        }
-        else {
+        } else {
             // Otherwise, the object is a recursive definition (recdef).
 
             // If the command consists of a single link, display the summary of the recdef.
@@ -209,8 +207,7 @@ int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* s
                 if (mode == MODE_PRINT) {
                     shell_view_object(objects[i], true);
                     return -1;
-                }
-                else {
+                } else {
                     shell_error_copyrec();
                     return -1;
                 }
@@ -262,9 +259,6 @@ int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* s
         return -1;
     }
 
-
-
-
     // The first link must be the only one and must correspond to a keyword.
     if (thecom->main->next || key == KY_NULL) {
         shell_error_syntax();
@@ -273,7 +267,6 @@ int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* s
 
     // Commands that don't calculate objects (specific to print mode).
     if (mode == MODE_PRINT) {
-
 
         classes cl = command_to_class(thecom);
         if (cl != CL_END) {
@@ -495,7 +488,7 @@ int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* s
 /* Affichage d'informations */
 /****************************/
 
-static bool filter_syntactic(int i, int* vals) {
+static bool filter_syntactic(int i, int *vals) {
     if (!objects[i] || objects[i]->type == RECDEF) {
         return false;
     }
@@ -513,13 +506,13 @@ static void info_syntactic(int i) {
     fprintf(stdout, "%-45s", buffer);
 }
 
-static bool params_syntactic(com_parameters* pars, int* vals) {
+static bool params_syntactic(com_parameters *pars, int *vals) {
     if (com_nbparams(pars) == 0) {
         vals[0] = 0;
         vals[1] = -1;
         return true;
     }
-    char* end;
+    char *end;
     vals[0] = strtol(com_getparam(pars, 0)->main->string, &end, 10);
     if (*end != '\0') {
         shell_error_numpar(keywordtostring(KY_SYNT), 1);
@@ -537,7 +530,7 @@ static bool params_syntactic(com_parameters* pars, int* vals) {
     return true;
 }
 
-static bool filter_minimal(int i, int* vals) {
+static bool filter_minimal(int i, int *vals) {
     if (!objects[i] || objects[i]->type == RECDEF) {
         return false;
     }
@@ -555,13 +548,13 @@ static void info_minimal(int i) {
     fprintf(stdout, "%-45s", buffer);
 }
 
-static bool params_minimal(com_parameters* pars, int* vals) {
+static bool params_minimal(com_parameters *pars, int *vals) {
     if (com_nbparams(pars) == 0) {
         vals[0] = 0;
         vals[1] = -1;
         return true;
     }
-    char* end;
+    char *end;
     vals[0] = strtol(com_getparam(pars, 0)->main->string, &end, 10);
     if (*end != '\0') {
         shell_error_numpar(keywordtostring(KY_MINI), 1);
@@ -579,12 +572,12 @@ static bool params_minimal(com_parameters* pars, int* vals) {
     return true;
 }
 
-static bool filter_idems(int i, int* vals) {
+static bool filter_idems(int i, int *vals) {
     if (!objects[i] || objects[i]->type == RECDEF) {
         return false;
     }
     int j = shell_compute_syntac(i, false);
-    morphism* M = objects[j]->mor->obj;
+    morphism *M = objects[j]->mor->obj;
     if (size_dequeue(M->idem_list) >= (uint)vals[0] && (vals[1] == -1 || size_dequeue(M->idem_list) <= (uint)vals[1])) {
         return true;
     }
@@ -594,18 +587,18 @@ static bool filter_idems(int i, int* vals) {
 static void info_idems(int i) {
     int j = shell_compute_syntac(i, false);
     char buffer[64];
-    morphism* M = objects[j]->mor->obj;
+    morphism *M = objects[j]->mor->obj;
     sprintf(buffer, "Idempotents in the syntactic monoid: %d", size_dequeue(M->idem_list));
     fprintf(stdout, "%-45s", buffer);
 }
 
-static bool params_idems(com_parameters* pars, int* vals) {
+static bool params_idems(com_parameters *pars, int *vals) {
     if (com_nbparams(pars) == 0) {
         vals[0] = 0;
         vals[1] = -1;
         return true;
     }
-    char* end;
+    char *end;
     vals[0] = strtol(com_getparam(pars, 0)->main->string, &end, 10);
     if (*end != '\0') {
         shell_error_numpar(keywordtostring(KY_IDEMS), 1);
@@ -623,14 +616,14 @@ static bool params_idems(com_parameters* pars, int* vals) {
     return true;
 }
 
-int shell_filter_objects(com_parameters* pars, ob_type type) {
+int shell_filter_objects(com_parameters *pars, ob_type type) {
     int n = com_nbparams(pars);
     if (type == RECDEF && n > 0) {
         fprintf(stderr, "Error: This command does not take any parameters.\n");
         return -1;
     }
 
-    bool (*filters[n + 1])(int, int*);
+    bool (*filters[n + 1])(int, int *);
     void (*infos[n + 1])(int);
     int vals[n + 1][8];
 
@@ -704,8 +697,7 @@ int shell_filter_objects(com_parameters* pars, ob_type type) {
         default:
             break;
         }
-    }
-    else {
+    } else {
         switch (type) {
         case REGEXP:
             printf("#### There are %d regular expressions(s) in memory with the specified properties:\n\n", count);
@@ -747,8 +739,7 @@ int shell_filter_objects(com_parameters* pars, ob_type type) {
             found++;
             if (type == DUMMY) {
                 sprintf(buffer, "#### %d (%s): %s", count, object_types_names[objects[i]->type], objects[i]->name);
-            }
-            else {
+            } else {
                 sprintf(buffer, "#### %d: %s", count, objects[i]->name);
             }
             fprintf(stdout, "%-45s", buffer);
@@ -792,7 +783,7 @@ int shell_filter_objects(com_parameters* pars, ob_type type) {
 /******************************/
 
 // Ajout d'un nouvel objet en copiant un objet déjà existant dans la table
-int shell_copy_generic(int i, char* newname) {
+int shell_copy_generic(int i, char *newname) {
     if (i == -1) {
         return -1;
     }
@@ -809,7 +800,7 @@ int shell_copy_generic(int i, char* newname) {
 }
 
 // Calcule un nouveau NFA avec la méthode de Glushkov à partir d'un langage.
-int shell_glushkov_nfa(char* varname, com_parameters* pars) {
+int shell_glushkov_nfa(char *varname, com_parameters *pars) {
 
     if (com_nbparams(pars) != 1) {
         shell_error_nbparams(keywordtostring(KY_GLUSHKOV), 1);
@@ -824,7 +815,7 @@ int shell_glushkov_nfa(char* varname, com_parameters* pars) {
         shell_error_exppar(keywordtostring(KY_GLUSHKOV), 1);
         return -1;
     }
-    nfa* automaton = reg_glushkov(objects[i]->exp);
+    nfa *automaton = reg_glushkov(objects[i]->exp);
     if (saved) {
         object_free(i);
     }
@@ -832,7 +823,7 @@ int shell_glushkov_nfa(char* varname, com_parameters* pars) {
 }
 
 // Calcule le miroir d'un nfa à partir d'un langage.
-int shell_mirror_nfa(char* varname, com_parameters* pars) {
+int shell_mirror_nfa(char *varname, com_parameters *pars) {
     if (com_nbparams(pars) != 1) {
         shell_error_nbparams(keywordtostring(KY_MIRROR), 1);
         return -1;
@@ -844,14 +835,14 @@ int shell_mirror_nfa(char* varname, com_parameters* pars) {
         shell_error_autopar(keywordtostring(KY_MIRROR), 1);
         return -1;
     }
-    nfa* automaton = nfa_mirror(objects[i]->nfa);
+    nfa *automaton = nfa_mirror(objects[i]->nfa);
     if (saved) {
         object_free(i);
     }
     return object_add_automaton(varname, automaton);
 }
 
-int shell_hopcroft_nfa(char* varname, com_parameters* pars) {
+int shell_hopcroft_nfa(char *varname, com_parameters *pars) {
     if (com_nbparams(pars) != 1) {
         shell_error_nbparams(keywordtostring(KY_HOPCROFT), 1);
         return -1;
@@ -865,14 +856,14 @@ int shell_hopcroft_nfa(char* varname, com_parameters* pars) {
         shell_error_autopar(keywordtostring(KY_HOPCROFT), 1);
         return -1;
     }
-    nfa* automaton = nfa_hopcroft(objects[i]->nfa);
+    nfa *automaton = nfa_hopcroft(objects[i]->nfa);
     if (saved) {
         object_free(i);
     }
     return object_add_automaton(varname, automaton);
 }
 
-int shell_mccluskey_reg(char* varname, com_parameters* pars) {
+int shell_mccluskey_reg(char *varname, com_parameters *pars) {
     if (com_nbparams(pars) != 1) {
         shell_error_nbparams(keywordtostring(KY_BMCK), 1);
         return -1;
@@ -887,7 +878,7 @@ int shell_mccluskey_reg(char* varname, com_parameters* pars) {
         return -1;
     }
     DEBUG("Computing a regular expression from an automaton");
-    regexp* exp = nfa_mccluskey(objects[i]->nfa);
+    regexp *exp = nfa_mccluskey(objects[i]->nfa);
     if (saved) {
         object_free(i);
     }
@@ -895,7 +886,7 @@ int shell_mccluskey_reg(char* varname, com_parameters* pars) {
 }
 
 // Calcule un nouveau NFA avec la méthode de thompson à partir d'un langage.
-int shell_thompson_nfa(char* varname, com_parameters* pars) {
+int shell_thompson_nfa(char *varname, com_parameters *pars) {
     if (com_nbparams(pars) != 1) {
         shell_error_nbparams(keywordtostring(KY_BMCK), 1);
         return -1;
@@ -909,7 +900,7 @@ int shell_thompson_nfa(char* varname, com_parameters* pars) {
         shell_error_exppar(keywordtostring(KY_THOMPSON), 1);
         return -1;
     }
-    nfa* automaton = reg_thompson(objects[i]->exp);
+    nfa *automaton = reg_thompson(objects[i]->exp);
     if (saved) {
         object_free(i);
     }
@@ -917,7 +908,7 @@ int shell_thompson_nfa(char* varname, com_parameters* pars) {
 }
 
 // Union de deux NFAs
-int shell_union_nfa(char* varname, com_parameters* pars) {
+int shell_union_nfa(char *varname, com_parameters *pars) {
     if (com_nbparams(pars) != 2) {
         shell_error_nbparams(keywordtostring(KY_UNION), 2);
         return -1;
@@ -937,7 +928,7 @@ int shell_union_nfa(char* varname, com_parameters* pars) {
         shell_error_autopar(keywordtostring(KY_UNION), 2);
         return -1;
     }
-    nfa* automaton = nfa_union(objects[i1]->nfa, objects[i2]->nfa);
+    nfa *automaton = nfa_union(objects[i1]->nfa, objects[i2]->nfa);
     if (saved1) {
         object_free(i1);
     }
@@ -948,7 +939,7 @@ int shell_union_nfa(char* varname, com_parameters* pars) {
 }
 
 // Concatène deux NFAs
-int shell_concat_nfa(char* varname, com_parameters* pars) {
+int shell_concat_nfa(char *varname, com_parameters *pars) {
     if (com_nbparams(pars) != 2) {
         shell_error_nbparams(keywordtostring(KY_CONCAT), 2);
         return -1;
@@ -968,7 +959,7 @@ int shell_concat_nfa(char* varname, com_parameters* pars) {
         shell_error_autopar(keywordtostring(KY_CONCAT), 2);
         return -1;
     }
-    nfa* automaton = nfa_concat(objects[i1]->nfa, objects[i2]->nfa);
+    nfa *automaton = nfa_concat(objects[i1]->nfa, objects[i2]->nfa);
     if (saved1) {
         object_free(i1);
     }
@@ -979,7 +970,7 @@ int shell_concat_nfa(char* varname, com_parameters* pars) {
 }
 
 // Étoile de Kleene sur un NFA
-int shell_kleene_nfa(char* varname, com_parameters* pars) {
+int shell_kleene_nfa(char *varname, com_parameters *pars) {
     if (com_nbparams(pars) != 1) {
         shell_error_nbparams(keywordtostring(KY_KLEENE), 1);
         return -1;
@@ -993,7 +984,7 @@ int shell_kleene_nfa(char* varname, com_parameters* pars) {
         shell_error_autopar(keywordtostring(KY_KLEENE), 1);
         return -1;
     }
-    nfa* automaton = nfa_star(objects[i]->nfa);
+    nfa *automaton = nfa_star(objects[i]->nfa);
     if (saved) {
         object_free(i);
     }
@@ -1001,7 +992,7 @@ int shell_kleene_nfa(char* varname, com_parameters* pars) {
 }
 
 // Calcule un nouveau NFA en éliminant les transitions epsilon
-int shell_elimeps_nfa(char* varname, com_parameters* pars) {
+int shell_elimeps_nfa(char *varname, com_parameters *pars) {
     if (com_nbparams(pars) != 1) {
         shell_error_nbparams(keywordtostring(KY_ELIMEPS), 1);
         return -1;
@@ -1015,7 +1006,7 @@ int shell_elimeps_nfa(char* varname, com_parameters* pars) {
         shell_error_autopar(keywordtostring(KY_ELIMEPS), 1);
         return -1;
     }
-    nfa* automaton = nfa_elimeps(objects[i]->nfa);
+    nfa *automaton = nfa_elimeps(objects[i]->nfa);
     if (saved) {
         object_free(i);
     }
@@ -1024,7 +1015,7 @@ int shell_elimeps_nfa(char* varname, com_parameters* pars) {
 
 // Calcule un nouveau NFA en supprimant tous les états non-accessibles ou non
 // co-accessibles
-int shell_trim_nfa(char* varname, com_parameters* pars) {
+int shell_trim_nfa(char *varname, com_parameters *pars) {
     if (com_nbparams(pars) != 1) {
         shell_error_nbparams(keywordtostring(KY_TRIMNFA), 1);
         return -1;
@@ -1039,7 +1030,7 @@ int shell_trim_nfa(char* varname, com_parameters* pars) {
         return -1;
     }
 
-    nfa* automaton = nfa_trim(objects[i]->nfa);
+    nfa *automaton = nfa_trim(objects[i]->nfa);
     if (saved) {
         object_free(i);
     }
@@ -1047,7 +1038,7 @@ int shell_trim_nfa(char* varname, com_parameters* pars) {
 }
 
 // Calcule un nouveau NFA en réalisant l'intersection de deux NFAs existants
-int shell_intersect_nfa(char* varname, com_parameters* pars) {
+int shell_intersect_nfa(char *varname, com_parameters *pars) {
     if (com_nbparams(pars) != 2) {
         shell_error_nbparams(keywordtostring(KY_INTERSEC), 2);
         return -1;
@@ -1067,7 +1058,7 @@ int shell_intersect_nfa(char* varname, com_parameters* pars) {
         shell_error_autopar(keywordtostring(KY_INTERSEC), 2);
         return -1;
     }
-    nfa* automaton = nfa_intersect(objects[i1]->nfa, objects[i2]->nfa, true);
+    nfa *automaton = nfa_intersect(objects[i1]->nfa, objects[i2]->nfa, true);
     if (saved1) {
         object_free(i1);
     }
@@ -1078,7 +1069,7 @@ int shell_intersect_nfa(char* varname, com_parameters* pars) {
 }
 
 // Computes a minimal automaton with the Brzozowski method
-int shell_brzozowski_nfa(char* varname, com_parameters* pars) {
+int shell_brzozowski_nfa(char *varname, com_parameters *pars) {
     if (com_nbparams(pars) != 1) {
         shell_error_nbparams(keywordtostring(KY_BRZOZO), 1);
         return -1;
@@ -1092,7 +1083,7 @@ int shell_brzozowski_nfa(char* varname, com_parameters* pars) {
         shell_error_autopar(keywordtostring(KY_BRZOZO), 1);
         return -1;
     }
-    nfa* automaton = nfa_brzozowski(objects[i]->nfa);
+    nfa *automaton = nfa_brzozowski(objects[i]->nfa);
     if (saved) {
         object_free(i);
     }
@@ -1100,7 +1091,7 @@ int shell_brzozowski_nfa(char* varname, com_parameters* pars) {
 }
 
 // Extension of a NFA by adding Dyck transitions
-int shell_dycktrans_nfa(char* varname, com_parameters* pars) {
+int shell_dycktrans_nfa(char *varname, com_parameters *pars) {
     if (com_nbparams(pars) != 1) {
         shell_error_nbparams(keywordtostring(KY_DYCKTRANS), 1);
         return -1;
@@ -1114,10 +1105,10 @@ int shell_dycktrans_nfa(char* varname, com_parameters* pars) {
         shell_error_autopar(keywordtostring(KY_DYCKTRANS), 1);
         return -1;
     }
-    parti* SCCS = nfa_inv_ext(objects[i]->nfa);
-    parti* FOLD = nfa_stal_fold(objects[i]->nfa, SCCS);
+    parti *SCCS = nfa_inv_ext(objects[i]->nfa);
+    parti *FOLD = nfa_stal_fold(objects[i]->nfa, SCCS);
     delete_parti(SCCS);
-    nfa* automaton = nfa_dyck_ext(objects[i]->nfa, FOLD);
+    nfa *automaton = nfa_dyck_ext(objects[i]->nfa, FOLD);
     delete_parti(FOLD);
     if (saved) {
         object_free(i);
@@ -1126,14 +1117,14 @@ int shell_dycktrans_nfa(char* varname, com_parameters* pars) {
 }
 
 // Computes a random NFA
-int shell_random_nfa(char* varname, com_parameters* params) {
+int shell_random_nfa(char *varname, com_parameters *params) {
     if (com_nbparams(params) != 3) {
         shell_error_nbparams(keywordtostring(KY_RNFA), 3);
         return -1;
     }
-    com_command* arg1 = params->param;
-    com_command* arg2 = params->next->param;
-    com_command* arg3 = params->next->next->param;
+    com_command *arg1 = params->param;
+    com_command *arg2 = params->next->param;
+    com_command *arg3 = params->next->next->param;
     if (!com_single(arg1)) {
         shell_error_numpar(keywordtostring(KY_RNFA), 1);
         return -1;
@@ -1149,7 +1140,7 @@ int shell_random_nfa(char* varname, com_parameters* params) {
         return -1;
     }
 
-    char* end;
+    char *end;
     int nb1 = strtol(arg1->main->string, &end, 10);
     if (*end != '\0') {
         shell_error_numpar(keywordtostring(KY_RNFA), 1);
@@ -1169,14 +1160,14 @@ int shell_random_nfa(char* varname, com_parameters* params) {
     return object_add_automaton(varname, nfa_random(nb1, nb2, nb3));
 }
 
-int shell_random_dfa(char* varname, com_parameters* params) {
+int shell_random_dfa(char *varname, com_parameters *params) {
     if (com_nbparams(params) != 3) {
         shell_error_nbparams(keywordtostring(KY_RDFA), 3);
         return -1;
     }
-    com_command* arg1 = params->param;
-    com_command* arg2 = params->next->param;
-    com_command* arg3 = params->next->next->param;
+    com_command *arg1 = params->param;
+    com_command *arg2 = params->next->param;
+    com_command *arg3 = params->next->next->param;
     if (!com_single(arg1)) {
         shell_error_numpar(keywordtostring(KY_RDFA), 1);
         return -1;
@@ -1192,7 +1183,7 @@ int shell_random_dfa(char* varname, com_parameters* params) {
         return -1;
     }
 
-    char* end;
+    char *end;
     int nb1 = strtol(arg1->main->string, &end, 10);
     if (*end != '\0') {
         shell_error_numpar(keywordtostring(KY_RDFA), 1);
@@ -1213,7 +1204,7 @@ int shell_random_dfa(char* varname, com_parameters* params) {
 }
 
 // Latex génération
-int shell_latex_gen(com_parameters* pars) {
+int shell_latex_gen(com_parameters *pars) {
     if (com_nbparams(pars) != 1) {
         shell_error_nbparams(keywordtostring(KY_LATEX), 1);
         return -1;
@@ -1240,21 +1231,20 @@ int shell_latex_gen(com_parameters* pars) {
     return -1;
 }
 
-
-int shell_recursive_init(char* varname, com_parameters* params) {
+int shell_recursive_init(char *varname, com_parameters *params) {
     if (com_nbparams(params) < 2) {
         shell_error_leastparams(keywordtostring(KY_RECDEF), 2);
         return -1;
     }
 
-    com_command* arg = params->param;
+    com_command *arg = params->param;
 
     if (!com_single(arg)) {
         shell_error_numpar(keywordtostring(KY_RECDEF), 1);
         return -1;
     }
 
-    char* end;
+    char *end;
     ushort nb = strtol(arg->main->string, &end, 10);
     if (*end != '\0') {
         shell_error_numpar(keywordtostring(KY_RECDEF), 1);
@@ -1299,7 +1289,7 @@ int shell_recursive_init(char* varname, com_parameters* params) {
 }
 
 // Save a single object to a file
-int shell_save_to_file(com_parameters* pars) {
+int shell_save_to_file(com_parameters *pars) {
     if (com_nbparams(pars) != 2) {
         shell_error_nbparams(keywordtostring(KY_SAVE), 2);
         return -1;
@@ -1314,7 +1304,7 @@ int shell_save_to_file(com_parameters* pars) {
         shell_error_filepar(keywordtostring(KY_SAVE), 2);
         return -1;
     }
-    char* filename = pars->next->param->main->string;
+    char *filename = pars->next->param->main->string;
     fprintf(stdout, "saving %s in the file: \"%s\".\n", pars->param->main->string, filename);
     files_save_object(objects[i], filename);
     if (saved) {
@@ -1324,7 +1314,7 @@ int shell_save_to_file(com_parameters* pars) {
 }
 
 // Save the current session in a file
-int shell_save_session(com_parameters* params) {
+int shell_save_session(com_parameters *params) {
     if (com_nbparams(params) != 1) {
         shell_error_nbparams(keywordtostring(KY_SAVESESSION), 1);
         return -1;
@@ -1333,14 +1323,14 @@ int shell_save_session(com_parameters* params) {
         shell_error_filepar(keywordtostring(KY_SAVESESSION), 1);
         return -1;
     }
-    char* filename = params->param->main->string;
+    char *filename = params->param->main->string;
     printf("saving the session in the file: \"%s\".\n", filename);
     files_save_session(filename);
     return -1;
 }
 
 // Loading a session from a file
-int shell_load_session(com_parameters* params) {
+int shell_load_session(com_parameters *params) {
     if (com_nbparams(params) != 1) {
         shell_error_nbparams(keywordtostring(KY_LOADSESSION), 1);
         return -1;
@@ -1349,14 +1339,14 @@ int shell_load_session(com_parameters* params) {
         shell_error_filepar(keywordtostring(KY_LOADSESSION), 1);
         return -1;
     }
-    char* filename = params->param->main->string;
+    char *filename = params->param->main->string;
     printf("loading the session saved in the file: \"%s\".\n", filename);
     files_load_session(filename);
     return -1;
 }
 
 // Deleting an object
-int shell_delete(com_parameters* params) {
+int shell_delete(com_parameters *params) {
     if (com_nbparams(params) != 1) {
         shell_error_nbparams(keywordtostring(KY_DELETE), 1);
         return -1;
@@ -1375,7 +1365,7 @@ int shell_delete(com_parameters* params) {
 }
 
 // Deletion of all objects
-int shell_delete_all(com_parameters* params) {
+int shell_delete_all(com_parameters *params) {
     if (com_nbparams(params) != 0) {
         shell_error_nbparams(keywordtostring(KY_CLEAR), 0);
         return -1;
@@ -1384,10 +1374,8 @@ int shell_delete_all(com_parameters* params) {
     return -1;
 }
 
-
-
 // Erases the names of the states of an automaton
-int shell_reset(com_parameters* params) {
+int shell_reset(com_parameters *params) {
     if (com_nbparams(params) != 1) {
         shell_error_nbparams(keywordtostring(KY_RESET), 1);
         return -1;
@@ -1411,7 +1399,7 @@ int shell_reset(com_parameters* params) {
 }
 
 // Calcul des transitions inverses dans un NFA
-int shell_invtrans(com_parameters* params) {
+int shell_invtrans(com_parameters *params) {
     if (com_nbparams(params) != 1) {
         shell_error_nbparams(keywordtostring(KY_INVTRANS), 1);
         return -1;
@@ -1430,26 +1418,26 @@ int shell_invtrans(com_parameters* params) {
         shell_error_autopar(keywordtostring(KY_INVTRANS), 1);
         return false;
     }
-    parti* par = nfa_inv_ext(objects[i]->nfa);
+    parti *par = nfa_inv_ext(objects[i]->nfa);
     delete_parti(par);
     return true;
 }
 
 // Ouverture d'un objet
-bool shell_open_object(char* varname, com_parameters* params) {
+int shell_open_object(char *varname, com_parameters *params) {
     if (com_nbparams(params) != 1) {
         shell_error_nbparams(keywordtostring(KY_OPEN), 1);
-        return -1;
+        return -2;
     }
     if (params->param->thetype != CMT_RAW) {
         shell_error_filepar(keywordtostring(KY_OPEN), 1);
-        return false;
+        return -3;
     }
     files_read_object(params->param->main->string, varname);
-    return true;
+    return -1;
 }
 
-int shell_toggle_optimization(com_parameters* params) {
+int shell_toggle_optimization(com_parameters *params) {
     if (com_nbparams(params) != 0) {
         shell_error_nbparams(keywordtostring(KY_TOGGLE), 0);
         return -1;
@@ -1457,15 +1445,14 @@ int shell_toggle_optimization(com_parameters* params) {
     if (optimization_level == LV_FULL) {
         optimization_level = LV_REG;
         fprintf(stdout, "#### Optimization mode for kernels and orbits enabled.\n");
-    }
-    else {
+    } else {
         optimization_level = LV_FULL;
         fprintf(stdout, "#### Optimization mode for kernels and orbits disabled.\n");
     }
     return -1;
 }
 
-int shell_counterfree(com_parameters* pars) {
+int shell_counterfree(com_parameters *pars) {
     if (com_nbparams(pars) != 1) {
         shell_error_nbparams(keywordtostring(KY_COUNTER), 1);
         return -1;
@@ -1492,7 +1479,7 @@ int shell_counterfree(com_parameters* pars) {
     return -1;
 }
 
-int shell_permutation(com_parameters* pars) {
+int shell_permutation(com_parameters *pars) {
     if (com_nbparams(pars) != 1) {
         shell_error_nbparams(keywordtostring(KY_PERMUT), 1);
         return -1;
@@ -1517,7 +1504,7 @@ int shell_permutation(com_parameters* pars) {
 /* Affichage - fonctions appellées par le gestionnaire de commandes */
 /********************************************************************/
 
-bool shell_view_object(object* ob, bool title) {
+bool shell_view_object(object *ob, bool title) {
     if (!ob) {
         return false;
     }
@@ -1564,7 +1551,7 @@ bool shell_view_object(object* ob, bool title) {
     }
 }
 
-int shell_sort(com_parameters* pars) {
+int shell_sort(com_parameters *pars) {
     if (com_nbparams(pars) > 1) {
         shell_error_rangeparams(keywordtostring(KY_SORT), 0, 1);
         return -1;
@@ -1594,7 +1581,7 @@ int shell_sort(com_parameters* pars) {
     return -1;
 }
 
-int shell_view_rcayley(com_parameters* pars) {
+int shell_view_rcayley(com_parameters *pars) {
     if (com_nbparams(pars) != 1) {
         shell_error_nbparams(keywordtostring(KY_RCAY), 1);
         return -1;
@@ -1616,7 +1603,7 @@ int shell_view_rcayley(com_parameters* pars) {
     return -1;
 }
 
-int shell_view_lcayley(com_parameters* pars) {
+int shell_view_lcayley(com_parameters *pars) {
     if (com_nbparams(pars) != 1) {
         shell_error_nbparams(keywordtostring(KY_LCAY), 1);
         return -1;
@@ -1638,7 +1625,7 @@ int shell_view_lcayley(com_parameters* pars) {
     return -1;
 }
 
-int shell_view_mormult(com_parameters* pars) {
+int shell_view_mormult(com_parameters *pars) {
     if (com_nbparams(pars) != 1) {
         shell_error_nbparams(keywordtostring(KY_MULT), 1);
         return -1;
@@ -1661,7 +1648,7 @@ int shell_view_mormult(com_parameters* pars) {
     return -1;
 }
 
-int shell_view_morder(com_parameters* pars) {
+int shell_view_morder(com_parameters *pars) {
     if (com_nbparams(pars) != 1) {
         shell_error_nbparams(keywordtostring(KY_ORDER), 1);
         return -1;
@@ -1684,7 +1671,7 @@ int shell_view_morder(com_parameters* pars) {
     return -1;
 }
 
-int shell_view_idems(com_parameters* pars) {
+int shell_view_idems(com_parameters *pars) {
     if (com_nbparams(pars) != 1) {
         shell_error_nbparams(keywordtostring(KY_IDEMS), 1);
         return -1;
@@ -1705,7 +1692,7 @@ int shell_view_idems(com_parameters* pars) {
     return -1;
 }
 
-int shell_view_mkernel(com_parameters* pars) {
+int shell_view_mkernel(com_parameters *pars) {
     if (com_nbparams(pars) != 1) {
         shell_error_nbparams(keywordtostring(KY_MKER), 1);
         return -1;
@@ -1729,7 +1716,7 @@ int shell_view_mkernel(com_parameters* pars) {
     return -1;
 }
 
-int shell_view_akernel(com_parameters* pars) {
+int shell_view_akernel(com_parameters *pars) {
     if (com_nbparams(pars) != 1) {
         shell_error_nbparams(keywordtostring(KY_AKER), 1);
         return -1;
@@ -1746,7 +1733,7 @@ int shell_view_akernel(com_parameters* pars) {
     shell_view_object(objects[i], true);
 
     print_title_box(100, true, stdout, 1, "AMT-kernel of the morphism.");
-    //shell_compute_ker(i, KER_AMT, optimization_level);
+    // shell_compute_ker(i, KER_AMT, optimization_level);
     print_full_subsemi(shell_compute_ker(i, KER_AMT, optimization_level), stdout);
     if (saved) {
         object_free(i);
@@ -1754,7 +1741,7 @@ int shell_view_akernel(com_parameters* pars) {
     return -1;
 }
 
-int shell_view_gkernel(com_parameters* pars) {
+int shell_view_gkernel(com_parameters *pars) {
     if (com_nbparams(pars) != 1) {
         shell_error_nbparams(keywordtostring(KY_GKER), 1);
         return -1;
@@ -1779,10 +1766,8 @@ int shell_view_gkernel(com_parameters* pars) {
     return -1;
 }
 
-
-static subsemi* shell_compute_orbit_aux(int i, uint e, orbits_type thetype) {
-    switch (thetype)
-    {
+static subsemi *shell_compute_orbit_aux(int i, uint e, orbits_type thetype) {
+    switch (thetype) {
     case ORB_DD:
         return compute_one_ddorb(objects[i]->mor->obj, e);
         break;
@@ -1825,7 +1810,7 @@ static subsemi* shell_compute_orbit_aux(int i, uint e, orbits_type thetype) {
     return NULL;
 }
 
-int shell_view_orbits(com_parameters* pars) {
+int shell_view_orbits(com_parameters *pars) {
     int n = com_nbparams(pars);
     if (n < 2 || n > 3) {
         shell_error_rangeparams(keywordtostring(KY_ORB), 2, 3);
@@ -2020,7 +2005,7 @@ int shell_view_orbits(com_parameters* pars) {
         shell_error_morpar(keywordtostring(KY_ORB), 2);
         return false;
     }
-    //shell_view_object(objects[i], true);
+    // shell_view_object(objects[i], true);
 
     char title[64];
     sprintf(title, "%s-orbits of the morphism", cl_name);
@@ -2028,9 +2013,8 @@ int shell_view_orbits(com_parameters* pars) {
 
     if (n == 2) {
         print_all_orbs(shell_compute_orbits(i, thetype, optimization_level), cl_name, stdout);
-    }
-    else {
-        regexp* myexp = parse_string_regexp(pars->next->next->param->main->string);
+    } else {
+        regexp *myexp = parse_string_regexp(pars->next->next->param->main->string);
         if (myexp->op != WORD) {
             fprintf(stderr, "Error: Parameter 3 of the command \"%s\" has to be an idempotent of the monoid.\n", keywordtostring(KY_ORB));
             return -1;
@@ -2041,7 +2025,7 @@ int shell_view_orbits(com_parameters* pars) {
             fprintf(stderr, "Error: Parameter 3 of the command \"%s\" has to be an idempotent of the monoid.\n", keywordtostring(KY_ORB));
             return false;
         }
-        subsemi* theorbit = shell_compute_orbit_aux(i, e, thetype);
+        subsemi *theorbit = shell_compute_orbit_aux(i, e, thetype);
 
         fprintf(stdout, "#### %s-orbit of the idempotent ", cl_name);
         mor_fprint_name_utf8(objects[i]->mor->obj, e, stdout);
@@ -2050,10 +2034,7 @@ int shell_view_orbits(com_parameters* pars) {
 
         delete_subsemi(theorbit);
 
-
-
-
-        //print_one_orb(f(i, ORB_ELEM, j), j, stdout);
+        // print_one_orb(f(i, ORB_ELEM, j), j, stdout);
     }
 
     if (saved) {
@@ -2062,7 +2043,7 @@ int shell_view_orbits(com_parameters* pars) {
     return true;
 }
 
-int shell_view_nfa_run(com_parameters* pars) {
+int shell_view_nfa_run(com_parameters *pars) {
     if (com_nbparams(pars) != 2 || pars->next->param->thetype != CMT_RAW) {
         shell_error_nbparams(keywordtostring(KY_RUN), 2);
         return -1;
@@ -2076,17 +2057,17 @@ int shell_view_nfa_run(com_parameters* pars) {
     }
 
     shell_view_object(objects[k], true);
-    nfa* A = objects[k]->nfa;
+    nfa *A = objects[k]->nfa;
 
     fprintf(stdout, "Running the word %s in this automaton.\n", pars->next->param->main->string);
 
-    regexp* myexp = parse_string_regexp(pars->next->param->main->string);
+    regexp *myexp = parse_string_regexp(pars->next->param->main->string);
     if (myexp->op != WORD) {
         shell_error_wordpar(keywordtostring(KY_RUN), 2);
         return -1;
     }
 
-    dequeue* states = nfa_compute_runs(A, myexp->word);
+    dequeue *states = nfa_compute_runs(A, myexp->word);
 
     reg_free(myexp);
 
@@ -2097,8 +2078,7 @@ int shell_view_nfa_run(com_parameters* pars) {
     fprintf(stdout, "Set of states reached: ");
     if (isempty_dequeue(states)) {
         printf("∅.\n");
-    }
-    else {
+    } else {
         printf("{");
         for (uint i = 0; i < size_dequeue(states) - 1; i++) {
             nfa_print_state(A, lefread_dequeue(states, i), stdout);
@@ -2115,11 +2095,9 @@ int shell_view_nfa_run(com_parameters* pars) {
         if (lefread_dequeue(states, i) == lefread_dequeue(A->finals, j)) {
             printf("The word is accepted.\n");
             return -1;
-        }
-        else if (lefread_dequeue(states, i) < lefread_dequeue(A->finals, j)) {
+        } else if (lefread_dequeue(states, i) < lefread_dequeue(A->finals, j)) {
             i++;
-        }
-        else {
+        } else {
             j++;
         }
     }
@@ -2130,7 +2108,7 @@ int shell_view_nfa_run(com_parameters* pars) {
     return -1;
 }
 
-int shell_view_mor_image(com_parameters* pars) {
+int shell_view_mor_image(com_parameters *pars) {
     if (com_nbparams(pars) != 2 || pars->next->param->thetype != CMT_RAW) {
         shell_error_nbparams(keywordtostring(KY_IMAGE), 1);
         return -1;
@@ -2144,11 +2122,11 @@ int shell_view_mor_image(com_parameters* pars) {
     }
 
     shell_view_object(objects[k], true);
-    morphism* M = objects[k]->mor->obj;
+    morphism *M = objects[k]->mor->obj;
 
     fprintf(stdout, "Computing the image of the word %s by this morphism.\n", pars->next->param->main->string);
 
-    regexp* myexp = parse_string_regexp(pars->next->param->main->string);
+    regexp *myexp = parse_string_regexp(pars->next->param->main->string);
     if (myexp->op != WORD) {
         shell_error_wordpar(keywordtostring(KY_IMAGE), 2);
         return -1;
@@ -2167,8 +2145,7 @@ int shell_view_mor_image(com_parameters* pars) {
     // On teste si ce mot est dans le langage.
     if (M->accept_array[s]) {
         fprintf(stdout, "\nThe word belongs to the recognized language.\n");
-    }
-    else {
+    } else {
         fprintf(stdout, "\nThe word does not belong to the recognized language.\n");
     }
     if (saved) {

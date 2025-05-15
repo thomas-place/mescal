@@ -308,17 +308,21 @@ void mor_compute_green(morphism* M) {
     // Initialization of the structure.
     CALLOC(M->rels, 1);
 
+
     // Computing the R equivalence (strongly connected components of the right cayley graph).
     M->rels->RCL = dtarjan(M->r_cayley);
 
     // Computing the L equivalence (strongly connected components of the left cayley graph).
     M->rels->LCL = dtarjan(M->l_cayley);
 
+
     // Computing the J equivalence (strongly connected components of the J order).
     M->rels->JCL = ltarjan(M->j_order);
 
+
     // Computing the relation H.
     h_green_compute(M->rels);
+
 
     // Computing the regular elements and the groups.
     gr_green_compute(M->idem_list, M->rels);
@@ -774,12 +778,13 @@ morphism* dfa_to_morphism(nfa* A, bool** order, int* error) {
 
     uint** permuts;
     MALLOC(permuts, num); // Array of permutations defining the elements.
-
     // Creation of transitions, idempotents and detection of accepting elements (simultaneously releases the AVL).
     morphism_avl_to_table(thetree, A, M, permuts, M->accept_array, M->idem_array);
 
+
     // Free the AVL
     avl_free_strong(thetree, &delete_morphism_state_weak);
+
 
     // Creation of lists of idempotents and accepting elements.
     M->idem_list = create_dequeue();
@@ -793,28 +798,31 @@ morphism* dfa_to_morphism(nfa* A, bool** order, int* error) {
         }
     }
 
-
     // Compute the left Cayley graph.
     mor_compute_leftcayley(M);
 
 
     // Compute the Green relations.
     M->j_order = ldgraphs_to_lgraph(0, 2, 2, M->r_cayley, M->l_cayley); // Compute the J-order.
+
+
     mor_compute_green(M);
 
+
     mor_compute_rep(M);
+
 
     if (order) {
         compute_ordering_partial(M, A->trans->size_graph, order, permuts);
 
     }
 
+
     // Release of the permuts table
     for (uint i = 0; i < num; i++) {
         free(permuts[i]);
     }
     free(permuts);
-
 
 
     ignore_interrupt();

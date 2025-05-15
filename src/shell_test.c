@@ -15,31 +15,94 @@
 #define DIMEN 3
 #define ALPHASIZE 6
 
-void test(void) {
+extern uint slice_test, width_test;
 
+void test(void) {
+#if 0
+    // Calcule et sauvegarde les automates atteints toutes les 5x10^6 étapes
     nfa_enum *E = nfa_enum_init(7, 2);
     ulong count = 0;
     ulong size = 0;
+    char filename[1000];
+    char *prefix = "automata/hopcroft-";
+    system("mkdir -p automata");
     while (nfa_enum_next(E)) {
         count++;
         nfa *A = nfa_enum_to_nfa(E);
-        nfa *MINI = nfa_brzozowski(A);
+        nfa *MINI = nfa_hopcroft(A);
+        // ulong size_mini = dfa_to_morphism_opti(MINI);
+        if (count % 100000 == 0) {
+            printf("count: %lu\n", count);
+        }
+
+        if (count % 5000000 == 0) {
+            strcpy(filename, prefix);
+            sprintf(filename + strlen(prefix), "%lu", count);
+            DEBUG("saving automaton in file: \"%s\".\n", filename);
+            if (json_object_to_file(filename, files_auto_to_json(MINI))) {
+                DEBUG("Error: failed to save %s.\n", filename);
+            } else {
+                DEBUG("%s saved.\n", filename);
+            }
+        }
+        delete_nfa(MINI);
+        delete_nfa(A);
+    }
+    printf("final count: %lu\n", count);
+    printf("final size: %lu\n", size);
+    nfa_enum_free(E);
+#endif
+#if 1
+    uint slice = slice_test * width_test + 1;
+    uint width = width_test;
+
+    INFO("From %u to %u", slice, slice + width - 1);
+
+    nfa_enum *E = nfa_enum_init(7, 2);
+
+    ulong count = 0;
+    ulong size = 0;
+    system("mkdir -p automata");
+    char filename[1000];
+    char *prefix = "automata/hopcroft-";
+
+    while (nfa_enum_next(E)) {
+        count++;
+
+        nfa *A = nfa_enum_to_nfa(E);
+        if (count < slice) { // we do not treat these cases
+            delete_nfa(A);
+            continue;
+        }
+        if (count >= slice + width) {
+            delete_nfa(A);
+            break;
+        }
+        nfa *MINI = nfa_hopcroft(A);
         ulong size_mini = dfa_to_morphism_opti(MINI);
 
         if (size_mini > size) {
             size = size_mini;
+            strcpy(filename, prefix);
+            sprintf(filename + strlen(prefix), "%lu-%lu", count, size);
+            DEBUG("saving automaton in file: \"%s\".\n", filename);
+            if (json_object_to_file(filename, files_auto_to_json(MINI))) {
+                DEBUG("Error: failed to save %s.\n", filename);
+            } else {
+                DEBUG("%s saved.\n", filename);
+            }
         }
-
         delete_nfa(MINI);
         delete_nfa(A);
 
-        if (count % 100000 == 0) {
+        if (count % 5000 == 0) {
             printf("count: %lu, size so far: %lu\n", count, size);
         }
     }
     printf("final count: %lu\n", count);
     printf("final size: %lu\n", size);
     nfa_enum_free(E);
+#endif
 
     /*
     char testc[60];
