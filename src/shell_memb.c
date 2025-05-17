@@ -839,7 +839,7 @@ bool shell_morprop_ubp2eq(int j, orbits_type type, char* orbs, char* name, FILE*
         fprintf(out, "      all s,t ∊ M and e ∊ E(M) where s is in the %s-orbit of e.\n", orbs);
     }
 
-    if (is_upbp_mono(shell_compute_orbits(j, type, LV_REG), get_counter(out))) {
+    if (is_upbp_mono(shell_compute_orbits(j, type, LV_GREG), get_counter(out))) {
         if (out) {
             fprintf(out, "#### The equation is satisfied\n");
         }

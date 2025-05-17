@@ -1227,6 +1227,8 @@ bool is_bpolgrp_mono(orbits* L, uint* cexa) {
     return true;
 }
 
+
+
 // Knast for at-sets
 bool is_knast_at_mono(orbits* L, uint* cexa) {
 
@@ -1365,7 +1367,7 @@ bool is_upbp_mono(orbits* L, uint* cexa) {
                 continue;
             }
 
-            // We do a BFS to explore all elements t such that e R t eset is an idempotent
+            // We do a BFS to explore all elements t such that eset is an idempotent
             dequeue* elem = create_dequeue();
             dequeue* path = create_dequeue();
             rigins_dequeue(e, elem);
