@@ -24,17 +24,20 @@ ifeq ($(shell uname -s), Darwin)
 override CFLAGS += -std=gnu2x -MMD -Wall -pedantic -Wextra -Wshadow -Wpointer-arith	\
 -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -Wno-gnu-zero-variadic-macro-arguments
 	CPPFLAGS += -I/opt/homebrew/include -I/opt/homebrew/include/flint -I/opt/homebrew/include/json-c -I/opt/homebrew/opt/readline/include
-	LDFLAGS += -L/opt/homebrew/lib -L/opt/homebrew/lib -Wl,-stack_size -Wl,0x10000000
+	LDFLAGS += -L/opt/homebrew/lib -L/opt/homebrew/lib
 endif
+# To increase the stack size:
+# LDFLAGS += -Wl,-stack_size -Wl,0x10000000
 
 ifeq ($(shell uname -s), Linux)
 override CFLAGS += -std=gnu2x -MMD -Wall -pedantic -Wextra -Wshadow -Wpointer-arith	\
 -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -D_GNU_SOURCE \
--Wno-comment -fsplit-stack
+-Wno-comment
 	CPPFLAGS += -I/usr/include -I/opt/homebrew/include/flint -I/usr/include/json-c
-	LDFLAGS += -Wl,-z,stack-size=268435456
 endif
-
+# To increase the stack size:
+# add CFLAGS += -fsplit-stack
+# and LDFLAGS += -Wl,-z,stack-size=268435456
 
 LDLIBS += $(shell sdl2-config --libs)
 LDLIBS += -ljson-c -lflint

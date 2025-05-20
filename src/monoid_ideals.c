@@ -30,7 +30,7 @@ dequeue* compute_l_ideal(morphism* M, uint s, bool* rest) {
 dequeue* compute_j_ideal(morphism* M, uint s, bool* rest) {
     dequeue* ini = create_dequeue();
     rigins_dequeue(s, ini);
-    dequeue* res = lgraph_search(DFS, M->j_order, ini, NULL, rest);
+    dequeue* res = twin_dgraph_search(DFS, M->r_cayley, M->l_cayley, ini, NULL, rest);
     delete_dequeue(ini);
     return res;
 }
@@ -55,7 +55,7 @@ dequeue* compute_l_ideal_alph(morphism* M, uint s, bool* alph, bool* rest) {
 dequeue* compute_j_ideal_alph(morphism* M, uint s, bool* alph, bool* rest) {
     dequeue* ini = create_dequeue();
     rigins_dequeue(s, ini);
-    dequeue* res = lgraph_search(DFS, M->j_order, ini, alph, rest);
+    dequeue* res = twin_dgraph_search(DFS, M->r_cayley, M->l_cayley, ini, alph, rest);
     delete_dequeue(ini);
     return res;
 }

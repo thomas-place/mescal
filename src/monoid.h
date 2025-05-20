@@ -90,7 +90,7 @@ typedef struct {
     uint* pred_lab;       //!< Array of preceding letters (for the naming as a product of generators).
     dgraph* r_cayley;     //!< The right Cayley graph of the morphism (stores the number of elements and the numbers of letters).
     dgraph* l_cayley;     //!< The left Cayley graph of the morphism.
-    lgraph* j_order;       //!< The J-order on the elements of the monoid: fusion of the two cayley graphs in a single graph.
+    //lgraph* j_order;       //!< The J-order on the elements of the monoid: fusion of the two cayley graphs in a single graph.
     dequeue* idem_list;   //!< The list of all idempotents, sorted in increasing order.
     bool* idem_array;     //!< An array of Booleans indexed by the elements. Marks the idempotents.
     dequeue* accept_list; //!< The list of all accepting elements, sorted in increasing order.

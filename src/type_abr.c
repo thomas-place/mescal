@@ -95,6 +95,8 @@ static avlnode* repare_balance_avl(avlnode* p) {
     return p;
 }
 
+
+
 /**************/
 /* Opérations */
 /**************/

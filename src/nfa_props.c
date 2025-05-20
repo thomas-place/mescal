@@ -316,3 +316,6 @@ bool is_counterfree_dfa(nfa* A, int* error, FILE* out) {
     }
     return true;
 }
+
+
+

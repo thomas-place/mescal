@@ -59,7 +59,7 @@ void delete_morphism(morphism* M) {
     delete_green(M->rels);
 
     // Free jord
-    delete_lgraph(M->j_order);
+    //delete_lgraph(M->j_order);
 
     // Free the representatives
     free(M->regular_idems);
@@ -317,7 +317,9 @@ void mor_compute_green(morphism* M) {
 
 
     // Computing the J equivalence (strongly connected components of the J order).
-    M->rels->JCL = ltarjan(M->j_order);
+    graph* j_order = ldgraphs_to_graph(0, 0, 2, 2, M->r_cayley, M->l_cayley); // Compute the J-order.
+    M->rels->JCL = tarjan(j_order);
+    delete_graph(j_order);
 
 
     // Computing the relation H.
@@ -803,7 +805,7 @@ morphism* dfa_to_morphism(nfa* A, bool** order, int* error) {
 
 
     // Compute the Green relations.
-    M->j_order = ldgraphs_to_lgraph(0, 2, 2, M->r_cayley, M->l_cayley); // Compute the J-order.
+    //M->j_order = ldgraphs_to_lgraph(0, 2, 2, M->r_cayley, M->l_cayley); // Compute the J-order.
 
 
     mor_compute_green(M);

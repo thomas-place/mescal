@@ -109,4 +109,6 @@ bool is_counterfree_dfa(nfa*,      //!< The NFA.
     FILE*      //!< The stream.
 );
 
+
+
 #endif

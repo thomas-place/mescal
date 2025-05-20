@@ -347,6 +347,55 @@ dequeue* dgraph_search(graph_stype, //!< The type of search that has to be used.
     bool*       //!< An array indexed by the vertices. Used to restrict the list of reachable vertices.
 );
 
+
+
+/**
+ * @brief
+ * Search in two deterministic complete labeled graphs (same set of vertices, same alphabet). A set of already visited vertices is taken as input.
+ * This set is updated by the search.
+ *
+ * @remark
+ * An additional array of Booleans is taken as input. It is indexed by the labels and represents a
+ * set of labels. It restricts the edges that can be used to those labeled by a label in this set.
+ * If no restriction is needed, a NULL pointer should be given as input.
+ *
+ * @attention
+ * The starting set is emptied by the function (it serves as a stack or a queue).
+ */
+void twin_dgraph_search_update(graph_stype, //!< The type of search that has to be used.
+    dgraph*,    //!< The first graph.
+    dgraph*,    //!< The second graph.
+    dequeue*,   //!< The starting set of vertices.
+    bool*,      //!< An array indexed by the labels. Used to restrict the edges that can be used.
+    bool*       //!< A set of already visited vertices. It is updated by the fucntion.
+);
+
+/**
+ * @brief
+ * Search in two deterministic complete labeled graphs (same set of vertices, same alphabet). Reachable vertices are returned inside a
+ * dequeue sorted in increasing order.
+ *
+ * @attention
+ * The starting set is emptied by the function (it serves as a stack or a queue).
+ *
+ * @remark
+ * Two arrays of Booleans are taken as input. The first one is indexed by the labels. It represents
+ * a set of labels which restricts the edges that can be used to those labeled by a label in this set.
+ * The second array is indexed by the vertices. It represents a subset of these vertices which is used
+ * to restrict the list of reachable vertices to those in the given set. In both cases, if no restriction
+ * is needed, a NULL pointer should be given as input.
+ *
+ * @return
+ * The list of reachable vertices sorted in increasing order.
+ */
+dequeue* twin_dgraph_search(graph_stype, //!< The type of search that has to be used.
+    dgraph*,    //!< The first graph.
+    dgraph*,    //!< The second graph.
+    dequeue*,   //!< The starting set of vertices.
+    bool*,      //!< An array indexed by the labels. Used to restrict the edges that can be used.
+    bool*       //!< An array indexed by the vertices. Used to restrict the list of reachable vertices.
+);
+
 /********************************/
 /*+ Disjoint merging of graphs +*/
 /********************************/
@@ -440,6 +489,60 @@ lgraph* ldgraphs_to_lgraph(uint, //!< Number of input labeled graphs.
  */
 lgraph* dgraph_to_lgraph(dgraph* //!< The complete deterministic labeled graph.
 );
+
+/**
+ * @brief
+ * Conversion of a standard labeled graph into a unlabeled graph.
+ *
+ * @return
+ * The unlabeled graph.
+ */
+graph* lgraph_to_graph(lgraph* //!< The labeled graph.
+);
+
+/**
+ * @brief
+ * Conversion of a standard labeled graph into a unlabeled graph. Restricted version.
+ *
+ * @remark
+ * An array of Booleans is taken as input. It is indexed by the labels and represents a sub-alphabet
+ * of the graph. It restricts the edges that can be used to those labeled by a label in this set. If
+ * a NULL pointer is given, all edges are used.
+ *
+ * @return
+ * The unlabeled graph.
+ */
+graph* lgraph_to_graph_alpha(lgraph*, //!< The labeled graph.
+    bool* //!< An array indexed by the labels. Used to restrict the edges that can be used.
+);
+
+
+/**
+ * @brief
+ * Conversion of a deterministic labeled graph into a unlabeled graph.
+ *
+ * @return
+ * The unlabeled graph.
+ */
+graph* dgraph_to_graph(dgraph* //!< The labeled graph.
+);
+
+/**
+ * @brief
+ * Conversion of a deterministic labeled graph into a unlabeled graph. Restricted version.
+ *
+ * @remark
+ * An array of Booleans is taken as input. It is indexed by the labels and represents a sub-alphabet
+ * of the graph. It restricts the edges that can be used to those labeled by a label in this set. If
+ * a NULL pointer is given, all edges are used.
+ *
+ * @return
+ * The unlabeled graph.
+ */
+graph* dgraph_to_graph_alpha(dgraph*, //!< The labeled graph.
+    bool* //!< An array indexed by the labels. Used to restrict the edges that can be used.
+);
+
 
 /***************************************/
 /*+ Computation of adjacents vertices +*/

@@ -18,9 +18,10 @@
 
 /**
  * @brief
- * The default timeout value. This is the number of seconds before the computation is interrupted.
+ * The default timeout value. This is the number of seconds before the
+ * computation is interrupted.
  */
-#define TIMEOUT_DEFAULT 5
+#define TIMEOUT_DEFAULT 0
 
 /**
  * @brief The timeout value. It is set to 0 if no timeout is set, and to the
@@ -38,7 +39,8 @@ extern bool timeout_flag;
 
 /**
  * @brief
- * The default limit value. This is the size of an object above which the computation is interrupted.
+ * The default limit value. This is the size of an object above which the
+ * computation is interrupted.
  */
 #define LIMIT_DEFAULT 1000000
 
