@@ -1,5 +1,10 @@
 var NAVTREEINDEX3 =
 {
+"structnum__span__trees.html#a67430f7a494bf5e5ec53c1418bcbbf77":[1,0,26,2],
+"structnum__span__trees.html#a7bc3bcedf6b07266b08ed4ea8d7e3623":[1,0,26,1],
+"structnum__span__trees.html#ab1d72a88f43825f050a279431da85ad9":[1,0,26,0],
+"structnum__span__trees.html#afdf5542ff68974dce71ffcc6bf55774d":[1,0,26,3],
+"structob__morphism.html":[1,0,27],
 "structob__morphism.html#a07e06365a9b2fc959280b9f40ba8aeb4":[1,0,27,1],
 "structob__morphism.html#a45fabd66d4fcdd32dec6f5ef81e278be":[1,0,27,0],
 "structob__morphism.html#a6499688aa2add9e8057c1e833afb3cd8":[1,0,27,2],

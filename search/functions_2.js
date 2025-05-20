@@ -30,10 +30,12 @@ var searchData=
   ['dgraph_5fnb_5fedges_27',['dgraph_nb_edges',['../graphs_8h.html#aa771c03d7e613494b7cb7699790ba003',1,'graphs.c']]],
   ['dgraph_5fsearch_28',['dgraph_search',['../graphs_8h.html#a9c0a43517e0be4fd197a10bd4338d3f9',1,'graphs.c']]],
   ['dgraph_5fsearch_5fupdate_29',['dgraph_search_update',['../graphs_8h.html#a25e1c54a054182ba449641b87f41efdb',1,'graphs.c']]],
-  ['dgraph_5fto_5flgraph_30',['dgraph_to_lgraph',['../graphs_8h.html#a10ac0ddac7534b40351650bf0c3d90fe',1,'graphs.c']]],
-  ['display_5fsyletter_5futf8_31',['display_syletter_utf8',['../regexp_8h.html#afc822beda3f58d0f381de94ef6478d8a',1,'regexp.c']]],
-  ['display_5fsyvar_5futf8_32',['display_syvar_utf8',['../regexp_8h.html#aa1e30e80bbc958492e10d8bd761ee096',1,'regexp.c']]],
-  ['display_5fword_33',['display_word',['../words_8h.html#ac37cb104de3d1383de3014cc5ae1fc3c',1,'words.c']]],
-  ['dtarjan_34',['dtarjan',['../graphs__tarjan_8h.html#a82b3e0fa3faa0d631b8597f7b2aec36c',1,'graphs_tarjan.c']]],
-  ['dtarjan_5falph_35',['dtarjan_alph',['../graphs__tarjan_8h.html#a6f81189fc50c4f77b6932df97d122a2c',1,'graphs_tarjan.c']]]
+  ['dgraph_5fto_5fgraph_30',['dgraph_to_graph',['../graphs_8h.html#a155ee826cfc5a288be03e0a4711239e3',1,'graphs.c']]],
+  ['dgraph_5fto_5fgraph_5falpha_31',['dgraph_to_graph_alpha',['../graphs_8h.html#af4572aae68e83742af6071d202d80263',1,'graphs.c']]],
+  ['dgraph_5fto_5flgraph_32',['dgraph_to_lgraph',['../graphs_8h.html#a10ac0ddac7534b40351650bf0c3d90fe',1,'graphs.c']]],
+  ['display_5fsyletter_5futf8_33',['display_syletter_utf8',['../regexp_8h.html#afc822beda3f58d0f381de94ef6478d8a',1,'regexp.c']]],
+  ['display_5fsyvar_5futf8_34',['display_syvar_utf8',['../regexp_8h.html#aa1e30e80bbc958492e10d8bd761ee096',1,'regexp.c']]],
+  ['display_5fword_35',['display_word',['../words_8h.html#ac37cb104de3d1383de3014cc5ae1fc3c',1,'words.c']]],
+  ['dtarjan_36',['dtarjan',['../graphs__tarjan_8h.html#a82b3e0fa3faa0d631b8597f7b2aec36c',1,'graphs_tarjan.c']]],
+  ['dtarjan_5falph_37',['dtarjan_alph',['../graphs__tarjan_8h.html#a6f81189fc50c4f77b6932df97d122a2c',1,'graphs_tarjan.c']]]
 ];

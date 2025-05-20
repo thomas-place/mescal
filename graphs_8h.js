@@ -18,6 +18,8 @@ var graphs_8h =
     [ "dgraph_nb_edges", "graphs_8h.html#aa771c03d7e613494b7cb7699790ba003", null ],
     [ "dgraph_search", "graphs_8h.html#a9c0a43517e0be4fd197a10bd4338d3f9", null ],
     [ "dgraph_search_update", "graphs_8h.html#a25e1c54a054182ba449641b87f41efdb", null ],
+    [ "dgraph_to_graph", "graphs_8h.html#a155ee826cfc5a288be03e0a4711239e3", null ],
+    [ "dgraph_to_graph_alpha", "graphs_8h.html#af4572aae68e83742af6071d202d80263", null ],
     [ "dgraph_to_lgraph", "graphs_8h.html#a10ac0ddac7534b40351650bf0c3d90fe", null ],
     [ "graph_mirror", "graphs_8h.html#a67e75d4e63dee41143abceb6c09fe73c", null ],
     [ "graph_nb_edges", "graphs_8h.html#aef11eda5e05a1dbfad39933d41742199", null ],
@@ -30,6 +32,10 @@ var graphs_8h =
     [ "lgraph_reachable", "graphs_8h.html#a65bd76d322515fd370db7c6f98b7510a", null ],
     [ "lgraph_search", "graphs_8h.html#a621e6cd9609980aa14d2382e210e4825", null ],
     [ "lgraph_search_update", "graphs_8h.html#a1871ffbe9a1c44bf18edc7a6665deb2b", null ],
+    [ "lgraph_to_graph", "graphs_8h.html#a52da04c1af11929a4dae1936ea998186", null ],
+    [ "lgraph_to_graph_alpha", "graphs_8h.html#a241e2ae201bfb4efae360e64b437e718", null ],
     [ "merge_graphs", "graphs_8h.html#adb17d1bc074506de7625d2c759a07556", null ],
-    [ "merge_lgraphs", "graphs_8h.html#accd55f5ff9f4d520b49c2581686bff03", null ]
+    [ "merge_lgraphs", "graphs_8h.html#accd55f5ff9f4d520b49c2581686bff03", null ],
+    [ "twin_dgraph_search", "graphs_8h.html#a71a9720e9ed9b7adc22d418205e9f7b4", null ],
+    [ "twin_dgraph_search_update", "graphs_8h.html#a9ae94228232e6b8c7c271208c11808a1", null ]
 ];

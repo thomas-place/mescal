@@ -52,9 +52,9 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "alloc_8c.html",
-"monoid__orbits_8h.html",
-"shell__keywords_8h.html#a3c46b9a9ba1b08f7bffde99b45910d53a41dd4c5c48134cdf20b5089879281763",
-"structob__morphism.html#a07e06365a9b2fc959280b9f40ba8aeb4"
+"monoid__kernels_8h.html#a847714c8b835ca8e92cef6b27a013aab",
+"shell__keywords_8h.html#a3c46b9a9ba1b08f7bffde99b45910d53a3aab5dc2d485f70d2242d2662669d437",
+"structnum__span__trees.html#a67430f7a494bf5e5ec53c1418bcbbf77"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

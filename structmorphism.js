@@ -5,7 +5,6 @@ var structmorphism =
     [ "alphabet", "structmorphism.html#a3e3b78168306bfe70b2dc2aa55a2b68d", null ],
     [ "idem_array", "structmorphism.html#adfa7c52d91ce26788fdca53b2dccd459", null ],
     [ "idem_list", "structmorphism.html#aa1a1ab452a986a85981e4b20a95861ad", null ],
-    [ "j_order", "structmorphism.html#a307de5fc0a70cd446f1872ac979ab156", null ],
     [ "l_cayley", "structmorphism.html#a280cb7bbd7fb2ac171e4a01bbf307e32", null ],
     [ "mult", "structmorphism.html#add286e2c6935d1ca21c2d857791b6c2f", null ],
     [ "nb_min_regular_jcl", "structmorphism.html#a8c898448fea9eae128e78e95e857a05a", null ],

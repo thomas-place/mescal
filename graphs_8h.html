@@ -200,6 +200,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>delete_dgraph</b> (<a
 <tr class="memitem:a9c0a43517e0be4fd197a10bd4338d3f9" id="r_a9c0a43517e0be4fd197a10bd4338d3f9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdequeue.html">dequeue</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9c0a43517e0be4fd197a10bd4338d3f9">dgraph_search</a> (<a class="el" href="#af79428132abe4bab1bda312319693dc8">graph_stype</a>, <a class="el" href="structdgraph.html">dgraph</a> *, <a class="el" href="structdequeue.html">dequeue</a> *, bool *, bool *)</td></tr>
 <tr class="memdesc:a9c0a43517e0be4fd197a10bd4338d3f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Search in a desterministic complete labeled graph. Reachable vertices are returned inside a dequeue sorted in increasing order.  <br /></td></tr>
 <tr class="separator:a9c0a43517e0be4fd197a10bd4338d3f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ae94228232e6b8c7c271208c11808a1" id="r_a9ae94228232e6b8c7c271208c11808a1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9ae94228232e6b8c7c271208c11808a1">twin_dgraph_search_update</a> (<a class="el" href="#af79428132abe4bab1bda312319693dc8">graph_stype</a>, <a class="el" href="structdgraph.html">dgraph</a> *, <a class="el" href="structdgraph.html">dgraph</a> *, <a class="el" href="structdequeue.html">dequeue</a> *, bool *, bool *)</td></tr>
+<tr class="memdesc:a9ae94228232e6b8c7c271208c11808a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Search in two deterministic complete labeled graphs (same set of vertices, same alphabet). A set of already visited vertices is taken as input. This set is updated by the search.  <br /></td></tr>
+<tr class="separator:a9ae94228232e6b8c7c271208c11808a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71a9720e9ed9b7adc22d418205e9f7b4" id="r_a71a9720e9ed9b7adc22d418205e9f7b4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdequeue.html">dequeue</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a71a9720e9ed9b7adc22d418205e9f7b4">twin_dgraph_search</a> (<a class="el" href="#af79428132abe4bab1bda312319693dc8">graph_stype</a>, <a class="el" href="structdgraph.html">dgraph</a> *, <a class="el" href="structdgraph.html">dgraph</a> *, <a class="el" href="structdequeue.html">dequeue</a> *, bool *, bool *)</td></tr>
+<tr class="memdesc:a71a9720e9ed9b7adc22d418205e9f7b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Search in two deterministic complete labeled graphs (same set of vertices, same alphabet). Reachable vertices are returned inside a dequeue sorted in increasing order.  <br /></td></tr>
+<tr class="separator:a71a9720e9ed9b7adc22d418205e9f7b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb17d1bc074506de7625d2c759a07556" id="r_adb17d1bc074506de7625d2c759a07556"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structgraph.html">graph</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adb17d1bc074506de7625d2c759a07556">merge_graphs</a> (uint *, uint,...)</td></tr>
 <tr class="memdesc:adb17d1bc074506de7625d2c759a07556"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disjoint merge of an arbitrary number of unlabeled graphs.  <br /></td></tr>
 <tr class="separator:adb17d1bc074506de7625d2c759a07556"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -215,6 +221,18 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>delete_dgraph</b> (<a
 <tr class="memitem:a10ac0ddac7534b40351650bf0c3d90fe" id="r_a10ac0ddac7534b40351650bf0c3d90fe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structlgraph.html">lgraph</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a10ac0ddac7534b40351650bf0c3d90fe">dgraph_to_lgraph</a> (<a class="el" href="structdgraph.html">dgraph</a> *)</td></tr>
 <tr class="memdesc:a10ac0ddac7534b40351650bf0c3d90fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion of a complete deterministic labeled graph into a standard labeled graph.  <br /></td></tr>
 <tr class="separator:a10ac0ddac7534b40351650bf0c3d90fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a52da04c1af11929a4dae1936ea998186" id="r_a52da04c1af11929a4dae1936ea998186"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structgraph.html">graph</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a52da04c1af11929a4dae1936ea998186">lgraph_to_graph</a> (<a class="el" href="structlgraph.html">lgraph</a> *)</td></tr>
+<tr class="memdesc:a52da04c1af11929a4dae1936ea998186"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion of a standard labeled graph into a unlabeled graph.  <br /></td></tr>
+<tr class="separator:a52da04c1af11929a4dae1936ea998186"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a241e2ae201bfb4efae360e64b437e718" id="r_a241e2ae201bfb4efae360e64b437e718"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structgraph.html">graph</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a241e2ae201bfb4efae360e64b437e718">lgraph_to_graph_alpha</a> (<a class="el" href="structlgraph.html">lgraph</a> *, bool *)</td></tr>
+<tr class="memdesc:a241e2ae201bfb4efae360e64b437e718"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion of a standard labeled graph into a unlabeled graph. Restricted version.  <br /></td></tr>
+<tr class="separator:a241e2ae201bfb4efae360e64b437e718"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a155ee826cfc5a288be03e0a4711239e3" id="r_a155ee826cfc5a288be03e0a4711239e3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structgraph.html">graph</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a155ee826cfc5a288be03e0a4711239e3">dgraph_to_graph</a> (<a class="el" href="structdgraph.html">dgraph</a> *)</td></tr>
+<tr class="memdesc:a155ee826cfc5a288be03e0a4711239e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion of a deterministic labeled graph into a unlabeled graph.  <br /></td></tr>
+<tr class="separator:a155ee826cfc5a288be03e0a4711239e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4572aae68e83742af6071d202d80263" id="r_af4572aae68e83742af6071d202d80263"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structgraph.html">graph</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af4572aae68e83742af6071d202d80263">dgraph_to_graph_alpha</a> (<a class="el" href="structdgraph.html">dgraph</a> *, bool *)</td></tr>
+<tr class="memdesc:af4572aae68e83742af6071d202d80263"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion of a deterministic labeled graph into a unlabeled graph. Restricted version.  <br /></td></tr>
+<tr class="separator:af4572aae68e83742af6071d202d80263"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a65bd76d322515fd370db7c6f98b7510a" id="r_a65bd76d322515fd370db7c6f98b7510a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdequeue.html">dequeue</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a65bd76d322515fd370db7c6f98b7510a">lgraph_reachable</a> (<a class="el" href="structlgraph.html">lgraph</a> *, <a class="el" href="structdequeue.html">dequeue</a> *, uint)</td></tr>
 <tr class="memdesc:a65bd76d322515fd370db7c6f98b7510a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given a labeled graph, a list of vertices in this graph and a label, computed the list of all vertices connected to a vertex in the input list by an edge labeled by the input label.  <br /></td></tr>
 <tr class="separator:a65bd76d322515fd370db7c6f98b7510a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -472,6 +490,64 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>delete_dgraph</b> (<a
     <tr><td class="paramname">ini</td><td>The starting set of vertices.  </td></tr>
     <tr><td class="paramname">alph</td><td>An array indexed by the labels. Used to restrict the edges that can be used.  </td></tr>
     <tr><td class="paramname">visited</td><td>A set of already visited vertices. It is updated by the fucntion. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a155ee826cfc5a288be03e0a4711239e3" name="a155ee826cfc5a288be03e0a4711239e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a155ee826cfc5a288be03e0a4711239e3">&#9670;&#160;</a></span>dgraph_to_graph()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structgraph.html">graph</a> * dgraph_to_graph </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdgraph.html">dgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>dg</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Conversion of a deterministic labeled graph into a unlabeled graph. </p>
+<dl class="section return"><dt>Returns</dt><dd>The unlabeled graph. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dg</td><td>The labeled graph. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="af4572aae68e83742af6071d202d80263" name="af4572aae68e83742af6071d202d80263"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af4572aae68e83742af6071d202d80263">&#9670;&#160;</a></span>dgraph_to_graph_alpha()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structgraph.html">graph</a> * dgraph_to_graph_alpha </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdgraph.html">dgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>dg</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool *</td>          <td class="paramname"><span class="paramname"><em>alph</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Conversion of a deterministic labeled graph into a unlabeled graph. Restricted version. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>An array of Booleans is taken as input. It is indexed by the labels and represents a sub-alphabet of the graph. It restricts the edges that can be used to those labeled by a label in this set. If a NULL pointer is given, all edges are used.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The unlabeled graph. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dg</td><td>The labeled graph.  </td></tr>
+    <tr><td class="paramname">alph</td><td>An array indexed by the labels. Used to restrict the edges that can be used. </td></tr>
   </table>
   </dd>
 </dl>
@@ -906,6 +982,64 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>delete_dgraph</b> (<a
 
 </div>
 </div>
+<a id="a52da04c1af11929a4dae1936ea998186" name="a52da04c1af11929a4dae1936ea998186"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a52da04c1af11929a4dae1936ea998186">&#9670;&#160;</a></span>lgraph_to_graph()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structgraph.html">graph</a> * lgraph_to_graph </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structlgraph.html">lgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>lg</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Conversion of a standard labeled graph into a unlabeled graph. </p>
+<dl class="section return"><dt>Returns</dt><dd>The unlabeled graph. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">lg</td><td>The labeled graph. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a241e2ae201bfb4efae360e64b437e718" name="a241e2ae201bfb4efae360e64b437e718"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a241e2ae201bfb4efae360e64b437e718">&#9670;&#160;</a></span>lgraph_to_graph_alpha()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structgraph.html">graph</a> * lgraph_to_graph_alpha </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structlgraph.html">lgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>lg</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool *</td>          <td class="paramname"><span class="paramname"><em>alph</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Conversion of a standard labeled graph into a unlabeled graph. Restricted version. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>An array of Booleans is taken as input. It is indexed by the labels and represents a sub-alphabet of the graph. It restricts the edges that can be used to those labeled by a label in this set. If a NULL pointer is given, all edges are used.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The unlabeled graph. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">lg</td><td>The labeled graph.  </td></tr>
+    <tr><td class="paramname">alph</td><td>An array indexed by the labels. Used to restrict the edges that can be used. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="adb17d1bc074506de7625d2c759a07556" name="adb17d1bc074506de7625d2c759a07556"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adb17d1bc074506de7625d2c759a07556">&#9670;&#160;</a></span>merge_graphs()</h2>
 
@@ -977,6 +1111,119 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>delete_dgraph</b> (<a
     <tr><td class="paramname">lag</td><td>An array indexed by the input graphs. It is used to return the index of the first vertex of each graph in the merged graph.  </td></tr>
     <tr><td class="paramname">n</td><td>The number of graphs given as input.  </td></tr>
     <tr><td class="paramname">...</td><td>The graphs. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a71a9720e9ed9b7adc22d418205e9f7b4" name="a71a9720e9ed9b7adc22d418205e9f7b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a71a9720e9ed9b7adc22d418205e9f7b4">&#9670;&#160;</a></span>twin_dgraph_search()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdequeue.html">dequeue</a> * twin_dgraph_search </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#af79428132abe4bab1bda312319693dc8">graph_stype</a></td>          <td class="paramname"><span class="paramname"><em>T</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structdgraph.html">dgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>G1</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structdgraph.html">dgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>G2</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structdequeue.html">dequeue</a> *</td>          <td class="paramname"><span class="paramname"><em>ini</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool *</td>          <td class="paramname"><span class="paramname"><em>alph</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool *</td>          <td class="paramname"><span class="paramname"><em>rest</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Search in two deterministic complete labeled graphs (same set of vertices, same alphabet). Reachable vertices are returned inside a dequeue sorted in increasing order. </p>
+<dl class="section attention"><dt>Attention</dt><dd>The starting set is emptied by the function (it serves as a stack or a queue).</dd></dl>
+<dl class="section remark"><dt>Remarks</dt><dd>Two arrays of Booleans are taken as input. The first one is indexed by the labels. It represents a set of labels which restricts the edges that can be used to those labeled by a label in this set. The second array is indexed by the vertices. It represents a subset of these vertices which is used to restrict the list of reachable vertices to those in the given set. In both cases, if no restriction is needed, a NULL pointer should be given as input.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The list of reachable vertices sorted in increasing order. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">T</td><td>The type of search that has to be used.  </td></tr>
+    <tr><td class="paramname">G1</td><td>The first graph.  </td></tr>
+    <tr><td class="paramname">G2</td><td>The second graph.  </td></tr>
+    <tr><td class="paramname">ini</td><td>The starting set of vertices.  </td></tr>
+    <tr><td class="paramname">alph</td><td>An array indexed by the labels. Used to restrict the edges that can be used.  </td></tr>
+    <tr><td class="paramname">rest</td><td>An array indexed by the vertices. Used to restrict the list of reachable vertices. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a9ae94228232e6b8c7c271208c11808a1" name="a9ae94228232e6b8c7c271208c11808a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ae94228232e6b8c7c271208c11808a1">&#9670;&#160;</a></span>twin_dgraph_search_update()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void twin_dgraph_search_update </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="#af79428132abe4bab1bda312319693dc8">graph_stype</a></td>          <td class="paramname"><span class="paramname"><em>T</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structdgraph.html">dgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>G1</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structdgraph.html">dgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>G2</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structdequeue.html">dequeue</a> *</td>          <td class="paramname"><span class="paramname"><em>ini</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool *</td>          <td class="paramname"><span class="paramname"><em>alph</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool *</td>          <td class="paramname"><span class="paramname"><em>visited</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Search in two deterministic complete labeled graphs (same set of vertices, same alphabet). A set of already visited vertices is taken as input. This set is updated by the search. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>An additional array of Booleans is taken as input. It is indexed by the labels and represents a set of labels. It restricts the edges that can be used to those labeled by a label in this set. If no restriction is needed, a NULL pointer should be given as input.</dd></dl>
+<dl class="section attention"><dt>Attention</dt><dd>The starting set is emptied by the function (it serves as a stack or a queue). </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">T</td><td>The type of search that has to be used.  </td></tr>
+    <tr><td class="paramname">G1</td><td>The first graph.  </td></tr>
+    <tr><td class="paramname">G2</td><td>The second graph.  </td></tr>
+    <tr><td class="paramname">ini</td><td>The starting set of vertices.  </td></tr>
+    <tr><td class="paramname">alph</td><td>An array indexed by the labels. Used to restrict the edges that can be used.  </td></tr>
+    <tr><td class="paramname">visited</td><td>A set of already visited vertices. It is updated by the fucntion. </td></tr>
   </table>
   </dd>
 </dl>

@@ -18,9 +18,11 @@ var searchData=
   ['lgraph_5freachable_15',['lgraph_reachable',['../graphs_8h.html#a65bd76d322515fd370db7c6f98b7510a',1,'graphs.c']]],
   ['lgraph_5fsearch_16',['lgraph_search',['../graphs_8h.html#a621e6cd9609980aa14d2382e210e4825',1,'graphs.c']]],
   ['lgraph_5fsearch_5fupdate_17',['lgraph_search_update',['../graphs_8h.html#a1871ffbe9a1c44bf18edc7a6665deb2b',1,'graphs.c']]],
-  ['listen_5finterrupt_18',['listen_interrupt',['../interrupt_8h.html#ad9733108dc59f30e1552d275aa704a17',1,'interrupt.c']]],
-  ['listen_5ftimeout_19',['listen_timeout',['../interrupt_8h.html#ae22c315569cade11cfad2c1b9e74fc41',1,'interrupt.c']]],
-  ['listening_5fmode_20',['listening_mode',['../interrupt_8h.html#af165da926e7da93c5fcc68797aedc20e',1,'interrupt.c']]],
-  ['ltarjan_21',['ltarjan',['../graphs__tarjan_8h.html#a1056a2c05386186a2b6acf54a373aa33',1,'graphs_tarjan.c']]],
-  ['ltarjan_5falph_22',['ltarjan_alph',['../graphs__tarjan_8h.html#a1ae025020a832977dcc7a63cd3537d02',1,'graphs_tarjan.c']]]
+  ['lgraph_5fto_5fgraph_18',['lgraph_to_graph',['../graphs_8h.html#a52da04c1af11929a4dae1936ea998186',1,'graphs.c']]],
+  ['lgraph_5fto_5fgraph_5falpha_19',['lgraph_to_graph_alpha',['../graphs_8h.html#a241e2ae201bfb4efae360e64b437e718',1,'graphs.c']]],
+  ['listen_5finterrupt_20',['listen_interrupt',['../interrupt_8h.html#ad9733108dc59f30e1552d275aa704a17',1,'interrupt.c']]],
+  ['listen_5ftimeout_21',['listen_timeout',['../interrupt_8h.html#ae22c315569cade11cfad2c1b9e74fc41',1,'interrupt.c']]],
+  ['listening_5fmode_22',['listening_mode',['../interrupt_8h.html#af165da926e7da93c5fcc68797aedc20e',1,'interrupt.c']]],
+  ['ltarjan_23',['ltarjan',['../graphs__tarjan_8h.html#a1056a2c05386186a2b6acf54a373aa33',1,'graphs_tarjan.c']]],
+  ['ltarjan_5falph_24',['ltarjan_alph',['../graphs__tarjan_8h.html#a1ae025020a832977dcc7a63cd3537d02',1,'graphs_tarjan.c']]]
 ];
