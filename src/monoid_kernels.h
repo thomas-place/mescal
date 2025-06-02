@@ -7,20 +7,22 @@
 #ifndef MONOID_KERNELS_H
 #define MONOID_KERNELS_H
 
-/*  _  __                    _      */
-/* | |/ /___ _ __ _ __   ___| |___  */
-/* | ' // _ \ '__| '_ \ / _ \ / __| */
-/* | . \  __/ |  | | | |  __/ \__ \ */
-/* |_|\_\___|_|  |_| |_|\___|_|___/ */
+ /*  _  __                    _      */
+ /* | |/ /___ _ __ _ __   ___| |___  */
+ /* | ' // _ \ '__| '_ \ / _ \ / __| */
+ /* | . \  __/ |  | | | |  __/ \__ \ */
+ /* |_|\_\___|_|  |_| |_|\___|_|___/ */
 
 #include "monoid.h"
 #include "monoid_sub.h"
 #include "sep_group.h"
 
+// #define DEBUG_KERNEL
+
 /**
  * @brief
  * Computes a DFA from the right Cayley graph of a morphism. Discards all
- * transitions which entering a new regular R-class.
+ * transitions which are entering a new regular R-class.
  *
  * @remark
  * Used to compute full Kernels.
@@ -28,7 +30,7 @@
  * @return
  * The DFA.
  */
-nfa *morphism_to_dfa_kernel(morphism * //!< The morphism.
+nfa* morphism_to_dfa_kernel(morphism* //!< The morphism.
 );
 
 /**
@@ -42,7 +44,7 @@ nfa *morphism_to_dfa_kernel(morphism * //!< The morphism.
  * @return
  * The DFA.
  */
-nfa *morphism_to_dfa_rcl(morphism * //!< The morphism.
+nfa* morphism_to_dfa_rcl(morphism* //!< The morphism.
 );
 
 /**
@@ -56,7 +58,7 @@ nfa *morphism_to_dfa_rcl(morphism * //!< The morphism.
  * @return
  * The DFA.
  */
-nfa *morphism_to_dfa_lcl(morphism * //!< The morphism.
+nfa* morphism_to_dfa_lcl(morphism* //!< The morphism.
 );
 
 /**
@@ -70,9 +72,10 @@ nfa *morphism_to_dfa_lcl(morphism * //!< The morphism.
  * @return
  * The GR-kernel.
  */
-subsemi *
-get_grp_kernel(morphism *, //!< The morphism.
-               sub_level //!< The desired computation level of the subsemigroup.
+subsemi*
+
+get_grp_kernel(morphism*, //!< The morphism.
+    sub_level //!< The desired computation level of the subsemigroup.
 );
 
 /**
@@ -86,9 +89,9 @@ get_grp_kernel(morphism *, //!< The morphism.
  * @return
  * The MOD-kernel.
  */
-subsemi *
-get_mod_kernel(morphism *, //!< The morphism.
-               sub_level //!< The desired computation level of the subsemigroup.
+subsemi*
+get_mod_kernel(morphism*, //!< The morphism.
+    sub_level //!< The desired computation level of the subsemigroup.
 );
 
 /*****************/
@@ -115,20 +118,51 @@ get_mod_kernel(morphism *, //!< The morphism.
  * (this is a code since the graph is deteministic).
  */
 typedef struct {
-    dgraph *cay; //!< The Cayley graph used to compute the spanning trees.
-    parti *P;    //!< The partition into strongly connected components of the
-                 //!< Cayley graph.
-    int **span_trees; //!< The spanning trees. Indexed by the elements, then the
-                      //!< letters. For each R- or L-class (depending on what we
-                      //!< compute), we fix an idempotent. The value
-                      //!< span_trees[s][a] counts the number of a's on the
-                      //!< branch from e to s in the span_tree associated to the
-                      //!< R- or L-class.
-    dequeue **dropped; //!< The dropped edges, ie, those not in the span tree
-                       //!< (we use them to close the < cycles). Indexed by the
-                       //!< classes of the < partition. NULL if the class is not
-                       //!< regular.
+    dgraph* cay; //!< The Cayley graph used to compute the spanning trees.
+    parti* P;    //!< The partition into strongly connected components of the
+    //!< Cayley graph.
+    int** span_trees; //!< The spanning trees. Indexed by the elements, then the
+    //!< letters. For each R- or L-class (depending on what we
+    //!< compute), we fix an idempotent. The value
+    //!< span_trees[s][a] counts the number of a's on the
+    //!< branch from e to s in the span_tree associated to the
+    //!< R- or L-class.
+    dequeue** dropped; //!< The dropped edges, ie, those not in the span tree
+    //!< (we use them to close the < cycles). Indexed by the
+    //!< classes of the < partition. NULL if the class is not
+    //!< regular.
 } num_span_trees;
+
+/**
+ * @brief
+ * Type used to store the information needed to compute the FOLDING of a R-class.
+ *
+ * @details
+ * Stores a spanning tree for the R-class plus the list of dropped edges in the construction.
+ *
+ * @remark
+ * Only partial information is stored for the spanning tre: span_trees[s][a]
+ * is the number of occurrences of the letter a on the path from the root of the
+ * tree to s (the root being an arbitrary element in the R of s).
+ *
+ * @remark
+ * The dropped edges are stored in a dequeue. An edge (r,a,s) is stored in the
+ * dequeue and represented by the integer r * size_alpha + a
+ * (this is a code since the graph is deteministic).
+ */
+typedef struct {
+    dgraph* cay; //!< The Cayley graph used to compute the spanning trees.
+    int** span_tree; //!< The spanning tree. Indexed by the elements, then the
+    //!< letters.The value span_trees[s][a] counts the number of a's on the
+    //!< branch from e to s in the span_tree associated to the R-class.
+    dequeue* dropped; //!< The dropped edges, ie, those not in the span tree
+    //!< (we use them to close the < cycles). Indexed by the
+    //!< classes of the < partition. NULL if the class is not
+    //!< regular.
+} single_num_span_tree;
+
+
+single_num_span_tree* compute_single_span_tree(dgraph* G);
 
 /**
  * @brief
@@ -137,8 +171,8 @@ typedef struct {
  * @return
  * The spanning trees.
  */
-num_span_trees *compute_num_span_trees(
-    morphism *, //!< The morphism.
+num_span_trees* compute_num_span_trees(
+    morphism*, //!< The morphism.
     bool //!< True if the spanning trees are computed from the right Cayley
          //!< graph, false if they are computed from the left one.
 );
@@ -147,7 +181,17 @@ num_span_trees *compute_num_span_trees(
  * @brief
  * Deletes the structure used to store the spanning trees.
  */
-void delete_num_span_trees(num_span_trees * //!< The structure to delete.
+void delete_num_span_trees(num_span_trees* //!< The structure to delete.
+);
+
+void delete_single_num_span_tree(single_num_span_tree* //!< The structure to delete.
+);
+
+/**
+ * @brief
+ * Computes the regular elements of the AMT-kernel in a morphism.
+ */
+parti* compute_amt_fold(dgraph* //!< The morphism.
 );
 
 /**
@@ -155,9 +199,9 @@ void delete_num_span_trees(num_span_trees * //!< The structure to delete.
  * Computes the regular elements of the AMT-kernel in a morphism.
  */
 void compute_amt_kernel_regular(
-    morphism *, //!< The morphism.
-    bool *,     //!< The array to fill with the elements of the kernel.
-    uint *      //!< Used to return the size of the kernel.
+    morphism*, //!< The morphism.
+    bool*,     //!< The array to fill with the elements of the kernel.
+    uint*      //!< Used to return the size of the kernel.
 );
 
 /**
@@ -166,14 +210,12 @@ void compute_amt_kernel_regular(
  * the L-class of f.
  */
 void compute_amt_pairs_regular(
-    num_span_trees *, //!< The spanning trees of the R-classes
-    num_span_trees *, //!< The spanning trees of the L-classes
+    num_span_trees*, //!< The spanning trees of the R-classes
+    num_span_trees*, //!< The spanning trees of the L-classes
     uint,             //!< The idempotent e.
     uint,             //!< The idempotent f.
-    dequeue
-        *, //!< The dequeue to fill with the first elements of each anti-pair.
-    dequeue
-        * //!< The dequeue to fill with the second elements of each anti-pair.
+    dequeue*, //!< The dequeue to fill with the first elements of each anti-pair.
+    dequeue* //!< The dequeue to fill with the second elements of each anti-pair.
 );
 
 /**
@@ -187,9 +229,9 @@ void compute_amt_pairs_regular(
  * @return
  * The AMT-kernel (restricted to its regular elements).
  */
-subsemi *
-get_amt_kernel(morphism *, //!< The morphism.
-               sub_level //!< The desired computation level of the subsemigroup.
+subsemi*
+get_amt_kernel(morphism*, //!< The morphism.
+    sub_level //!< The desired computation level of the subsemigroup.
 );
 
 #endif

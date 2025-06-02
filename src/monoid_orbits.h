@@ -18,6 +18,7 @@
  /* |_|  |_|\___/|_| |_|\___/|_|\__,_|___(_)  \___/|_|  |_.__/|_|\__|___/ */
 
 
+//#define DEBUG_ORBITS
 
 /**
  * @brief
@@ -172,7 +173,8 @@ bool* compute_maxalph_com_scc(morphism*,//!< The morphism.
  * The PT-orbit.
  */
 subsemi* compute_one_ptorb(morphism*, //!< The morphism.
-    uint //!< The idempotent.
+    uint, //!< The idempotent.
+    sub_level //!< Desired computation level.
 );
 
 /**
@@ -188,7 +190,8 @@ subsemi* compute_one_ptorb(morphism*, //!< The morphism.
  * @return
  * The (partial) set of PT-orbits.
  */
-orbits* compute_ptorbits(morphism* //!< The morphism.
+orbits* compute_ptorbits(morphism*, //!< The morphism.
+    sub_level //!< Desired computation level.
 );
 
 
@@ -197,33 +200,7 @@ orbits* compute_ptorbits(morphism* //!< The morphism.
 /* BPol(G)-orbits */
 /******************/
 
-/**
- * @brief
- * Given an idempotent e, computes the associated BPol(C)-orbit from a relevant subset of the
- * Pol(C)-pairs.
- *
- * @attention
- * Only the Pol(C)-pairs (s,t) such that s belongs to eM and t R e are given as input (this is
- * enough information to compute the BPol(C)-orbit of e). They are given by a two-dimensional
- * array of Booleans indexed by the indices of the right ideal eM (first) and the indices of the
- * R-class of e (second).
- *
- * @remark
- * The procedure exploits the fact that the BPol(C)-orbites are the same as the co-Pol(C)-orbits.
- *
- * @remark
- * The available computation levels are LV_FULL and LV_GREG. If LV_REG is chosen, the computation
- * defaults to LV_GREG.
- *
- * @return
- * The BPol(C)-orbit.
- */
-subsemi* compute_one_orbit_from_pairs(morphism*, //!< The morphism.
-    uint, //!< The index of the idempotent e.
-    dequeue*, //!< The right ideal eM associated to e.
-    bool**, //!< Two-dimensional array indicating the Pol(C)-pairs.
-    sub_level //!< Desired computation level.
-);
+
 
 /**
  * @brief
@@ -263,6 +240,15 @@ bool** compute_polgpairs(subsemi*, //!< The G-kernel.
     uint //!< The index of the R-class.
 );
 
+
+typedef enum {
+    BPG_ST,
+    BPG_MOD,
+    BPG_GR,
+    BPG_AMT
+} bpg_type;
+
+
 /**
  * @brief
  * Computes the BPol(G)-orbit associated to a given idempotent for group class G. The G-kernel
@@ -275,9 +261,10 @@ bool** compute_polgpairs(subsemi*, //!< The G-kernel.
  * @return
  * The BPol(G)-orbit.
  */
-subsemi* compute_one_bpgorb(subsemi*, //!< The G-kernel.
+subsemi* compute_one_bpgorb(morphism* M, //!< The morphism.
     uint, //!< The idempotent.
-    sub_level //!< Desired computation level.
+    sub_level, //!< Desired computation level.
+    bpg_type //!< Type of the BPol(G)-orbit to compute (MOD, AMT or GR).
 );
 
 /**
@@ -294,8 +281,9 @@ subsemi* compute_one_bpgorb(subsemi*, //!< The G-kernel.
  * @return
  * The (partial) set of BPol(G)-orbits.
  */
-orbits* compute_bpgorbits(subsemi*, //!< The G-kernel.
-    sub_level //!< Desired computation level.
+orbits* compute_bpgorbits(morphism* M, //!< The G-kernel.
+    sub_level, //!< Desired computation level.
+    bpg_type //!< Type of the BPol(G)-orbit to compute (MOD, AMT or GR).
 );
 
 
@@ -306,37 +294,76 @@ orbits* compute_bpgorbits(subsemi*, //!< The G-kernel.
 
 /**
  * @brief
- * Computes a subset of the Pol(G⁺)-pairs associated to a given morphism. The comutation depends
- * on the G⁺-orbits which are given as input.
+ * Given an idempotent e, computes the associated BPol(C)-orbit from a relevant subset of the
+ * Pol(C)-pairs.
  *
  * @attention
- * A regular R-class is given as input. Only the Pol(G⁺)-pairs (s,t) such that s is in the right
- * ideal of the R-class and t is in the R-class itself are computed.
+ * Only the Pol(C)-pairs (s,t) such that s belongs to eM and t R e are given as input (this is
+ * enough information to compute the BPol(C)-orbit of e). They are given by a two-dimensional
+ * array of Booleans indexed by the indices of the right ideal eM (first) and the indices of the
+ * R-class of e (second).
  *
- * @return
- * A two-dimensional array of Booleans indexed by the indices of the right ideal (first) and the
- * indices of the R-class (second). It marks the Pol(G)-pairs.
- */
-bool** compute_polgpluspairs(orbits*, //!< The G⁺-orbits.
-    dequeue*, //!< The right ideal associated to the R-class.
-    uint //!< The index of the R-class.
-);
-
-/**
- * @brief
- * Computes the BPol(G⁺)-orbit associated to a given idempotent for group class G. The G⁺-orbits
- * needs to be given as an input.
+ * @remark
+ * The procedure exploits the fact that the BPol(C)-orbites are the same as the co-Pol(C)-orbits.
  *
  * @remark
  * The available computation levels are LV_FULL and LV_GREG. If LV_REG is chosen, the computation
  * defaults to LV_GREG.
  *
  * @return
+ * The BPol(C)-orbit.
+ */
+subsemi* compute_one_orbit_from_pairs(morphism*, //!< The morphism.
+    uint, //!< The index of the idempotent e.
+    dequeue*, //!< The right ideal eM associated to e.
+    bool**, //!< Two-dimensional array indicating the Pol(C)-pairs.
+    sub_level //!< Desired computation level.
+);
+
+
+/**
+ * @brief
+ * Computes the BPol(DD)-orbit associated to a given idempotent.
+ *
+ * @remark
+ * The available computation levels are LV_FULL and LV_GREG. If LV_REG is chosen, the computation
+ * defaults to LV_GREG.
+ *
+ * @remark
+ * If the monoid has a non-empty neutral element, the BPol(DD)-orbit is the same as the BPol(ST)-orbit
+ * and the computation default to the latter as this is much faster.
+ *
+ * @return
+ * The BPol(DD)-orbit.
+ */
+subsemi* compute_one_bpddorb(morphism* M, //!< The morphism.
+    uint e, //!< The idempotent.
+    sub_level level //!< Desired computation level.
+);
+
+
+/**
+ * @brief
+ * Computes the BPol(G⁺)-orbit associated to a given idempotent for group class G.
+ *
+ * @remark
+ * The available computation levels are LV_FULL and LV_GREG. If LV_REG is chosen, the computation
+ * defaults to LV_GREG.
+ *
+ * @remark
+ * If the monoid has a non-empty neutral element, the BPol(G⁺)-orbit is the same as the BPol(G)-orbit
+ * and the computation default to the latter as this is much faster.
+ *
+ * @remark
+ * For G = ST, the BPol(G⁺)-orbit is the BPol(DD)-orbit an the function compute_one_bpddorb is called.
+ *
+ * @return
  * The BPol(G⁺)-orbit.
  */
-subsemi* compute_one_bpgplusorb(orbits*, //!< The G⁺-orbits.
+subsemi* compute_one_bpgplusorb(morphism*, //!< The morphism.
     uint, //!< The idempotent.
-    sub_level //!< Desired computation level.
+    sub_level, //!< Desired computation level.
+    bpg_type //!< Type of the BPol(G⁺)-orbit to compute (ST, MOD, AMT or GR).
 );
 
 /**
@@ -353,8 +380,9 @@ subsemi* compute_one_bpgplusorb(orbits*, //!< The G⁺-orbits.
  * @return
  * The set of BPol(G⁺)-orbits.
  */
-orbits* compute_bpgplusorbits(orbits*, //!< The G⁺-orbits.
-    sub_level //!< Desired computation level.
+orbits* compute_bpgplusorbits(morphism*, //!< The morphism.
+    sub_level, //!< Desired computation level.
+    bpg_type //!< Type of the BPol(G⁺)-orbit to compute (ST, MOD, AMT or GR).
 );
 
 

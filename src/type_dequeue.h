@@ -194,6 +194,7 @@ bool mem_dequeue_sorted(uint,  //!< The value.
   uint*                      //!< Returns the index at which the value occurs (from the left).
 );
 
+
 /**
  * @brief
  * Merge of two sorted dequeues with no repetitions.
@@ -218,6 +219,8 @@ void merge_sorted_dequeue(dequeue*,  //!< The first dequeue (modified)
 dequeue* make_inter_sorted_dequeue(dequeue*, //!< The first dequeue.
   dequeue*                                   //!< The second dequeue.
 );
+
+dequeue* make_inter_sorted_dequeue_array(dequeue* p, uint* arr, uint size);
 
 /**
  * @brief

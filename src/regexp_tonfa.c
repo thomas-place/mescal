@@ -295,7 +295,7 @@ nfa* reg_thompson(regexp* expr) {
         break;
 
     case UNION:
-        ret = nfa_union(aleft, aright);
+        ret = nfa_union(aleft, false, aright, false);
         break;
 
     case INTER:
@@ -303,7 +303,7 @@ nfa* reg_thompson(regexp* expr) {
         break;
 
     case CONCAT:
-        ret = nfa_concat(aleft, aright);
+        ret = nfa_concat(aleft, false, aright, false);
         break;
 
     case COMPLEMENT:
@@ -322,8 +322,8 @@ nfa* reg_thompson(regexp* expr) {
         ret = NULL;
         break;
     }
-    delete_nfa(aleft);
-    delete_nfa(aright);
+    nfa_delete(aleft);
+    nfa_delete(aright);
     return ret;
 }
 

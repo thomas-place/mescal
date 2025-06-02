@@ -41,7 +41,8 @@ typedef struct {
     bool* mono_in_sub;  //!< Array of Booleans indexed by the elements of the original monoid. Marks the elements inside the subsemigroup.
     uint* mono_to_sub;  //!< Array of Booleans indexed by the elements of the original monoid. Maps each elements to the orrepsonding one in the subsemigroup (if it exists).
     uint neut;          //!< Index of the neutral element in the subsemigroup.
-    dequeue* idem_list; //!< List of all idempotents.
+    uint* idem_list;    //!< List of all idempotents.
+    uint nb_idems;      //!< Number of idempotents in the subsemigroup.
     bool* idem_array;   //!< Array of Booleans indexed by the elements of the subsemgroup. Marks the idempotents.
     green* rels;        //!< The Green relations of the subsemigroup.
 } subsemi;

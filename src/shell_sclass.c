@@ -1494,6 +1494,8 @@ classes command_to_class(com_command* thecom) {
 }
 
 
+
+
 void print_class_info(classes class, FILE* out) {
     if (class_infos[class]) {
         class_infos[class](out);
@@ -2694,7 +2696,12 @@ void print_info_input(int i, FILE* out)
     case AUTOMATON:
         print_title_box(10, true, out, 1, "Input: an automaton.");
         fprintf(out, "#### The automaton  :\n");
-        view_nfa(objects[i]->nfa);
+        if (objects[i]->aut->dfa) {
+            view_dfa(objects[i]->aut->obj_dfa);
+        }
+        else {
+            view_nfa(objects[i]->aut->obj_nfa);
+        }
         break;
     default:
         break;

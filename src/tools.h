@@ -29,14 +29,40 @@
 
 /**
  * @brief
+ * Compares two unsigned integers.
+ *
+ * @return
+ * A negative value if p1 < p2, 0 if p1 == p2, and a positive value if p1 > p2.
+ */
+int compare_uint(const void* p1, //!< The first integer.
+    const void* p2 //!< The second integer.
+);
+
+
+bool mem_array_sorted(uint e, uint* array, uint size, uint* ind);
+
+
+
+/**
+ * @brief
  * Computes the length of the decimal representation of an integer.
  *
  * @return
  * The length.
  */
-uint get_uint_length(uint //!< The integer.
+uint get_uint_length(uint n //!< The integer.
 );
 
+
+/**
+ * @brief
+ * Computes the length of the binary representation of an integer.
+ *
+ * @return
+ * The length.
+ */
+uchar get_uint_lbinary(uint n//!< The integer.
+);
 
 /**
  * @brief

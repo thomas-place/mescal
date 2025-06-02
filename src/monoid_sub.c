@@ -19,6 +19,7 @@ subsemi* init_subsemi(morphism* M) {
     S->idem_array = NULL;
     S->idem_list = NULL;
     S->rels = NULL;
+    S->nb_idems = 0;
     return S;
 }
 
@@ -58,14 +59,22 @@ void compute_idems_subsemi(subsemi* S) {
         free(S->idem_array);
     }
     if (S->idem_list) {
-        delete_dequeue(S->idem_list);
+        free(S->idem_list);
     }
+    S->nb_idems = 0;
     MALLOC(S->idem_array, S->size);
-    S->idem_list = create_dequeue();
     for (uint j = 0; j < S->size; j++) {
         S->idem_array[j] = S->original->idem_array[S->sub_to_mono[j]];
         if (S->idem_array[j]) {
-            rigins_dequeue(j, S->idem_list);
+            S->nb_idems++;
+        }
+    }
+    MALLOC(S->idem_list, S->nb_idems);
+    uint num = 0;
+    for (uint j = 0; j < S->size; j++) {
+        if (S->idem_array[j]) {
+            S->idem_list[num] = j;
+            num++;
         }
     }
 }
@@ -77,9 +86,9 @@ uint* compute_jord_subsemi(subsemi* S) {
     MALLOC(jord, S->size);
     uint num = 0;
     for (uint cjo = 0; cjo < G->JCL->size_par; cjo++) {
-        for (uint i = 0; i < size_dequeue(G->JCL->cl[cjo]); i++) {
-            if (S->mono_in_sub[lefread_dequeue(G->JCL->cl[cjo], i)]) {
-                jord[num] = S->mono_to_sub[lefread_dequeue(G->JCL->cl[cjo], i)];
+        for (uint i = 0; i < G->JCL->cl_size[cjo]; i++) {
+            if (S->mono_in_sub[G->JCL->cl_elems[cjo][i]]) {
+                jord[num] = S->mono_to_sub[G->JCL->cl_elems[cjo][i]];
                 num++;
             }
         }
@@ -97,9 +106,10 @@ void compute_jrel_subsemi(subsemi* S, uint* jord) {
         delete_parti(S->rels->JCL);
     }
 
-    MALLOC(S->rels->JCL, 1);
-    S->rels->JCL->size_set = S->size;
-    MALLOC(S->rels->JCL->numcl, S->size);
+    // MALLOC(S->rels->JCL, 1);
+    // S->rels->JCL->size_set = S->size;
+    uint* numcl;
+    MALLOC(numcl, S->size);
 
     bool* done;
     CALLOC(done, S->size);
@@ -109,13 +119,13 @@ void compute_jrel_subsemi(subsemi* S, uint* jord) {
     for (uint i = 0; i < S->size; i++) {
         if (!done[jord[i]]) {
             uint cr = S->rels->RCL->numcl[jord[i]];
-            for (uint j = 0; j < size_dequeue(S->rels->RCL->cl[cr]); j++) {
-                uint s = lefread_dequeue(S->rels->RCL->cl[cr], j);
+            for (uint j = 0; j < S->rels->RCL->cl_size[cr]; j++) {
+                uint s = S->rels->RCL->cl_elems[cr][j];
                 if (!done[s]) {
                     uint cl = S->rels->LCL->numcl[s];
-                    for (uint k = 0; k < size_dequeue(S->rels->LCL->cl[cl]); k++) {
-                        S->rels->JCL->numcl[lefread_dequeue(S->rels->LCL->cl[cl], k)] = num;
-                        done[lefread_dequeue(S->rels->LCL->cl[cl], k)] = true;
+                    for (uint k = 0; k < S->rels->LCL->cl_size[cl]; k++) {
+                        numcl[S->rels->LCL->cl_elems[cl][k]] = num;
+                        done[S->rels->LCL->cl_elems[cl][k]] = true;
                     }
                 }
             }
@@ -123,14 +133,16 @@ void compute_jrel_subsemi(subsemi* S, uint* jord) {
         }
     }
 
-    S->rels->JCL->size_par = num;
-    MALLOC(S->rels->JCL->cl, num);
-    for (uint i = 0; i < num; i++) {
-        S->rels->JCL->cl[i] = create_dequeue();
-    }
-    for (uint s = 0; s < S->size; s++) {
-        rigins_dequeue(s, S->rels->JCL->cl[S->rels->JCL->numcl[s]]);
-    }
+    S->rels->JCL = create_parti(S->size, num, numcl);
+
+    // S->rels->JCL->size_par = num;
+    // MALLOC(S->rels->JCL->cl, num);
+    // for (uint i = 0; i < num; i++) {
+    //     S->rels->JCL->cl[i] = create_dequeue();
+    // }
+    // for (uint s = 0; s < S->size; s++) {
+    //     rigins_dequeue(s, S->rels->JCL->cl[S->rels->JCL->numcl[s]]);
+    // }
     free(done);
 }
 
@@ -146,7 +158,7 @@ void delete_subsemi(subsemi* S) {
     free(S->mono_to_sub);
     free(S->sub_to_mono);
     free(S->idem_array);
-    delete_dequeue(S->idem_list);
+    free(S->idem_list);
     delete_green(S->rels);
     free(S);
 }
@@ -222,7 +234,7 @@ void green_compute_sub(subsemi* S) {
 
     // Computes the groups and the regular elements.
 
-    gr_green_compute(S->idem_list, S->rels);
+    gr_green_compute(S->idem_list, S->nb_idems, S->rels);
 }
 
 
@@ -255,10 +267,10 @@ void green_compute_sub_reg(subsemi* S) {
 
     // Filling the arrays: loop over all idempotents in the subsemigroup
     // First, we restrict the regular classes to the elements in the subsemigroup
-    for (uint i = 0; i < size_dequeue(S->idem_list); i++) {
+    for (uint i = 0; i < S->nb_idems; i++) {
 
         // Index of the idempotent in the subsemigroup
-        uint sube = lefread_dequeue(S->idem_list, i);
+        uint sube = S->idem_list[i];
 
         // Index of the idempotent in the original monoid
         uint e = S->sub_to_mono[sube];
@@ -266,8 +278,8 @@ void green_compute_sub_reg(subsemi* S) {
         // If the idempotent has not already been handled as being part of the R-class of another idempotent
         if (rarray[sube] == UINT_MAX) {
             // For each element in the original R-class of the idempotent
-            for (uint j = 0; j < size_dequeue(G->RCL->cl[G->RCL->numcl[e]]); j++) {
-                uint s = lefread_dequeue(G->RCL->cl[G->RCL->numcl[e]], j);
+            for (uint j = 0; j < G->RCL->cl_size[G->RCL->numcl[e]]; j++) {
+                uint s = G->RCL->cl_elems[G->RCL->numcl[e]][j];
                 // If the element is in the subsemigroup
                 if (S->mono_in_sub[s]) {
                     rarray[S->mono_to_sub[s]] = sube;
@@ -279,8 +291,8 @@ void green_compute_sub_reg(subsemi* S) {
         // If the idempotent has not already been handled as being part of the L-class of another idempotent
         if (larray[sube] == UINT_MAX) {
             // For each element in the original L-class of the idempotent
-            for (uint j = 0; j < size_dequeue(G->LCL->cl[G->LCL->numcl[e]]); j++) {
-                uint s = lefread_dequeue(G->LCL->cl[G->LCL->numcl[e]], j);
+            for (uint j = 0; j < G->LCL->cl_size[G->LCL->numcl[e]]; j++) {
+                uint s = G->LCL->cl_elems[G->LCL->numcl[e]][j];
                 // If the element is in the subsemigroup
                 if (S->mono_in_sub[s]) {
                     larray[S->mono_to_sub[s]] = sube;
@@ -326,32 +338,32 @@ void green_compute_sub_reg(subsemi* S) {
 
         // The R-class of e restricted to the elements in the subsemigroup
         dequeue* re = create_dequeue();
-        for (uint i = 0; i < size_dequeue(G->RCL->cl[G->RCL->numcl[e]]); i++) {
-            uint s = lefread_dequeue(G->RCL->cl[G->RCL->numcl[e]], i);
+        for (uint i = 0; i < G->RCL->cl_size[G->RCL->numcl[e]]; i++) {
+            uint s = G->RCL->cl_elems[G->RCL->numcl[e]][i];
             if (S->mono_in_sub[s]) {
                 rigins_dequeue(s, re);
             }
         }
         // The R-class of f restricted to the elements in the subsemigroup
         dequeue* rf = create_dequeue();
-        for (uint i = 0; i < size_dequeue(G->RCL->cl[G->RCL->numcl[f]]); i++) {
-            uint s = lefread_dequeue(G->RCL->cl[G->RCL->numcl[f]], i);
+        for (uint i = 0; i < G->RCL->cl_size[G->RCL->numcl[f]]; i++) {
+            uint s = G->RCL->cl_elems[G->RCL->numcl[f]][i];
             if (S->mono_in_sub[s]) {
                 rigins_dequeue(s, rf);
             }
         }
         // The L-class of e restricted to the elements in the subsemigroup
         dequeue* le = create_dequeue();
-        for (uint i = 0; i < size_dequeue(G->LCL->cl[G->LCL->numcl[e]]); i++) {
-            uint s = lefread_dequeue(G->LCL->cl[G->LCL->numcl[e]], i);
+        for (uint i = 0; i < G->LCL->cl_size[G->LCL->numcl[e]]; i++) {
+            uint s = G->LCL->cl_elems[G->LCL->numcl[e]][i];
             if (S->mono_in_sub[s]) {
                 rigins_dequeue(s, le);
             }
         }
         // The L-class of e restricted to the elements in the subsemigroup
         dequeue* lf = create_dequeue();
-        for (uint i = 0; i < size_dequeue(G->LCL->cl[G->LCL->numcl[f]]); i++) {
-            uint s = lefread_dequeue(G->LCL->cl[G->LCL->numcl[f]], i);
+        for (uint i = 0; i < G->LCL->cl_size[G->LCL->numcl[f]]; i++) {
+            uint s = G->LCL->cl_elems[G->LCL->numcl[f]][i];
             if (S->mono_in_sub[s]) {
                 rigins_dequeue(s, lf);
             }
@@ -413,74 +425,74 @@ void green_compute_sub_reg(subsemi* S) {
 
 
     // Computation of the R-classes and L-classes.
-    MALLOC(S->rels->RCL, 1);
-    MALLOC(S->rels->LCL, 1);
-    MALLOC(S->rels->RCL->numcl, S->size);
-    MALLOC(S->rels->LCL->numcl, S->size);
-    S->rels->RCL->size_set = S->size;
-    S->rels->LCL->size_set = S->size;
+    uint* rnumcl;
+    uint* lnumcl;
+    MALLOC(rnumcl, S->size);
+    MALLOC(lnumcl, S->size);
 
-    S->rels->RCL->size_par = 0;
-    S->rels->LCL->size_par = 0;
+    uint rsize_par = 0;
+    uint lsize_par = 0;
 
 
     // Computation of the classes indices for regular elements (we keep the ordering of the original monoid)
     for (uint i = 0; i < G->RCL->size_par; i++) {
         bool inter = false;
-        for (uint j = 0; j < size_dequeue(G->RCL->cl[i]); j++) {
-            uint s = lefread_dequeue(G->RCL->cl[i], j);
+        for (uint j = 0; j < G->RCL->cl_size[i]; j++) {
+            uint s = G->RCL->cl_elems[i][j];
             if (S->mono_in_sub[s] && rarray[S->mono_to_sub[s]] != UINT_MAX) {
                 inter = true;
-                S->rels->RCL->numcl[S->mono_to_sub[s]] = S->rels->RCL->size_par;
+                rnumcl[S->mono_to_sub[s]] = rsize_par;
             }
 
         }
         if (inter) {
-            S->rels->RCL->size_par++;
+            rsize_par++;
         }
     }
 
 
     for (uint i = 0; i < G->LCL->size_par; i++) {
         bool inter = false;
-        for (uint j = 0; j < size_dequeue(G->LCL->cl[i]); j++) {
-            uint s = lefread_dequeue(G->LCL->cl[i], j);
+        for (uint j = 0; j < G->LCL->cl_size[i]; j++) {
+            uint s = G->LCL->cl_elems[i][j];
             if (S->mono_in_sub[s] && larray[S->mono_to_sub[s]] != UINT_MAX) {
                 inter = true;
-                S->rels->LCL->numcl[S->mono_to_sub[s]] = S->rels->LCL->size_par;
+                lnumcl[S->mono_to_sub[s]] = lsize_par;
             }
 
         }
         if (inter) {
-            S->rels->LCL->size_par++;
+            lsize_par++;
         }
     }
 
     // Computation of the classes indices for the non-regular elements (placed at the end)
     for (uint t = 0; t < S->size;t++) {
         if (rarray[t] == UINT_MAX) {
-            S->rels->RCL->numcl[t] = S->rels->RCL->size_par;
-            S->rels->RCL->size_par++;
+            rnumcl[t] = rsize_par;
+            rsize_par++;
         }
         if (larray[t] == UINT_MAX) {
-            S->rels->LCL->numcl[t] = S->rels->LCL->size_par;
-            S->rels->LCL->size_par++;
+            lnumcl[t] = lsize_par;
+            lsize_par++;
         }
     }
 
     // Computation of the classes
-    MALLOC(S->rels->RCL->cl, S->rels->RCL->size_par);
-    for (uint c = 0; c < S->rels->RCL->size_par; c++) {
-        S->rels->RCL->cl[c] = create_dequeue();
-    }
-    MALLOC(S->rels->LCL->cl, S->rels->LCL->size_par);
-    for (uint c = 0; c < S->rels->LCL->size_par; c++) {
-        S->rels->LCL->cl[c] = create_dequeue();
-    }
-    for (uint s = 0; s < S->size; s++) {
-        rigins_dequeue(s, S->rels->RCL->cl[S->rels->RCL->numcl[s]]);
-        rigins_dequeue(s, S->rels->LCL->cl[S->rels->LCL->numcl[s]]);
-    }
+    S->rels->RCL = create_parti(S->size, rsize_par, rnumcl);
+    S->rels->LCL = create_parti(S->size, lsize_par, lnumcl);
+    // MALLOC(S->rels->RCL->cl, S->rels->RCL->size_par);
+    // for (uint c = 0; c < S->rels->RCL->size_par; c++) {
+    //     S->rels->RCL->cl[c] = create_dequeue();
+    // }
+    // MALLOC(S->rels->LCL->cl, S->rels->LCL->size_par);
+    // for (uint c = 0; c < S->rels->LCL->size_par; c++) {
+    //     S->rels->LCL->cl[c] = create_dequeue();
+    // }
+    // for (uint s = 0; s < S->size; s++) {
+    //     rigins_dequeue(s, S->rels->RCL->cl[S->rels->RCL->numcl[s]]);
+    //     rigins_dequeue(s, S->rels->LCL->cl[S->rels->LCL->numcl[s]]);
+    // }
 
     free(larray);
     free(rarray);
@@ -490,44 +502,49 @@ void green_compute_sub_reg(subsemi* S) {
     uint* jord = compute_jord_subsemi(S);
 
 
+    uint* jnumcl;
+    MALLOC(jnumcl, S->size);
+    uint jsize_par = 0;
+    // MALLOC(S->rels->JCL, 1);
+    // MALLOC(S->rels->JCL->numcl, S->size);
+    // S->rels->JCL->size_set = S->size;
+    // S->rels->JCL->size_par = 0;
 
-    MALLOC(S->rels->JCL, 1);
-    MALLOC(S->rels->JCL->numcl, S->size);
-    S->rels->JCL->size_set = S->size;
-    S->rels->JCL->size_par = 0;
+
     for (uint i = 0; i < S->size; i++) {
-        S->rels->JCL->numcl[i] = UINT_MAX;
+        jnumcl[i] = UINT_MAX;
     }
 
     for (uint h = 0; h < S->size; h++) {
         uint t = jord[h];
-        if (S->rels->JCL->numcl[t] != UINT_MAX) {
+        if (jnumcl[t] != UINT_MAX) {
             continue;
         }
         uint i = S->rels->RCL->numcl[t];
-        for (uint j = 0; j < size_dequeue(S->rels->RCL->cl[i]); j++) {
-            uint s = lefread_dequeue(S->rels->RCL->cl[i], j);
-            if (S->rels->JCL->numcl[s] != UINT_MAX) {
+        for (uint j = 0; j < S->rels->RCL->cl_size[i]; j++) {
+            uint s = S->rels->RCL->cl_elems[i][j];
+            if (jnumcl[s] != UINT_MAX) {
                 continue;
             }
             uint n = S->rels->LCL->numcl[s];
-            for (uint k = 0; k < size_dequeue(S->rels->LCL->cl[n]); k++) {
-                S->rels->JCL->numcl[lefread_dequeue(S->rels->LCL->cl[n], k)] = S->rels->JCL->size_par;
+            for (uint k = 0; k < S->rels->LCL->cl_size[n]; k++) {
+                jnumcl[S->rels->LCL->cl_elems[n][k]] = jsize_par;
             }
         }
-        S->rels->JCL->size_par++;
+        jsize_par++;
     }
 
+    S->rels->JCL = create_parti(S->size, jsize_par, jnumcl);
 
 
 
-    MALLOC(S->rels->JCL->cl, S->rels->JCL->size_par);
-    for (uint c = 0; c < S->rels->JCL->size_par; c++) {
-        S->rels->JCL->cl[c] = create_dequeue();
-    }
-    for (uint i = 0; i < S->size; i++) {
-        rigins_dequeue(i, S->rels->JCL->cl[S->rels->JCL->numcl[i]]);
-    }
+    // MALLOC(S->rels->JCL->cl, S->rels->JCL->size_par);
+    // for (uint c = 0; c < S->rels->JCL->size_par; c++) {
+    //     S->rels->JCL->cl[c] = create_dequeue();
+    // }
+    // for (uint i = 0; i < S->size; i++) {
+    //     rigins_dequeue(i, S->rels->JCL->cl[S->rels->JCL->numcl[i]]);
+    // }
 
     free(jord);
 
@@ -538,7 +555,7 @@ void green_compute_sub_reg(subsemi* S) {
 
     // Computes the groups and the regular elements.
 
-    gr_green_compute(S->idem_list, S->rels);
+    gr_green_compute(S->idem_list, S->nb_idems, S->rels);
 
 }
 

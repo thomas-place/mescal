@@ -122,6 +122,18 @@ int compare_letters(const void* p1, const void* p2) {
     return 0;
 }
 
+
+letter* duplicate_alphabet(const letter* alph, uint size) {
+    letter* new;
+    MALLOC(new, size);
+    for (uint i = 0; i < size; i++) {
+        new[i] = alph[i];
+    }
+    return new;
+}
+
+
+
 // Double la taille du tableau utilisé dans la liste.
 static void grow_word(word* p) {
     CHECK_NULL(2, p, "The list of word", p->array, "The array in the list of word");

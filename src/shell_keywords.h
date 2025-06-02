@@ -56,7 +56,6 @@ typedef enum {
     KY_BMCK,
     KY_INTERSEC,
     KY_ELIMEPS,
-    KY_COMPLEM,
     KY_BRZOZO,
     KY_KLEENE,
     KY_MIRROR,
@@ -72,6 +71,10 @@ typedef enum {
     KY_RECDEF,
     KY_PERMUT,
     KY_COUNTER,
+    KY_AUTODA,
+    KY_CYCLETRIV,
+    KY_DETERMINIZE,
+    KY_COMPLEMENT,
 
     // Morphisms commands
     KY_SYNT,
@@ -86,6 +89,10 @@ typedef enum {
     KY_AKER,
     KY_ORB,
 
+    // Shared commands
+    KY_COMMUT,
+    KY_LETTERIND,
+
     // Recursive
     KY_RECINIT,
 
@@ -95,6 +102,9 @@ typedef enum {
     KY_CHIERA,
     KY_NHIERA,
     KY_FPHIERA,
+
+    // End of commands
+    KY_COMEND,
 
     // Classes
     KY_HTGEN,
@@ -142,6 +152,11 @@ typedef enum {
     KY_NULL
 } com_keyword;
 
+
+
+
+
+
 /**
  * @brief
  * The two kinds of commands.
@@ -182,17 +197,16 @@ typedef struct com_command {
     com_parameters* params; //!< The parameters of the command.
 } com_command;
 
-/*************************/
-/* Array of all keywords */
-/*************************/
+/***************************/
+/*+ Array of all keywords +*/
+/**************************/
 
 /**
  * @brief
  * Initialization of a single keyword.
  */
-void keywords_add_key(com_keyword //!< The keyword.
-    ,
-    const char* //!< The string corresponding to the keyword.
+void keywords_add_key(com_keyword key, //!< The keyword.
+    const char* str//!< The string corresponding to the keyword.
 );
 
 /**
@@ -201,30 +215,29 @@ void keywords_add_key(com_keyword //!< The keyword.
  */
 void keywords_add_all_keys(void);
 
-/****************************/
-/* Generic display commands */
-/****************************/
+/******************************/
+/*+ Generic display commands +*/
+/******************************/
 
 /**
  * @brief
  * Display a string chain.
  */
-void print_string_chain(const string_chain*, //!< The string chain.
-    FILE*                //!< The output stream.
+void print_string_chain(const string_chain* stchain, //!< The string chain.
+    FILE* out                //!< The output stream.
 );
 
 /**
  * @brief
  * Display a command.
  */
-void print_command(com_command* //!< The command.
-    ,
-    FILE* //!< The output stream.
+void print_command(com_command* com, //!< The command.
+    FILE* out //!< The output stream.
 );
 
-/************************************/
-/* Converting a string to a keyword */
-/************************************/
+/**************************************/
+/*+ Converting a string to a keyword +*/
+/**************************************/
 
 /**
  * @brief
@@ -233,7 +246,7 @@ void print_command(com_command* //!< The command.
  * @return
  * The string corresponding to the keyword.
  */
-const char* keywordtostring(com_keyword //!< The keyword.
+const char* keywordtostring(com_keyword key //!< The keyword.
 );
 
 /**
@@ -247,7 +260,7 @@ const char* keywordtostring(com_keyword //!< The keyword.
  * @return
  * The keyword corresponding to the string.
  */
-com_keyword string_to_keyword(const char* //!< The string.
+com_keyword string_to_keyword(const char* str //!< The string.
 );
 
 /**
@@ -257,12 +270,12 @@ com_keyword string_to_keyword(const char* //!< The string.
  * @return
  * True if the variable name is valid, false otherwise.
  */
-bool check_varname(const char* //!< The variable name.
+bool check_varname(const char* str //!< The variable name.
 );
 
-/*****************************/
-/* Informations on a command */
-/*****************************/
+/*******************************/
+/*+ Informations on a command +*/
+/*******************************/
 
 /**
  * @brief
@@ -271,8 +284,11 @@ bool check_varname(const char* //!< The variable name.
  * @return
  * True if the command is a class, false otherwise.
  */
-bool com_isclass(com_command* //!< The command.
+bool com_isclass(com_command* com //!< The command.
 );
+
+
+
 
 /**
  * @brief
@@ -281,7 +297,7 @@ bool com_isclass(com_command* //!< The command.
  * @return
  * True if the command is raw text, false otherwise.
  */
-bool com_israw(const com_command* //!< The command.
+bool com_israw(const com_command* com //!< The command.
 );
 
 /**
@@ -291,7 +307,7 @@ bool com_israw(const com_command* //!< The command.
  * @return
  * True if the command is a single link without parameters, false otherwise.
  */
-bool com_single(const com_command* //!< The command.
+bool com_single(const com_command* com //!< The command.
 );
 
 /**
@@ -301,7 +317,7 @@ bool com_single(const com_command* //!< The command.
  * @return
  * True if the command is a single link with or without parameters, false otherwise.
  */
-bool com_single_par(const com_command* //!< The command.
+bool com_single_par(const com_command* com //!< The command.
 );
 
 /**
@@ -311,7 +327,7 @@ bool com_single_par(const com_command* //!< The command.
  * @return
  * The number of parameters of the command.
  */
-int com_nbparams(const com_parameters* //!< The parameters of the command.
+int com_nbparams(const com_parameters* pars //!< The parameters of the command.
 );
 
 /**
@@ -321,9 +337,14 @@ int com_nbparams(const com_parameters* //!< The parameters of the command.
  * @return
  * The n-th parameter of the command.
  */
-com_command* com_getparam(const com_parameters*, //!< The parameters of the command.
-    int                     //!< The index of the parameter.
+com_command* com_getparam(const com_parameters* com, //!< The parameters of the command.
+    int i              //!< The index of the parameter.
 );
+
+
+
+
+
 
 /**
  * @brief
@@ -332,7 +353,7 @@ com_command* com_getparam(const com_parameters*, //!< The parameters of the comm
  * @return
  *  The keyword associated with the first link in a string chain.
  */
-com_keyword key_from_string_chain(const string_chain* //!< The string chain.
+com_keyword key_from_string_chain(const string_chain* strchain //!< The string chain.
 );
 
 /**
@@ -345,8 +366,13 @@ com_keyword key_from_string_chain(const string_chain* //!< The string chain.
  * @return
  *  The keyword associated with the single link string chain.
  */
-com_keyword key_from_string_chain_single(const string_chain* //!< The string chain.
+com_keyword key_from_string_chain_single(const string_chain* strchain //!< The string chain.
 );
+
+
+
+
+
 
 /*****************************/
 /* Construction of a command */

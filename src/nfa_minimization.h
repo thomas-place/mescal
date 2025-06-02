@@ -26,16 +26,16 @@
 
 /**
  * @brief
- * Makes a copy of a minimal NFA. The ordering between the states is changed
+ * Makes a copy of a minimal DFA. The ordering between the states is changed
  * to make the copy canonical.
  *
  * @attention
- * The input NFA is assumed to be minimal. This is not checked.
+ * The input DFA is assumed to be minimal. This is not checked.
  *
  * @return
- * The canonical copy of the input NFA.
+ * The canonical copy of the input DFA.
  */
-nfa* nfa_mini_canonical_copy(nfa*  //!< The NFA to copy.
+dfa* dfa_mini_canonical_copy(dfa*  //!< The DFA to copy.
 );
 
 
@@ -45,12 +45,23 @@ nfa* nfa_mini_canonical_copy(nfa*  //!< The NFA to copy.
 
 /**
  * @brief
- * Brzozowski's minimization algorithm.
+ * Brzozowski's minimization algorithm (for input NFAs)
  *
  * @return
  * The minimal automaton of the input language.
  */
-nfa* nfa_brzozowski(nfa* //!< The NFA.
+dfa* nfa_brzozowski(nfa* //!< The NFA.
+);
+
+
+/**
+ * @brief
+ * Brzozowski's minimization algorithm (fo rinput DFAs)
+ *
+ * @return
+ * The minimal automaton of the input language.
+ */
+dfa* dfa_brzozowski(dfa* //!< The DFA.
 );
 
 
@@ -86,8 +97,9 @@ typedef struct {
  * @return
  * The initial partition.
  */
-hopcroft_partition* nfa_hopcroft_initial(uint, //!< The number of states in the automaton.
-    dequeue*                                   //!< The list of final states (assumed to be non-trivial).
+hopcroft_partition* dfa_hopcroft_initial(uint, //!< The number of states in the automaton.
+    uint*,                                   //!< The list of final states (assumed to be non-trivial).
+    uint //!< The number of final states (assumed to be non-trivial).
 );
 
 /**
@@ -97,7 +109,7 @@ hopcroft_partition* nfa_hopcroft_initial(uint, //!< The number of states in the 
  * @return
  * The minimal automaton.
  */
-nfa* nfa_hopcroft_genauto(nfa*,  //!< The original complete DFA.
+dfa* dfa_hopcroft_genauto(dfa*,  //!< The original complete DFA.
     hopcroft_partition*          //!< The partition. 
 );
 
@@ -105,7 +117,7 @@ nfa* nfa_hopcroft_genauto(nfa*,  //!< The original complete DFA.
  * @brief
  * Release of a Hopcroft's partition.
  */
-void nfa_hopcroft_free(hopcroft_partition*  //!< The partition.
+void dfa_hopcroft_free(hopcroft_partition*  //!< The partition.
 );
 
 /**
@@ -113,9 +125,9 @@ void nfa_hopcroft_free(hopcroft_partition*  //!< The partition.
  * Hopcroft's minimization algorithm.
  *
  * @return
- * The minimal automaton of the input language.
+ * The minimal automaton of the input DFA.
  */
-nfa* nfa_hopcroft(nfa*   //!< The NFA.
+dfa* dfa_hopcroft(dfa*   //!< The DFA.
 );
 
 
@@ -125,12 +137,12 @@ nfa* nfa_hopcroft(nfa*   //!< The NFA.
 
 /**
  * @brief
- * Computes the canonical ordering of the states of a minimal NFA.
+ * Computes the canonical ordering of the states of a minimal DFA.
  *
  * @return
  * The canonical ordering of the states.
  */
-bool** nfa_mini_canonical_ordering(nfa*  //!< The NFA to order (must be minimal).
+bool** dfa_mini_canonical_ordering(dfa*  //!< The DFA to order (must be minimal).
 );
 
 #endif

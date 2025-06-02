@@ -4,6 +4,7 @@
 /********************************************/
 
 #include "graphs.h"
+#include <limits.h>
 
 /*****************************/
 /*+ Création et suppression +*/
@@ -90,18 +91,16 @@ dgraph* create_dgraph_noedges(uint size_graph, uint size_alpha) {
 
     // Création du graphe
     dgraph* new;
-    MALLOC(new, 1);
+    CALLOC(new, 1);
 
     // Définition du graphe
     new->size_alpha = size_alpha;
     new->size_graph = size_graph;
     if (size_graph != 0 && size_alpha != 0) {
         MALLOC(new->edges, size_graph);
+        CALLOC(new->storage, size_graph * size_alpha);
         for (uint q = 0; q < size_graph; q++) {
-            MALLOC(new->edges[q], size_alpha);
-            for (uint a = 0; a < size_alpha; a++) {
-                new->edges[q][a] = q;
-            }
+            new->edges[q] = new->storage + q * size_alpha;
         }
     }
     else {
@@ -111,13 +110,10 @@ dgraph* create_dgraph_noedges(uint size_graph, uint size_alpha) {
 }
 
 void delete_dgraph(dgraph* G) {
-    if (G == NULL || G->edges == NULL) {
-        free(G);
+    if (G == NULL) {
         return;
     }
-    for (uint q = 0; q < G->size_graph; q++) {
-        free(G->edges[q]);
-    }
+    free(G->storage);
     free(G->edges);
     free(G);
 }
@@ -753,3 +749,7 @@ dequeue* lgraph_reachable(lgraph* G, dequeue* start, uint a) {
     merge_array_sorted_dequeue(end, tomerge, size_dequeue(start));
     return end;
 }
+
+
+
+

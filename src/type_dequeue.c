@@ -386,6 +386,8 @@ bool mem_dequeue_sorted(uint e, dequeue* p, uint* ind) {
     return false;
 }
 
+
+
 void merge_sorted_dequeue(dequeue* p1, dequeue* p2) {
     // printf("test\n");
     if (p1 == p2) {
@@ -433,6 +435,29 @@ dequeue* make_inter_sorted_dequeue(dequeue* p1, dequeue* p2) {
         }
         else {
             rigins_dequeue(lefread_dequeue(p1, i), res);
+            i++;
+            j++;
+        }
+    }
+    return res;
+}
+
+dequeue* make_inter_sorted_dequeue_array(dequeue* p, uint* arr, uint size) {
+    dequeue* res = create_dequeue();
+    uint n1 = size_dequeue(p);
+    uint n2 = size;
+    uint i = 0; // Indice dans p
+    uint j = 0; // Indice dans arr
+
+    while (i < n1 && j < n2) {
+        if (lefread_dequeue(p, i) < arr[j]) {
+            i++;
+        }
+        else if (lefread_dequeue(p, i) > arr[j]) {
+            j++;
+        }
+        else {
+            rigins_dequeue(lefread_dequeue(p, i), res);
             i++;
             j++;
         }

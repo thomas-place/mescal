@@ -1,8 +1,9 @@
 #include "nfa_props.h"
 #include "monoid_display.h"
+#include "limits.h"
 
 // Pour l'automate minimal
-bool is_trivial_dfa(nfa* A, FILE* out) {
+bool is_trivial_dfa(dfa* A, FILE* out) {
     if (A->trans->size_graph == 1) {
         if (out != NULL) {
             fprintf(out, "#### This automaton has a single state.\n");
@@ -18,110 +19,131 @@ bool is_trivial_dfa(nfa* A, FILE* out) {
 }
 
 // Pour l'automate minimal
-bool is_letterind_dfa(nfa* A, FILE* out) {
+bool is_letterind_dfa(dfa* A, int*, FILE* out) {
     for (uint s = 0; s < A->trans->size_graph; s++) {
         for (uint a = 1; a < A->trans->size_alpha; a++) {
-            if (lefread_dequeue(A->trans->edges[s][0], 0) != lefread_dequeue(A->trans->edges[s][a], 0)) {
+            if (A->trans->edges[s][0] != A->trans->edges[s][a]) {
                 if (out != NULL) {
-                    fprintf(out, "#### There are letters which have distinct actions on the states.\n");
-                    fprintf(out, "#### For instance, we have the transitions (%d,%c,%d) and (%d,%c,%d).\n", s, 0 + 'a', lefread_dequeue(A->trans->edges[s][0], 0), s, a + 'a',
-                        lefread_dequeue(A->trans->edges[s][a], 0));
+                    fprintf(out, "#### The DFA contains the transitions ");
+                    fprintf(out, "(");
+                    dfa_print_state(A, s, out);
+                    fprintf(out, ",");
+                    dfa_fprint_letter_utf8(A, 0, out);
+                    fprintf(out, ",");
+                    dfa_print_state(A, A->trans->edges[s][0], out);
+                    fprintf(out, ") and (");
+                    dfa_print_state(A, s, out);
+                    fprintf(out, ",");
+                    dfa_fprint_letter_utf8(A, a, out);
+                    fprintf(out, ",");
+                    dfa_print_state(A, A->trans->edges[s][a], out);
+                    fprintf(out, ")\n");
                     return false;
                 }
             }
         }
-    }
-
-    if (out != NULL) {
-        fprintf(out, "#### All letters have the same action on the states.\n");
     }
     return true;
 }
 
 // Teste si un DFA est commutatif
-bool dfa_is_comm(nfa* A, FILE* out) {
-    if (!nfa_is_det(A)) {
-        if (out) {
-            fprintf(out, "#### Error: the commutativity test is only meaningful for DFAs.\n");
-        }
-        return false;
-    }
-    if (out) {
-        fprintf(out, "#### Checking if the DFA is commutative.\n");
-    }
+bool is_comm_dfa(dfa* A, int*, FILE* out) {
+
     for (uint a = 0; a < A->trans->size_alpha; a++) {
         for (uint b = a + 1; b < A->trans->size_alpha; b++) {
             for (uint q = 0; q < A->trans->size_graph; q++) {
-                uint r = lefread_dequeue(A->trans->edges[lefread_dequeue(A->trans->edges[q][b], 0)][a], 0);
-                uint s = lefread_dequeue(A->trans->edges[lefread_dequeue(A->trans->edges[q][a], 0)][b], 0);
-                if (r != s) {
+                uint qa = A->trans->edges[q][a];
+                uint qb = A->trans->edges[q][b];
+                uint qab = A->trans->edges[qa][b];
+                uint qba = A->trans->edges[qb][a];
+                if (qab != qba) {
                     if (out) {
-                        fprintf(out, "#### The DFA is NOT commutative.\n");
-                        fprintf(out, "#### For instance, (");
-                        nfa_print_state(A, q, out);
-                        fprintf(out, ",%c%c) ⟶ ", a + 'a', b + 'a');
-                        nfa_print_state(A, s, out);
-                        fprintf(out, " and (");
-                        nfa_print_state(A, q, out);
-                        fprintf(out, ",%c%c) ⟶ ", b + 'a', a + 'a');
-                        nfa_print_state(A, r, out);
-                        fprintf(out, ".\n");
+                        fprintf(out, "#### The DFA contains the following transitions: \n");
+                        fprintf(out, "     (");
+                        dfa_print_state(A, q, out);
+                        fprintf(out, ",");
+                        dfa_fprint_letter_utf8(A, a, out);
+                        fprintf(out, ",");
+                        dfa_print_state(A, qa, out);
+                        fprintf(out, ") and (");
+                        dfa_print_state(A, qa, out);
+                        fprintf(out, ",");
+                        dfa_fprint_letter_utf8(A, b, out);
+                        fprintf(out, ",");
+                        dfa_print_state(A, qab, out);
+                        fprintf(out, ")\n");
+
+                        fprintf(out, "     (");
+                        dfa_print_state(A, q, out);
+                        fprintf(out, ",");
+                        dfa_fprint_letter_utf8(A, b, out);
+                        fprintf(out, ",");
+                        dfa_print_state(A, qb, out);
+                        fprintf(out, ") and (");
+                        dfa_print_state(A, qb, out);
+                        fprintf(out, ",");
+                        dfa_fprint_letter_utf8(A, a, out);
+                        fprintf(out, ",");
+                        dfa_print_state(A, qba, out);
+                        fprintf(out, ")\n");
                     }
                     return false;
                 }
             }
         }
     }
-    if (out) {
-        fprintf(out, "#### The DFA is commutative.\n");
-    }
     return true;
 }
 
-bool is_permutation_dfa(nfa* A, FILE* out) {
-    if (!nfa_is_det(A)) {
-        fprintf(stderr, "#### This automaton is not deterministic and therefore not a permutation DFA.\n");
-        return false;
-    }
+bool is_permutation_dfa(dfa* A, int*, FILE* out) {
 
-    if (!nfa_is_comp(A)) {
-        fprintf(stderr, "#### This automaton is not complete and therefore not a permutation DFA.\n");
-        return false;
-    }
+    uint* reached;
+    MALLOC(reached, A->trans->size_graph);
 
-    for (uint s = 0; s < A->trans->size_graph; s++) {
-        for (uint t = 0; t < A->trans->size_graph; t++) {
-            if (s != t) {
-                for (uint b = 0; b < A->trans->size_alpha; b++) {
-                    if (lefread_dequeue(A->trans->edges[s][b], 0) == lefread_dequeue(A->trans->edges[t][b], 0)) {
-                        if (out != NULL) {
-                            fprintf(out, "#### This is NOT a permutation automaton.\n");
+    for (uint a = 0; a < A->trans->size_alpha; a++) {
+        for (uint q = 0; q < A->trans->size_graph; q++) {
+            reached[q] = UINT_MAX;
+        }
 
-                            fprintf(out, "#### For instance, it contains the transitions (%d,", s);
-                            nfa_fprint_letter_utf8(A, b, out);
-                            fprintf(out, ",%d) and (%d,", lefread_dequeue(A->trans->edges[s][b], 0), t);
-                            nfa_fprint_letter_utf8(A, b, out);
-                            fprintf(out, ",%d).\n", lefread_dequeue(A->trans->edges[t][b], 0));
-                        }
-                        return false;
-                    }
+        for (uint q = 0; q < A->trans->size_graph; q++) {
+            uint r = A->trans->edges[q][a];
+            if (reached[r] == UINT_MAX) {
+                reached[r] = q;
+            }
+            else {
+                if (out != NULL) {
+                    fprintf(out, "#### The DFA contains the transitions (");
+                    dfa_print_state(A, reached[r], out);
+                    fprintf(out, ",");
+                    dfa_fprint_letter_utf8(A, a, out);
+                    fprintf(out, ",");
+                    dfa_print_state(A, r, out);
+                    fprintf(out, ") and (");
+                    dfa_print_state(A, q, out);
+                    fprintf(out, ",");
+                    dfa_fprint_letter_utf8(A, a, out);
+                    fprintf(out, ",");
+                    dfa_print_state(A, r, out);
+                    fprintf(out, ").\n");
                 }
+                free(reached);
+                return false;
             }
         }
-    }
 
-    if (out != NULL) {
-        fprintf(out, "#### This is a permutation automaton.\n");
+
+
     }
+    free(reached);
     return true;
 }
 
 // Retourne l'état atteint à partir de s en lisant le mot w dans le DFA A
 // (le déterminisme n'est pas vérifié)
-static uint dfa_function(nfa* A, uint s, dequeue* w) {
+static uint dfa_function(dfa* A, uint s, dequeue* w) {
     uint e = s;
     for (uint i = 0; i < size_dequeue(w); i++) {
-        e = lefread_dequeue(A->trans->edges[e][lefread_dequeue(w, i)], 0);
+        e = A->trans->edges[e][lefread_dequeue(w, i)];
     }
     return e;
 }
@@ -129,117 +151,52 @@ static uint dfa_function(nfa* A, uint s, dequeue* w) {
 // Génération d'un nfa à partir d'un lgraph et d'un unique état initial
 // Seuls les états accessibles sont conservés. Si l'automate n'est pas
 // complet, celui-ci est complété en ajoutant un état supplémentaire.
-static nfa* lgraph_to_nfa(lgraph* G, uint ini, letter* anames) {
-    // La pile pour le parcours en profondeur
-    dequeue* thestack = create_dequeue();
+static dfa* dfa_from_scc(dfa* A, parti* sccs, uint p) {
 
-    // Un tableau pour mémoriser les états recontrés
-    bool visited[G->size_graph];
-    for (uint q = 0; q < G->size_graph; q++) {
-        visited[q] = false;
-    }
+    dfa* D = dfa_init(sccs->cl_size[p] + 1, A->trans->size_alpha, 0, A->alphabet);
 
-    // Un Booléen pour mémoriser si l'automate est complet
-    bool is_complete = true;
-
-    // Un compteur qui compte le nombre d'états rencontrés
-    uint num = 0;
-
-    // Empilement de l'état initial
-    rigins_dequeue(ini, thestack);
-    visited[ini] = true;
-    num++;
-
-    while (!isempty_dequeue(thestack)) {
-        uint state = rigpull_dequeue(thestack);
-        for (uint a = 0; a < G->size_alpha; a++) {
-            if (isempty_dequeue(G->edges[state][a])) {
-                is_complete = false;
+    for (uint i = 0; i < sccs->cl_size[p]; i++) {
+        uint q = sccs->cl_elems[p][i];
+        for (uint a = 0; a < A->trans->size_alpha; a++) {
+            uint r = A->trans->edges[q][a];
+            if (sccs->numcl[r] != p) {
+                D->trans->edges[i][a] = sccs->cl_size[p];
             }
             else {
-                for (uint i = 0; i < size_dequeue(G->edges[state][a]); i++) {
-                    if (!visited[lefread_dequeue(G->edges[state][a], i)]) {
-                        rigins_dequeue(lefread_dequeue(G->edges[state][a], i), thestack);
-                        num++;
-                        visited[lefread_dequeue(G->edges[state][a], i)] = true;
-                    }
-                }
+                D->trans->edges[i][a] = ((uint*)bsearch(&r, sccs->cl_elems[p], sccs->cl_size[p], sizeof(uint), &compare_uint)) - sccs->cl_elems[p];
             }
         }
     }
 
-    // Calcul de la taille de l'automate
-    uint size_auto = num;
-    if (!is_complete) { // Si l'automate n'était pas complet, on rajoute un état
-        size_auto++;
+    for (uint a = 0; a < A->trans->size_alpha; a++) {
+        D->trans->edges[sccs->cl_size[p]][a] = sccs->cl_size[p];
     }
 
-    // Création de l'automate
-    nfa* A = nfa_init();
-    A->trans = create_lgraph_noedges(size_auto, G->size_alpha);
-    A->alphabet = anames;
+    D->initial = 0; // L'état initial est le premier de la liste
 
-    // Calcul de l'association entre les nouveaux états et les anciens
-    MALLOC(A->ancestors, size_auto);
-
-    uint GTOA[G->size_graph];
-    uint t = 0;
-    for (uint q = 0; q < G->size_graph; q++) {
-        if (visited[q]) {
-            GTOA[q] = t;
-            A->ancestors[t] = q;
-            if (q == ini) {
-                rigins_dequeue(t, A->initials);
-            }
-            t++;
-        }
-    }
-    // Affectation des transtions
-    for (uint s = 0; s < num; s++) {
-        for (uint a = 0; a < G->size_alpha; a++) {
-            if (isempty_dequeue(G->edges[A->ancestors[s]][a])) {
-                rigins_dequeue(num, A->trans->edges[s][a]);
-            }
-            else {
-                for (uint i = 0; i < size_dequeue(G->edges[A->ancestors[s]][a]); i++) {
-                    rigins_dequeue(GTOA[lefread_dequeue(G->edges[A->ancestors[s]][a], i)], A->trans->edges[s][a]);
-                }
-            }
-        }
-    }
-    if (!is_complete) {
-        for (uint a = 0; a < G->size_alpha; a++) {
-            rigins_dequeue(num, A->trans->edges[num][a]);
-        }
-    }
-
-    return A;
+    return D;
 }
 
-bool is_counterfree_dfa(nfa* A, int* error, FILE* out) {
-    if (!nfa_is_det(A)) {
-        fprintf(stderr, "#### This automaton is not deterministic.\n");
-        return false;
-    }
+
+
+bool is_counterfree_dfa(dfa* A, int* error, FILE* out) {
+
 
     /* We consider each SCC in the automaton, and check that none of them contains a counter. */
 
     // First compute the SCCs of the DFA.
-    parti* PSCCS = ltarjan(A->trans);
-
-    // Compute the transition graph obtained by keeping only those internal to SCCs.
-    lgraph* G = nfa_get_lab_parti(A, PSCCS);
+    parti* PSCCS = dtarjan(A->trans, NULL, false);
 
     // Consider each SCC independently.
     for (uint c = 0; c < PSCCS->size_par; c++) {
         // Compute the automaton obtained by only keeping this SCC
-        nfa* SCC = lgraph_to_nfa(G, lefread_dequeue(PSCCS->cl[c], 0), nfa_duplicate_alpha(A));
+        dfa* D = dfa_from_scc(A, PSCCS, c);
 
         // We compute the associated morphism.
 
         *error = 0;
 
-        morphism* M = dfa_to_morphism(SCC, NULL, error);
+        morphism* M = dfa_to_morphism(D, NULL, error);
         if (*error < 0) {
             return false;
         }
@@ -252,13 +209,13 @@ bool is_counterfree_dfa(nfa* A, int* error, FILE* out) {
             // Si on doit afficher un exemple de compteur
             if (out != NULL) {
                 // On cherche un groupe non-trivial dans le monoide
-                for (uint i = 0; i < size_dequeue(M->idem_list); i++) {
-                    uint cl = GREL->HCL->numcl[lefread_dequeue(M->idem_list, i)];
-                    if (size_dequeue(GREL->HCL->cl[cl]) > 1) {
+                for (uint i = 0; i < M->nb_idems; i++) {
+                    uint cl = GREL->HCL->numcl[M->idem_list[i]];
+                    if (GREL->HCL->cl_size[cl] > 1) {
                         // On prend un élément de ce groupe qui n'est pas le neutre
-                        uint s = lefread_dequeue(GREL->HCL->cl[cl], 0);
+                        uint s = GREL->HCL->cl_elems[cl][0];
                         if (M->idem_array[s]) {
-                            s = lefread_dequeue(GREL->HCL->cl[cl], 1);
+                            s = GREL->HCL->cl_elems[cl][1];
                         }
 
                         // Cet élément satisfiait s^omega != s^omega+1. Donc son nom étiquette un compteur
@@ -272,9 +229,9 @@ bool is_counterfree_dfa(nfa* A, int* error, FILE* out) {
 
                         dequeue* name = mor_name(M, s);
 
-                        graph* GW = create_graph_noedges(SCC->trans->size_graph);
+                        graph* GW = create_graph_noedges(D->trans->size_graph);
                         for (uint q = 0; q < GW->size; q++) {
-                            lefins_dequeue(dfa_function(SCC, q, name), GW->edges[q]);
+                            lefins_dequeue(dfa_function(D, q, name), GW->edges[q]);
                         }
                         delete_dequeue(name);
                         // graph_printing_test(GW, stdout);
@@ -282,40 +239,143 @@ bool is_counterfree_dfa(nfa* A, int* error, FILE* out) {
                         // Le compteur recherché est une SCC non triviale dans ce graphe (qui sera un cycle)
                         parti* CYCLES = tarjan(GW);
                         for (uint j = 0; j < CYCLES->size_par; j++) {
-                            if (size_dequeue(CYCLES->cl[j]) > 1) {
-                                uint q = lefread_dequeue(CYCLES->cl[j], 0);
-                                nfa_print_state(A, SCC->ancestors[q], out);
+                            if (CYCLES->cl_size[j] > 1) {
+                                uint q = CYCLES->cl_elems[j][0];
+                                dfa_print_state(A, PSCCS->cl_elems[c][q], out);
                                 uint r = lefread_dequeue(GW->edges[q], 0);
                                 while (r != q) {
                                     fprintf(out, " -> ");
-                                    nfa_print_state(A, SCC->ancestors[r], out);
+                                    dfa_print_state(A, PSCCS->cl_elems[c][r], out);
                                     r = lefread_dequeue(GW->edges[r], 0);
                                 }
                                 fprintf(out, " -> ");
-                                nfa_print_state(A, SCC->ancestors[q], out);
+                                dfa_print_state(A, PSCCS->cl_elems[c][q], out);
                                 fprintf(out, "\n");
                                 break;
                             }
                         }
                         delete_parti(CYCLES);
                         delete_graph(GW);
-                        delete_nfa(SCC);
+                        dfa_delete(D);
 
                         delete_morphism(M);
                         return false;
                     }
                 }
             }
-            delete_nfa(SCC);
+            dfa_delete(D);
             delete_morphism(M);
             return false;
         }
-    }
-    if (out != NULL) {
-        fprintf(stdout, "#### This automaton is counter-free.\n");
     }
     return true;
 }
 
 
+
+static void compute_alph_scc_dgraph(dgraph* G, parti* SCC, uint num, bool* alph) {
+
+
+    for (uint a = 0; a < G->size_alpha; a++) {
+        alph[a] = false;
+    }
+    for (uint i = 0; i < SCC->cl_size[num]; i++) {
+        for (uint a = 0; a < G->size_alpha; a++) {
+            if (SCC->numcl[G->edges[SCC->cl_elems[num][i]][a]] == num) {
+                alph[a] = true;
+            }
+        }
+    }
+}
+
+
+
+
+
+bool is_da_dfa(dfa* A, int*) {
+
+    parti* scca = dtarjan(A->trans, NULL, false);
+
+    uint size = A->trans->size_graph * A->trans->size_graph;
+
+    dgraph* inter = create_dgraph_noedges(size + 1, A->trans->size_alpha);
+
+
+    for (uint q = 0; q < A->trans->size_graph; q++) {
+        for (uint r = 0; r < A->trans->size_graph; r++) {
+            for (uint a = 0; a < A->trans->size_alpha; a++) {
+                uint qa = A->trans->edges[q][a];
+                uint ra = A->trans->edges[r][a];
+                if (scca->numcl[q] == scca->numcl[qa] && scca->numcl[r] == scca->numcl[ra]) {
+                    inter->edges[q * A->trans->size_graph + r][a] = qa * A->trans->size_graph + ra;
+                }
+                else {
+                    inter->edges[q * A->trans->size_graph + r][a] = size;
+                }
+            }
+        }
+    }
+    for (uint a = 0; a < A->trans->size_alpha; a++) {
+        inter->edges[size][a] = size;
+    }
+
+
+    parti* scci = dtarjan(inter, NULL, false);
+
+
+    bool alpha[A->trans->size_alpha];
+    for (uint i = 0; i < scci->size_par; i++) {
+        if (i == scci->numcl[size]) {
+            continue;
+        }
+        uint qr = scci->cl_elems[i][0];
+        uint q = qr / A->trans->size_graph;
+        uint r = qr % A->trans->size_graph;
+        if (q == r || scca->numcl[q] > scca->numcl[r]) {
+            continue;
+        }
+
+        compute_alph_scc_dgraph(inter, scci, i, alpha);
+        if (dfa_exists_path(A, q, r, alpha)) {
+            delete_dgraph(inter);
+            delete_parti(scca);
+            delete_parti(scci);
+            return false;
+        }
+    }
+    delete_dgraph(inter);
+    delete_parti(scca);
+    delete_parti(scci);
+    return true;
+
+}
+
+
+
+
+bool is_cycletrivial_dfa(dfa* A, int*, FILE* out) {
+    parti* scca = dtarjan(A->trans, NULL, false);
+    if (scca->size_par == A->trans->size_graph) {
+        delete_parti(scca);
+        return true;
+    }
+
+    if (out) {
+        for (uint i = 0; i < scca->size_par; i++) {
+            if (scca->cl_size[i] > 1) {
+                fprintf(out, "#### The states ");
+                dfa_print_state(A, scca->cl_elems[i][0], out);
+                fprintf(out, " and ");
+                dfa_print_state(A, scca->cl_elems[i][1], out);
+                fprintf(out, " are in the same strongly connected component\n");
+                delete_parti(scca);
+                return false;
+
+            }
+        }
+
+    }
+    delete_parti(scca);
+    return false;
+}
 

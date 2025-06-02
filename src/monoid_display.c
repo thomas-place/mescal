@@ -157,6 +157,23 @@ uint mor_max_name_size(morphism* M, dequeue* sub) {
     }
 }
 
+uint mor_max_name_size_array(morphism* M, uint* sub, uint sizearray) {
+    uint size = 1;
+
+    if (sub == NULL) {
+        for (uint q = 0; q < M->r_cayley->size_graph; q++) {
+            size = max(size, mor_get_name_length(M, q));
+        }
+        return size;
+    }
+    else {
+        for (uint i = 0; i < sizearray; i++) {
+            size = max(size, mor_get_name_length(M, sub[i]));
+        }
+        return size;
+    }
+}
+
 void mor_print_sub(morphism* M, dequeue* elems, FILE* out) {
     for (uint i = 0; i < size_dequeue(elems); i++) {
         mor_fprint_name_utf8(M, lefread_dequeue(elems, i), out);
@@ -166,6 +183,17 @@ void mor_print_sub(morphism* M, dequeue* elems, FILE* out) {
     }
     fprintf(out, "\n");
 }
+
+void mor_print_sub_array(morphism* M, uint* elems, uint nb_elems, FILE* out) {
+    for (uint i = 0; i < nb_elems; i++) {
+        mor_fprint_name_utf8(M, elems[i], out);
+        if (i < nb_elems - 1) {
+            fprintf(out, ", ");
+        }
+    }
+    fprintf(out, "\n");
+}
+
 
 void mor_print_sub_aligned(morphism* M, dequeue* elems, uint width, uint padding, FILE* out) {
     uint max_size = width - padding;
@@ -195,12 +223,50 @@ void mor_print_sub_aligned(morphism* M, dequeue* elems, uint width, uint padding
     fprintf(out, "│\n");
 }
 
+void mor_print_sub_array_aligned(morphism* M, uint* elems, uint nb_elems, uint width, uint padding, FILE* out) {
+    uint max_size = width - padding;
+    uint use_size = 0;
+    for (uint i = 0; i < nb_elems; i++) {
+        uint e = elems[i];
+        uint size_elem = mor_get_name_length(M, e);
+
+        if (size_elem + use_size + 2 > max_size || (i == nb_elems - 1 && size_elem + use_size > max_size)) {
+            for (uint j = 0; j < max_size - use_size; j++) {
+                fprintf(out, " ");
+            }
+            fprintf(out, "│\n│");
+            for (uint j = 0; j < padding; j++) {
+                fprintf(out, " ");
+            }
+            use_size = 0;
+        }
+        mor_fprint_name_utf8(M, e, out);
+        use_size = use_size + size_elem;
+        if (i < nb_elems - 1) {
+            fprintf(out, ", ");
+            use_size = use_size + 2;
+        }
+    }
+    print_spaces(max_size - use_size, out);
+    fprintf(out, "│\n");
+}
+
 void mor_print_sub_titled(morphism* M, dequeue* elems, uint length, char* name, FILE* out) {
     print_title_box(length, false, out, 1, name);
     fprintf(out, "│");
 
     // Print the subset.
     mor_print_sub_aligned(M, elems, length, 0, out);
+
+    print_bot_line(length, out);
+}
+
+void mor_print_sub_array_titled(morphism* M, uint* elems, uint nb_elems, uint length, char* name, FILE* out) {
+    print_title_box(length, false, out, 1, name);
+    fprintf(out, "│");
+
+    // Print the subset.
+    mor_print_sub_array_aligned(M, elems, nb_elems, length, 0, out);
 
     print_bot_line(length, out);
 }
@@ -221,7 +287,7 @@ void mor_print_mapping(morphism* M, FILE* out) {
 void mor_print_idems(morphism* M, FILE* out) {
     print_top_line(100, out);
     fprintf(out, "│Idempotents : ");
-    mor_print_sub_aligned(M, M->idem_list, 100, 14, out);
+    mor_print_sub_array_aligned(M, M->idem_list, M->nb_idems, 100, 14, out);
     print_bot_line(100, out);
 }
 
@@ -316,7 +382,7 @@ void mor_mult_print(morphism* M, FILE* out) {
         mor_fprint_name_utf8_aligned(M, k, length, out);
         fprintf(out, "│");
         for (uint i = 0; i < M->r_cayley->size_graph; i++) {
-            mor_fprint_name_utf8_aligned(M, M->mult[k][i], length, out);
+            mor_fprint_name_utf8_aligned(M, M->mult[k * M->r_cayley->size_graph + i], length, out);
             fprintf(out, "│");
         }
         fprintf(out, "\n");
@@ -344,52 +410,52 @@ void mor_mult_print(morphism* M, FILE* out) {
 
 
 
-// Output of all idempotents of a subsemigroup.
-void submono_print_idems(subsemi* S, FILE* out) {
-    morphism* M = S->original;
-    if (S->mono_in_sub == NULL) {
-        mor_print_idems(M, out);
-        return;
-    }
-    print_top_line(100, out);
-    fprintf(out, "│Idempotents : ");
-    dequeue* idemsinsub = restrict_list_to_subsemi(S, M->idem_list);
-    mor_print_sub_aligned(M, idemsinsub, 100, 14, out);
-    print_bot_line(100, out);
-    delete_dequeue(idemsinsub);
-}
+// // Output of all idempotents of a subsemigroup.
+// void submono_print_idems(subsemi* S, FILE* out) {
+//     morphism* M = S->original;
+//     if (S->mono_in_sub == NULL) {
+//         mor_print_idems(M, out);
+//         return;
+//     }
+//     print_top_line(100, out);
+//     fprintf(out, "│Idempotents : ");
+//     dequeue* idemsinsub = restrict_list_to_subsemi(S, M->idem_list);
+//     mor_print_sub_aligned(M, idemsinsub, 100, 14, out);
+//     print_bot_line(100, out);
+//     delete_dequeue(idemsinsub);
+// }
 
-// Output of the syntactic order of a subsemigroup.
-void submono_print_order(subsemi* S, FILE* out) {
-    morphism* M = S->original;
+// // Output of the syntactic order of a subsemigroup.
+// void submono_print_order(subsemi* S, FILE* out) {
+//     morphism* M = S->original;
 
-    if (S->mono_in_sub == NULL) {
-        mor_print_order(M, out);
-        return;
-    }
-    mor_compute_order(M);
-    print_top_line(100, out);
+//     if (S->mono_in_sub == NULL) {
+//         mor_print_order(M, out);
+//         return;
+//     }
+//     mor_compute_order(M);
+//     print_top_line(100, out);
 
-    // Computes the maximum size of a name.
-    uint size_max = 1;
-    for (uint i = 0; i < S->size; i++) {
-        dequeue* name = mor_name(M, S->sub_to_mono[i]);
-        size_max = max(size_max, size_dequeue(name));
-        delete_dequeue(name);
-    }
+//     // Computes the maximum size of a name.
+//     uint size_max = 1;
+//     for (uint i = 0; i < S->size; i++) {
+//         dequeue* name = mor_name(M, S->sub_to_mono[i]);
+//         size_max = max(size_max, size_dequeue(name));
+//         delete_dequeue(name);
+//     }
 
-    uint padding = 24 + size_max;
+//     uint padding = 24 + size_max;
 
-    for (uint i = 0; i < S->size; i++) {
-        dequeue* elems = restrict_list_to_subsemi(S, M->order[S->sub_to_mono[i]]);
-        fprintf(out, "│Elements larger than ");
-        mor_fprint_name_utf8_aligned(M, S->sub_to_mono[i], size_max, out);
-        fprintf(out, " : ");
-        mor_print_sub_aligned(M, elems, 100, padding, out);
-        delete_dequeue(elems);
-    }
-    print_bot_line(100, out);
-}
+//     for (uint i = 0; i < S->size; i++) {
+//         dequeue* elems = restrict_list_to_subsemi(S, M->order[S->sub_to_mono[i]]);
+//         fprintf(out, "│Elements larger than ");
+//         mor_fprint_name_utf8_aligned(M, S->sub_to_mono[i], size_max, out);
+//         fprintf(out, " : ");
+//         mor_print_sub_aligned(M, elems, 100, padding, out);
+//         delete_dequeue(elems);
+//     }
+//     print_bot_line(100, out);
+// }
 
 /***********/
 /* Display */
@@ -399,7 +465,7 @@ void submono_print_order(subsemi* S, FILE* out) {
 
 void print_infos_green(morphism* M, FILE* out) {
     fprintf(out, "#### Size of the monoid                 : %d.\n", M->r_cayley->size_graph);
-    fprintf(out, "#### Number of idempotents              : %d.\n", size_dequeue(M->idem_list));
+    fprintf(out, "#### Number of idempotents              : %d.\n", M->nb_idems);
     fprintf(out, "#### Number of regular elements         : %d.\n", M->rels->nb_regular_elems);
     fprintf(out, "#### Number of J-classes                : %d.\n", M->rels->JCL->size_par);
     fprintf(out, "#### Number of L-classes                : %d.\n", M->rels->LCL->size_par);
@@ -413,7 +479,7 @@ void print_infos_green(morphism* M, FILE* out) {
 void print_infos_green_sub(subsemi* S, FILE* out) {
     if (S->level == LV_REG) {
         fprintf(out, "#### For optimization purposes, only the regular elements are computed.\n");
-        fprintf(out, "#### Number of idempotents       : %d.\n", size_dequeue(S->idem_list));
+        fprintf(out, "#### Number of idempotents       : %d.\n", S->nb_idems);
         fprintf(out, "#### Number of regular elements  : %d.\n", S->rels->nb_regular_elems);
         fprintf(out, "#### Number of regular J-classes : %d.\n", S->rels->JCL->size_par);
         fprintf(out, "#### Number of regular L-classes : %d.\n", S->rels->LCL->size_par);
@@ -428,7 +494,7 @@ void print_infos_green_sub(subsemi* S, FILE* out) {
 
         fprintf(out, "#### For optimization purposes, the Green relations are only computed over the regular elements.\n");
         fprintf(out, "#### Size of the monoid          : %d.\n", S->rels->HCL->size_set);
-        fprintf(out, "#### Number of idempotents       : %d.\n", size_dequeue(S->idem_list));
+        fprintf(out, "#### Number of idempotents       : %d.\n", S->nb_idems);
         fprintf(out, "#### Number of regular elements  : %d.\n", S->rels->nb_regular_elems);
         fprintf(out, "#### Number of regular J-classes : %d.\n", S->rels->JCL->size_par - nonreg);
         fprintf(out, "#### Number of regular L-classes : %d.\n", S->rels->LCL->size_par - nonreg);
@@ -439,7 +505,7 @@ void print_infos_green_sub(subsemi* S, FILE* out) {
 
     if (S->level == LV_FULL) {
         fprintf(out, "#### Size of the monoid                 : %d.\n", S->size);
-        fprintf(out, "#### Number of idempotents              : %d.\n", size_dequeue(S->idem_list));
+        fprintf(out, "#### Number of idempotents              : %d.\n", S->nb_idems);
         fprintf(out, "#### Number of regular elements         : %d.\n", S->rels->nb_regular_elems);
         fprintf(out, "#### Number of J-classes                : %d.\n", S->rels->JCL->size_par);
         fprintf(out, "#### Number of L-classes                : %d.\n", S->rels->LCL->size_par);
@@ -451,14 +517,18 @@ void print_infos_green_sub(subsemi* S, FILE* out) {
 
 static void print_jclass_green_aux(morphism* M, green* G, uint* remap, uint jclass, uint padding, FILE* out) {
     // An element in the J-class (used to compute various parameters).
-    uint elem = lefread_dequeue(G->JCL->cl[jclass], 0);
+    uint elem = G->JCL->cl_elems[jclass][0];
+    //uint elem = lefread_dequeue(G->JCL->cl[jclass], 0);
 
     // Size of the H-classes in the J-class.
-    uint size_hc = size_dequeue(G->HCL->cl[G->HCL->numcl[elem]]);
+    uint size_hc = G->HCL->cl_size[G->HCL->numcl[elem]];
+    //uint size_hc = size_dequeue(G->HCL->cl[G->HCL->numcl[elem]]);
     // Size of the R-classes in the J-class.
-    uint size_rc = size_dequeue(G->RCL->cl[G->RCL->numcl[elem]]);
+    uint size_rc = G->RCL->cl_size[G->RCL->numcl[elem]];
+    //uint size_rc = size_dequeue(G->RCL->cl[G->RCL->numcl[elem]]);
     // Size of the L-classes in the J-class.
-    uint size_lc = size_dequeue(G->LCL->cl[G->LCL->numcl[elem]]);
+    uint size_lc = G->LCL->cl_size[G->LCL->numcl[elem]];
+    //uint size_lc = size_dequeue(G->LCL->cl[G->LCL->numcl[elem]]);
 
     uint row_length = size_rc / size_hc;
     uint col_length = size_lc / size_hc;
@@ -467,14 +537,14 @@ static void print_jclass_green_aux(morphism* M, green* G, uint* remap, uint jcla
     uint name_size;
     if (remap) {
         dequeue* origelem = create_dequeue();
-        for (uint i = 0; i < size_dequeue(G->JCL->cl[jclass]); i++) {
-            rigins_dequeue(remap[lefread_dequeue(G->JCL->cl[jclass], i)], origelem);
+        for (uint i = 0; i < G->JCL->cl_size[jclass]; i++) {
+            rigins_dequeue(remap[G->JCL->cl_elems[jclass][i]], origelem);
         }
         name_size = mor_max_name_size(M, origelem);
         delete_dequeue(origelem);
     }
     else {
-        name_size = mor_max_name_size(M, G->JCL->cl[jclass]);
+        name_size = mor_max_name_size_array(M, G->JCL->cl_elems[jclass], G->JCL->cl_size[jclass]);
     }
 
     // Number of elements displayed per line in an H-class.
@@ -635,7 +705,8 @@ void print_full_subsemi(subsemi* S, FILE* out) {
         if (S->size <= 1000) {
             fprintf(out, "#### The regular J-classes (ordered using a topological sort).\n");
             for (uint i = S->rels->JCL->size_par; i > 0; i--) {
-                uint s = lefread_dequeue(S->rels->JCL->cl[i - 1], 0);
+                uint s = S->rels->JCL->cl_elems[i - 1][0];
+                //uint s = lefread_dequeue(S->rels->JCL->cl[i - 1], 0);
                 if (S->rels->regular_array[s]) {
                     print_jclass_subsemi(S, i - 1, 5, out);
                 }

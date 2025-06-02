@@ -1,7 +1,7 @@
 /**
  * @file nfa_enum.h
  * @brief
- * Enumeration of NFAs.
+ * Enumeration of DFAs.
  */
 #ifndef NFA_ENUM_H
 #define NFA_ENUM_H
@@ -20,7 +20,7 @@ typedef struct
     short* parsize; //!< Sizes of the partition.
     short inisep;   //!< Number of letters looping on the initial state. 
     short final;    //!< Final state.
-} nfa_enum;
+} dfa_enum;
 
 
 
@@ -28,7 +28,7 @@ typedef struct
  * @brief
  * Initializes an enumeration of NFAs.
  */
-nfa_enum* nfa_enum_init(short, //!< Number of states.
+dfa_enum* dfa_enum_init(short, //!< Number of states.
     short                   //!< Number of letters in the alphabet.
 );
 
@@ -36,27 +36,27 @@ nfa_enum* nfa_enum_init(short, //!< Number of states.
  * @brief
  * Frees the memory allocated for an enumeration of NFAs.
  */
-void nfa_enum_free(nfa_enum* //!< The enumeration.
+void dfa_enum_free(dfa_enum* //!< The enumeration.
 );
 
 /**
  * @brief
  * Computes the next NFA in the enumeration.
  */
-bool nfa_enum_next(nfa_enum* //!< The enumeration.
+bool dfa_enum_next(dfa_enum* //!< The enumeration.
 );
 
 
 
-short iterate_integer_partition(short* //!< The partition.
-    , short                             //!< The partitioned integer
+short iterate_integer_partition(short*, //!< The partition.
+    short                             //!< The partitioned integer
 );
 
-nfa* nfa_enum_to_nfa(nfa_enum* //!< The enumeration.
+dfa* dfa_enum_to_dfa(dfa_enum* //!< The enumeration.
 );
 
 
-void nfa_enum_print(nfa_enum* E);
+void dfa_enum_print(dfa_enum* E);
 
 
 

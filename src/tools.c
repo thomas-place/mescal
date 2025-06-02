@@ -1,7 +1,28 @@
 #include "tools.h"
 
 
+int compare_uint(const void* p1, const void* p2) {
+    uint a = *(const uint*)p1;
+    uint b = *(const uint*)p2;
+    if (a < b) {
+        return -1;
+    }
+    if (a > b) {
+        return 1;
+    }
+    return 0;
+}
 
+bool mem_array_sorted(uint e, uint* array, uint size, uint* ind) {
+    uint* p = bsearch(&e, array, size, sizeof(uint), compare_uint);
+    if (p) {
+        if (ind) {
+            *ind = p - array;
+        }
+        return true; // The element was found
+    }
+    return false;
+}
 
 uint get_uint_length(uint n) {
     if (n == 0) {
@@ -10,6 +31,18 @@ uint get_uint_length(uint n) {
     uint l = 0;
     while (n != 0) {
         n /= 10;
+        l++;
+    }
+    return l;
+}
+
+uchar get_uint_lbinary(uint n) {
+    if (n == 0) {
+        return 1;
+    }
+    uint l = 0;
+    while (n != 0) {
+        n >>= 1; // Shift right by 1 bit
         l++;
     }
     return l;

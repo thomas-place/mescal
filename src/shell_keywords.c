@@ -63,7 +63,6 @@ void keywords_add_all_keys(void) {
 
     // Commandes automates
 
-    keywords_add_key(KY_COMPLEM, "complement");
     keywords_add_key(KY_INTERSEC, "intersection");
     keywords_add_key(KY_KLEENE, "kleene");
     keywords_add_key(KY_MINI, "minimal");
@@ -83,8 +82,12 @@ void keywords_add_all_keys(void) {
     keywords_add_key(KY_DYCKTRANS, "dyckextension");
     keywords_add_key(KY_PERMUT, "permutation");
     keywords_add_key(KY_COUNTER, "counterfree");
+    keywords_add_key(KY_AUTODA, "autoda");
+    keywords_add_key(KY_CYCLETRIV, "cycletrivial");
     keywords_add_key(KY_RNFA, "nfarandom");
     keywords_add_key(KY_RDFA, "dfarandom");
+    keywords_add_key(KY_DETERMINIZE, "determinize");
+    keywords_add_key(KY_COMPLEMENT, "complement");
 
     // Commandes morphismes
     keywords_add_key(KY_SYNT, "syntactic");
@@ -98,6 +101,11 @@ void keywords_add_all_keys(void) {
     keywords_add_key(KY_GKER, "gkernel");
     keywords_add_key(KY_AKER, "akernel");
     keywords_add_key(KY_ORB, "orbit");
+
+
+    // Shared
+    keywords_add_key(KY_COMMUT, "commutative");
+    keywords_add_key(KY_LETTERIND, "letteruniform");
 
     keywords_add_key(KY_RECINIT, "initrecursion");
 

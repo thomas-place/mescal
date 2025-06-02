@@ -56,7 +56,17 @@ mccluskey_auto* nfa_to_mccluskey(nfa* //!< The NFA.
 
 /**
  * @brief
- * Brzozowski-McCluskey algorithm.
+ * Computes a generalized automaton from an arbitrary DFA.
+ *
+ * @return
+ * A generalized automaton recognizing the same language as the input DFA.
+ **/
+mccluskey_auto* dfa_to_mccluskey(dfa* //!< The DFA.
+);
+
+/**
+ * @brief
+ * Brzozowski-McCluskey algorithm (NFAs).
  *
  * @return
  * A regular expression recognizing the same language as the input NFA.
@@ -64,6 +74,14 @@ mccluskey_auto* nfa_to_mccluskey(nfa* //!< The NFA.
 regexp* nfa_mccluskey(nfa* //!< The NFA.
 );
 
-
+/**
+ * @brief
+ * Brzozowski-McCluskey algorithm (DFAs).
+ *
+ * @return
+ * A regular expression recognizing the same language as the input NFA.
+ **/
+regexp* dfa_mccluskey(dfa* //!< The DFA.
+);
 
 #endif

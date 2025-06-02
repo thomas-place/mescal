@@ -16,20 +16,119 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-/*  ____                             _   _                  ____ */
-/* / ___|  ___ _ __   __ _ _ __ __ _| |_(_) ___  _ __  _   / ___|_ __ ___  _   _
- * _ __   */
-/* \___ \ / _ \ '_ \ / _` | '__/ _` | __| |/ _ \| '_ \(_) | |  _| '__/ _ \| | |
- * | '_ \  */
-/*  ___) |  __/ |_) | (_| | | | (_| | |_| | (_) | | | |_  | |_| | | | (_) | |_|
- * | |_) | */
-/* |____/ \___| .__/ \__,_|_|  \__,_|\__|_|\___/|_| |_(_)  \____|_|  \___/
- * \__,_| .__/  */
-/* | | __ _ _ |_|  __ _ _   _  __ _  __ _  ___  ___ |_|     */
-/* | |/ _` | '_ \ / _` | | | |/ _` |/ _` |/ _ \/ __| */
-/* | | (_| | | | | (_| | |_| | (_| | (_| |  __/\__ \ */
-/* |_|\__,_|_| |_|\__, |\__,_|\__,_|\__, |\___||___/ */
-/*                |___/             |___/ */
+ /*  ____                             _   _                  ____ */
+ /* / ___|  ___ _ __   __ _ _ __ __ _| |_(_) ___  _ __  _   / ___|_ __ ___  _    __ __   */
+ /* \___ \ / _ \ '_ \ / _` | '__/ _` | __| |/ _ \| '_ \(_) | |  _| '__/ _ \| | | | '_ \  */
+ /*  ___) |  __/ |_) | (_| | | | (_| | |_| | (_) | | | |_  | |_| | | | (_) | |_| | |_) | */
+ /* |____/ \___| .__/ \__,_|_|  \__,_|\__|_|\___/|_| |_(_)  \____|_|  \___/\__,_ | .__/  */
+ /* | | __ _ _ |_|  __ _ _   _  __ _  __ _  ___  ___ |_|     */
+ /* | |/ _` | '_ \ / _` | | | |/ _` |/ _` |/ _ \/ __| */
+ /* | | (_| | | | | (_| | |_| | (_| | (_| |  __/\__ \ */
+ /* |_|\__,_|_| |_|\__, |\__,_|\__,_|\__, |\___||___/ */
+ /*                |___/             |___/ */
+
+/****************************/
+/*+ Dealing with morphisms +*/
+/****************************/
+
+
+
+/**
+ * @brief
+ * Computes the Stalling partition obtained from a graph.
+ *
+ * @remark
+ * In group mode, the alphabet is preserved, in modulo mode, it is reduced to a single letter.
+ *
+ * @return
+ * The partition.
+ */
+parti* dgraph_stal_fold(dgraph* G,
+    bool grp);
+
+
+
+/**
+ * @brief
+ * Computes the Stalling partition obtained from the right or left Cayley graph of the morphism.
+ *
+ * @remark
+ * In group mode, the alphabet is preserved, in modulo mode, it is reduced to a single letter.
+ *
+ * @return
+ * The partition.
+ */
+parti* mor_stal_fold(morphism* M, //!< The morphism.
+    bool grp, //!< true: group mode, false: modulo mode.
+    bool rcl //!< true: right Cayley graph, false: left Cayley graph.
+);
+
+
+/**
+ * @brief
+ * Computes the graph obtained by folding a right or left Cayley graph according to the Stalling partition.
+ * Modulo mode: the alphabet is reduced to a single letter.
+ *
+ * @remark
+ * Undefined transitions (which go outside of a SCC) are mapped to `UINT_MAX`.
+ *
+ * @return
+ * The folded graph.
+ */
+dgraph* shrink_mod(dgraph* g, //!< The graph to fold (right or left Cayley graph of a morphism).
+    parti* fold, //!< The stalling partition.
+    parti* sccs //!< The partition into SCCs of the states (R-classes or L-classes).
+);
+
+/**
+ * @brief
+ * Computes the graph obtained by folding a right or left Cayley graph according to the Stalling partition.
+ * Modulo mode: the alphabet is reduced to a single letter.
+ * Mirror mode: the transitions are reversed.
+ *
+ * @remark
+ * Undefined transitions (which go outside of a SCC) are mapped to `UINT_MAX`.
+ *
+ * @return
+ * The folded graph.
+ */
+dgraph* shrink_mod_mirror(dgraph* g, //!< The graph to fold (right or left Cayley graph of a morphism).
+    parti* fold, //!< The stalling partition.
+    parti* sccs //!< The partition into SCCs of the states (R-classes or L-classes).
+);
+
+/**
+ * @brief
+ * Computes the graph obtained by folding a right or left Cayley graph according to the Stalling partition.
+ * Group mode: the alphabet is preserved.
+ *
+ * @remark
+ * Undefined transitions (which go outside of a SCC) are mapped to `UINT_MAX`.
+ *
+ * @return
+ * The folded graph.
+ */
+dgraph* shrink_grp(dgraph* g, //!< The graph to fold (right or left Cayley graph of a morphism).
+    parti* fold, //!< The stalling partition.
+    parti* sccs //!< The partition into SCCs of the states (R-classes or L-classes).
+);
+
+/**
+ * @brief
+ * Computes the graph obtained by folding a right or left Cayley graph according to the Stalling partition.
+ * Group mode: the alphabet is preserved.
+ * Mirror mode: the transitions are reversed.
+ *
+ * @remark
+ * Undefined transitions (which go outside of a SCC) are mapped to `UINT_MAX`.
+ *
+ * @return
+ * The folded graph.
+ */
+dgraph* shrink_grp_mirror(dgraph* g, //!< The graph to fold (right or left Cayley graph of a morphism).
+    parti* fold, //!< The stalling partition.
+    parti* sccs //!< The partition into SCCs of the states (R-classes or L-classes).
+);
 
 /***********************/
 /*+ Inverse extension +*/
@@ -47,14 +146,14 @@
  * The partition into SCCs used for the computation (it is often useful for
  * further computations).
  */
-parti *nfa_inv_ext(nfa * //!< The NFA.
+parti* nfa_inv_ext(nfa* //!< The NFA.
 );
 
 /**
  * @brief
  * Remove all inverse transitions in an NFA.
  */
-void nfa_remove_inv(nfa * //!< The NFA.
+void nfa_remove_inv(nfa* //!< The NFA.
 );
 
 /***********************************/
@@ -71,9 +170,11 @@ void nfa_remove_inv(nfa * //!< The NFA.
  * @return
  * The partition.
  */
-parti *nfa_stal_fold(nfa *, //!< The NFA (inverse transitions must be computed).
-                     parti * //!< The partition into SCCs of the states.
+parti* nfa_stal_fold(nfa*, //!< The NFA (inverse transitions must be computed).
+    parti* //!< The partition into SCCs of the states.
 );
+
+
 
 /**
  * @brief
@@ -87,9 +188,9 @@ parti *nfa_stal_fold(nfa *, //!< The NFA (inverse transitions must be computed).
  * @return
  * The NFA.
  */
-nfa *nfa_dyck_ext(
-    nfa *,  //!< The NFA (inverse transitions must be computed).
-    parti * //!< The partition corresponding to the folding of the SCCs.
+nfa* nfa_dyck_ext(
+    nfa*,  //!< The NFA (inverse transitions must be computed).
+    parti* //!< The partition corresponding to the folding of the SCCs.
 );
 
 /**
@@ -104,10 +205,10 @@ nfa *nfa_dyck_ext(
  * @return
  * A Boolean indicating whether the two input languages are GR-separable.
  */
-bool decid_grp_sep(nfa *, //!< First NFA.
-                   nfa *, //!< Second NFA.
-                   bool,  //!< Should further details be displayed?
-                   FILE * //!< The stream.
+bool decid_grp_sep(nfa*, //!< First NFA.
+    nfa*, //!< Second NFA.
+    bool,  //!< Should further details be displayed?
+    FILE* //!< The stream.
 );
 
 /************************************/
@@ -121,7 +222,7 @@ bool decid_grp_sep(nfa *, //!< First NFA.
  * @return
  * The projection.
  */
-nfa *nfa_proj_unary(nfa * //!< The NFA.
+nfa* nfa_proj_unary(nfa* //!< The NFA.
 );
 
 /**
@@ -136,10 +237,10 @@ nfa *nfa_proj_unary(nfa * //!< The NFA.
  * @return
  * A Boolean indicating whether the two input languages are MOD-separable.
  */
-bool decid_mod_sep(nfa *, //!< First NFA.
-                   nfa *, //!< Second NFA.
-                   bool,  //!< Should further details be displayed?
-                   FILE * //!< The stream.
+bool decid_mod_sep(nfa*, //!< First NFA.
+    nfa*, //!< Second NFA.
+    bool,  //!< Should further details be displayed?
+    FILE* //!< The stream.
 );
 
 /*************************************/
@@ -157,9 +258,9 @@ bool decid_mod_sep(nfa *, //!< First NFA.
  * @return
  * A Boolean indicating whether the two input languages are ST-separable.
  */
-bool decid_st_sep(nfa *, //!< First NFA.
-                  nfa *, //!< Second NFA.
-                  FILE * //!< The stream.
+bool decid_st_sep(nfa*, //!< First NFA.
+    nfa*, //!< Second NFA.
+    FILE* //!< The stream.
 );
 
 #endif

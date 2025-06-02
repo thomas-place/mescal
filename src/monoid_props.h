@@ -434,6 +434,9 @@ bool is_da_orbmono(orbits*,    //!< The orbits.
  * Tests if a morphism satisfies the equation 1 ≤ s.
  *
  * @remark
+ * The order must be computed before calling this function.
+ *
+ * @remark
  * If the test fails and the second parameter is not NULL, it will be set to a
  * counterexample: the element s which fails the equation.
  *
@@ -441,13 +444,15 @@ bool is_da_orbmono(orbits*,    //!< The orbits.
  * A Boolean indicating whether si the morphism satisfies the equation 1 ≤ s.
  */
 bool is_jsat_mono(morphism*, //!< The morphism.
-    dequeue*, //!< The list of elements larger than 1.
     uint* //!< Pointer on a uint array to return a counterexample.
 );
 
 /**
  * @brief
  * Tests if a morphism satisfies the equation 1 ≤ e (for every idempotent e).
+ *
+ * @remark
+ * The order must be computed before calling this function.
  *
  * @remark
  * If the test fails and the second parameter is not NULL, it will be set to a
@@ -457,13 +462,15 @@ bool is_jsat_mono(morphism*, //!< The morphism.
  * A Boolean indicating whether the morphisme satisfies the equation 1 ≤ e (for every idempotent e).
  */
 bool is_ejsat_mono(morphism*, //!< The morphism.
-    dequeue*, //!< The list of elements larger than 1.
     uint* //!< Pointer on a uint array to return a counterexample.
 );
 
 /**
  * @brief
  * Tests if a subsemigroup satisfies the equation 1 ≤ s.
+ *
+ * @remark
+ * The order must be computed before calling this function.
  *
  * @remark
  * If the test fails and the third parameter is not NULL, it will be set to a
@@ -473,7 +480,7 @@ bool is_ejsat_mono(morphism*, //!< The morphism.
  * A Boolean indicating whether the subsemigroup satisfies the equation 1 ≤ s.
  */
 bool is_jsat_subsemi(subsemi*,  //!< The subsemigroup.
-    dequeue*, //!< The list of elements larger than 1 in the original monoid.
+    uint, //!< The index of the neutral element in the list of representative idempotents.
     uint* //!< Pointer on a uint array to return a counterexample.
 );
 
@@ -481,6 +488,9 @@ bool is_jsat_subsemi(subsemi*,  //!< The subsemigroup.
 /**
  * @brief
  * Tests if all orbits satisfy the equation 1 ≤ s.
+ *
+ * @remark
+ * The order must be computed before calling this function.
  *
  * @remark
  * If the test fails and the second parameter is not NULL, it will be set to a

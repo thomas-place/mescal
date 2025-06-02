@@ -3,6 +3,8 @@
 #include "interrupt.h"
 #include "shell_errors.h"
 #include "monoid_ideals.h"
+#include "type_hash.h"
+#include <time.h>
 
 
 
@@ -46,11 +48,11 @@ void delete_morphism(morphism* M) {
 
     // Free accepting elements.
     free(M->accept_array);
-    delete_dequeue(M->accept_list);
+    free(M->accept_list);
 
     // Free idempotents.
     free(M->idem_array);
-    delete_dequeue(M->idem_list);
+    free(M->idem_list);
 
     // Free generators.
     free(M->alphabet);
@@ -66,24 +68,16 @@ void delete_morphism(morphism* M) {
 
     /* Optional fields */
 
-    // Free multiplication table (if needed).
-    if (M->mult != NULL) {
-        for (uint i = 0; i < M->r_cayley->size_graph; i++) {
-            free(M->mult[i]);
-        }
-        free(M->mult);
-    }
-
-    // Free monoid order (if needed)
-    if (M->order != NULL) {
-        for (uint i = 0; i < M->nb_regular_jcl; i++) {
-            delete_dequeue(M->order[i]);
-        }
-    }
 
     // Free Cayley graphs
     delete_dgraph(M->l_cayley);
     delete_dgraph(M->r_cayley);
+
+    // Free optionnal fields.
+    free(M->mult);
+    free(M->order);
+    free(M->order_size);
+    free(M->order_storage);
 
     free(M);
 }
@@ -194,11 +188,11 @@ static void aux_quick_sort_green(uint* array, uint i, uint j, uint* rnums, uint*
 
 uint* green_sorted_jclass(green* G, uint i) {
     uint* sorted_jclass;
-    MALLOC(sorted_jclass, size_dequeue(G->JCL->cl[i]));
-    for (uint j = 0; j < size_dequeue(G->JCL->cl[i]); j++) {
-        sorted_jclass[j] = lefread_dequeue(G->JCL->cl[i], j);
+    MALLOC(sorted_jclass, G->JCL->cl_size[i]);
+    for (uint j = 0; j < G->JCL->cl_size[i]; j++) {
+        sorted_jclass[j] = G->JCL->cl_elems[i][j];
     }
-    aux_quick_sort_green(sorted_jclass, 0, size_dequeue(G->JCL->cl[i]), G->RCL->numcl, G->LCL->numcl);
+    aux_quick_sort_green(sorted_jclass, 0, G->JCL->cl_size[i], G->RCL->numcl, G->LCL->numcl);
     return sorted_jclass;
 }
 
@@ -219,9 +213,11 @@ void h_green_compute(green* GREL) {
     uint num = 0;
 
     // Computes the H-classes
-    MALLOC(GREL->HCL, 1);
-    GREL->HCL->size_set = GREL->JCL->size_set;
-    MALLOC(GREL->HCL->numcl, GREL->HCL->size_set);
+    // MALLOC(GREL->HCL, 1);
+    // GREL->HCL->size_set = GREL->JCL->size_set;
+    // MALLOC(GREL->HCL->numcl, GREL->HCL->size_set);
+    uint* hnumcl;
+    MALLOC(hnumcl, GREL->JCL->size_set);
 
 
     // For each J-class.
@@ -233,14 +229,14 @@ void h_green_compute(green* GREL) {
 
 
         uint elem = thejclass[0];
-        GREL->HCL->numcl[elem] = num;
+        hnumcl[elem] = num;
         num++;
-        for (uint i = 1; i < size_dequeue(GREL->JCL->cl[cr]); i++) {
+        for (uint i = 1; i < GREL->JCL->cl_size[cr]; i++) {
             if (GREL->LCL->numcl[thejclass[i]] == GREL->LCL->numcl[elem] && GREL->RCL->numcl[thejclass[i]] == GREL->RCL->numcl[elem]) {
-                GREL->HCL->numcl[thejclass[i]] = GREL->HCL->numcl[elem];
+                hnumcl[thejclass[i]] = hnumcl[elem];
             }
             else {
-                GREL->HCL->numcl[thejclass[i]] = num;
+                hnumcl[thejclass[i]] = num;
                 num++;
                 elem = thejclass[i];
             }
@@ -250,24 +246,26 @@ void h_green_compute(green* GREL) {
     }
 
     // We now know the number of H-classes.
-    GREL->HCL->size_par = num;
 
-    // It remains to build the table of classes.
-    MALLOC(GREL->HCL->cl, GREL->HCL->size_par);
+    GREL->HCL = create_parti(GREL->JCL->size_set, num, hnumcl);
+    // GREL->HCL->size_par = num;
 
-    for (uint c = 0; c < GREL->HCL->size_par; c++) {
-        GREL->HCL->cl[c] = create_dequeue();
-    }
-    for (uint v = 0; v < GREL->HCL->size_set; v++) {
-        rigins_dequeue(v, GREL->HCL->cl[GREL->HCL->numcl[v]]);
-    }
+    // // It remains to build the table of classes.
+    // MALLOC(GREL->HCL->cl, GREL->HCL->size_par);
+
+    // for (uint c = 0; c < GREL->HCL->size_par; c++) {
+    //     GREL->HCL->cl[c] = create_dequeue();
+    // }
+    // for (uint v = 0; v < GREL->HCL->size_set; v++) {
+    //     rigins_dequeue(v, GREL->HCL->cl[GREL->HCL->numcl[v]]);
+    // }
 
 }
 
 
 
 
-void gr_green_compute(dequeue* idem_list, green* G) {
+void gr_green_compute(uint* idem_list, uint nb_idems, green* G) {
 
     // First, we compute the regular elements.
     CALLOC(G->regular_array, G->JCL->size_set);
@@ -276,24 +274,23 @@ void gr_green_compute(dequeue* idem_list, green* G) {
     // For each idempotent, we mark all elements of its J-class has regular. We
     // skip an idempotent whose J-class has already been marked as regular.
 
-    for (uint i = 0; i < size_dequeue(idem_list); i++) {
-        uint e = lefread_dequeue(idem_list, i);
-        uint c = G->JCL->numcl[e];
-        if (G->regular_array[lefread_dequeue(G->JCL->cl[c], 0)]) {
+    for (uint i = 0; i < nb_idems; i++) {
+        uint c = G->JCL->numcl[idem_list[i]];
+        if (G->regular_array[G->JCL->cl_elems[c][0]]) {
             continue;
         }
-        for (uint j = 0; j < size_dequeue(G->JCL->cl[c]); j++) {
-            G->regular_array[lefread_dequeue(G->JCL->cl[c], j)] = true;
+        for (uint j = 0; j < G->JCL->cl_size[c]; j++) {
+            G->regular_array[G->JCL->cl_elems[c][j]] = true;
         }
-        G->nb_regular_elems += size_dequeue(G->JCL->cl[c]);
+        G->nb_regular_elems += G->JCL->cl_size[c];
     }
 
     // Building information on groups.
     CALLOC(G->group_array, G->HCL->size_set);
-    for (uint i = 0; i < size_dequeue(idem_list); i++) {
-        uint j = G->HCL->numcl[lefread_dequeue(idem_list, i)];
-        for (uint k = 0; k < size_dequeue(G->HCL->cl[j]); k++) {
-            G->group_array[lefread_dequeue(G->HCL->cl[j], k)] = true;
+    for (uint i = 0; i < nb_idems; i++) {
+        uint j = G->HCL->numcl[idem_list[i]];
+        for (uint k = 0; k < G->HCL->cl_size[j]; k++) {
+            G->group_array[G->HCL->cl_elems[j][k]] = true;
         }
     }
 }
@@ -304,30 +301,55 @@ void mor_compute_green(morphism* M) {
     if (M->rels) {
         delete_green(M->rels);
     }
-
+#ifdef DEBUG_MONO
+    printf("Computing the Green relations of the monoid.\n");
+    ulong thetime = time(NULL);
+#endif
     // Initialization of the structure.
     CALLOC(M->rels, 1);
 
 
     // Computing the R equivalence (strongly connected components of the right cayley graph).
-    M->rels->RCL = dtarjan(M->r_cayley);
+    M->rels->RCL = dtarjan(M->r_cayley, NULL, true);
+#ifdef DEBUG_MONO
+    printf("R done. Time: %f\n", difftime(time(NULL), thetime));
+#endif
+
 
     // Computing the L equivalence (strongly connected components of the left cayley graph).
-    M->rels->LCL = dtarjan(M->l_cayley);
+    M->rels->LCL = dtarjan(M->l_cayley, NULL, true);
+
+#ifdef DEBUG_MONO
+    printf("L done. Time: %f\n", difftime(time(NULL), thetime));
+#endif
 
 
     // Computing the J equivalence (strongly connected components of the J order).
-    graph* j_order = ldgraphs_to_graph(0, 0, 2, 2, M->r_cayley, M->l_cayley); // Compute the J-order.
-    M->rels->JCL = tarjan(j_order);
-    delete_graph(j_order);
+    //graph* j_order = ldgraphs_to_graph(0, 0, 2, 2, M->r_cayley, M->l_cayley); // Compute the J-order.
+
+
+    M->rels->JCL = dualdtarjan(M->r_cayley, M->l_cayley, NULL, true);
+    //M->rels->JCL = tarjan(j_order);
+    //printf("J done. Time: %f\n", difftime(time(NULL), thetime));
+    //delete_graph(j_order);
+#ifdef DEBUG_MONO
+    printf("J done. Time: %f\n", difftime(time(NULL), thetime));
+#endif
+
 
 
     // Computing the relation H.
     h_green_compute(M->rels);
-
+#ifdef DEBUG_MONO
+    printf("H done. Time: %f\n", difftime(time(NULL), thetime));
+#endif
 
     // Computing the regular elements and the groups.
-    gr_green_compute(M->idem_list, M->rels);
+    gr_green_compute(M->idem_list, M->nb_idems, M->rels);
+#ifdef DEBUG_MONO
+    printf("Regular elements and groups done. Time: %f\n", difftime(time(NULL), thetime));
+    printf("the end\n\n");
+#endif
 }
 
 
@@ -346,8 +368,8 @@ void mor_compute_rep(morphism* M) {
     for (uint i = 0; i < M->rels->JCL->size_par; i++) {
         regular_jcls_idems[i] = UINT_MAX;
     }
-    for (uint i = 0; i < size_dequeue(M->idem_list);i++) {
-        uint e = rigread_dequeue(M->idem_list, i);
+    for (uint i = 0; i < M->nb_idems;i++) {
+        uint e = M->idem_list[i];
         if (regular_jcls_idems[M->rels->JCL->numcl[e]] == UINT_MAX) {
             M->nb_regular_jcl++;
         }
@@ -391,8 +413,8 @@ void mor_compute_rep(morphism* M) {
     // We start from the elements that follow a regular J-class (which is not the one of 1)
     for (uint i = 1; i < M->rels->JCL->size_par; i++) {
         if (regular_jcls_idems[i] != UINT_MAX) {
-            for (uint j = 0; j < size_dequeue(M->rels->JCL->cl[i]); j++) {
-                uint s = lefread_dequeue(M->rels->JCL->cl[i], j);
+            for (uint j = 0; j < M->rels->JCL->cl_size[i]; j++) {
+                uint s = M->rels->JCL->cl_elems[i][j];
                 for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
                     if (M->rels->JCL->numcl[s] != M->rels->JCL->numcl[M->r_cayley->edges[s][a]]) {
                         rigins_dequeue(M->r_cayley->edges[s][a], queue);
@@ -419,7 +441,7 @@ void mor_compute_rep(morphism* M) {
 
     M->nb_min_regular_jcl = 0;
     for (uint i = 0; i < M->rels->JCL->size_par; i++) {
-        uint s = lefread_dequeue(M->rels->JCL->cl[i], 0);
+        uint s = M->rels->JCL->cl_elems[i][0];
         if (regular_jcls_idems[i] != UINT_MAX && !visited[s]) {
             M->regular_idems[M->nb_min_regular_jcl] = regular_jcls_idems[i];
             M->nb_min_regular_jcl++;
@@ -428,7 +450,7 @@ void mor_compute_rep(morphism* M) {
 
     uint j = M->nb_min_regular_jcl;
     for (uint i = 0; i < M->rels->JCL->size_par; i++) {
-        uint s = lefread_dequeue(M->rels->JCL->cl[i], 0);
+        uint s = M->rels->JCL->cl_elems[i][0];
         if (regular_jcls_idems[i] != UINT_MAX && visited[s]) {
             M->regular_idems[j] = regular_jcls_idems[i];
             j++;
@@ -522,432 +544,468 @@ void mor_compute_min_regular_jcl(morphism* M) {
 /* Construction from a complete DFA */
 /************************************/
 
-// Representation of a state of the morphism graph built from a
-// complete DFA and of the outgoing transitions from this state.
-typedef struct morphism_state {
-    uint size_graph;              //!< Number of states of the DFA used in the construction.
-    uint* state;                  //!< A state: a permutation of {0, ..., size_graph-1}.
-    uint pred_ele;                //!< The preceding element of the state.
-    uint pred_lab;                //!< The preceding letter of the state.
-    uint size_alpha;              //!< The size of the alphabet.
-    uint num;                     //!< The number of the state in the future monoid.
-    struct morphism_state** next; //!< Array of size size_alpha containing the transitions, one for each letter.
-} morphism_state;
 
-// Release function
-static void delete_morphism_state(void* p) {
-    if (p == NULL) {
-        return;
-    }
-    free(((morphism_state*)p)->state); // Free the permutation
-    free(((morphism_state*)p)->next);  // Free the transition table
-    free(p);
+
+
+
+// Storage of the permutations of DFA states
+static ulong mor_cons_size = 0; // Size of the mor_perms array.
+static ulong mor_cons_elem = 0; // Number of permutations in the mor_perms array.
+static uint mor_cons_states = 0; // Number of states in the DFA.
+static uint mor_cons_letters = 0; // Number of letters in the DFA (size of the alphabet).
+static uint* mor_cons_perms = NULL; // Array of permutations (a single permutation takes mor_cons_states cells). Size: mor_cons_size * mor_cons_states.
+static uint* mor_cons_next = NULL;  // Array of transitions (a single transition takes mor_cons_letters cells). Size: mor_cons_size * mor_cons_letters.
+static uint* mor_cons_prede = NULL; // Array of predecessor elements. Size: mor_cons_size.       
+static uint* mor_cons_predl = NULL; // Array of predecessor letters. Size: mor_cons_size.
+
+// Initialization of the arrays used in the construction of the morphism.
+static void mor_cons_init(uint size, uint states, uint letters) {
+    size = max(size, 2); // Ensure that the size is at least 2.
+    mor_cons_size = size;
+    mor_cons_elem = 0;
+    mor_cons_states = states;
+    mor_cons_letters = letters;
+    MALLOC(mor_cons_perms, mor_cons_size * mor_cons_states);
+    MALLOC(mor_cons_next, mor_cons_size * mor_cons_letters);
+    MALLOC(mor_cons_prede, mor_cons_size);
+    MALLOC(mor_cons_predl, mor_cons_size);
 }
 
-static void delete_morphism_state_weak(void* p) {
-    if (p == NULL) {
-        return;
-    }
-    free(((morphism_state*)p)->next);
-    free(p);
+// Initialization of the arrays used in the construction of the morphism (weak version: skips prede and predl).
+static void mor_cons_init_weak(uint size, uint states, uint letters) {
+    size = max(size, 2); // Ensure that the size is at least 2.
+    mor_cons_size = size;
+    mor_cons_elem = 0;
+    mor_cons_states = states;
+    mor_cons_letters = letters;
+    MALLOC(mor_cons_perms, mor_cons_size * mor_cons_states);
+    MALLOC(mor_cons_next, mor_cons_size * mor_cons_letters);
 }
 
-static void delete_morphism_state_strong(void* p) {
-    if (p == NULL) {
+// Deletes the arrays used in the construction of the morphism and resets the variables.
+static void mor_cons_delete() {
+    free(mor_cons_perms);
+    mor_cons_perms = NULL;
+    free(mor_cons_next);
+    mor_cons_next = NULL;
+    free(mor_cons_prede);
+    mor_cons_prede = NULL;
+    free(mor_cons_predl);
+    mor_cons_predl = NULL;
+    mor_cons_size = 0;
+    mor_cons_elem = 0;
+    mor_cons_states = 0;
+    mor_cons_letters = 0;
+}
 
-        return;
+// Doubles the size of the arrays used in the construction of the morphism if they are full.
+static void mor_cons_grow() {
+    if (mor_cons_elem < mor_cons_size) {
+        return; // If the arrays are not full, we do nothing.
     }
-    free(((morphism_state*)p)->state);
-    free(((morphism_state*)p)->next);
-    free(p);
+
+#ifdef DEBUG_MONO
+    printf("Doubling the size of the morphism construction arrays.\n");
+    printf("Current size: %lu.\n", mor_cons_size);
+#endif
+    // Double the size of the arrays used in the construction of the morphism.
+    mor_cons_size <<= 1; // Double the size of the arrays.
+#ifdef DEBUG_MONO
+    printf("New size: %lu\n\n", mor_cons_size);
+#endif
+    // Reallocate the arrays with the new size.
+    REALLOC(mor_cons_perms, mor_cons_size * mor_cons_states);
+    REALLOC(mor_cons_next, mor_cons_size * mor_cons_letters);
+    REALLOC(mor_cons_prede, mor_cons_size);
+    REALLOC(mor_cons_predl, mor_cons_size);
+}
+
+// Doubles the size of the arrays used in the construction of the morphism if they are full (weak version: skips prede and predl).
+static void mor_cons_grow_weak() {
+    if (mor_cons_elem < mor_cons_size) {
+        return; // If the arrays are not full, we do nothing.
+    }
+
+#ifdef DEBUG_MONO
+    printf("Doubling the size of the morphism construction arrays.\n");
+    printf("Current size: %lu.\n", mor_cons_size);
+#endif
+    // Double the size of the arrays used in the construction of the morphism.
+    mor_cons_size <<= 1; // Double the size of the arrays.
+#ifdef DEBUG_MONO
+    printf("New size: %lu\n\n", mor_cons_size);
+#endif
+    // Reallocate the arrays with the new size.
+    REALLOC(mor_cons_perms, mor_cons_size * mor_cons_states);
+    REALLOC(mor_cons_next, mor_cons_size * mor_cons_letters);
 }
 
 
-// Function comparing two objects of type morphism_state. Useful for comparing states in AVLs.
-static int comp_morphism_state(void* p1, void* p2) {
-    if (((morphism_state*)p1)->size_graph != ((morphism_state*)p2)->size_graph) {
-        fprintf(stderr, "Error, the morphism states should have the same size.\n");
-        exit(EXIT_FAILURE);
-    }
-    for (uint i = 0; i < ((morphism_state*)p1)->size_graph; i++) {
-        if (((morphism_state*)p1)->state[i] < ((morphism_state*)p2)->state[i]) {
-            return 1;
+// Checks if two permutations stored in the array are equal.
+static bool mor_cons_equal(uint i, uint j) {
+    ulong zi = i * mor_cons_states; // The index of the first element in the mor_perms array.
+    ulong zj = j * mor_cons_states; // The index of the second element in the mor_perms array.
+    for (uint h = 0; h < mor_cons_states; h++) {
+        if (mor_cons_perms[zi + h] != mor_cons_perms[zj + h]) {
+            return false; // If any element is different, the two permutations are not equal.
         }
-        if (((morphism_state*)p1)->state[i] > ((morphism_state*)p2)->state[i]) {
-            return -1;
-        }
     }
-    return 0;
+    return true;
 }
 
-// Auxiliary function used in dfa_to_morphism. The AVL contains morphism states.
-static void morphism_avl_to_table(avlnode* tree, nfa* A, morphism* thegraph, uint** permuts, bool* newfinals, bool* theidems) {
-    if (tree == NULL) {
-        return;
+// Hashing function for the morphism construction.
+static uint mor_cons_hash(uint i, uint size_hash) {
+    ulong e = i * mor_cons_states; // The index of the element in the mor_perms array.
+    uint hash = 0;
+    uint a = 0x9e3779b9; // fractional bits of the golden ratio
+    for (uint j = 0; j < mor_cons_states; j++) {
+        hash = (hash * (mor_cons_states + 1) + mor_cons_perms[e + j] * a) % size_hash;
     }
-
-    morphism_avl_to_table(tree->left, A, thegraph, permuts, newfinals, theidems);
-    morphism_avl_to_table(tree->right, A, thegraph, permuts, newfinals, theidems);
-
-    morphism_state* thestate = (morphism_state*)tree->value;
-
-    // Assign transitions in the right Cayley graph.
-    for (uint a = 0; a < thegraph->r_cayley->size_alpha; a++) {
-        thegraph->r_cayley->edges[thestate->num][a] = thestate->next[a]->num;
-    }
-
-    // Is the state an accepting element?
-    if (mem_dequeue_sorted(thestate->state[lefread_dequeue(A->initials, 0)], A->finals, NULL)) {
-        newfinals[thestate->num] = true;
-    }
-    else {
-        newfinals[thestate->num] = false;
-    }
-
-    // Is the state an idempotent?
-    theidems[thestate->num] = true;
-    uint q = 0;
-    while (theidems[thestate->num] && q < thestate->size_graph) {
-        if (thestate->state[q] != thestate->state[thestate->state[q]]) {
-            theidems[thestate->num] = false;
-        }
-        else {
-            q++;
-        }
-    }
-
-    // Store the name of the element in the morphism.
-    thegraph->pred_ele[thestate->num] = thestate->pred_ele;
-    thegraph->pred_lab[thestate->num] = thestate->pred_lab;
-
-    // We save the permutation defining the state (might be used for ordering computation).
-    permuts[thestate->num] = thestate->state;
-
-
+    return hash;
 }
 
-static void compute_ordering_partial(morphism* M, uint size, bool** order, uint** permuts) {
+
+// Computes (partial information on) the syntactic ordering from the array of permutations and the ordering on the input DFA.
+static void mor_cons_order(morphism* M, bool** order) {
+
+#ifdef DEBUG_MONO
+    printf("Computing the syntactic ordering of the morphism.\n");
+#endif
+
     MALLOC(M->order, M->nb_regular_jcl);
+    MALLOC(M->order_size, M->nb_regular_jcl);
+    uint size_storage = 0;
+    dequeue** order_temp;
+    MALLOC(order_temp, M->nb_regular_jcl);
+
+#ifdef DEBUG_MONO
+    printf("Finished allocation.\n");
+#endif
+
     for (uint i = 0; i < M->nb_regular_jcl; i++) {
-        M->order[i] = create_dequeue();
-        uint e = M->regular_idems[i];
+        order_temp[i] = create_dequeue();
+        ulong e = M->regular_idems[i];
         dequeue* eM = compute_r_ideal(M, e, NULL);
         dequeue* Me = compute_l_ideal(M, e, NULL);
         dequeue* eMe = make_inter_sorted_dequeue(eM, Me);
         delete_dequeue(eM);
         delete_dequeue(Me);
 
+
         for (uint j = 0; j < size_dequeue(eMe); j++) {
-            uint q = lefread_dequeue(eMe, j);
+            uint q = lefread_dequeue(eMe, j) * (ulong)mor_cons_states;
             bool found = true;
-            for (uint k = 0; k < size; k++) {
-                if (!order[permuts[e][k]][permuts[q][k]]) {
+            for (uint k = 0; k < mor_cons_states; k++) {
+                if (!order[mor_cons_perms[e + k]][mor_cons_perms[q + k]]) {
                     found = false;
                     break;
                 }
             }
             if (found) {
-                rigins_dequeue(q, M->order[i]);
+                rigins_dequeue(q, order_temp[i]);
             }
         }
-
-
+        M->order_size[i] = size_dequeue(order_temp[i]);
+        size_storage += M->order_size[i];
     }
 
+#ifdef DEBUG_MONO
+    printf("Finished computation.\n");
+#endif
+
+    MALLOC(M->order_storage, size_storage);
+    uint pos = 0;
+    for (uint i = 0; i < M->nb_regular_jcl; i++) {
+        M->order[i] = M->order_storage + pos;
+        pos += M->order_size[i];
+        for (uint j = 0; j < size_dequeue(order_temp[i]); j++) {
+            M->order[i][j] = lefread_dequeue(order_temp[i], j);
+        }
+        delete_dequeue(order_temp[i]);
+    }
+    free(order_temp);
+
+#ifdef DEBUG_MONO
+    printf("All finished.\n");
+#endif
 }
 
-// Works only with a complete input DFA
-morphism* dfa_to_morphism(nfa* A, bool** order, int* error) {
-    if (!nfa_is_det(A) || !nfa_is_comp(A)) {
-        fprintf(stderr, "Error: The construction of the transition morphism requires a Complete DFA. Returned NULL\n");
-        if (error != NULL) {
-            *error = INVALID_OBJECT;
-        }
-        return NULL;
+
+morphism* dfa_to_morphism(dfa* A, bool** order, int*) {
+
+#ifdef DEBUG_MONO
+    ulong thetime = time(NULL);
+#endif
+
+    uchar power = get_uint_lbinary(A->trans->size_graph) + 2; // We add 2 to ensure that the hash table is large enough.
+    uint thesize = 1U << power; // The size of the hash table is 2^power.
+
+    // Initialization of the arrays used in the construction of the morphism.
+    mor_cons_init(thesize, A->trans->size_graph, A->trans->size_alpha);
+
+    // Initialize the hash table.
+    hash_table* thehash = create_hash_table(power, &mor_cons_hash, &mor_cons_equal);
+
+    // Queue containing the elements to be processed.
+    dequeue* thequeue = create_dequeue();
+
+    // Create the first element: the identity (which has number 0).
+    for (uint i = 0; i < A->trans->size_graph; i++) {
+        mor_cons_perms[i] = i; // The identity is the permutation of the states.
     }
+    mor_cons_elem++;
+    hash_table_insert(thehash, 0); // Insert the identity in the hash table.
+    rigins_dequeue(0, thequeue); // Add the identity to the queue.
 
-    // Fifo containing the elements to be processed.
-    dequeue_gen* thequeue = create_dequeue_gen();
+#ifdef DEBUG_MONO
+    printf("Size automaton: %d, size hash table: %d, initial power: %d\n", A->trans->size_graph, thesize, power);
+#endif
 
-    // AVL containing all elements already constructed.
-    avlnode* thetree = NULL;
+    while (!isempty_dequeue(thequeue)) {
 
-    // Count the number of elements constructed.
-    uint num = 0;
+        uint s = lefpull_dequeue(thequeue); // Get the element to be processed.
 
-    // Stack the first element: the identity (which has number 0).
-    morphism_state* neutral;
-    MALLOC(neutral, 1);
-    neutral->num = num;
-    num++;
-    //neutral->name = create_dequeue();           // The name of this element is the empty word.
-    neutral->size_alpha = A->trans->size_alpha; // Number of letters.
-    neutral->size_graph = A->trans->size_graph; // Number of states.
-    neutral->next = NULL;                       // The next elements are not yet computed.
-    MALLOC(neutral->state, neutral->size_graph);
-    for (uint q = 0; q < neutral->size_graph; q++) // This element is the identity.
-    {
-        neutral->state[q] = q;
-    }
+        // Computes the transitions from this element.
+        for (uint a = 0; a < A->trans->size_alpha; a++) {
 
-    // Insertion in the set of already met elements.
-    thetree = avl_insert(neutral, thetree, &comp_morphism_state, NULL);
-
-    // Treat this element.
-    lefins_dequeue_gen(neutral, thequeue);
-
-    // Potentially long loop, react to interrupts and timeout.
-    listening_mode(timeout_value);
-
-    while (!isempty_dequeue_gen(thequeue)) {
-        // Free allocated memory if the limit is reached, or if a yser
-        // interruption occurs, or if the timeout is reached.
-        if ((limit_value > 0 && num > limit_value) || interrupt_flag || timeout_flag) {
-            delete_dequeue_gen(thequeue);
-            avl_free_strong(thetree, &delete_morphism_state);
-
-            if (error != NULL) {
-                if ((limit_value > 0 && num > limit_value)) {
-                    *error = MEMORY_LIMIT;
-                }
-                if (interrupt_flag) {
-                    INFO("INTERRUPT");
-                    *error = INTERRUPTION;
-                }
-                if (timeout_flag) {
-                    *error = TIMEOUT_OCCURRED;
-                }
-
-                // Go back to normal mode, where interruptions and timeouts are ignored.
-                normal_mode();
-                return NULL;
-            }
-        }
-
-        // Get the element to be processed.
-        morphism_state* theelem = (morphism_state*)rigpull_dequeue_gen(thequeue);
-
-        // Compute the transitions from this element.
-        MALLOC(theelem->next, theelem->size_alpha);
-
-        for (uint a = 0; a < theelem->size_alpha; a++) {
-            // Create the (potential) new element, computed by multiplying the old one on the right.
-            morphism_state* new;
-            MALLOC(new, 1);
-            new->size_graph = A->trans->size_graph;
-            MALLOC(new->state, new->size_graph);
-
-            // Compute the corresponding permutation.
-            for (uint q = 0; q < neutral->size_graph; q++) {
-                new->state[q] = lefread_dequeue(A->trans->edges[theelem->state[q]][a], 0);
+            // Create the (potential) new permutation in the next cell of the table.
+            ulong i = mor_cons_elem * mor_cons_states; // Position of the next element in the mor_perms array.
+            ulong j = s * mor_cons_states; // Position of the current element in the mor_perms array.
+            for (uint q = 0; q < A->trans->size_graph; q++) {
+                mor_cons_perms[i + q] = A->trans->edges[mor_cons_perms[j + q]][a];
             }
 
-            // Check if this state already exists.
-            avlnode* thenode = avl_search(new, thetree, &comp_morphism_state);
+            // Try to insert the new element in the hash table.
+            uint h = hash_table_insert(thehash, mor_cons_elem);
+            if (h == mor_cons_elem) {
 
-            // If not, initialize a new element.
-            if (thenode == NULL) {
-                new->size_alpha = A->trans->size_alpha;
-                new->next = NULL; // For now, we don't know the next elements.
-                new->num = num;
-                num++;
-                new->pred_ele = theelem->num; // The predecessor of this element is the one we are treating.
-                new->pred_lab = a;           // The predecessor letter is the one we are treating.
-                theelem->next[a] = new;                                         // Assign it as a successor for letter a.
-                thetree = avl_insert(new, thetree, &comp_morphism_state, NULL); // Store it in the set of known elements.
-                lefins_dequeue_gen(new, thequeue);                              // This new element has to be treated in the future..
+                // The element was not already constructed.
+                rigins_dequeue(mor_cons_elem, thequeue); // We add it to the queue for future processing.
+
+                // We initialize the new element.
+                mor_cons_prede[mor_cons_elem] = s; // The predecessor of this element is the one we are treating.
+                mor_cons_predl[mor_cons_elem] = a; // The predecessor letter is the one we are treating.
+
+                // Prepare the next element in the table.
+                mor_cons_elem++; // Increment the number of elements constructed.
+                mor_cons_grow(); // If the number of elements constructed is larger than the size of the table, we double the size.
             }
-            else
-                // The element was already constructed.
-            {
-                theelem->next[a] = ((morphism_state*)thenode->value); // We assign the version already built as an a-successor.
-                free(new->state);                                      // We free the copy we've just created.
-                free(new);
-            }
+
+            // Assign the next element of s for a.
+            ulong sa = s * mor_cons_letters + a;
+            mor_cons_next[sa] = h;
         }
     }
-    delete_dequeue_gen(thequeue);
 
-    // Construction of the morphism.
+    delete_dequeue(thequeue); // Free the queue.
+    delete_hash_table(thehash); // Free the hash table.
+
+#ifdef DEBUG_MONO
+    printf("BFS done. Time: %f\n Elements: %lu", difftime(time(NULL), thetime), mor_cons_elem);
+#endif
+
+    // Initialization of the morphism.
     morphism* M;
     CALLOC(M, 1);
-    M->alphabet = nfa_duplicate_alpha(A);                           // Copy letter names.
-    M->r_cayley = create_dgraph_noedges(num, A->trans->size_alpha); // Create the graph.
-    MALLOC(M->pred_ele, num);                                         // Predecessor elements.
-    MALLOC(M->pred_lab, num);                                         // Predecessor letters.
-    MALLOC(M->accept_array, num);                                   // Array representing the accepting set.
-    MALLOC(M->idem_array, num);                                     // Array of idempotents.
+    M->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha);  // Copy letter names.
+    M->r_cayley = create_dgraph_noedges(mor_cons_elem, mor_cons_letters); // Create the graph.
+    MALLOC(M->pred_ele, mor_cons_elem);                                   // Predecessor elements.
+    MALLOC(M->pred_lab, mor_cons_elem);                                   // Predecessor letters.
+    MALLOC(M->accept_array, mor_cons_elem);                               // Array representing the accepting set.
+    MALLOC(M->idem_array, mor_cons_elem);                                 // Array of idempotents.
+    M->order = NULL;                                                      // The ordering is not computed yet.
 
-    uint** permuts;
-    MALLOC(permuts, num); // Array of permutations defining the elements.
-    // Creation of transitions, idempotents and detection of accepting elements (simultaneously releases the AVL).
-    morphism_avl_to_table(thetree, A, M, permuts, M->accept_array, M->idem_array);
+    // Computation of the right Cayley graph, predecessors, the idempotents and the accepting elements.
+    M->nb_idems = 0; // Number of idempotents.
+    M->nb_accept = 0; // Number of accepting elements.
 
+    // For all elements
+    for (uint i = 0; i < mor_cons_elem; i++) {
 
-    // Free the AVL
-    avl_free_strong(thetree, &delete_morphism_state_weak);
+        // Right Cayley graph.
+        ulong j = i * (ulong)mor_cons_letters; // The index of the element in the table.
+        for (uint a = 0; a < A->trans->size_alpha; a++) {
+            M->r_cayley->edges[i][a] = mor_cons_next[j + a]; // Assign the transitions.
+        }
 
+        // Predecessors and predecessor letters.
+        M->pred_ele[i] = mor_cons_prede[i]; // Predecessor elements.
+        M->pred_lab[i] = mor_cons_predl[i]; // Predecessor letters.
 
-    // Creation of lists of idempotents and accepting elements.
-    M->idem_list = create_dequeue();
-    M->accept_list = create_dequeue();
-    for (uint i = 0; i < num; i++) {
-        if (M->accept_array[i]) {
-            rigins_dequeue(i, M->accept_list);
+        // Is the element an accepting one ?
+        ulong d = i * (ulong)mor_cons_states;
+        if (bsearch(&mor_cons_perms[d + A->initial], A->finals, A->nb_finals, sizeof(uint), &compare_uint)) {
+            M->accept_array[i] = true; // If the element is accepting, we set it to true.
+            M->nb_accept++; // Increment the number of accepting elements.
+        }
+        else {
+            M->accept_array[i] = false; // Otherwise, we set it to false.
+        }
+
+        // Is the element an idempotent one?
+        M->idem_array[i] = true; // We assume it is idempotent.
+        uint q = 0;
+        while (q < A->trans->size_graph) {
+            if (mor_cons_perms[d + q] != mor_cons_perms[d + mor_cons_perms[d + q]]) {
+                M->idem_array[i] = false;
+                break;
+            }
+            q++;
         }
         if (M->idem_array[i]) {
-            rigins_dequeue(i, M->idem_list);
+            M->nb_idems++; // If the element is idempotent, we increment the number of idempotents.
         }
     }
+
+    // Creation of the lists of idempotents and accepting elements.
+    MALLOC(M->idem_list, M->nb_idems);
+    MALLOC(M->accept_list, M->nb_accept);
+    uint j = 0;
+    uint h = 0;
+    for (uint i = 0; i < mor_cons_elem; i++) {
+        if (M->idem_array[i]) {
+            M->idem_list[j] = i;
+            j++;
+        }
+        if (M->accept_array[i]) {
+            M->accept_list[h] = i;
+            h++;
+        }
+    }
+
+#ifdef DEBUG_MONO
+    printf("Right Cayley graph, idempotent elements and accepting elements done. Time: %f\n", difftime(time(NULL), thetime));
+#endif
 
     // Compute the left Cayley graph.
     mor_compute_leftcayley(M);
 
+#ifdef DEBUG_MONO
+    printf("Left Cayley graph done. Time: %f\n", difftime(time(NULL), thetime));
+#endif
 
     // Compute the Green relations.
-    //M->j_order = ldgraphs_to_lgraph(0, 2, 2, M->r_cayley, M->l_cayley); // Compute the J-order.
-
-
     mor_compute_green(M);
 
-
+#ifdef DEBUG_MONO
+    printf("Green relations done. Time: %f\n", difftime(time(NULL), thetime));
+#endif
     mor_compute_rep(M);
 
+#ifdef DEBUG_MONO
+    printf("Representatives idempotents for the J-classes done. Time: %f\n", difftime(time(NULL), thetime));
+#endif
 
+    // If we need to compute the ordering, we do it now.
     if (order) {
-        compute_ordering_partial(M, A->trans->size_graph, order, permuts);
-
+        mor_cons_order(M, order);
+#ifdef DEBUG_MONO
+        printf("Ordering done. Time: %f\n", difftime(time(NULL), thetime));
+#endif
     }
 
-
-    // Release of the permuts table
-    for (uint i = 0; i < num; i++) {
-        free(permuts[i]);
-    }
-    free(permuts);
-
+    // We free the arrays used in the construction of the morphism.
+    mor_cons_delete();
 
     ignore_interrupt();
     normal_mode();
     return M;
+
 }
 
+uint dfa_to_morphism_size(dfa* A) {
 
+    uchar power = get_uint_lbinary(A->trans->size_graph) + 2; // We add 2 to ensure that the hash table is large enough.
+    uint thesize = 1U << power; // The size of the hash table is 2^power.
 
+    // Initialization of the arrays used in the construction of the morphism.
+    mor_cons_init_weak(thesize, A->trans->size_graph, A->trans->size_alpha);
 
+    // Initialize the hash table.
+    hash_table* thehash = create_hash_table(power, &mor_cons_hash, &mor_cons_equal);
 
+    // Queue containing the elements to be processed.
+    dequeue* thequeue = create_dequeue();
 
-int dfa_to_morphism_opti(nfa* A) {
-
-    // Fifo containing the elements to be processed.
-    dequeue_gen* thequeue = create_dequeue_gen();
-
-    // AVL containing all elements already constructed.
-    avlnode* thetree = NULL;
-
-    // Count the number of elements constructed.
-    uint num = 0;
-
-    // Stack the first element: the identity (which has number 0).
-    morphism_state* neutral;
-    MALLOC(neutral, 1);
-    neutral->num = num;
-    num++;
-    //neutral->name = create_dequeue();           // The name of this element is the empty word.
-    neutral->size_alpha = A->trans->size_alpha; // Number of letters.
-    neutral->size_graph = A->trans->size_graph; // Number of states.
-    neutral->next = NULL;                       // The next elements are not yet computed.
-    MALLOC(neutral->state, neutral->size_graph);
-    for (uint q = 0; q < neutral->size_graph; q++) // This element is the identity.
-    {
-        neutral->state[q] = q;
+    // Create the first element: the identity (which has number 0).
+    for (uint i = 0; i < A->trans->size_graph; i++) {
+        mor_cons_perms[i] = i; // The identity is the permutation of the states.
     }
-
-    // Insertion in the set of already met elements.
-    thetree = avl_insert(neutral, thetree, &comp_morphism_state, NULL);
-
-    // Treat this element.
-    lefins_dequeue_gen(neutral, thequeue);
+    mor_cons_elem++;
+    hash_table_insert(thehash, 0); // Insert the identity in the hash table.
+    rigins_dequeue(0, thequeue); // Add the identity to the queue.
 
 
-    while (!isempty_dequeue_gen(thequeue)) {
-        // Free allocated memory if the limit is reached, or if a yser
-        // interruption occurs, or if the timeout is reached.
+    while (!isempty_dequeue(thequeue)) {
 
+        uint s = lefpull_dequeue(thequeue); // Get the element to be processed.
 
-        // Get the element to be processed.
-        morphism_state* theelem = (morphism_state*)rigpull_dequeue_gen(thequeue);
+        // Computes the transitions from this element.
+        for (uint a = 0; a < A->trans->size_alpha; a++) {
 
-        // Compute the transitions from this element.
-        MALLOC(theelem->next, theelem->size_alpha);
-
-        for (uint a = 0; a < theelem->size_alpha; a++) {
-            // Create the (potential) new element, computed by multiplying the old one on the right.
-            morphism_state* new;
-            MALLOC(new, 1);
-            new->size_graph = A->trans->size_graph;
-            MALLOC(new->state, new->size_graph);
-
-            // Compute the corresponding permutation.
-            for (uint q = 0; q < neutral->size_graph; q++) {
-                new->state[q] = lefread_dequeue(A->trans->edges[theelem->state[q]][a], 0);
+            // Create the (potential) new permutation in the next cell of the table.
+            ulong i = mor_cons_elem * mor_cons_states; // Position of the next element in the mor_perms array.
+            ulong j = s * mor_cons_states; // Position of the current element in the mor_perms array.
+            for (uint q = 0; q < A->trans->size_graph; q++) {
+                mor_cons_perms[i + q] = A->trans->edges[mor_cons_perms[j + q]][a];
             }
 
-            // Check if this state already exists.
-            avlnode* thenode = avl_search(new, thetree, &comp_morphism_state);
+            // Try to insert the new element in the hash table.
+            uint h = hash_table_insert(thehash, mor_cons_elem);
+            if (h == mor_cons_elem) {
 
-            // If not, initialize a new element.
-            if (thenode == NULL) {
-                new->size_alpha = A->trans->size_alpha;
-                new->next = NULL; // For now, we don't know the next elements.
-                new->num = num;
-                num++;
-                new->pred_ele = theelem->num; // The predecessor of this element is the one we are treating.
-                new->pred_lab = a;           // The predecessor letter is the one we are treating.
-                theelem->next[a] = new;                                         // Assign it as a successor for letter a.
-                thetree = avl_insert(new, thetree, &comp_morphism_state, NULL); // Store it in the set of known elements.
-                lefins_dequeue_gen(new, thequeue);                              // This new element has to be treated in the future..
+                // The element was not already constructed.
+                rigins_dequeue(mor_cons_elem, thequeue); // We add it to the queue for future processing.
+
+
+                // Prepare the next element in the table.
+                mor_cons_elem++; // Increment the number of elements constructed.
+                mor_cons_grow_weak(); // If the number of elements constructed is larger than the size of the table, we double the size.
             }
-            else
-                // The element was already constructed.
-            {
-                theelem->next[a] = ((morphism_state*)thenode->value); // We assign the version already built as an a-successor.
-                free(new->state);                                      // We free the copy we've just created.
-                free(new);
-            }
+
+            // Assign the next element of s for a.
+            ulong sa = s * mor_cons_letters + a;
+            mor_cons_next[sa] = h;
         }
     }
-    delete_dequeue_gen(thequeue);
 
+    delete_dequeue(thequeue); // Free the queue.
+    delete_hash_table(thehash); // Free the hash table.
 
-
-
-
-    // Free the AVL
-    avl_free_strong(thetree, &delete_morphism_state_strong);
-
-
+    uint num = (uint)mor_cons_elem;
+    mor_cons_delete();
 
     return num;
 }
 
-nfa* morphism_to_dfa(morphism* M) {
-    nfa* A = nfa_init();
-    A->alphabet = mor_duplicate_alpha(M);
-    A->trans = dgraph_to_lgraph(M->r_cayley);
-    rigins_dequeue(0, A->initials);
-    copy_dequeue_right(A->finals, M->accept_list, 0);
-    return A;
+dfa* morphism_to_dfa(morphism* M) {
+    dfa* D = dfa_init(M->r_cayley->size_graph, M->r_cayley->size_alpha, M->nb_accept, M->alphabet);
+    for (uint i = 0; i < M->r_cayley->size_graph; i++) {
+        for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
+            D->trans->edges[i][a] = M->r_cayley->edges[i][a];
+        }
+    }
+    D->initial = ONE;
+    for (uint i = 0; i < M->nb_accept; i++) {
+        D->finals[i] = M->accept_list[i];
+    }
+    return D;
 }
 
-nfa* left_morphism_to_dfa(morphism* M) {
-    nfa* A = nfa_init();
-    A->alphabet = mor_duplicate_alpha(M);
-    A->trans = dgraph_to_lgraph(M->l_cayley);
-    rigins_dequeue(0, A->initials);
-    copy_dequeue_right(A->finals, M->accept_list, 0);
-    return A;
+dfa* left_morphism_to_dfa(morphism* M) {
+    dfa* D = dfa_init(M->l_cayley->size_graph, M->l_cayley->size_alpha, M->nb_accept, M->alphabet);
+    for (uint i = 0; i < M->l_cayley->size_graph; i++) {
+        for (uint a = 0; a < M->l_cayley->size_alpha; a++) {
+            D->trans->edges[i][a] = M->l_cayley->edges[i][a];
+        }
+    }
+    D->initial = ONE;
+    for (uint i = 0; i < M->nb_accept; i++) {
+        D->finals[i] = M->accept_list[i];
+    }
+    return D;
 }
+
 
 /************************************************/
 /* Calculs des informations sur un morphism graph */
@@ -968,7 +1026,7 @@ void mor_compute_mult(morphism* M) {
     // Pour chaque élément
     for (uint q = 0; q < M->r_cayley->size_graph; q++) {
         // Création du tableau des multiplications de q
-        MALLOC(M->mult[q], M->r_cayley->size_graph);
+        MALLOC(M->mult, M->r_cayley->size_graph * M->r_cayley->size_graph);
 
         // Initialisation des strucutures
         makeempty_dequeue(fromcur);
@@ -984,7 +1042,7 @@ void mor_compute_mult(morphism* M) {
         while (!isempty_dequeue(fromone)) {
             uint s = rigpull_dequeue(fromone);
             uint qs = rigpull_dequeue(fromcur);
-            M->mult[q][s] = qs;
+            M->mult[q * M->r_cayley->size_graph + s] = qs;
             for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
                 if (!visited[M->r_cayley->edges[s][a]]) {
                     rigins_dequeue(M->r_cayley->edges[s][a], fromone);
@@ -1024,7 +1082,7 @@ dequeue** mor_compute_order(morphism* M) {
     dequeue* stack_two = create_dequeue();
 
     // We push the starting pairs (accepting, non-accepting) which are clearly incomparable.
-    for (uint i = 0; i < size_dequeue(M->accept_list); i++)
+    for (uint i = 0; i < M->nb_accept; i++)
     {
         for (uint q = 0; q < thesize; q++) {
             // We skip q if it is an accepting element.
@@ -1033,7 +1091,7 @@ dequeue** mor_compute_order(morphism* M) {
             }
             // We loop over the accepting elements.
 
-            rigins_dequeue(lefread_dequeue(M->accept_list, i), stack_one);
+            rigins_dequeue(M->accept_list[i], stack_one);
             rigins_dequeue(q, stack_two);
         }
     }
@@ -1120,7 +1178,7 @@ uint mor_mult(morphism* M, uint s, uint t) {
         return M->r_cayley->size_graph;
     }
     if (M->mult != NULL) {
-        return M->mult[s][t];
+        return M->mult[M->r_cayley->size_graph * s + t];
     }
     while (s != ONE) {
         t = M->l_cayley->edges[t][M->pred_lab[s]];
@@ -1163,8 +1221,8 @@ uint mor_omega(morphism* M, uint s) {
 
 //
 bool mor_num_idem(morphism* M, uint s, uint* res) {
-    for (uint i = 0; i < size_dequeue(M->idem_list); i++) {
-        if (lefread_dequeue(M->idem_list, i) == s) {
+    for (uint i = 0; i < M->nb_idems; i++) {
+        if (M->idem_list[i] == s) {
             *res = i;
             return true;
         }
@@ -1236,10 +1294,14 @@ bool mor_neutral_letter(morphism* M, FILE* out) {
 
 bool mor_nonempty_neutral(morphism* M) {
     green* G = M->rels;
-    if (size_dequeue(G->HCL->cl[G->HCL->numcl[ONE]]) == 1) {
+    if (G->HCL->cl_size[G->HCL->numcl[ONE]] == 1) {
         return false;
     }
     return true;
+}
+
+bool mor_all_regular(morphism* M) {
+    return M->rels->nb_regular_elems == M->r_cayley->size_graph;
 }
 
 
@@ -1257,6 +1319,28 @@ uint mor_compute_image(morphism* M, word* w) {
     }
     return temp;
 }
+
+
+dgraph* mor_extract_rcl(morphism* M, uint rcl) {
+    // Création du graphe
+    dgraph* res = create_dgraph_noedges(M->rels->RCL->cl_size[rcl], M->r_cayley->size_alpha);
+    // Pour chaque élément du morphisme
+    for (uint i = 0; i < M->rels->RCL->cl_size[rcl]; i++) {
+        uint q = M->rels->RCL->cl_elems[rcl][i];
+        for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
+            uint r = M->r_cayley->edges[q][a];
+            if (M->rels->RCL->numcl[r] == rcl) {
+                mem_array_sorted(r, M->rels->RCL->cl_elems[rcl], M->rels->RCL->cl_size[rcl], &res->edges[i][a]);
+            }
+            else {
+                res->edges[i][a] = UINT_MAX; // Si l'élément n'est pas dans la classe rcl, on met la taille du graphe
+            }
+        }
+    }
+    return res;
+}
+
+
 
 /*
 // Structure pout stocker les paires rencontrée dans le DFA à l'intérieur d'un AVL

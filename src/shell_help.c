@@ -8,7 +8,7 @@
 void help(void) {
     // FILE *p = popen("less", "w");
     // if (p == NULL)
-    FILE *p = stdout;
+    FILE* p = stdout;
 
     print_dtitle_box(100, true, p, 1, "\"Welcome to the help of the MeSCaL program! ");
     print_title_box(100, true, p, 1, "Basic commands");
@@ -114,8 +114,10 @@ void help(void) {
     fprintf(p, "%4s%-*sThe syntactic morphism: works as a morphism variable.\n", "", PAD1, "A.syntactic");
     fprintf(p, "%4s%-*sBuilds a new automaton by eliminating the epsilon transitions.\n", "", PAD1, "elimepsilon(A)");
     fprintf(p, "%4s%-*sBuilds a new automaton by eliminating the tates that are not accessible or co-accessible.\n", "", PAD1, "trim(A)");
+    fprintf(p, "%4s%-*sBuilds a new complete deterministic automaton with the subset construction.\n", "", PAD1, "determinize(A)");
     fprintf(p, "%4s%-*sBuilds a new automaton by making a nondeterministic union.\n", "", PAD1, "union(A1,A2)");
     fprintf(p, "%4s%-*sBuilds a new automaton by making an intersection.\n", "", PAD1, "intersection(A1,A2)");
+    fprintf(p, "%4s%-*sBuilds a new automaton by making a complement.\n", "", PAD1, "complement(A)");
     fprintf(p, "%4s%-*sBuilds a new automaton by making a concatenation.\n", "", PAD1, "concatenation(A1,A2)");
     fprintf(p, "%4s%-*sBuilds a new automaton by applying a Kleene star.\n", "", PAD1, "kleene(A)");
     fprintf(p, "%4s%-*sUses the Brzozowski-McCluskey algorithm to compute a regular expression.\n", "", PAD1, "mccluskey(A)");
@@ -124,7 +126,7 @@ void help(void) {
     fprintf(p, "%4s%-*sBuilds a random NFA over an alphabet of size <n1> with at least <n2> states and at most <n3> states.\n", "", PAD1, "nfarandom(<n1>,<n2>,<n3>)");
     fprintf(p, "%4s%-*sBuilds a random complete DFA over an alphabet of size <n1> with at least <n2> states and at most <n3> states.\n", "", PAD1, "dfarandom(<n1>,<n2>,<n3>)");
     fprintf(p, "%4s%-*sComputes the set of states reached with an input word.\n", "", PAD1, "run(A,\"<word>\")");
-    fprintf(p, "%4s%-*sApplies inverse extension to the automaton (does not return an object).\n", "", PAD1, "iextension(A)");
+    fprintf(p, "%4s%-*sBuilds a new automaton by adding the inverse transitions.\n", "", PAD1, "iextension(A)");
     fprintf(p, "%4s%-*sBuilds a new automaton via Dyck extension.\n", "", PAD1, "dyckextension(A)");
     fprintf(p, "%4s%-*sTests if the automaton is a counterfree DFA.\n", "", PAD1, "counterfree(A)");
     fprintf(p, "%4s%-*sTests if the automaton is a permutation DFA.\n", "", PAD1, "permutation(A)");
@@ -206,15 +208,15 @@ void help(void) {
 
     fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state) and <n2> letters which are outside 𝒞 and inside 𝒟.\n", "", 56, "exall(𝒞,𝒟,<n1>,<n2>)");
     fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state) and <n2> letters which are outside 𝒞₁,..,𝒞ₙ and inside 𝒟₁,..,𝒟ₘ.\n", "", 70,
-            "exall(out(𝒞₁,..,𝒞ₙ),in(𝒟₁,..,𝒟ₘ),<n1>,<n2>)");
+        "exall(out(𝒞₁,..,𝒞ₙ),in(𝒟₁,..,𝒟ₘ),<n1>,<n2>)");
     fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state) and <n2> letters which are at level <n0> in the negation hierarchy of TL(𝒞).\n", "", 53,
-            "negexall(𝒞,<n0>,<n1>,<n2>)");
+        "negexall(𝒞,<n0>,<n1>,<n2>)");
     fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state) and <n2> letters which are at level <n0> in the future/past hierarchy of TL(𝒞).\n\n", "",
-            53, "fpexall(𝒞,<n0>,<n1>,<n2>)");
+        53, "fpexall(𝒞,<n0>,<n1>,<n2>)");
 
     print_title_box(100, true, p, 1, "Separation tests");
 
-    fprintf(p, "%4s%-*sChecks if <o1> is 𝒞-separable from <o2> (\"info\" is an optional parameter, it asks for more details).\n\n", "", PAD2, "separ(𝒞,<o1>,<o2>,(info))");
+    fprintf(p, "%4s%-*sChecks if <o1> is 𝒞-separable from <o2>.\n\n", "", PAD2, "separ(𝒞,<o1>,<o2>)");
     fprintf(p, "%6sAvailable classes 𝒞:\n", "");
     fprintf(p, "%8s%-*sTrivial class.\n", "", PADC, "ST");
     fprintf(p, "%8s%-*sModulo languages.\n", "", PADC, "MOD");
@@ -230,19 +232,21 @@ void help(void) {
     // fclose(p);
 }
 
-static void print_class_info_status(classes class, FILE *out) {
+static void print_class_info_status(classes class, FILE* out) {
     if (class_infos[class]) {
         class_infos[class](out);
 
         print_dmid_line(100, out);
         if (class_membership[class]) {
             print_dline_box(109, out, " Membership : " ANSI_COLOR_GREEN "Implemented.   " ANSI_COLOR_RESET);
-        } else {
+        }
+        else {
             print_dline_box(109, out, " Membership : " ANSI_COLOR_RED "Not implemented." ANSI_COLOR_RESET);
         }
         if (class_separation[class]) {
             print_dline_box(109, out, " Separation : " ANSI_COLOR_GREEN "Implemented." ANSI_COLOR_RESET);
-        } else {
+        }
+        else {
             print_dline_box(109, out, " Separation : " ANSI_COLOR_RED "Not implemented." ANSI_COLOR_RESET);
         }
         print_dbot_line(100, out);

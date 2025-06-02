@@ -22,6 +22,7 @@
 #include "type_basic.h"
 #include "type_binheap.h"
 #include "type_dequeue.h"
+#include "type_partitions.h"
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -71,7 +72,8 @@ typedef struct {
 typedef struct {
     uint size_graph; //!< Number of vertices.
     uint size_alpha; //!< Number of labels.
-    uint** edges;    //!< The edges: an array of arrays of size "size_graph * size_alpha".
+    uint* storage;   //!< The storage of the edges (one dimension array of size size_graph * size_alpha).
+    uint** edges;    //!< The edges: two dimensions array of size "size_graph * size_alpha" (actually contains pointers to the storage).
 } dgraph;
 
 /**************/
@@ -561,5 +563,8 @@ dequeue* lgraph_reachable(lgraph*,  //!< The graph.
     dequeue*, //!< The input list of vertices.
     uint       //!< The label.
 );
+
+
+
 
 #endif

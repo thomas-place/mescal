@@ -1,4 +1,7 @@
 #include "shell_memb.h"
+#include "shell_morprops.h"
+#include "shell_autoprops.h"
+#include "type_hash.h"
 #include "monoid_display.h"
 
 bool (*class_membership[CL_END])(int, FILE*) = { NULL };
@@ -172,686 +175,21 @@ bool shell_membership_needs_order(classes cl) {
 }
 
 
+// static void shell_print_syntac(int j, FILE* out) {
+//     print_title_box(10, true, stdout, 1, "The syntactic morphism.");
+//     shell_view_object(objects[shell_compute_syntac(j, false)], false);
+// }
+
+// static void shell_print_mini(int j, FILE* out) {
+//     print_title_box(10, true, stdout, 1, "The minimal automaton.");
+//     shell_view_object(objects[shell_compute_minimal(j)], false);
+// }
+
+
 /*********************/
 /* General functions */
 /*********************/
 
-uint m_cexa[6];
-
-static uint* get_counter(FILE* out) {
-    if (out) {
-        return m_cexa;
-    }
-    return NULL;
-}
-
-char m_buffers[6][100];
-
-static char* m_sprint(int j, uint i) {
-    mor_sprint_name_utf8(objects[j]->mor->obj, m_cexa[i], m_buffers[i]);
-    return m_buffers[i];
-}
-
-
-bool shell_morprop_htgentriv(int j, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the H-classes of 1 and all generators in the %s are trivial.\n", name);
-    }
-    if (is_htrivial_generators(objects[j]->mor->obj, get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The H-classes of 1 and all generators in the %s are trivial.\n", name);
-        }
-        return true;
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The H-classes of %s is not trivial (for instance, it contains %s).\n", m_sprint(j, 0), m_sprint(j, 1));
-        }
-        return false;
-    }
-
-}
-
-
-bool shell_morprop_monotriv(int j, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s is trivial.\n", name);
-    }
-    if (is_trivial_monoid(objects[j]->mor->obj, get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The %s is trivial.\n", name);
-        }
-        return true;
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The %s is NOT trivial.\n", name);
-            fprintf(out, "#### For instance, the elements %s and %s are distinct.\n", m_sprint(j, 0), m_sprint(j, 1));
-        }
-        return false;
-    }
-}
-
-bool shell_morprop_semitriv(int j, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s is trivial.\n", name);
-    }
-    if (is_trivial_semigroup(objects[j]->mor->obj, get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The %s is trivial.\n", name);
-        }
-        return true;
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The %s is NOT trivial.\n", name);
-            fprintf(out, "#### For instance, the elements %s and %s are distinct.\n", m_sprint(j, 0), m_sprint(j, 1));
-        }
-        return false;
-    }
-}
-
-bool shell_morprop_orbtriv(int j, orbits_type type, char* orbs, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s-orbits for the %s are trivial.\n", orbs, name);
-    }
-    if (is_trivial_orbmono(shell_compute_orbits(j, type, LV_REG), get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The %s-orbits are trivial.\n", name);
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The %s-orbit of %s is not trivial.\n", orbs, m_sprint(j, 2));
-            fprintf(out, "#### For instance, the elements %s and %s are distinct.\n", m_sprint(j, 0), m_sprint(j, 1));
-        }
-        return false;
-    }
-    return true;
-}
-
-
-bool shell_morprop_letterind(int j, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s maps every letter a ∊ A to the same element.\n", name);
-    }
-
-    if (is_letterind_mono(objects[j]->mor->obj, get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The %s maps every letter a ∊ A to the same element.\n", name);
-        }
-        return true;
-
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The %s maps the letters ", name);
-            fprint_letter_utf8(objects[j]->mor->obj->alphabet[0], out);
-            fprintf(out, " and ");
-            fprint_letter_utf8(objects[j]->mor->obj->alphabet[m_cexa[0]], out);
-            fprintf(out, " to distinct elements.\n");
-        }
-        return false;
-    }
-}
-
-bool shell_morprop_monogroup(int j, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s is a group.\n", name);
-    }
-    if (is_group_mono(objects[j]->mor->obj, get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The %s is a group.\n", name);
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The %s is not a group.\n", name);
-            fprintf(out, "#### For instance, the element %s has no inverse.\n", m_sprint(j, 0));
-        }
-        return false;
-    }
-    return true;
-}
-
-bool shell_morprop_semigroup(int j, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s is a group.\n", name);
-    }
-    if (is_group_semigroup(objects[j]->mor->obj, get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The %s is a group.\n", name);
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The %s is not a group.\n", name);
-            fprintf(out, "#### For instance, the elements %s and %s are not J-equivalent.\n", m_sprint(j, 0), m_sprint(j, 1));
-        }
-        return false;
-    }
-    return true;
-}
-
-
-bool shell_morprop_monocom(int j, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s is commutative.\n", name);
-    }
-    if (is_comm_mono(objects[j]->mor->obj, get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The %s is commutative.\n", name);
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The %s is not commutative.\n", name);
-            fprintf(out, "#### For instance, %s%s ≠ %s%s.\n", m_sprint(j, 0), m_sprint(j, 1), m_sprint(j, 2), m_sprint(j, 3));
-        }
-        return false;
-    }
-    return true;
-}
-
-bool shell_morprop_kercom(int j, kernel_type type, char* ker, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s-kernel of the %s is commutative.\n", ker, name);
-    }
-    if (is_comm_subsemi(shell_compute_ker(j, type, LV_GREG), get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The %s-kernel is commutative.\n", ker);
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The %s-kernel is not commutative.\n", ker);
-            fprintf(out, "#### For instance, %s%s ≠ %s%s.\n", m_sprint(j, 0), m_sprint(j, 1), m_sprint(j, 2), m_sprint(j, 3));
-        }
-        return false;
-    }
-    return true;
-}
-
-
-bool shell_morprop_orbcom(int j, orbits_type type, char* orbs, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s-orbits for the %s are commutative.\n", orbs, name);
-    }
-    if (is_com_orbmono(shell_compute_orbits(j, type, LV_REG), get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The %s-orbits are commutative.\n", name);
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The %s-orbit of %s is not commutative.\n", orbs, m_sprint(j, 4));
-            fprintf(out, "#### For instance, %s%s ≠ %s%s.\n", m_sprint(j, 0), m_sprint(j, 1), m_sprint(j, 2), m_sprint(j, 3));
-        }
-        return false;
-    }
-    return true;
-}
-
-
-bool shell_morprop_semigencom(int j, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s S satisfies the equation\n", name);
-        fprintf(out, "     erfsetf = etfserf for all r,s,t ∊ S and e,f ∊ E(S).\n");
-    }
-    if (is_comm_ltt_mono(shell_compute_orbits(j, ORB_DD, LV_GREG), get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The %s satisfies the equation.\n", name);
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The equation fails for r = %s, s = %s, t = %s, e = %s and f = %s.\n", m_sprint(j, 0), m_sprint(j, 1), m_sprint(j, 2), m_sprint(j, 3), m_sprint(j, 4));
-        }
-        return false;
-    }
-    return true;
-}
-
-
-bool shell_morprop_monoidem(int j, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s is idempotent.\n", name);
-    }
-    if (is_idem_mono(objects[j]->mor->obj, get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The %s is idempotent.\n", name);
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The %s is not idempotent.\n", name);
-            fprintf(out, "#### For instance, %s ≠ %s%s.\n", m_sprint(j, 0), m_sprint(j, 0), m_sprint(j, 0));
-        }
-        return false;
-    }
-    return true;
-}
-
-bool shell_morprop_keridem(int j, kernel_type type, char* ker, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s-kernel of the %s is idempotent.\n", ker, name);
-    }
-    if (is_idem_subsemi(shell_compute_ker(j, type, LV_GREG), get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The %s-kernel is idempotent.\n", ker);
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The %s-kernel is not idempotent.\n", ker);
-            fprintf(out, "#### For instance, %s%s ≠ %s.\n", m_sprint(j, 0), m_sprint(j, 0), m_sprint(j, 0));
-        }
-        return false;
-    }
-    return true;
-}
-
-
-bool shell_morprop_orbidem(int j, orbits_type type, char* orbs, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s-orbits for the %s are idempotent.\n", orbs, name);
-    }
-    if (is_idem_orbmono(shell_compute_orbits(j, type, LV_REG), get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The %s-orbits are idempotent.\n", name);
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The %s-orbit of %s is not idempotent.\n", orbs, m_sprint(j, 4));
-            fprintf(out, "#### For instance, %s%s ≠ %s.\n", m_sprint(j, 0), m_sprint(j, 0), m_sprint(j, 0));
-        }
-        return false;
-    }
-    return true;
-}
-
-
-
-bool shell_morprop_monogreen(int j, green_relation R, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s is %c-trivial.\n", name, green_rel_array[R]);
-    }
-    if (is_gtrivial_mono(objects[j]->mor->obj, R, get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The %s is %c-trivial.\n", name, green_rel_array[R]);
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The %s is not %c-trivial.\n", name, green_rel_array[R]);
-            fprintf(out, "#### For instance, %s %c %s.\n", m_sprint(j, 0), green_rel_array[R], m_sprint(j, 1));
-        }
-        return false;
-    }
-    return true;
-}
-
-bool shell_morprop_kergreen(int j, green_relation R, kernel_type type, char* ker, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s-kernel of the %s is %c-trivial.\n", ker, name, green_rel_array[R]);
-    }
-    if (is_gtrivial_subsemi(shell_compute_ker(j, type, LV_REG), R, get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The %s-kernel is %c-trivial.\n", ker, green_rel_array[R]);
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The %s-kernel is not %c-trivial.\n", ker, green_rel_array[R]);
-            fprintf(out, "#### For instance, %s %c %s.\n", m_sprint(j, 0), green_rel_array[R], m_sprint(j, 1));
-        }
-        return false;
-    }
-    return true;
-}
-
-
-bool shell_morprop_orbgreen(int j, green_relation R, orbits_type type, char* orbs, char* name, FILE* out) {
-
-    if (out) {
-        fprintf(out, "#### Checking if the %s-orbits for the %s are %c-trivial.\n", orbs, name, green_rel_array[R]);
-    }
-    if (is_gtrivial_orbmono(shell_compute_orbits(j, type, LV_REG), R, get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The %s-orbits are %c-trivial.\n", orbs, green_rel_array[R]);
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The %s-orbit of %s is not %c-trivial.\n", orbs, m_sprint(j, 2), green_rel_array[R]);
-            fprintf(out, "#### For instance, %s %c %s.\n", m_sprint(j, 0), green_rel_array[R], m_sprint(j, 1));
-        }
-        return false;
-    }
-    return true;
-}
-
-
-bool shell_morprop_monoda(int j, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s is in DA.\n", name);
-    }
-    if (is_da_mono(objects[j]->mor->obj, get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The %s is in DA.\n", name);
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The %s is not in DA.\n", name);
-            fprintf(out, "#### For instance, %s is a non-idempotent regular element.\n", m_sprint(j, 0));
-        }
-        return false;
-    }
-    return true;
-}
-
-bool shell_morprop_kerda(int j, kernel_type type, char* ker, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s-kernel of the %s is in DA.\n", ker, name);
-    }
-    if (is_da_subsemi(shell_compute_ker(j, type, LV_REG), get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The %s-kernel is in DA.\n", ker);
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The %s-kernel is not in DA.\n", ker);
-            fprintf(out, "#### For instance, %s is a non-idempotent regular element.\n", m_sprint(j, 0));
-        }
-        return false;
-    }
-    return true;
-}
-
-
-bool shell_morprop_orbda(int j, orbits_type type, char* orbs, char* name, FILE* out) {
-
-    if (out) {
-        fprintf(out, "#### Checking if the %s-orbits for the %s are in DA.\n", orbs, name);
-    }
-    if (is_da_orbmono(shell_compute_orbits(j, type, LV_REG), get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The %s-orbits are in DA.\n", orbs);
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The %s-orbit of %s is not in DA.\n", orbs, m_sprint(j, 2));
-            fprintf(out, "#### For instance, %s is a non-idempotent regular element.\n", m_sprint(j, 0));
-        }
-        return false;
-    }
-    return true;
-}
-
-
-
-bool shell_morprop_monojsat(int j, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s M satisfies the inequation 1 ⩽ s for all s ∊ M.\n", name);
-    }
-    if (is_jsat_mono(objects[j]->mor->obj, objects[j]->mor->obj->order[ONE], get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The inequation is satisfied.\n");
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The inequation fails for s = %s.\n", m_sprint(j, 0));
-        }
-        return false;
-    }
-    return true;
-}
-
-bool shell_morprop_monoejsat(int j, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s M satisfies the inequation 1 ⩽ e for all e ∊ E(M).\n", name);
-    }
-    if (is_ejsat_mono(objects[j]->mor->obj, objects[j]->mor->obj->order[ONE], get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The inequation is satisfied.\n");
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The inequation fails for e = %s.\n", m_sprint(j, 0));
-        }
-        return false;
-    }
-    return true;
-}
-
-bool shell_morprop_kerjsat(int j, kernel_type type, char* ker, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s-kernel N of the %s satisfies\n", ker, name);
-        fprintf(out, "     the inequation 1 ⩽ s for all s ∊ N.\n");
-    }
-    if (is_jsat_subsemi(shell_compute_ker(j, type, LV_GREG), objects[j]->mor->obj->order[ONE], get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The inequation is satisfied.\n");
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The inequation fails for s = %s ∊ N.\n", m_sprint(j, 0));
-        }
-        return false;
-    }
-    return true;
-}
-
-
-bool shell_morprop_orbjsat(int j, orbits_type type, char* orbs, char* name, FILE* out) {
-
-    if (out) {
-        fprintf(out, "#### Checking if every %s-orbit Mₑ for the %s satisfies\n", orbs, name);
-        fprintf(out, "     the inequation e ⩽ s for all s ∊ Mₑ.\n");
-    }
-    if (is_jsat_orbmono(shell_compute_orbits(j, type, LV_GREG), get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### All %s-orbits satisfy the inequation.\n", orbs);
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The inequation fails in the %s-orbit of e = %s for s = %s ∊ Mₑ.\n", orbs, m_sprint(j, 1), m_sprint(j, 0));
-        }
-        return false;
-    }
-    return true;
-}
-
-
-
-bool shell_morprop_bpgroupeq(int j, kernel_type type, char* ker, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s ⍺:A* → M satisfies the equation (qr)ʷst(st)ʷ = (qr)ʷqt(st)ʷ\n", name);
-        fprintf(out, "     for all %s-pairs (q,s) ∊ M² and all r,t ∊ M.\n", ker);
-    }
-
-    bool res;
-    switch (type) {
-    case KER_MOD:
-        res = is_bpolmod_mono(shell_compute_ker(j, type, LV_REG), get_counter(out));
-        break;
-    case KER_AMT:
-        res = is_bpolamt_mono(shell_compute_ker(j, type, LV_REG), get_counter(out));
-        break;
-    default:
-        res = false;
-    }
-    if (res) {
-        if (out) {
-            fprintf(out, "#### The equation is satisfied.\n");
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The equation fails for the %s-pair (q,s) = (%s,%s), r = %s and t = %s.\n", ker, m_sprint(j, 0), m_sprint(j, 2), m_sprint(j, 1), m_sprint(j, 3));
-        }
-        return false;
-    }
-    return true;
-}
-
-bool shell_morprop_blockg(int j, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s is a block group.\n", name);
-    }
-
-    if (is_blockg_mono(objects[j]->mor->obj, get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The %s is a block group.\n", name);
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The %s is not a block group.\n", name);
-            fprintf(out, "#### For instance, the idempotents %s and %s are %c-equivalent.\n", m_sprint(j, 0), m_sprint(j, 1), green_rel_array[m_cexa[2]]);
-        }
-        return false;
-    }
-    return true;
-}
-
-bool shell_mprop_semiknast(int j, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s S satisfies Knast's equation:\n", name);
-        fprintf(out, "     (eqfre)ʷ(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ for all q,r,s,t ∊ S and e,f ∊ E(S).\n");
-    }
-
-    if (is_knast_mono(shell_compute_orbits(j, ORB_DD, LV_REG), get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### Knast's equation is satisfied.\n");
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### Knast's equation fails for q = %s, r = %s, s = %s, t = %s, e = %s and f = %s.\n", m_sprint(j, 0), m_sprint(j, 1), m_sprint(j, 2), m_sprint(j, 3), m_sprint(j, 4), m_sprint(j, 5));
-        }
-        return false;
-    }
-    return true;
-}
-
-bool shell_morprop_kerknast(int j, kernel_type type, char* ker, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the strict %s-kernel S of the %s satisfies Knast's equation:\n", ker, name);
-        fprintf(out, "     (eqfre)ʷ(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ for all q,r,s,t ∊ S and e,f ∊ E(S).\n");
-    }
-
-    orbits_type otype;
-    switch (type) {
-    case KER_MOD:
-        otype = ORB_MODP;
-        break;
-    case KER_AMT:
-        otype = ORB_AMTP;
-        break;
-    case KER_GR:
-        otype = ORB_GRP;
-        break;
-    default:
-        otype = ORB_GRP;
-        break;
-    }
-
-
-    if (is_knast_ker(shell_compute_orbits(j, otype, LV_REG), shell_compute_ker(j, type, LV_REG), get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### Knast's equation is satisfied.\n");
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### Knast's equation fails for q = %s, r = %s, s = %s, t = %s, e = %s and f = %s.\n", m_sprint(j, 0), m_sprint(j, 1), m_sprint(j, 2), m_sprint(j, 3), m_sprint(j, 4), m_sprint(j, 5));
-        }
-        return false;
-    }
-    return true;
-}
-
-
-bool shell_morprop_knastat(int j, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s ⍺:A* → M satisfies the equation (eqfre)ʷ(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ\n", name);
-        fprintf(out, "     for all q,r,s,t ∊ M such that {q,e,f}, {r,e,f}, {s,e,f} and {t,e,f} are AT-sets and all e,f ∊ E(M).\n");
-    }
-
-    if (is_knast_at_mono(shell_compute_orbits(j, ORB_PT, LV_REG), get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The equation is satisfied.\n");
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The equation fails for q = %s, r = %s, s = %s, t = %s, e = %s and f = %s.\n", m_sprint(j, 0), m_sprint(j, 1), m_sprint(j, 2), m_sprint(j, 3), m_sprint(j, 4), m_sprint(j, 5));
-        }
-        return false;
-    }
-    return true;
-}
-
-bool shell_morprop_bpgroupeqplus(int j, orbits_type type, char* orbs, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s ⍺:A* → M satisfies the equation (eqfre)ʷsft(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ\n", name);
-        fprintf(out, "     for all %s-pairs (q,s) ∊ M², all r,t ∊ M and all e,f ∊ E(⍺(A⁺)).\n", orbs);
-    }
-
-    bool res;
-    switch (type) {
-    case ORB_AMTP:
-        res = is_bpolamtp_mono(shell_compute_orbits(j, type, LV_REG), get_counter(out));
-        break;
-    case ORB_GRP:
-        res = is_bpolgrp_mono(shell_compute_orbits(j, type, LV_REG), get_counter(out));
-        break;
-    default:
-        res = false;
-    }
-    if (res) {
-        if (out) {
-            fprintf(out, "#### The equation is satisfied.\n");
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The equation fails for the %s-pair (q,s) = (%s,%s), r = %s, t = %s, e = %s and f = %s.\n", orbs, m_sprint(j, 0), m_sprint(j, 2), m_sprint(j, 1), m_sprint(j, 3), m_sprint(j, 4), m_sprint(j, 5));
-        }
-        return false;
-    }
-    return true;
-}
-
-
-bool shell_morprop_ubp2eq(int j, orbits_type type, char* orbs, char* name, FILE* out) {
-    if (out) {
-        fprintf(out, "#### Checking if the %s ⍺:A* → M satisfies the equation (esete)ʷ⁺¹ = (esete)ʷete(esete)ʷ\n", name);
-        fprintf(out, "      all s,t ∊ M and e ∊ E(M) where s is in the %s-orbit of e.\n", orbs);
-    }
-
-    if (is_upbp_mono(shell_compute_orbits(j, type, LV_GREG), get_counter(out))) {
-        if (out) {
-            fprintf(out, "#### The equation is satisfied\n");
-        }
-    }
-    else {
-        if (out) {
-            fprintf(out, "#### The equation fails for s = %s, t = %s and e = %s.\n", m_sprint(j, 0), m_sprint(j, 1), m_sprint(j, 2));
-        }
-        return false;
-    }
-    return true;
-}
 
 
 bool shell_membership_reg(int, FILE*) { return true; }
@@ -865,35 +203,35 @@ bool shell_membership_htgen(int j, FILE* out) {
 /*****************/
 
 bool shell_membership_st(int j, FILE* out) {
-    return shell_morprop_monotriv(j, "syntactic monoid", out);
+    return shell_morprop_monotriv(shell_compute_syntac(j, false), "syntactic monoid", out);
 }
 
 bool shell_membership_dd(int j, FILE* out) {
-    return shell_morprop_semitriv(j, "syntactic semigroup", out);
+    return shell_morprop_semitriv(shell_compute_syntac(j, false), "syntactic semigroup", out);
 }
 
 bool shell_membership_mod(int j, FILE* out) {
-    return shell_morprop_letterind(j, "syntactic morphism", out) && shell_morprop_monogroup(j, "syntactic monoid", out);
+    return shell_morprop_letterind(shell_compute_syntac(j, false), "syntactic morphism", out) && shell_morprop_monogroup(shell_compute_syntac(j, false), "syntactic monoid", out);
 }
 
 bool shell_membership_modp(int j, FILE* out) {
-    return shell_morprop_letterind(j, "syntactic morphism", out) && shell_morprop_semigroup(j, "syntactic semigroup", out);
+    return shell_morprop_letterind(shell_compute_syntac(j, false), "syntactic morphism", out) && shell_morprop_semigroup(shell_compute_syntac(j, false), "syntactic semigroup", out);
 }
 
 bool shell_membership_amt(int j, FILE* out) {
-    return shell_morprop_monocom(j, "syntactic monoid", out) && shell_morprop_monogroup(j, "syntactic monoid", out);
+    return shell_morprop_monocom(shell_compute_syntac(j, false), "syntactic monoid", out) && shell_morprop_monogroup(shell_compute_syntac(j, false), "syntactic monoid", out);
 }
 
 bool shell_membership_amtp(int j, FILE* out) {
-    return shell_morprop_monocom(j, "syntactic semigroup", out) && shell_morprop_semigroup(j, "syntactic semigroup", out);
+    return shell_morprop_monocom(shell_compute_syntac(j, false), "syntactic semigroup", out) && shell_morprop_semigroup(shell_compute_syntac(j, false), "syntactic semigroup", out);
 }
 
 bool shell_membership_gr(int j, FILE* out) {
-    return shell_morprop_monogroup(j, "syntactic monoid", out);
+    return shell_morprop_monogroup(shell_compute_syntac(j, false), "syntactic monoid", out);
 }
 
 bool shell_membership_grp(int j, FILE* out) {
-    return shell_morprop_semigroup(j, "syntactic semigroup", out);
+    return shell_morprop_semigroup(shell_compute_syntac(j, false), "syntactic semigroup", out);
     return true;
 }
 
@@ -902,19 +240,19 @@ bool shell_membership_grp(int j, FILE* out) {
 /*****************/
 
 bool shell_membership_at(int j, FILE* out) {
-    return shell_morprop_monocom(j, "syntactic monoid", out) && shell_morprop_monoidem(j, "syntactic monoid", out);
+    return shell_morprop_monocom(shell_compute_syntac(j, false), "syntactic monoid", out) && shell_morprop_monoidem(shell_compute_syntac(j, false), "syntactic monoid", out);
 }
 
 bool shell_membership_att(int j, FILE* out) {
-    return shell_morprop_monocom(j, "syntactic monoid", out) && shell_morprop_monogreen(j, H_GREEN, "syntactic monoid", out);
+    return shell_morprop_monocom(shell_compute_syntac(j, false), "syntactic monoid", out) && shell_morprop_monogreen(shell_compute_syntac(j, false), H_GREEN, "syntactic monoid", out);
 }
 
 bool shell_membership_lt(int j, FILE* out) {
-    return shell_morprop_orbcom(j, ORB_DD, "DD", "syntactic morphism", out) && shell_morprop_orbidem(j, ORB_DD, "DD", "syntactic morphism", out);
+    return shell_morprop_orbcom(shell_compute_syntac(j, false), ORB_DD, "DD", "syntactic morphism", out) && shell_morprop_orbidem(shell_compute_syntac(j, false), ORB_DD, "DD", "syntactic morphism", out);
 }
 
 bool shell_membership_ltt(int j, FILE* out) {
-    return shell_morprop_monogreen(j, H_GREEN, "syntactic semigroup", out) && shell_morprop_semigencom(j, "syntactic semigroup", out);
+    return shell_morprop_monogreen(shell_compute_syntac(j, false), H_GREEN, "syntactic semigroup", out) && shell_morprop_semigencom(shell_compute_syntac(j, false), "syntactic semigroup", out);
 }
 
 /*********************/
@@ -922,19 +260,19 @@ bool shell_membership_ltt(int j, FILE* out) {
 /*********************/
 
 bool shell_membership_sf(int j, FILE* out) {
-    return shell_morprop_monogreen(j, H_GREEN, "syntactic monoid", out);
+    return shell_morprop_monogreen(shell_compute_syntac(j, false), H_GREEN, "syntactic monoid", out);
 }
 
 bool shell_membership_sfmod(int j, FILE* out) {
-    return shell_morprop_kergreen(j, H_GREEN, KER_MOD, "MOD", "syntactic monoid", out);
+    return shell_morprop_kergreen(shell_compute_syntac(j, false), H_GREEN, KER_MOD, "MOD", "syntactic monoid", out);
 }
 
 bool shell_membership_sfamt(int j, FILE* out) {
-    return shell_morprop_kergreen(j, H_GREEN, KER_AMT, "AMT", "syntactic monoid", out);
+    return shell_morprop_kergreen(shell_compute_syntac(j, false), H_GREEN, KER_AMT, "AMT", "syntactic monoid", out);
 }
 
 bool shell_membership_sfgr(int j, FILE* out) {
-    return shell_morprop_kergreen(j, H_GREEN, KER_GR, "GR", "syntactic monoid", out);
+    return shell_morprop_kergreen(shell_compute_syntac(j, false), H_GREEN, KER_GR, "GR", "syntactic monoid", out);
 }
 
 /**********************/
@@ -942,61 +280,61 @@ bool shell_membership_sfgr(int j, FILE* out) {
 /**********************/
 
 bool shell_membership_ppt(int j, FILE* out) {
-    return shell_morprop_monojsat(j, "syntactic monoid", out);
+    return shell_morprop_monojsat(shell_compute_syntac(j, true), "syntactic monoid", out);
 }
 
 bool shell_membership_polmod(int j, FILE* out) {
-    return shell_morprop_kerjsat(j, KER_MOD, "MOD", "syntactic morphism", out);
+    return shell_morprop_kerjsat(shell_compute_syntac(j, true), KER_MOD, "MOD", "syntactic morphism", out);
 }
 
 bool shell_membership_polgr(int j, FILE* out) {
-    return shell_morprop_monoejsat(j, "syntactic monoid", out);
+    return shell_morprop_monoejsat(shell_compute_syntac(j, true), "syntactic monoid", out);
 }
 
 
 
 bool shell_membership_poldd(int j, FILE* out) {
-    return shell_morprop_orbjsat(j, ORB_DD, "DD", "syntactic morphism", out);
+    return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_DD, "DD", "syntactic morphism", out);
 }
 
 bool shell_membership_polmodp(int j, FILE* out) {
-    return shell_morprop_orbjsat(j, ORB_MODP, "MOD⁺", "syntactic morphism", out);
+    return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_MODP, "MOD⁺", "syntactic morphism", out);
 }
 
 bool shell_membership_polgrp(int j, FILE* out) {
-    return shell_morprop_orbjsat(j, ORB_GRP, "GR⁺", "syntactic morphism", out);
+    return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_GRP, "GR⁺", "syntactic morphism", out);
 }
 
 bool shell_membership_pol2st(int j, FILE* out) {
-    return shell_morprop_orbjsat(j, ORB_PT, "PT", "syntactic morphism", out);
+    return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_PT, "PT", "syntactic morphism", out);
 }
 
 bool shell_membership_pol2mod(int j, FILE* out) {
-    return shell_morprop_orbjsat(j, ORB_BPMOD, "BPol(MOD)", "syntactic morphism", out);
+    return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_BPMOD, "BPol(MOD)", "syntactic morphism", out);
 }
 
 bool shell_membership_pol2amt(int j, FILE* out) {
-    return shell_morprop_orbjsat(j, ORB_BPAMT, "BPol(AMT)", "syntactic morphism", out);
+    return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_BPAMT, "BPol(AMT)", "syntactic morphism", out);
 }
 
 bool shell_membership_pol2gr(int j, FILE* out) {
-    return shell_morprop_orbjsat(j, ORB_BPGR, "BPol(GR)", "syntactic morphism", out);
+    return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_BPGR, "BPol(GR)", "syntactic morphism", out);
 }
 
 bool shell_membership_pol2dd(int j, FILE* out) {
-    return shell_morprop_orbjsat(j, ORB_BPDD, "BPol(DD)", "syntactic morphism", out);
+    return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_BPDD, "BPol(DD)", "syntactic morphism", out);
 }
 
 bool shell_membership_pol2modp(int j, FILE* out) {
-    return shell_morprop_orbjsat(j, ORB_BPMODP, "BPol(MOD⁺)", "syntactic morphism", out);
+    return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_BPMODP, "BPol(MOD⁺)", "syntactic morphism", out);
 }
 
 bool shell_membership_pol2amtp(int j, FILE* out) {
-    return shell_morprop_orbjsat(j, ORB_BPAMTP, "BPol(AMT⁺)", "syntactic morphism", out);
+    return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_BPAMTP, "BPol(AMT⁺)", "syntactic morphism", out);
 }
 
 bool shell_membership_pol2grp(int j, FILE* out) {
-    return shell_morprop_orbjsat(j, ORB_BPGRP, "BPol(GR⁺)", "syntactic morphism", out);
+    return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_BPGRP, "BPol(GR⁺)", "syntactic morphism", out);
 }
 
 /******************************/
@@ -1004,72 +342,72 @@ bool shell_membership_pol2grp(int j, FILE* out) {
 /******************************/
 
 bool shell_membership_pt(int j, FILE* out) {
-    return shell_morprop_monogreen(j, J_GREEN, "syntactic monoid", out);
+    return shell_morprop_monogreen(shell_compute_syntac(j, false), J_GREEN, "syntactic monoid", out);
 }
 
 bool shell_membership_bpolmod(int j, FILE* out) {
-    return shell_morprop_bpgroupeq(j, KER_MOD, "MOD", "syntactic morphism", out);
+    return shell_morprop_bpgroupeq(shell_compute_syntac(j, false), KER_MOD, "MOD", "syntactic morphism", out);
 }
 
 bool shell_membership_bpolamt(int j, FILE* out) {
-    return shell_morprop_bpgroupeq(j, KER_AMT, "AMT", "syntactic morphism", out);
+    return shell_morprop_bpgroupeq(shell_compute_syntac(j, false), KER_AMT, "AMT", "syntactic morphism", out);
 }
 
 bool shell_membership_bpolgr(int j, FILE* out) {
-    return shell_morprop_blockg(j, "syntactic monoid", out);
+    return shell_morprop_blockg(shell_compute_syntac(j, false), "syntactic monoid", out);
 }
 
 bool shell_membership_bpoldd(int j, FILE* out) {
-    return shell_mprop_semiknast(j, "syntactic semigroup", out);
+    return shell_mprop_semiknast(shell_compute_syntac(j, false), "syntactic semigroup", out);
 }
 
 bool shell_membership_bpolmodp(int j, FILE* out) {
-    return shell_morprop_kerknast(j, KER_MOD, "MOD", "syntactic morphism", out);
+    return shell_morprop_kerknast(shell_compute_syntac(j, false), KER_MOD, "MOD", "syntactic morphism", out);
 }
 
 bool shell_membership_bpolamtp(int j, FILE* out) {
-    return shell_morprop_bpgroupeqplus(j, ORB_AMTP, "AMT", "syntactic morphism", out);
+    return shell_morprop_bpgroupeqplus(shell_compute_syntac(j, false), ORB_AMTP, "AMT", "syntactic morphism", out);
 }
 
 
 bool shell_membership_bpolgrp(int j, FILE* out) {
-    return shell_morprop_bpgroupeqplus(j, ORB_GRP, "GR", "syntactic morphism", out);
+    return shell_morprop_bpgroupeqplus(shell_compute_syntac(j, false), ORB_GRP, "GR", "syntactic morphism", out);
 }
 
 bool shell_membership_bpol2st(int j, FILE* out) {
-    return shell_morprop_ubp2eq(j, ORB_PT, "PT", "syntactic morphism", out) && shell_morprop_knastat(j, "syntactic morphism", out);
+    return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_PT, "PT", "syntactic morphism", out) && shell_morprop_knastat(shell_compute_syntac(j, false), "syntactic morphism", out);
 }
 
 bool shell_membership_jorbmod(int j, FILE* out) {
-    return shell_morprop_kergreen(j, J_GREEN, KER_MOD, "MOD", "syntactic monoid", out);
+    return shell_morprop_kergreen(shell_compute_syntac(j, false), J_GREEN, KER_MOD, "MOD", "syntactic monoid", out);
 }
 
 bool shell_membership_jorbamt(int j, FILE* out) {
-    return shell_morprop_kergreen(j, J_GREEN, KER_AMT, "AMT", "syntactic monoid", out);
+    return shell_morprop_kergreen(shell_compute_syntac(j, false), J_GREEN, KER_AMT, "AMT", "syntactic monoid", out);
 }
 
 bool shell_membership_jorbmodp(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, J_GREEN, ORB_MODP, "MOD⁺", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), J_GREEN, ORB_MODP, "MOD⁺", "syntactic morphism", out);
 }
 
 bool shell_membership_jorbamtp(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, J_GREEN, ORB_AMTP, "AMT⁺", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), J_GREEN, ORB_AMTP, "AMT⁺", "syntactic morphism", out);
 }
 
 bool shell_membership_jorbgrp(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, J_GREEN, ORB_GRP, "GR⁺", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), J_GREEN, ORB_GRP, "GR⁺", "syntactic morphism", out);
 }
 
 bool shell_membership_jorbdd(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, J_GREEN, ORB_DD, "DD", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), J_GREEN, ORB_DD, "DD", "syntactic morphism", out);
 }
 
 bool shell_membership_jorbat(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, J_GREEN, ORB_PT, "PT", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), J_GREEN, ORB_PT, "PT", "syntactic morphism", out);
 }
 
 bool shell_membership_knastat(int j, FILE* out) {
-    return shell_morprop_knastat(j, "syntactic morphism", out);
+    return shell_morprop_knastat(shell_compute_syntac(j, false), "syntactic morphism", out);
 }
 
 /**********************************/
@@ -1077,53 +415,53 @@ bool shell_membership_knastat(int j, FILE* out) {
 /**********************************/
 
 bool shell_membership_upoldd(int j, FILE* out) {
-    return shell_morprop_orbtriv(j, ORB_DD, "DD", "syntactic morphism", out);
+    return shell_morprop_orbtriv(shell_compute_syntac(j, false), ORB_DD, "DD", "syntactic morphism", out);
 }
 
 bool shell_membership_upolmodp(int j, FILE* out) {
-    return shell_morprop_orbtriv(j, ORB_MODP, "MOD⁺", "syntactic morphism", out);
+    return shell_morprop_orbtriv(shell_compute_syntac(j, false), ORB_MODP, "MOD⁺", "syntactic morphism", out);
 }
 
 bool shell_membership_upolamtp(int j, FILE* out) {
-    return shell_morprop_orbtriv(j, ORB_AMTP, "AMT⁺", "syntactic morphism", out);
+    return shell_morprop_orbtriv(shell_compute_syntac(j, false), ORB_AMTP, "AMT⁺", "syntactic morphism", out);
 }
 
 bool shell_membership_upolgrp(int j, FILE* out) {
-    return shell_morprop_orbtriv(j, ORB_GRP, "GR⁺", "syntactic morphism", out);
+    return shell_morprop_orbtriv(shell_compute_syntac(j, false), ORB_GRP, "GR⁺", "syntactic morphism", out);
 }
 
 
 bool shell_membership_ubpol2st(int j, FILE* out) {
-    return shell_morprop_ubp2eq(j, ORB_PT, "PT", "syntactic morphism", out);
+    return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_PT, "PT", "syntactic morphism", out);
 }
 
 bool shell_membership_ubpol2mod(int j, FILE* out) {
-    return shell_morprop_ubp2eq(j, ORB_BPMOD, "BPol(MOD)-orbit", "syntactic morphism", out);
+    return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_BPMOD, "BPol(MOD)-orbit", "syntactic morphism", out);
 }
 
 bool shell_membership_ubpol2amt(int j, FILE* out) {
-    return shell_morprop_ubp2eq(j, ORB_BPAMT, "BPol(AMT)-orbit", "syntactic morphism", out);
+    return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_BPAMT, "BPol(AMT)-orbit", "syntactic morphism", out);
 }
 
 bool shell_membership_ubpol2gr(int j, FILE* out) {
-    return shell_morprop_ubp2eq(j, ORB_BPGR, "BPol(GR)-orbit", "syntactic morphism", out);
+    return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_BPGR, "BPol(GR)-orbit", "syntactic morphism", out);
 }
 
 bool shell_membership_ubpol2dd(int j, FILE* out) {
-    return shell_morprop_ubp2eq(j, ORB_BPDD, "BPol(DD)-orbit", "syntactic morphism", out);
+    return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_BPDD, "BPol(DD)-orbit", "syntactic morphism", out);
 }
 
 bool shell_membership_ubpol2modp(int j, FILE* out) {
-    return shell_morprop_ubp2eq(j, ORB_BPMODP, "BPol(MOD⁺)-orbit", "syntactic morphism", out);
+    return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_BPMODP, "BPol(MOD⁺)-orbit", "syntactic morphism", out);
 }
 
 
 bool shell_membership_ubpol2amtp(int j, FILE* out) {
-    return shell_morprop_ubp2eq(j, ORB_BPAMTP, "BPol(AMT⁺)-orbit", "syntactic morphism", out);
+    return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_BPAMTP, "BPol(AMT⁺)-orbit", "syntactic morphism", out);
 }
 
 bool shell_membership_ubpol2grp(int j, FILE* out) {
-    return shell_morprop_ubp2eq(j, ORB_BPGRP, "BPol(GR⁺)-orbit", "syntactic morphism", out);
+    return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_BPGRP, "BPol(GR⁺)-orbit", "syntactic morphism", out);
 }
 
 /******************/
@@ -1131,253 +469,205 @@ bool shell_membership_ubpol2grp(int j, FILE* out) {
 /******************/
 
 bool shell_membership_ul(int j, FILE* out) {
-    return shell_morprop_monoda(j, "syntactic monoid", out);
+    if (objects[j]->type == MORPHISM) {
+        return shell_morprop_monoda(shell_compute_syntac(j, false), "syntactic monoid", out);
+    }
+    else {
+        int error = 0;
+        return shell_autoprop_dapat(shell_compute_minimal(j), "minimal automaton", &error, out);
+    }
 }
 
 bool shell_membership_tlmod(int j, FILE* out) {
-    return shell_morprop_kerda(j, KER_MOD, "MOD", "syntactic morphism", out);
+    return shell_morprop_kerda(shell_compute_syntac(j, false), KER_MOD, "MOD", "syntactic morphism", out);
 }
 
 bool shell_membership_tlamt(int j, FILE* out) {
-    return shell_morprop_kerda(j, KER_AMT, "AMT", "syntactic morphism", out);
+    return shell_morprop_kerda(shell_compute_syntac(j, false), KER_AMT, "AMT", "syntactic morphism", out);
 }
 
 bool shell_membership_tlgr(int j, FILE* out) {
-    return shell_morprop_kerda(j, KER_GR, "GR", "syntactic morphism", out);
+    return shell_morprop_kerda(shell_compute_syntac(j, false), KER_GR, "GR", "syntactic morphism", out);
 }
 
 bool shell_membership_tldd(int j, FILE* out) {
-    return shell_morprop_orbda(j, ORB_DD, "DD", "syntactic morphism", out);
+    return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_DD, "DD", "syntactic morphism", out);
 }
 
 bool shell_membership_tlmodp(int j, FILE* out) {
-    return shell_morprop_orbda(j, ORB_MODP, "MOD⁺", "syntactic morphism", out);
+    return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_MODP, "MOD⁺", "syntactic morphism", out);
 }
 
 bool shell_membership_tlamtp(int j, FILE* out) {
-    return shell_morprop_orbda(j, ORB_AMTP, "AMT⁺", "syntactic morphism", out);
+    return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_AMTP, "AMT⁺", "syntactic morphism", out);
 }
 
 bool shell_membership_tlgrp(int j, FILE* out) {
-    return shell_morprop_orbda(j, ORB_GRP, "GR⁺", "syntactic morphism", out);
+    return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_GRP, "GR⁺", "syntactic morphism", out);
 }
 
 bool shell_membership_tl2st(int j, FILE* out) {
-    return shell_morprop_orbda(j, ORB_PT, "TL(ST)", "syntactic morphism", out);
+    return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_PT, "TL(ST)", "syntactic morphism", out);
 }
 
 bool shell_membership_tl2mod(int j, FILE* out) {
-    return shell_morprop_orbda(j, ORB_BPMOD, "TL(MOD)", "syntactic morphism", out);
+    return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_BPMOD, "TL(MOD)", "syntactic morphism", out);
 }
 
 bool shell_membership_tl2amt(int j, FILE* out) {
-    return shell_morprop_orbda(j, ORB_BPAMT, "TL(AMT)", "syntactic morphism", out);
+    return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_BPAMT, "TL(AMT)", "syntactic morphism", out);
 }
 
 bool shell_membership_tl2gr(int j, FILE* out) {
-    return shell_morprop_orbda(j, ORB_BPGR, "TL(GR)", "syntactic morphism", out);
+    return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_BPGR, "TL(GR)", "syntactic morphism", out);
 }
 
 bool shell_membership_tl2dd(int j, FILE* out) {
-    return shell_morprop_orbda(j, ORB_BPDD, "TL(DD)", "syntactic morphism", out);
+    return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_BPDD, "TL(DD)", "syntactic morphism", out);
 }
 
 bool shell_membership_tl2modp(int j, FILE* out) {
-    return shell_morprop_orbda(j, ORB_BPMODP, "TL(MOD⁺)", "syntactic morphism", out);
+    return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_BPMODP, "TL(MOD⁺)", "syntactic morphism", out);
 }
 
 bool shell_membership_tl2amtp(int j, FILE* out) {
-    return shell_morprop_orbda(j, ORB_BPAMTP, "TL(AMT⁺)", "syntactic morphism", out);
+    return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_BPAMTP, "TL(AMT⁺)", "syntactic morphism", out);
 }
 
 bool shell_membership_tl2grp(int j, FILE* out) {
-    return shell_morprop_orbda(j, ORB_BPGRP, "TL(GR⁺)", "syntactic morphism", out);
+    return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_BPGRP, "TL(GR⁺)", "syntactic morphism", out);
 }
 
 
 bool shell_membership_fl(int j, FILE* out) {
-    return shell_morprop_monogreen(j, L_GREEN, "syntactic monoid", out);
+    return shell_morprop_monogreen(shell_compute_syntac(j, false), L_GREEN, "syntactic monoid", out);
 }
 
 bool shell_membership_flmod(int j, FILE* out) {
-    return shell_morprop_kergreen(j, L_GREEN, KER_MOD, "MOD", "syntactic morphism", out);
+    return shell_morprop_kergreen(shell_compute_syntac(j, false), L_GREEN, KER_MOD, "MOD", "syntactic morphism", out);
 }
 
 bool shell_membership_flamt(int j, FILE* out) {
-    return shell_morprop_kergreen(j, L_GREEN, KER_AMT, "AMT", "syntactic morphism", out);
+    return shell_morprop_kergreen(shell_compute_syntac(j, false), L_GREEN, KER_AMT, "AMT", "syntactic morphism", out);
 }
 
 bool shell_membership_flgr(int j, FILE* out) {
-    return shell_morprop_kergreen(j, L_GREEN, KER_GR, "GR", "syntactic morphism", out);
+    return shell_morprop_kergreen(shell_compute_syntac(j, false), L_GREEN, KER_GR, "GR", "syntactic morphism", out);
 }
 
 bool shell_membership_fldd(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, L_GREEN, ORB_DD, "DD", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_DD, "DD", "syntactic morphism", out);
 }
 
 bool shell_membership_flmodp(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, L_GREEN, ORB_MODP, "MOD⁺", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_MODP, "MOD⁺", "syntactic morphism", out);
 }
 
 bool shell_membership_flamtp(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, L_GREEN, ORB_AMTP, "AMT⁺", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_AMTP, "AMT⁺", "syntactic morphism", out);
 }
 
 bool shell_membership_flgrp(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, L_GREEN, ORB_GRP, "GR⁺", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_GRP, "GR⁺", "syntactic morphism", out);
 }
 
 bool shell_membership_fl2st(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, L_GREEN, ORB_PT, "FL(ST)", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_PT, "FL(ST)", "syntactic morphism", out);
 }
 
 bool shell_membership_fl2mod(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, L_GREEN, ORB_BPMOD, "FL(MOD)", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_BPMOD, "FL(MOD)", "syntactic morphism", out);
 }
 
 bool shell_membership_fl2amt(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, L_GREEN, ORB_BPAMT, "FL(AMT)", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_BPAMT, "FL(AMT)", "syntactic morphism", out);
 }
 
 bool shell_membership_fl2gr(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, L_GREEN, ORB_BPGR, "FL(GR)", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_BPGR, "FL(GR)", "syntactic morphism", out);
 }
 
 bool shell_membership_fl2dd(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, L_GREEN, ORB_BPDD, "FL(DD)", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_BPDD, "FL(DD)", "syntactic morphism", out);
 }
 
 bool shell_membership_fl2modp(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, L_GREEN, ORB_BPMODP, "FL(MOD⁺)", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_BPMODP, "FL(MOD⁺)", "syntactic morphism", out);
 }
 
 bool shell_membership_fl2amtp(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, L_GREEN, ORB_BPAMTP, "FL(AMT⁺)", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_BPAMTP, "FL(AMT⁺)", "syntactic morphism", out);
 }
 
 bool shell_membership_fl2grp(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, L_GREEN, ORB_BPGRP, "FL(GR⁺)", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_BPGRP, "FL(GR⁺)", "syntactic morphism", out);
 }
 
 bool shell_membership_pl(int j, FILE* out) {
-    return shell_morprop_monogreen(j, R_GREEN, "syntactic monoid", out);
+    return shell_morprop_monogreen(shell_compute_syntac(j, false), R_GREEN, "syntactic monoid", out);
 }
 
 bool shell_membership_plmod(int j, FILE* out) {
-    return shell_morprop_kergreen(j, R_GREEN, KER_MOD, "MOD", "syntactic morphism", out);
+    return shell_morprop_kergreen(shell_compute_syntac(j, false), R_GREEN, KER_MOD, "MOD", "syntactic morphism", out);
 }
 
 bool shell_membership_plamt(int j, FILE* out) {
-    return shell_morprop_kergreen(j, R_GREEN, KER_AMT, "AMT", "syntactic morphism", out);
+    return shell_morprop_kergreen(shell_compute_syntac(j, false), R_GREEN, KER_AMT, "AMT", "syntactic morphism", out);
 }
 
 bool shell_membership_plgr(int j, FILE* out) {
-    return shell_morprop_kergreen(j, R_GREEN, KER_GR, "GR", "syntactic morphism", out);
+    return shell_morprop_kergreen(shell_compute_syntac(j, false), R_GREEN, KER_GR, "GR", "syntactic morphism", out);
 }
 
 bool shell_membership_pldd(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, R_GREEN, ORB_DD, "DD", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_DD, "DD", "syntactic morphism", out);
 }
 
 bool shell_membership_plmodp(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, R_GREEN, ORB_MODP, "MOD⁺", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_MODP, "MOD⁺", "syntactic morphism", out);
 }
 
 bool shell_membership_plamtp(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, R_GREEN, ORB_AMTP, "AMT⁺", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_AMTP, "AMT⁺", "syntactic morphism", out);
 }
 
 bool shell_membership_plgrp(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, R_GREEN, ORB_GRP, "GR⁺", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_GRP, "GR⁺", "syntactic morphism", out);
 }
 
 bool shell_membership_pl2st(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, R_GREEN, ORB_PT, "PL(ST)", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_PT, "PL(ST)", "syntactic morphism", out);
 }
 
 bool shell_membership_pl2mod(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, R_GREEN, ORB_BPMOD, "PL(MOD)", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_BPMOD, "PL(MOD)", "syntactic morphism", out);
 }
 
 bool shell_membership_pl2amt(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, R_GREEN, ORB_BPAMT, "PL(AMT)", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_BPAMT, "PL(AMT)", "syntactic morphism", out);
 }
 
 bool shell_membership_pl2gr(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, R_GREEN, ORB_BPGR, "PL(GR)", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_BPGR, "PL(GR)", "syntactic morphism", out);
 }
 
 bool shell_membership_pl2dd(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, R_GREEN, ORB_BPDD, "PL(DD)", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_BPDD, "PL(DD)", "syntactic morphism", out);
 }
 
 bool shell_membership_pl2modp(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, R_GREEN, ORB_BPMODP, "PL(MOD⁺)", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_BPMODP, "PL(MOD⁺)", "syntactic morphism", out);
 }
 
 bool shell_membership_pl2amtp(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, R_GREEN, ORB_BPAMTP, "PL(AMT⁺)", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_BPAMTP, "PL(AMT⁺)", "syntactic morphism", out);
 }
 
 bool shell_membership_pl2grp(int j, FILE* out) {
-    return shell_morprop_orbgreen(j, R_GREEN, ORB_BPGRP, "PL(GR⁺)", "syntactic morphism", out);
+    return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_BPGRP, "PL(GR⁺)", "syntactic morphism", out);
 }
 
-/***********************/
-/* Procédures globales */
-/***********************/
 
-bool shell_membership(com_parameters* pars) {
-    int n = com_nbparams(pars);
-    if (n != 2) {
-        shell_error_nbparams(keywordtostring(KY_MEMB), 2);
-        return false;
-    }
-
-    print_title_box(0, true, stdout, 1, "Membership");
-    // La classe
-    classes cl = command_to_class(com_getparam(pars, 0));
-
-    if (cl == CL_END) {
-        fprintf(stdout, "#### The class ");
-        print_command(com_getparam(pars, 0), stdout);
-        fprintf(stdout, " is either unknown or unsupported.\n\n");
-        return false;
-    }
-
-    if (class_membership[cl] == NULL) {
-        fprintf(stdout, "#### Membership is unsupported for the class ");
-        print_command(com_getparam(pars, 0), stdout);
-        fprintf(stdout, ".\n\n");
-        return false;
-    }
-
-    fprintf(stdout, "#### ");
-    print_command(com_getparam(pars, 0), stdout);
-    fprintf(stdout, " is equal to the class %s.\n", class_names[cl]);
-    print_class_info(cl, stdout);
-
-    // Récupération de l'argument.
-    bool saved;
-    int i = com_apply_command(com_getparam(pars, 1), NULL, MODE_DEFAULT, &saved);
-    if (i == -1) {
-        return false;
-    }
-    print_info_input(i, stdout);
-    // Caclcul du morphisme syntactique
-    int j = shell_compute_syntac(i, shell_membership_needs_order(cl));
-    if (j == -1) {
-        return false;
-    }
-
-    print_title_box(10, true, stdout, 1, "The syntactic morphism.");
-    shell_view_object(objects[j], false);
-    print_conclusion_comp(stdout, class_membership[cl](j, stdout), class_names[cl]);
-    if (saved) {
-        object_free(i);
-    }
-    return false;
-}
 
 /********************************/
 /* Summary for all main classes */
@@ -1470,37 +760,27 @@ static void populate_line_from_sf(int bs, ans_type ans, ans_type res[CLT_SIZE][B
 
 
 
-static void summary_print_answer(ans_type res) {
+static void summary_print_answer(ans_type res, FILE* out) {
     switch (res) {
     case ANS_YES:
-        fprintf(stdout, "║" ANSI_COLOR_GREEN "     YES      " ANSI_COLOR_RESET);
+        fprintf(out, "║" ANSI_COLOR_GREEN "     YES      " ANSI_COLOR_RESET);
         break;
     case ANS_NO:
-        fprintf(stdout, "║" ANSI_COLOR_RED "     NO       " ANSI_COLOR_RESET);
+        fprintf(out, "║" ANSI_COLOR_RED "     NO       " ANSI_COLOR_RESET);
         break;
     case ANS_UNKNOWN:
-        fprintf(stdout, "║" ANSI_COLOR_YELLOW "    UNKNOWN   " ANSI_COLOR_RESET);
+        fprintf(out, "║" ANSI_COLOR_YELLOW "    UNKNOWN   " ANSI_COLOR_RESET);
         break;
     default:
         break;
     }
 }
 
-bool shell_chiera_summary(com_parameters* pars) {
-    if (com_nbparams(pars) != 1) {
-        shell_error_nbparams(keywordtostring(KY_CHIERA), 1);
-        return false;
-    }
-    // Récupération de l'input et de son morphisme syntactique.
-    bool saved;
-    int i = com_apply_command(pars->param, NULL, MODE_DEFAULT, &saved);
-
-    if (i == -1) {
-        return false;
-    }
+void shell_chiera_summary(int i, FILE* out) {
     int j = shell_compute_syntac(i, true);
-    if (j == -1) {
-        return false;
+
+    if (j < 0) {
+        return;
     }
 
     ans_type res[CLT_SIZE][BSI_SIZE];
@@ -1526,16 +806,16 @@ bool shell_chiera_summary(com_parameters* pars) {
     populate_table_star(j, CLT_POL2, BSI_ST, shell_membership_pol2st, res);
 
 
-    fprintf(stdout, "╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗\n");
-    fprintf(stdout, "║                                          Concatenation hierarchies: membership tests summary                                         ║\n");
-    fprintf(stdout, "╠══════════════╦══════════════╦══════════════╦══════════════╦══════════════╦══════════════╦══════════════╦══════════════╦══════════════╣\n");
-    fprintf(stdout, "║  Basis: ST   ║    Pol(ST)   ║   BPol(ST)   ║    TL(ST)    ║   Pol₂(ST)   ║   BPol₂(ST)  ║  UBPol₂(ST)  ║   TL₂(ST)    ║    SF(ST)    ║\n");
-    fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
-    // fprintf(stdout, "║             ");
+    fprintf(out, "╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗\n");
+    fprintf(out, "║                                          Concatenation hierarchies: membership tests summary                                         ║\n");
+    fprintf(out, "╠══════════════╦══════════════╦══════════════╦══════════════╦══════════════╦══════════════╦══════════════╦══════════════╦══════════════╣\n");
+    fprintf(out, "║  Basis: ST   ║    Pol(ST)   ║   BPol(ST)   ║    TL(ST)    ║   Pol₂(ST)   ║   BPol₂(ST)  ║  UBPol₂(ST)  ║   TL₂(ST)    ║    SF(ST)    ║\n");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    // fprintf(out, "║             ");
     for (uint h = 0; h < CLT_SIZE;h++) {
-        summary_print_answer(res[h][BSI_ST]);
+        summary_print_answer(res[h][BSI_ST], out);
     }
-    fprintf(stdout, "║\n");
+    fprintf(out, "║\n");
 
     /************/
     /* Basis DD */
@@ -1551,14 +831,14 @@ bool shell_chiera_summary(com_parameters* pars) {
     populate_table_plus(j, CLT_UBPOL2, BSI_DD, shell_membership_ubpol2dd, res);
     populate_table_plus(j, CLT_POL2, BSI_DD, shell_membership_pol2dd, res);
 
-    fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
-    fprintf(stdout, "║  Basis: DD   ║    Pol(DD)   ║   BPol(DD)   ║    TL(DD)    ║   Pol₂(DD)   ║   BPol₂(DD)  ║  UBPol₂(DD)  ║   TL₂(DD)    ║    SF(DD)    ║\n");
-    fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    fprintf(out, "║  Basis: DD   ║    Pol(DD)   ║   BPol(DD)   ║    TL(DD)    ║   Pol₂(DD)   ║   BPol₂(DD)  ║  UBPol₂(DD)  ║   TL₂(DD)    ║    SF(DD)    ║\n");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
 
     for (uint h = 0; h < CLT_SIZE;h++) {
-        summary_print_answer(res[h][BSI_DD]);
+        summary_print_answer(res[h][BSI_DD], out);
     }
-    fprintf(stdout, "║\n");
+    fprintf(out, "║\n");
 
     /*************/
     /* Basis MOD */
@@ -1573,15 +853,15 @@ bool shell_chiera_summary(com_parameters* pars) {
     populate_table_star(j, CLT_UBPOL2, BSI_MOD, shell_membership_ubpol2mod, res);
     populate_table_star(j, CLT_POL2, BSI_MOD, shell_membership_pol2mod, res);
 
-    fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
-    fprintf(stdout, "║  Basis: MOD  ║   Pol(MOD)   ║  BPol(MOD)   ║   TL(MOD)    ║  Pol₂(MOD)   ║  BPol₂(MOD)  ║ UBPol₂(MOD)  ║  TL₂(MOD)    ║   SF(MOD)    ║\n");
-    fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    fprintf(out, "║  Basis: MOD  ║   Pol(MOD)   ║  BPol(MOD)   ║   TL(MOD)    ║  Pol₂(MOD)   ║  BPol₂(MOD)  ║ UBPol₂(MOD)  ║  TL₂(MOD)    ║   SF(MOD)    ║\n");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
 
     for (uint h = 0; h < CLT_SIZE;h++) {
-        summary_print_answer(res[h][BSI_MOD]);
+        summary_print_answer(res[h][BSI_MOD], out);
     }
 
-    fprintf(stdout, "║\n");
+    fprintf(out, "║\n");
     /**************/
     /* Basis MODP */
     /**************/
@@ -1594,15 +874,15 @@ bool shell_chiera_summary(com_parameters* pars) {
     populate_table_plus(j, CLT_UBPOL2, BSI_MODP, shell_membership_ubpol2modp, res);
     populate_table_plus(j, CLT_POL2, BSI_MODP, shell_membership_pol2modp, res);
 
-    fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
-    fprintf(stdout, "║  Basis: MOD⁺ ║   Pol(MOD⁺)  ║  BPol(MOD⁺)  ║   TL(MOD⁺)   ║  Pol₂(MOD⁺)  ║  BPol₂(MOD⁺) ║ UBPol₂(MOD⁺) ║  TL₂(MOD⁺)   ║   SF(MOD⁺)   ║\n");
-    fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    fprintf(out, "║  Basis: MOD⁺ ║   Pol(MOD⁺)  ║  BPol(MOD⁺)  ║   TL(MOD⁺)   ║  Pol₂(MOD⁺)  ║  BPol₂(MOD⁺) ║ UBPol₂(MOD⁺) ║  TL₂(MOD⁺)   ║   SF(MOD⁺)   ║\n");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
 
     for (uint h = 0; h < CLT_SIZE;h++) {
-        summary_print_answer(res[h][BSI_MODP]);
+        summary_print_answer(res[h][BSI_MODP], out);
     }
 
-    fprintf(stdout, "║\n");
+    fprintf(out, "║\n");
 
     /*************/
     /* Basis AMT */
@@ -1660,107 +940,111 @@ bool shell_chiera_summary(com_parameters* pars) {
     populate_table_plus(j, CLT_UBPOL2, BSI_GRP, shell_membership_ubpol2grp, res);
     populate_table_plus(j, CLT_POL2, BSI_GRP, shell_membership_pol2grp, res);
 
-    fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
-    fprintf(stdout, "║  Basis: AMT  ║   Pol(AMT)   ║  BPol(AMT)   ║   TL(AMT)    ║  Pol₂(AMT)   ║  BPol₂(AMT)  ║ UBPol₂(AMT)  ║  TL₂(AMT)    ║   SF(AMT)    ║\n");
-    fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    fprintf(out, "║  Basis: AMT  ║   Pol(AMT)   ║  BPol(AMT)   ║   TL(AMT)    ║  Pol₂(AMT)   ║  BPol₂(AMT)  ║ UBPol₂(AMT)  ║  TL₂(AMT)    ║   SF(AMT)    ║\n");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
 
     for (uint h = 0; h < CLT_SIZE;h++) {
-        summary_print_answer(res[h][BSI_AMT]);
+        summary_print_answer(res[h][BSI_AMT], out);
     }
 
-    fprintf(stdout, "║\n");
+    fprintf(out, "║\n");
 
-    fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
-    fprintf(stdout, "║  Basis: AMT⁺ ║   Pol(AMT⁺)  ║  BPol(AMT⁺)  ║   TL(AMT⁺)   ║  Pol₂(AMT⁺)  ║  BPol₂(AMT⁺) ║ UBPol₂(AMT⁺) ║  TL₂(AMT⁺)   ║   SF(AMT⁺)   ║\n");
-    fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    fprintf(out, "║  Basis: AMT⁺ ║   Pol(AMT⁺)  ║  BPol(AMT⁺)  ║   TL(AMT⁺)   ║  Pol₂(AMT⁺)  ║  BPol₂(AMT⁺) ║ UBPol₂(AMT⁺) ║  TL₂(AMT⁺)   ║   SF(AMT⁺)   ║\n");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
 
     for (uint h = 0; h < CLT_SIZE;h++) {
-        summary_print_answer(res[h][BSI_AMTP]);
+        summary_print_answer(res[h][BSI_AMTP], out);
     }
 
-    fprintf(stdout, "║\n");
+    fprintf(out, "║\n");
 
 
-    fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
-    fprintf(stdout, "║  Basis: GR   ║    Pol(GR)   ║   BPol(GR)   ║    TL(GR)    ║   Pol₂(GR)   ║   BPol₂(GR)  ║  UBPol₂(GR)  ║   TL₂(GR)    ║    SF(GR)    ║\n");
-    fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    fprintf(out, "║  Basis: GR   ║    Pol(GR)   ║   BPol(GR)   ║    TL(GR)    ║   Pol₂(GR)   ║   BPol₂(GR)  ║  UBPol₂(GR)  ║   TL₂(GR)    ║    SF(GR)    ║\n");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
     for (uint h = 0; h < CLT_SIZE;h++) {
-        summary_print_answer(res[h][BSI_GR]);
+        summary_print_answer(res[h][BSI_GR], out);
     }
 
-    fprintf(stdout, "║\n");
+    fprintf(out, "║\n");
 
-    fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
-    fprintf(stdout, "║  Basis: GR⁺  ║    Pol(GR⁺)  ║   BPol(GR⁺)  ║    TL(GR⁺)   ║   Pol₂(GR⁺)  ║  BPol₂(GR⁺)  ║  UBPol₂(GR⁺) ║   TL₂(GR⁺)   ║    SF(GR⁺)   ║\n");
-    fprintf(stdout, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
-    // fprintf(stdout, "║             ");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    fprintf(out, "║  Basis: GR⁺  ║    Pol(GR⁺)  ║   BPol(GR⁺)  ║    TL(GR⁺)   ║   Pol₂(GR⁺)  ║  BPol₂(GR⁺)  ║  UBPol₂(GR⁺) ║   TL₂(GR⁺)   ║    SF(GR⁺)   ║\n");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    // fprintf(out, "║             ");
     for (uint h = 0; h < CLT_SIZE;h++) {
-        summary_print_answer(res[h][BSI_GRP]);
+        summary_print_answer(res[h][BSI_GRP], out);
     }
 
-    fprintf(stdout, "║\n");
+    fprintf(out, "║\n");
 
-    fprintf(stdout, "╚══════════════╩══════════════╩══════════════╩══════════════╩══════════════╩══════════════╩══════════════╩══════════════╩══════════════╝\n");
+    fprintf(out, "╚══════════════╩══════════════╩══════════════╩══════════════╩══════════════╩══════════════╩══════════════╩══════════════╩══════════════╝\n");
 
-    if (saved) {
-        object_free(i);
-    }
-
-    return 1;
+    return;
 }
 
 
-static short shell_neghiera_aux(int j, classes cl) {
+static short shell_neghiera_aux(int i, classes cl) {
     ufind* theuf = NULL;
 
-
+    int j = 0;
     switch (cl) {
     case CL_ST:
-        if (!shell_membership_ul(j, NULL)) {
+        if (!shell_membership_ul(i, NULL)) {
             return -1;
         }
+        j = shell_compute_syntac(i, false);
         theuf = iden_green_mono(objects[j]->mor->obj, J_GREEN);
         break;
     case CL_MOD:
-        if (!shell_membership_tlmod(j, NULL)) {
+        if (!shell_membership_tlmod(i, NULL)) {
             return -1;
         }
+        j = shell_compute_syntac(i, false);
         theuf = iden_bpolmod_mono(objects[j]->mor->obj);
         break;
     case CL_AMT:
-        if (!shell_membership_tlamt(j, NULL)) {
+        if (!shell_membership_tlamt(i, NULL)) {
             return -1;
         }
+        j = shell_compute_syntac(i, false);
         theuf = iden_bpolamt_mono(objects[j]->mor->obj);
         break;
     case CL_GR:
-        if (!shell_membership_tlgr(j, NULL)) {
+        if (!shell_membership_tlgr(i, NULL)) {
             return -1;
         }
+        j = shell_compute_syntac(i, false);
         theuf = iden_blockg_mono(objects[j]->mor->obj);
         break;
     case CL_DD:
-        if (!shell_membership_tldd(j, NULL)) {
+        if (!shell_membership_tldd(i, NULL)) {
             return -1;
         }
+        j = shell_compute_syntac(i, false);
         theuf = iden_knast_mono(shell_compute_orbits(j, ORB_DD, LV_REG));
         break;
     case CL_MODP:
-        if (!shell_membership_tlmodp(j, NULL)) {
+        if (!shell_membership_tlmodp(i, NULL)) {
             return -1;
         }
+        j = shell_compute_syntac(i, false);
         theuf = iden_qknast_mono(shell_compute_orbits(j, ORB_MODP, LV_REG), shell_compute_ker(j, KER_MOD, LV_REG));
         break;
     case CL_AMTP:
-        if (!shell_membership_tlamtp(j, NULL)) {
+        if (!shell_membership_tlamtp(i, NULL)) {
             return -1;
         }
+        j = shell_compute_syntac(i, false);
         theuf = iden_bpolamtp_mono(shell_compute_orbits(j, ORB_AMTP, LV_REG));
         break;
     case CL_GRP:
-        if (!shell_membership_tlgrp(j, NULL)) {
+        if (!shell_membership_tlgrp(i, NULL)) {
             return -1;
         }
+        j = shell_compute_syntac(i, false);
         theuf = iden_bpolgrp_mono(shell_compute_orbits(j, ORB_GRP, LV_REG));
         break;
     default:
@@ -1786,53 +1070,27 @@ static short shell_neghiera_aux(int j, classes cl) {
 }
 
 
-bool shell_neghiera(com_parameters* pars) {
-
-    // There should be two arguments:
-    // - the base class
-    // - the variable that gives the language or the input morphism.
-    if (com_nbparams(pars) != 2) {
-        shell_error_nbparams(keywordtostring(KY_NHIERA), 2);
-        return false;
-    }
+bool shell_neghiera(classes cl, int i, FILE* out) {
 
 
-    // Getting the input and its syntactic morphism.
-    bool saved;
-    int i = com_apply_command(pars->next->param, NULL, MODE_DEFAULT, &saved);
 
     if (i == -1) {
         return false;
     }
-    int j = shell_compute_syntac(i, false);
-    if (j == -1) {
-        return false;
-    }
-
-    // The name of the base class is given by the first argument.
-  // La classe
-    classes cl = command_to_class(com_getparam(pars, 0));
-
-    if (cl == CL_END) {
-        fprintf(stdout, "#### The class ");
-        print_command(com_getparam(pars, 0), stdout);
-        fprintf(stdout, " is either unknown or unsupported.\n\n");
-        return false;
-    }
 
     if (!class_is_basis(cl)) {
-        fprintf(stdout, "#### The class %s is not a valid input class for negation hierarchies.\n", class_names[cl]);
+        fprintf(out, "#### The class %s is not a valid input class for negation hierarchies.\n", class_names[cl]);
         return false;
     }
 
-    print_infooper_neghiera(cl, stdout);
-    print_info_input(i, stdout);
+    print_infooper_neghiera(cl, out);
+    print_info_input(i, out);
 
-    fprintf(stdout, "#### Checking if the input belongs to TL(%s).\n", class_names[cl]);
-    fprintf(stdout, "#### If so, computing the least level n such that the input belongs to TLⁿ(%s).\n", class_names[cl]);
-    fprintf(stdout, "#### The algorithm is based on the characterizations of TL(%s), BPol(%s) and MPol.\n", class_names[cl], class_names[cl]);
+    fprintf(out, "#### Checking if the input belongs to TL(%s).\n", class_names[cl]);
+    fprintf(out, "#### If so, computing the least level n such that the input belongs to TLⁿ(%s).\n", class_names[cl]);
+    fprintf(out, "#### The algorithm is based on the characterizations of TL(%s), BPol(%s) and MPol.\n", class_names[cl], class_names[cl]);
 
-    short level = shell_neghiera_aux(j, cl);
+    short level = shell_neghiera_aux(i, cl);
     char message[150];
     if (level == -1) {
         sprintf(message, "The input does not belong to TL(%s).", class_names[cl]);
@@ -1844,19 +1102,12 @@ bool shell_neghiera(com_parameters* pars) {
     }
 
 
-    print_dtitle_box(100, true, stdout, 1, message);
+    print_dtitle_box(100, true, out, 1, message);
 
-
-
-
-
-    if (saved) {
-        object_free(i);
-    }
     return true;
 }
 
-static void shell_fphiera_aux(int j, classes cl, short* fllv, short* pllv) {
+static void shell_fphiera_aux(int i, classes cl, short* fllv, short* pllv) {
     *fllv = -1;
     *pllv = -1;
 
@@ -1864,65 +1115,75 @@ static void shell_fphiera_aux(int j, classes cl, short* fllv, short* pllv) {
     ufind* pluf = NULL;
     ufind* fluf = NULL;
 
-
+    int j;
     switch (cl) {
     case CL_ST:
-        if (!shell_membership_ul(j, NULL)) {
+        if (!shell_membership_ul(i, NULL)) {
             return;
         }
+
+        j = shell_compute_syntac(i, false);
         fluf = iden_green_mono(objects[j]->mor->obj, L_GREEN);
         pluf = iden_green_mono(objects[j]->mor->obj, R_GREEN);
         break;
     case CL_MOD:
-        if (!shell_membership_tlmod(j, NULL)) {
+        if (!shell_membership_tlmod(i, NULL)) {
             return;
         }
+        j = shell_compute_syntac(i, false);
         fluf = iden_green_subsemi(shell_compute_ker(j, KER_MOD, LV_REG), L_GREEN);
         pluf = iden_green_subsemi(shell_compute_ker(j, KER_MOD, LV_REG), R_GREEN);
         break;
     case CL_AMT:
-        if (!shell_membership_tlamt(j, NULL)) {
+        if (!shell_membership_tlamt(i, NULL)) {
             return;
         }
+        j = shell_compute_syntac(i, false);
         fluf = iden_green_subsemi(shell_compute_ker(j, KER_AMT, LV_REG), L_GREEN);
         pluf = iden_green_subsemi(shell_compute_ker(j, KER_AMT, LV_REG), R_GREEN);
         break;
     case CL_GR:
-        if (!shell_membership_tlgr(j, NULL)) {
+        if (!shell_membership_tlgr(i, NULL)) {
             return;
         }
+        j = shell_compute_syntac(i, false);
         fluf = iden_green_subsemi(shell_compute_ker(j, KER_GR, LV_REG), L_GREEN);
         pluf = iden_green_subsemi(shell_compute_ker(j, KER_GR, LV_REG), R_GREEN);
         break;
     case CL_DD:
-        if (!shell_membership_tldd(j, NULL)) {
+        if (!shell_membership_tldd(i, NULL)) {
             return;
         }
+        j = shell_compute_syntac(i, false);
         fluf = iden_green_orbmono(shell_compute_orbits(j, ORB_DD, LV_REG), L_GREEN);
         pluf = iden_green_orbmono(shell_compute_orbits(j, ORB_DD, LV_REG), R_GREEN);
         break;
     case CL_MODP:
-        if (!shell_membership_tlmodp(j, NULL)) {
+        if (!shell_membership_tlmodp(i, NULL)) {
             return;
         }
+        j = shell_compute_syntac(i, false);
         fluf = iden_green_orbmono(shell_compute_orbits(j, ORB_MODP, LV_REG), L_GREEN);
         pluf = iden_green_orbmono(shell_compute_orbits(j, ORB_MODP, LV_REG), R_GREEN);
         break;
     case CL_AMTP:
-        if (!shell_membership_tlamtp(j, NULL)) {
+        if (!shell_membership_tlamtp(i, NULL)) {
             return;
         }
+        j = shell_compute_syntac(i, false);
         fluf = iden_green_orbmono(shell_compute_orbits(j, ORB_AMTP, LV_REG), L_GREEN);
         pluf = iden_green_orbmono(shell_compute_orbits(j, ORB_AMTP, LV_REG), R_GREEN);
         break;
     case CL_GRP:
-        if (!shell_membership_tlgrp(j, NULL)) {
+        if (!shell_membership_tlgrp(i, NULL)) {
             return;
         }
+        j = shell_compute_syntac(i, false);
         fluf = iden_green_orbmono(shell_compute_orbits(j, ORB_GRP, LV_REG), L_GREEN);
         pluf = iden_green_orbmono(shell_compute_orbits(j, ORB_GRP, LV_REG), R_GREEN);
         break;
     default:
+        j = 0;
         return;
         break;
     }
@@ -1962,57 +1223,39 @@ static void shell_fphiera_aux(int j, classes cl, short* fllv, short* pllv) {
 
 }
 
-bool shell_fphiera(com_parameters* pars) {
+bool shell_fphiera(classes cl, int i, FILE* out) {
 
-    // There should be two arguments:
-    // - the base class
-    // - the variable that gives the language or the input morphism.
-    if (com_nbparams(pars) != 2) {
-        shell_error_nbparams(keywordtostring(KY_FPHIERA), 2);
-        return false;
-    }
-
-    // Getting the input and its syntactic morphism.
-    bool saved;
-    int i = com_apply_command(pars->next->param, NULL, MODE_DEFAULT, &saved);
 
     if (i == -1) {
         return false;
     }
-    int j = shell_compute_syntac(i, false);
-    if (j == -1) {
-        return false;
-    }
+    // int j = shell_compute_syntac(i, false);
+    // if (j == -1) {
+    //     return false;
+    // }
 
     // The name of the base class is given by the first argument.
  // La classe
-    classes cl = command_to_class(com_getparam(pars, 0));
 
-    if (cl == CL_END) {
-        fprintf(stdout, "#### The class ");
-        print_command(com_getparam(pars, 0), stdout);
-        fprintf(stdout, " is either unknown or unsupported.\n\n");
-        return false;
-    }
 
     if (!class_is_basis(cl)) {
-        fprintf(stdout, "#### The class %s is not a valid input class for future/past hierarchies.\n", class_names[cl]);
+        fprintf(out, "#### The class %s is not a valid input class for future/past hierarchies.\n", class_names[cl]);
         return false;
     }
 
-    print_infooper_fphiera(cl, stdout);
-    print_info_input(i, stdout);
+    print_infooper_fphiera(cl, out);
+    print_info_input(i, out);
 
 
-    fprintf(stdout, "#### Checking if the input belongs to TL(%s).\n", class_names[cl]);
-    fprintf(stdout, "#### If so, computing the least level containing the input in the future/past hierarchy of TL(%s).\n", class_names[cl]);
-    fprintf(stdout, "#### The algorithm is based on the characterizations of TL(%s), LPol and RPol.\n", class_names[cl]);
+    fprintf(out, "#### Checking if the input belongs to TL(%s).\n", class_names[cl]);
+    fprintf(out, "#### If so, computing the least level containing the input in the future/past hierarchy of TL(%s).\n", class_names[cl]);
+    fprintf(out, "#### The algorithm is based on the characterizations of TL(%s), LPol and RPol.\n", class_names[cl]);
 
 
 
     short lvfl;
     short lvpl;
-    shell_fphiera_aux(j, cl, &lvfl, &lvpl);
+    shell_fphiera_aux(i, cl, &lvfl, &lvpl);
 
 
 
@@ -2020,6 +1263,7 @@ bool shell_fphiera(com_parameters* pars) {
 
 
     char supscript[10];
+    char supscript2[10];
     char message[150];
     if (lvfl == -1) {
         sprintf(message, "The input does not belong to TL(%s).", class_names[cl]);
@@ -2028,24 +1272,18 @@ bool shell_fphiera(com_parameters* pars) {
         sprint_power_utf8(lvfl, supscript);
         sprintf(message, "The least level containing the input is FL%s(%s) ⋂ PL%s(%s).", supscript, class_names[cl], supscript, class_names[cl]);
     }
-    else if (lvfl < lvpl) {
-        sprint_power_utf8(lvfl, supscript);
-        sprintf(message, "The least level containing the input is FL%s(%s).", supscript, class_names[cl]);
-    }
     else {
-        sprint_power_utf8(lvpl, supscript);
-        sprintf(message, "The least level containing the input is PL%s(%s).", supscript, class_names[cl]);
+        sprint_power_utf8(lvfl, supscript);
+        sprint_power_utf8(lvpl, supscript2);
+        sprintf(message, "The least levels containing the input are FL%s(%s) and PL%s(%s).", supscript, class_names[cl], supscript2, class_names[cl]);
 
     }
-    print_dtitle_box(100, true, stdout, 1, message);
+    print_dtitle_box(100, true, out, 1, message);
 
 
 
 
 
-    if (saved) {
-        object_free(i);
-    }
     return true;
 }
 
@@ -2054,260 +1292,88 @@ bool shell_fphiera(com_parameters* pars) {
 /* Examples generators */
 /***********************/
 
-bool shell_exsearch(com_parameters* pars) {
-    int n = com_nbparams(pars);
-    if (n < 6) {
-        shell_error_leastparams(keywordtostring(KY_EXSEARCH), 6);
-        return false;
-    }
 
-    // Les classes
-    classes low[n - 5];
-    for (int i = 0; i < n - 5; i++) {
-        low[i] = command_to_class(pars->param);
-        if (low[i] == CL_END) {
-            fprintf(stdout, "#### The class ");
-            print_command(pars->param, stdout);
-            fprintf(stdout, " is either unknown or unsupported.\n\n");
-            return false;
-        }
-        if (class_membership[low[i]] == NULL) {
-            fprintf(stdout, "#### Membership is unsupported for the class ");
-            print_command(pars->param, stdout);
-            fprintf(stdout, ".\n\n");
-            return false;
-        }
-        // printf("low: %s\n", class_names[low[i]]);
-        pars = pars->next;
-    }
+static ulong exa_size = 0; // Size of exa_array.
+static ulong exa_elem = 0; // Number of DFAs stored in the exa_array.
+static dfa** exa_array = NULL; // Array that store the example DFAs (size exa_size).
 
-    classes cl = command_to_class(com_getparam(pars, 0));
-
-    if (cl == CL_END) {
-        fprintf(stdout, "#### The class ");
-        print_command(com_getparam(pars, 0), stdout);
-        fprintf(stdout, " is either unknown or unsupported.\n\n");
-        return false;
-    }
-
-    if (class_membership[cl] == NULL) {
-        fprintf(stdout, "#### Membership is unsupported for the class ");
-        print_command(com_getparam(pars, 0), stdout);
-        fprintf(stdout, ".\n\n");
-        return false;
-    }
-
-    if (!com_single(com_getparam(pars, 1))) {
-        shell_error_numpar(keywordtostring(KY_EXSEARCH), 1);
-        return false;
-    }
-    char* end;
-    int cycle = strtol(com_getparam(pars, 1)->main->string, &end, 10);
-    if (*end != '\0') {
-        shell_error_numpar(keywordtostring(KY_EXSEARCH), n - 4);
-        return false;
-    }
-
-    int count = 0;
-    char buffer[64];
-
-    for (int i = 0; i < cycle; i++) {
-        sprintf(buffer, "EXA%04d", count);
-        int j = shell_random_dfa(buffer, pars->next->next);
-        int k = shell_compute_syntac(j, false);
-        if (k == -1) {
-            fprintf(stdout, "#### Test %d: Syntactic monoid too large.\n", i + 1);
-            continue;
-        }
-        bool not = false;
-        for (int h = 0; h < n - 5; h++) {
-
-            not = not || class_membership[low[h]](k, NULL);
-        }
-        // view_nfa(objects[j]->nfa);
-        if (j != -1 && !not&& class_membership[cl](k, NULL)) {
-            fprintf(stdout, "#### Test %d: Found an example. Stored in variable %s.\n", i + 1, buffer);
-            count++;
-        }
-        else if (j != -1) {
-            fprintf(stdout, "#### Test %d: Not an example.\n", i + 1);
-            object_free(j);
-        }
-    }
-
-    return false;
+static void exa_init(uint size) {
+    size = max(size, 2); // Ensure the size is at least 2.
+    exa_size = size; // The size of the array is the number of states in the morphism.
+    exa_elem = 0; // The number of elements in the array is initially 0.
+    MALLOC(exa_array, exa_size); // Allocate the array of DFAs.
 }
 
+static void exa_delete() {
+    free(exa_array); // Free the array of DFAs.
+    exa_array = NULL; // Reset the pointer to NULL.
+    exa_size = 0; // Reset the size of the array.
+    exa_elem = 0; // Reset the number of elements in the array.
+}
 
+static void exa_grow() {
+    exa_size <<= 1; // Double the size of the array.
+    REALLOC(exa_array, exa_size); // Reallocate the array to the new size.
+}
 
-static int nfa_compare_minimal(void* N1, void* N2) {
-    nfa* A1 = (nfa*)N1;
-    nfa* A2 = (nfa*)N2;
-    int sizeg = A1->trans->size_graph - A2->trans->size_graph;
-    if (sizeg != 0) {
-        return sizeg;
+static bool exa_equal(uint i, uint j) {
+    dfa* A1 = exa_array[i];
+    dfa* A2 = exa_array[j];
+
+    if (A1->trans->size_graph != A2->trans->size_graph || A1->trans->size_alpha != A2->trans->size_alpha || A1->nb_finals != A2->nb_finals || A1->initial != A2->initial) {
+        return false; // If the sizes of the graphs or alphabets are different, the DFAs are not equal.
     }
-    int sizea = A1->trans->size_alpha - A2->trans->size_alpha;
-    if (sizea != 0) {
-        return sizea;
-    }
-
     for (uint q = 0; q < A1->trans->size_graph; q++) {
         for (uint a = 0; a < A1->trans->size_alpha; a++) {
-            int difft = lefread_dequeue(A1->trans->edges[q][a], 0) - lefread_dequeue(A2->trans->edges[q][a], 0);
-            if (difft != 0) {
-                return difft;
+            if (A1->trans->edges[q][a] != A2->trans->edges[q][a]) {
+                return false;
             }
         }
     }
-
-    int sizef = size_dequeue(A1->finals) - size_dequeue(A2->finals);
-    if (sizef != 0) {
-        return sizef;
-    }
-
-    for (uint i = 0; i < size_dequeue(A1->finals); i++) {
-        int diff = lefread_dequeue(A1->finals, i) - lefread_dequeue(A2->finals, i);
-        if (diff != 0) {
-            return diff;
+    for (uint h = 0; h < A1->nb_finals; h++) {
+        if (A1->finals[h] != A2->finals[h]) {
+            return false; // If any final state is different, the DFAs are not equal.
         }
     }
-
-    return 0;
+    return true;
 }
 
-static void avl_to_objarray(avlnode* set, uint* num) {
-    if (!set) {
-        return;
+static uint exa_hash(uint i, uint size_hash) {
+    uint hash = 0;
+
+    uint nb = exa_array[i]->trans->size_graph * exa_array[i]->trans->size_alpha + exa_array[i]->nb_finals + 1;
+    uint a = 0x9e3779b9; // fractional bits of the golden ratio
+
+    hash = (hash * (nb + 1) + exa_array[i]->initial * a) % size_hash;
+
+
+    for (uint j = 0; j < exa_array[i]->trans->size_graph; j++) {
+        for (uint b = 0; b < exa_array[i]->trans->size_alpha; b++) {
+            hash = (hash * (nb + 1) + exa_array[i]->trans->edges[j][b] * a) % size_hash;
+        }
     }
-    avl_to_objarray(set->left, num);
-    char buffer[64];
-    sprintf(buffer, "EXA%04d", *num);
-    *num += 1;
-    object_add_automaton(buffer, set->value);
-    avl_to_objarray(set->right, num);
-    free(set);
+
+    for (uint j = 0; j < exa_array[i]->nb_finals; j++) {
+        hash = (hash * (nb + 1) + exa_array[i]->finals[j] * a) % size_hash;
+    }
+
+    return hash;
 }
 
-static void nfa_release(void* A) { delete_nfa((nfa*)A); }
 
-bool shell_exall(com_parameters* pars) {
-    int n = com_nbparams(pars);
-    if (n != 4) {
-        shell_error_nbparams(keywordtostring(KY_EXALL), 4);
-        return false;
-    }
-
-    // Classes to exclude
-    uchar nblow;
-    com_keyword lkey = key_from_string_chain_single(com_getparam(pars, 0)->main);
-    if (lkey == KY_OUTSIDE) {
-        nblow = com_nbparams(com_getparam(pars, 0)->params);
-    }
-    else {
-        nblow = 1;
-    }
-
-    if (nblow == 0) {
-        fprintf(stderr, "#### Error: At least one forbidden class of languages is required.\n\n");
-        return false;
-    }
-
-    classes low[nblow];
-
-    if (lkey != KY_OUTSIDE) {
-        low[0] = command_to_class(com_getparam(pars, 0));
-    }
-    else {
-        com_parameters* lpars = com_getparam(pars, 0)->params;
-        for (int i = 0; i < nblow; i++) {
-            low[i] = command_to_class(com_getparam(lpars, i));
-        }
-    }
-
-    for (int i = 0; i < nblow; i++) {
-        if (low[i] == CL_END) {
-            fprintf(stdout, "#### Error: Unknow or unsupported class\n\n");
-            return false;
-        }
-        if (class_membership[low[i]] == NULL) {
-            fprintf(stdout, "#### Error: Membership is unsupported for the class %s.\n\n", class_names[low[i]]);
-            return false;
-        }
-
-        // printf("low: %s\n", class_names[low[i]]);
-    }
-
-    // Classes to include
-    uchar nbhigh;
-    com_keyword hkey = key_from_string_chain_single(com_getparam(pars, 1)->main);
-    if (hkey == KY_INSIDE) {
-        nbhigh = com_nbparams(com_getparam(pars, 1)->params);
-    }
-    else {
-        nbhigh = 1;
-    }
-
-    if (nbhigh == 0) {
-        fprintf(stderr, "#### Error: At least one constraining class of languages is required.\n\n");
-        return false;
-    }
-
-    classes high[nbhigh];
-
-    if (hkey != KY_INSIDE) {
-        high[0] = command_to_class(com_getparam(pars, 1));
-    }
-    else {
-        com_parameters* hpars = com_getparam(pars, 1)->params;
-        for (int i = 0; i < nbhigh; i++) {
-            high[i] = command_to_class(com_getparam(hpars, i));
-        }
-    }
-
-    for (int i = 0; i < nbhigh; i++) {
-        if (high[i] == CL_END) {
-            fprintf(stdout, "#### Error: Unknow or unsupported class\n\n");
-            return false;
-        }
-        if (class_membership[high[i]] == NULL) {
-            fprintf(stdout, "#### Error: Membership is unsupported for the class %s.\n\n", class_names[high[i]]);
-            return false;
-        }
-
-        // printf("high: %s\n", class_names[high[i]]);
-    }
-
-    if (!com_single(com_getparam(pars, 2))) {
-        shell_error_numpar(keywordtostring(KY_EXALL), 3);
-        return false;
-    }
-    char* end;
-    uint states = strtol(com_getparam(pars, 2)->main->string, &end, 10);
-    if (*end != '\0') {
-        shell_error_numpar(keywordtostring(KY_EXALL), 3);
-        return false;
-    }
-
-    if (!com_single(com_getparam(pars, 3))) {
-        shell_error_numpar(keywordtostring(KY_EXALL), 4);
-        return false;
-    }
-    uint alpha = strtol(com_getparam(pars, 3)->main->string, &end, 10);
-    if (*end != '\0') {
-        shell_error_numpar(keywordtostring(KY_EXALL), 4);
-        return false;
-    }
+void shell_exall(classes* low, int nblow, classes* high, int nbhigh, int states, int alpha) {
+    states = max(states, 1);
+    alpha = max(alpha, 1);
 
     bool order = false;
-    for (uint i = 0; i < nblow; i++) {
+    for (int i = 0; i < nblow; i++) {
         if (shell_membership_needs_order(low[i])) {
             order = true;
             break;
         }
     }
     if (!order) {
-        for (uint i = 0; i < nbhigh; i++) {
+        for (int i = 0; i < nbhigh; i++) {
             if (shell_membership_needs_order(high[i])) {
                 order = true;
                 break;
@@ -2316,23 +1382,28 @@ bool shell_exall(com_parameters* pars) {
     }
 
 
-    nfa_enum* E = nfa_enum_init(states, alpha);
+    dfa_enum* E = dfa_enum_init(states, alpha);
     uint count = 0;
-    uint exa = 0;
-    avlnode* set = NULL;
 
-    //    nfa_enum_print(E);
+    exa_init(128);
+    hash_table* thehash = create_hash_table(8, &exa_hash, &exa_equal);
 
-    while (nfa_enum_next(E)) {
 
-        //       nfa_enum_print(E);
-        nfa* A = nfa_enum_to_nfa(E);
 
-        int j = object_add_automaton(NULL, A);
+    while (dfa_enum_next(E)) {
+
+        //       dfa_enum_print(E);
+        dfa* A = dfa_enum_to_dfa(E);
+
+        //view_nfa(A);
+
+        int j = object_add_automaton_dfa(NULL, A);
 
 
         // TODO: Fix when shell_compute_syntac fails
+        //fprintf(stdout, "#### Test %d: Testing automaton %d.\n", count, j);
         int k = shell_compute_syntac(j, order);
+        //fprintf(stdout, "#### Test %d: Syntactic monoid computed.\n", count);
 
         if (k == MEMORY_LIMIT) {
             fprintf(stdout, "#### Test %d: Syntactic monoid too large.\n", count);
@@ -2361,26 +1432,42 @@ bool shell_exall(com_parameters* pars) {
 
 
         if (j != -1 && res) {
-            set = avl_insert(nfa_mini_canonical_copy(objects[shell_compute_minimal(j)]->nfa), set, nfa_compare_minimal, nfa_release);
-            exa++;
+            exa_array[exa_elem] = dfa_mini_canonical_copy(objects[shell_compute_minimal(j)]->aut->obj_dfa);
+            uint x = hash_table_insert(thehash, exa_elem);
+            if (x == exa_elem) {
+                // If this was a new automaton, we add it to the set.
+                exa_elem++;
+                if (exa_elem >= exa_size) {
+                    exa_grow(); // Grow the array if needed.
+                }
+            }
+            else {
+                dfa_delete(exa_array[exa_elem]);
+            }
         }
 
         if (count % 20000 == 0) {
-            fprintf(stdout, "#### %d tests done so far. %d were positive\n", count, exa);
+            fprintf(stdout, "#### %d tests done so far. %lu examples found.\n", count, exa_elem);
         }
 
         object_free(j);
     }
 
-    nfa_enum_free(E);
+    dfa_enum_free(E);
+    delete_hash_table(thehash); // Delete the hash table.
 
-    int found = getsize_avl(set);
-    fprintf(stdout, "#### %d tests in total. Found %d example languages.\n", count, found);
 
-    uint num = 0;
-    avl_to_objarray(set, &num);
+    fprintf(stdout, "#### %d tests in total. Found %lu example languages.\n", count, exa_elem);
 
-    return false;
+    char buffer[64];
+    for (uint i = 0; i < exa_elem; i++) {
+        sprintf(buffer, "EXA%04d", i);
+        object_add_automaton_dfa(buffer, exa_array[i]);
+    }
+
+    exa_delete(); // Free the example array.
+
+    return;
 }
 
 
@@ -2391,76 +1478,211 @@ bool shell_exall(com_parameters* pars) {
 
 
 
-bool shell_exall_dethiera(com_parameters* pars, bool neg) {
-    int n = com_nbparams(pars);
-    if (n != 4) {
-        shell_error_nbparams(keywordtostring(KY_EXALL), 4);
-        return false;
-    }
+void shell_exall_dethiera(classes cl, int level, int states, int alpha, bool neg) {
 
-    // Input class for the hierarchy
-    classes cl = command_to_class(com_getparam(pars, 0));
-    if (cl == CL_END) {
-        fprintf(stdout, "#### The class ");
-        print_command(com_getparam(pars, 0), stdout);
-        fprintf(stdout, " is either unknown or unsupported.\n\n");
-        return false;
-    }
     if (!class_is_basis(cl)) {
-        fprintf(stdout, "#### The class %s is not a valid input class for negation hierarchies.\n", class_names[cl]);
-        return false;
-    }
-
-    if (!com_single(com_getparam(pars, 1))) {
-        shell_error_numpar(keywordtostring(KY_EXALL), 2);
-        return false;
-    }
-    char* end;
-    short level = strtol(com_getparam(pars, 1)->main->string, &end, 10);
-    if (*end != '\0') {
-        shell_error_numpar(keywordtostring(KY_EXALL), 2);
-        return false;
-    }
-
-    if (!com_single(com_getparam(pars, 2))) {
-        shell_error_numpar(keywordtostring(KY_EXALL), 3);
-        return false;
-    }
-    uint states = strtol(com_getparam(pars, 2)->main->string, &end, 10);
-    if (*end != '\0') {
-        shell_error_numpar(keywordtostring(KY_EXALL), 3);
-        return false;
-    }
-
-    if (!com_single(com_getparam(pars, 3))) {
-        shell_error_numpar(keywordtostring(KY_EXALL), 4);
-        return false;
-    }
-    uint alpha = strtol(com_getparam(pars, 3)->main->string, &end, 10);
-    if (*end != '\0') {
-        shell_error_numpar(keywordtostring(KY_EXALL), 4);
-        return false;
+        fprintf(stdout, "#### The class %s is not a valid basis.\n", class_names[cl]);
+        return;
     }
 
 
 
 
-    nfa_enum* E = nfa_enum_init(states, alpha);
+
+    dfa_enum* E = dfa_enum_init(states, alpha);
     uint count = 0;
-    uint exa = 0;
-    avlnode* set = NULL;
 
-    //    nfa_enum_print(E);
+    exa_init(128);
+    hash_table* thehash = create_hash_table(8, &exa_hash, &exa_equal);
 
-    while (nfa_enum_next(E)) {
+    while (dfa_enum_next(E)) {
 
-        //       nfa_enum_print(E);
-        nfa* A = nfa_enum_to_nfa(E);
+        //       dfa_enum_print(E);
+        dfa* A = dfa_enum_to_dfa(E);
 
-        int j = object_add_automaton(NULL, A);
+        int i = object_add_automaton_dfa(NULL, A);
 
 
-        // TODO: Fix when shell_compute_syntac fails
+
+
+
+        // // TODO: Fix when shell_compute_syntac fails
+        // int k = shell_compute_syntac(j, false);
+
+        // if (k == MEMORY_LIMIT) {
+        //     fprintf(stdout, "#### Test %d: Syntactic monoid too large.\n", count);
+        //     continue;
+        // }
+        // if (k == TIMEOUT_OCCURRED) {
+        //     fprintf(stdout, "#### Test %d: timeout occurred.\n", count);
+        //     continue;
+        // }
+        // if (k == INTERRUPTION) {
+        //     fprintf(stdout, "#### Test %d: user interruption.\n", count);
+        //     break;
+        // }
+
+        short levelj;
+        if (neg) {
+            levelj = shell_neghiera_aux(i, cl);
+        }
+        else {
+            short pllv;
+            short fllv;
+            shell_fphiera_aux(i, cl, &fllv, &pllv);
+            levelj = max(pllv, fllv);
+        }
+
+
+
+        count++;
+        // view_nfa(objects[j]->aut->obj_nfa);
+
+        if (i != -1 && levelj >= level) {
+            exa_array[exa_elem] = dfa_mini_canonical_copy(objects[shell_compute_minimal(i)]->aut->obj_dfa);
+            uint x = hash_table_insert(thehash, exa_elem);
+            if (x == exa_elem) {
+                // If this was a new automaton, we add it to the set.
+                exa_elem++;
+                if (exa_elem >= exa_size) {
+                    exa_grow(); // Grow the array if needed.
+                }
+            }
+            else {
+                dfa_delete(exa_array[exa_elem]);
+            }
+        }
+
+        if (count % 20000 == 0) {
+            fprintf(stdout, "#### %d tests done so far. %lu were positive\n", count, exa_elem);
+        }
+
+        object_free(i);
+    }
+
+    dfa_enum_free(E);
+    delete_hash_table(thehash); // Delete the hash table.
+
+
+    fprintf(stdout, "#### %d tests in total. Found %lu example languages.\n", count, exa_elem);
+
+    char buffer[64];
+    for (uint i = 0; i < exa_elem; i++) {
+        sprintf(buffer, "EXA%04d", i);
+        object_add_automaton_dfa(buffer, exa_array[i]);
+    }
+
+    exa_delete(); // Free the example array.
+
+    return;
+}
+
+
+
+
+
+// bool shell_exsearch(com_parameters* pars) {
+//     int n = com_nbparams(pars);
+//     if (n < 6) {
+//         shell_error_leastparams(keywordtostring(KY_EXSEARCH), 6);
+//         return false;
+//     }
+
+//     // Les classes
+//     classes low[n - 5];
+//     for (int i = 0; i < n - 5; i++) {
+//         low[i] = command_to_class(pars->param);
+//         if (low[i] == CL_END) {
+//             fprintf(stdout, "#### The class ");
+//             print_command(pars->param, stdout);
+//             fprintf(stdout, " is either unknown or unsupported.\n\n");
+//             return false;
+//         }
+//         if (class_membership[low[i]] == NULL) {
+//             fprintf(stdout, "#### Membership is unsupported for the class ");
+//             print_command(pars->param, stdout);
+//             fprintf(stdout, ".\n\n");
+//             return false;
+//         }
+//         // printf("low: %s\n", class_names[low[i]]);
+//         pars = pars->next;
+//     }
+
+//     classes cl = command_to_class(com_getparam(pars, 0));
+
+//     if (cl == CL_END) {
+//         fprintf(stdout, "#### The class ");
+//         print_command(com_getparam(pars, 0), stdout);
+//         fprintf(stdout, " is either unknown or unsupported.\n\n");
+//         return false;
+//     }
+
+//     if (class_membership[cl] == NULL) {
+//         fprintf(stdout, "#### Membership is unsupported for the class ");
+//         print_command(com_getparam(pars, 0), stdout);
+//         fprintf(stdout, ".\n\n");
+//         return false;
+//     }
+
+//     if (!com_single(com_getparam(pars, 1))) {
+//         shell_error_numpar(keywordtostring(KY_EXSEARCH), 1);
+//         return false;
+//     }
+//     char* end;
+//     int cycle = strtol(com_getparam(pars, 1)->main->string, &end, 10);
+//     if (*end != '\0') {
+//         shell_error_numpar(keywordtostring(KY_EXSEARCH), n - 4);
+//         return false;
+//     }
+
+//     int count = 0;
+//     char buffer[64];
+
+//     for (int i = 0; i < cycle; i++) {
+//         sprintf(buffer, "EXA%04d", count);
+//         int j = -1;//shell_random_dfa(buffer, pars->next->next);
+//         int k = shell_compute_syntac(j, false);
+//         if (k == -1) {
+//             fprintf(stdout, "#### Test %d: Syntactic monoid too large.\n", i + 1);
+//             continue;
+//         }
+//         bool not = false;
+//         for (int h = 0; h < n - 5; h++) {
+
+//             not = not || class_membership[low[h]](k, NULL);
+//         }
+//         // view_nfa(objects[j]->aut->obj_nfa);
+//         if (j != -1 && !not&& class_membership[cl](k, NULL)) {
+//             fprintf(stdout, "#### Test %d: Found an example. Stored in variable %s.\n", i + 1, buffer);
+//             count++;
+//         }
+//         else if (j != -1) {
+//             fprintf(stdout, "#### Test %d: Not an example.\n", i + 1);
+//             object_free(j);
+//         }
+//     }
+
+//     return false;
+// }
+
+
+
+bool shell_exall_dfatest(void) {
+
+    dfa_enum* E = dfa_enum_init(3, 3);
+    uint count = 0;
+
+    exa_init(128);
+    hash_table* thehash = create_hash_table(8, &exa_hash, &exa_equal);
+
+
+    while (dfa_enum_next(E)) {
+
+        dfa* A = dfa_enum_to_dfa(E);
+
+
+        int j = object_add_automaton_dfa(NULL, A);
+
         int k = shell_compute_syntac(j, false);
 
         if (k == MEMORY_LIMIT) {
@@ -2475,40 +1697,48 @@ bool shell_exall_dethiera(com_parameters* pars, bool neg) {
             fprintf(stdout, "#### Test %d: user interruption.\n", count);
             break;
         }
-        short levelj;
-        if (neg) {
-            levelj = shell_neghiera_aux(k, cl);
-        }
-        else {
-            short pllv;
-            short fllv;
-            shell_fphiera_aux(k, cl, &fllv, &pllv);
-            levelj = max(pllv, fllv);
-        }
+        bool resmono = class_membership[CL_UL](k, NULL);
+        bool resauto = class_membership[CL_UL](j, NULL);
 
 
         count++;
-        // view_nfa(objects[j]->nfa);
 
-        if (j != -1 && levelj >= level) {
-            set = avl_insert(nfa_mini_canonical_copy(objects[shell_compute_minimal(j)]->nfa), set, nfa_compare_minimal, nfa_release);
-            exa++;
+
+        if (resmono != resauto) {
+            exa_array[exa_elem] = dfa_mini_canonical_copy(objects[shell_compute_minimal(j)]->aut->obj_dfa);
+            uint x = hash_table_insert(thehash, exa_elem);
+            if (x == exa_elem) {
+                // If this was a new automaton, we add it to the set.
+                exa_elem++;
+                if (exa_elem >= exa_size) {
+                    exa_grow(); // Grow the array if needed.
+                }
+            }
+            else {
+                dfa_delete(exa_array[exa_elem]);
+            }
         }
 
         if (count % 20000 == 0) {
-            fprintf(stdout, "#### %d tests done so far. %d were positive\n", count, exa);
+            fprintf(stdout, "#### %d tests done so far. %lu were positive\n", count, exa_elem);
         }
 
         object_free(j);
     }
 
-    nfa_enum_free(E);
+    dfa_enum_free(E);
+    delete_hash_table(thehash); // Delete the hash table.
 
-    int found = getsize_avl(set);
-    fprintf(stdout, "#### %d tests in total. Found %d example languages.\n", count, found);
 
-    uint num = 0;
-    avl_to_objarray(set, &num);
+    fprintf(stdout, "#### %d tests in total. Found %lu example languages.\n", count, exa_elem);
+
+    char buffer[64];
+    for (uint i = 0; i < exa_elem; i++) {
+        sprintf(buffer, "EXA%04d", i);
+        object_add_automaton_dfa(buffer, exa_array[i]);
+    }
+
+    exa_delete(); // Free the example array.
 
     return false;
 }

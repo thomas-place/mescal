@@ -33,7 +33,7 @@
   * @return
   * A Boolean indicating whether the complete DFA is trivial.
   */
-bool is_trivial_dfa(nfa*, //!< The DFA.
+bool is_trivial_dfa(dfa*, //!< The DFA.
     FILE* //!< The stream.
 );
 
@@ -51,7 +51,8 @@ bool is_trivial_dfa(nfa*, //!< The DFA.
  * @return
  * A Boolean indicating whether all letters have the same action.
  */
-bool is_letterind_dfa(nfa*, //!< The DFA.
+bool is_letterind_dfa(dfa*, //!< The DFA.
+    int* error, //!< The error code.
     FILE* //!< The stream.
 );
 
@@ -69,7 +70,8 @@ bool is_letterind_dfa(nfa*, //!< The DFA.
  * @return
  * A Boolean indicating whether the complete DFA is commutative.
  */
-bool dfa_is_comm(nfa*, //!< The DFA.
+bool is_comm_dfa(dfa*, //!< The DFA.
+    int* error, //!< The error code.
     FILE* //!< The stream.
 );
 
@@ -78,37 +80,86 @@ bool dfa_is_comm(nfa*, //!< The DFA.
  * Tests is an arbitrary NFA is a permutation automata.
  *
  * @remark
- * A stream is taken as input. It is utilized to display the results of the computations.
- * If this is not desired, a NULL pointer should be given.
- *
- * @return
- * A Boolean indicating whether the NFA is a permutation automata.
- */
-bool is_permutation_dfa(nfa*, //!< The NFA.
-    FILE* //!< The stream.
-);
-
-/**
- * @brief
- * Tests if an arbitrary NFA is a counterfree DFA.
- *
- * @remark
- *
  * A pointer to an allocated integer is taken as input. If the computation fails
  * (because of a timeout or an interruption), the function fills this integer
  * variable with an error code.
  *
- * A stream is also taken as input. It is used to display the results of the
- * computations. If this is not desired, a NULL pointer should be given.
+ * A stream is also taken as input. It is utilized to display the results of the computations.
+ * If this is not desired, a NULL pointer should be given.
+ *
+ * @attention
+ * The function does not check whether the input is indeed a complete DFA.
+ *
+ * @return
+ * A Boolean indicating whether the NFA is a permutation automata.
+ */
+bool is_permutation_dfa(dfa* A, //!< The NFA.
+    int* error, //!< The error code.
+    FILE* out //!< The stream.
+);
+
+/**
+ * @brief
+ * Tests if a DFA is counterfree.
+ *
+ * @remark
+ * A pointer to an allocated integer is taken as input. If the computation fails
+ * (because of a timeout or an interruption), the function fills this integer
+ * variable with an error code.
+ *
+ * A stream is also taken as input. It is used to display a counter if one is found.
+ * If this is not desired, a NULL pointer should be given.
+ *
+ * @attention
+ * The function does not check whether the input is indeed a DFA.
  *
  * @return
  * A Boolean indicating whether the NFA is counterfree DFA.
  */
-bool is_counterfree_dfa(nfa*,      //!< The NFA.
+bool is_counterfree_dfa(dfa*,      //!< The NFA.
     int* error, // !< The error code.
     FILE*      //!< The stream.
 );
 
 
+/**
+ * @brief
+ * Tests if a complete DFA satisfies the DA pattern equation.
+ *
+ * @remark
+ * A pointer to an allocated integer is taken as input. If the computation fails
+ * (because of a timeout or an interruption), the function fills this integer
+ * variable with an error code.
+ *
+ * @attention
+ * The function does not check whether the input is indeed a complete DFA.
+ *
+ * @return
+ * A Boolean indicating whether the NFA satisfies the DA pattern equation.
+ */
+bool is_da_dfa(dfa* A, //!< The complete DFA.
+    int* error //!< The error code.
+);
+
+
+/**
+ * @brief
+ * Tests if a DFA is cycle trivial..
+ *
+ * @remark
+ * A pointer to an allocated integer is taken as input. If the computation fails
+ * (because of a timeout or an interruption), the function fills this integer
+ * variable with an error code.
+ *
+ * A stream is also taken as input. It is utilized to display the results of the computations.
+ * If this is not desired, a NULL pointer should be given.
+ *
+ * @return
+ * A Boolean indicating whether the DFA is cycle trivial.
+ */
+bool is_cycletrivial_dfa(dfa* A, //!< The DFA.
+    int* error, //!< The error code.
+    FILE* out //!< The stream.
+);
 
 #endif

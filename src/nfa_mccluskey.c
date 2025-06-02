@@ -58,9 +58,46 @@ mccluskey_auto* nfa_to_mccluskey(nfa* A) {
 }
 
 
-regexp* nfa_mccluskey(nfa* A) {
-    nfa* B = nfa_trim(A);
-    mccluskey_auto* grid = nfa_to_mccluskey(B);
+mccluskey_auto* dfa_to_mccluskey(dfa* A) {
+    if (!A) {
+        return NULL;
+    }
+
+    mccluskey_auto* grid;
+    MALLOC(grid, 1);
+    grid->size = A->trans->size_graph + 2;
+    MALLOC(grid->matrix, grid->size);
+    for (uint i = 0;i < grid->size;i++) {
+        CALLOC(grid->matrix[i], grid->size);
+    }
+
+    grid->matrix[0][A->initial + 2] = reg_epsilon();
+
+
+    for (uint i = 0; i < A->nb_finals; i++) {
+        grid->matrix[A->finals[i] + 2][1] = reg_epsilon();
+    }
+
+    for (uint q = 0; q < A->trans->size_graph;q++) {
+        for (uint a = 0; a < A->trans->size_alpha;a++) {
+            uint r = A->trans->edges[q][a];
+            regexp* new = reg_letter_ext(A->alphabet[a]);
+            if (grid->matrix[q + 2][r + 2]) {
+                grid->matrix[q + 2][r + 2] = reg_union(grid->matrix[q + 2][r + 2], new);
+            }
+            else {
+                grid->matrix[q + 2][r + 2] = new;
+            }
+
+        }
+    }
+
+
+
+    return grid;
+}
+
+static regexp* aux_mccluskey(mccluskey_auto* grid) {
     for (uint q = grid->size - 1; q > 1; q--) {
         for (uint r = 0; r < q; r++) {
             if (grid->matrix[r][q]) {
@@ -100,7 +137,21 @@ regexp* nfa_mccluskey(nfa* A) {
     free(grid);
 
 
-    delete_nfa(B);
-    return ret;
 
+    return ret;
+}
+
+regexp* nfa_mccluskey(nfa* A) {
+    nfa* B = nfa_trim(A);
+    mccluskey_auto* grid = nfa_to_mccluskey(B);
+    nfa_delete(B);
+
+    return aux_mccluskey(grid);
+}
+
+
+
+regexp* dfa_mccluskey(dfa* A) {
+    mccluskey_auto* grid = dfa_to_mccluskey(A);
+    return aux_mccluskey(grid);
 }

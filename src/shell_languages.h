@@ -7,6 +7,7 @@
 #include "nfa.h"
 #include "nfa_determi.h"
 #include "printing.h"
+#include "monoid_display.h"
 #include "regexp.h"
 #include "regexp_tonfa.h"
 #include <stdlib.h>
@@ -68,6 +69,19 @@ typedef enum {
     ORB_SIZE,
 } orbits_type;
 
+/**
+ * @brief
+ * Structure used to represent an automaton and various information.
+ */
+typedef struct {
+    union
+    {
+        nfa* obj_nfa; //!< The automaton.
+        dfa* obj_dfa; //!< The automaton.
+    };
+    bool dfa; //!< Boolean indicating if the automaton is a DFA (true) or an NFA (false).
+} ob_automaton;
+
 
 /**
  * @brief
@@ -128,7 +142,7 @@ typedef struct {
     ob_type type; //!< Type of the object.
     union {
         regexp* exp;       //!< Case of a regular expression.
-        nfa* nfa;          //!< Case of an automaton.
+        ob_automaton* aut;          //!< Case of an automaton.
         ob_morphism* mor;  //!< Case of a morphism.
         ob_recursion* rec; //!< Case of a recursive definition of regular expressions.
     };
@@ -233,14 +247,13 @@ int object_delete_from_name(const char* //!< The variable name.
  * @return
  * The index of the created object.
  */
-int object_add_regexp(const char* //!< The desired variable name (NULL if no name for system objects).
-    ,
+int object_add_regexp(const char*, //!< The desired variable name (NULL if no name for system objects).
     regexp* //!< The regular expression.
 );
 
 /**
  * @brief
- * Adds a new object of type automaton.
+ * Adds a new object of type automaton (NFA structure).
  *
  * @attention
  * The name passed as input is duplicated. The automaton passed
@@ -249,9 +262,23 @@ int object_add_regexp(const char* //!< The desired variable name (NULL if no nam
  * @return
  * The index of the created object.
  */
-int object_add_automaton(const char* //!< The desired variable name (NULL if no name for system objects).
-    ,
+int object_add_automaton_nfa(const char*, //!< The desired variable name (NULL if no name for system objects).
     nfa* //!< The automaton.
+);
+
+/**
+ * @brief
+ * Adds a new object of type automaton (DFA structure).
+ *
+ * @attention
+ * The name passed as input is duplicated. The automaton passed
+ * as input is NOT duplicated.
+ *
+ * @return
+ * The index of the created object.
+ */
+int object_add_automaton_dfa(const char* name, //!< The desired variable name (NULL if no name for system objects).
+    dfa* A //!< The automaton.
 );
 
 /**
@@ -265,10 +292,24 @@ int object_add_automaton(const char* //!< The desired variable name (NULL if no 
  * @return
  * The index of the created object.
  */
-int object_add_morphism(char* //!< The desired variable name (NULL if no name for system objects).
-    ,
+int object_add_morphism(char*, //!< The desired variable name (NULL if no name for system objects).
     morphism* //!< The morphism.
 );
+
+/**
+ * @brief
+ * Copy of an object.
+ *
+ * @remark
+ * If an object with the same name already exists, it is deleted.
+ *
+ * @return
+ * The index of the copy.
+ */
+int shell_copy_generic(int i, //!< The index of the object to copy.
+    char* newname //!< The variable name for the new object.
+);
+
 
 /***********/
 /* Sorting */
@@ -284,8 +325,7 @@ int object_add_morphism(char* //!< The desired variable name (NULL if no name fo
  * a positive value if the second object should be placed before the first one,
  * and 0 if the two objects are equal.
  */
-int object_compare(int //!< The index of the first object.
-    ,
+int object_compare(int, //!< The index of the first object.
     int //!< The index of the second object.
 );
 
@@ -507,5 +547,21 @@ regexp* shell_rec_getexp(int, //!< The index of the recursion.
 void shell_rec_display(ob_recursion*, //!< The recursion.
     FILE* //!< The stream.
 );
+
+
+/***********/
+/* Display */
+/***********/
+
+
+/**
+ * @brief
+ * Displays an object
+ */
+void shell_view_object(object* ob, //!< The object.
+    bool title //!< Boolean indicating if a title should be displayed.
+);
+
+
 
 #endif // LANGUAGES_H_

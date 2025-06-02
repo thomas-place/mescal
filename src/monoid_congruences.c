@@ -163,9 +163,9 @@ static void iden_green_subsemi_aux(subsemi* S, green_relation grel, ufind* theuf
         break;
     }
     for (uint i = 0; i < theparti->size_par; i++) {
-        uint s = lefread_dequeue(theparti->cl[theparti->numcl[i]], 0);
-        for (uint j = 1; j < size_dequeue(theparti->cl[theparti->numcl[i]]); j++) {
-            uint t = lefread_dequeue(theparti->cl[theparti->numcl[i]], j);
+        uint s = theparti->cl_elems[i][0];
+        for (uint j = 1; j < theparti->cl_size[i]; j++) {
+            uint t = theparti->cl_elems[i][j];
             union_ufind(S->sub_to_mono[s], S->sub_to_mono[t], theuf);
         }
     }
@@ -202,49 +202,31 @@ ufind* iden_bpolmod_mono(morphism* M) {
     // Otherwise, we create a trivial union-find
     ufind* uf = create_ufind(M->r_cayley->size_graph);
 
+    parti* FOLDR = mor_stal_fold(M, false, true);
+    parti* FOLDL = mor_stal_fold(M, false, false);
 
-    nfa* AR = morphism_to_dfa_rcl(M);
-    nfa* AL = morphism_to_dfa_lcl(M);
-    nfa* UR = nfa_proj_unary(AR);
-    nfa* UL = nfa_proj_unary(AL);
-    delete_nfa(AR);
-    delete_nfa(AL);
-    parti* SCCSR = nfa_inv_ext(UR);
-    parti* SCCSL = nfa_inv_ext(UL);
-    parti* FOLDR = nfa_stal_fold(UR, SCCSR);
-    parti* FOLDL = nfa_stal_fold(UL, SCCSL);
-    delete_parti(SCCSR);
-    delete_parti(SCCSL);
-
-    nfa* BR = nfa_merge_states(UR, FOLDR);
-    nfa* BL = nfa_merge_states(UL, FOLDL);
-
-    delete_nfa(UR);
-    delete_nfa(UL);
-
-    lgraph* temp = BL->trans;
-    BL->trans = BL->trans_i;
-    BL->trans_i = temp;
+    dgraph* gr = shrink_mod(M->r_cayley, FOLDR, M->rels->RCL);
+    dgraph* glinv = shrink_mod_mirror(M->l_cayley, FOLDL, M->rels->LCL);
 
     uint size = 0;
 
     // Loop over all idempotents e = qr
-    for (uint i = 0; i < size_dequeue(M->idem_list); i++) {
-        uint e = lefread_dequeue(M->idem_list, i);
+    for (uint i = 0; i < M->nb_idems; i++) {
+        uint e = M->idem_list[i];
 
         // Loop over all idempotents f = st
-        for (uint j = 0; j < size_dequeue(M->idem_list); j++) {
-            uint f = lefread_dequeue(M->idem_list, j);
+        for (uint j = 0; j < M->nb_idems; j++) {
+            uint f = M->idem_list[j];
             uint ef = mor_mult(M, e, f);
-            nfa_prod_pair* pairs = nfa_intersec_reach(BR, BL, FOLDR->numcl[e], FOLDL->numcl[f], &size);
+            prod_pair* pairs = dgraph_intersec(gr, glinv, FOLDR->numcl[e], FOLDL->numcl[f], &size);
             for (uint p = 0; p < size; p++) {
                 uint c = pairs[p].q1;
                 uint d = pairs[p].q2;
 
-                for (uint g = 0; g < size_dequeue(FOLDR->cl[c]); g++) {
-                    uint q = lefread_dequeue(FOLDR->cl[c], g);
-                    for (uint k = 0; k < size_dequeue(FOLDL->cl[d]); k++) {
-                        uint t = lefread_dequeue(FOLDL->cl[d], k);
+                for (uint g = 0; g < FOLDR->cl_size[c]; g++) {
+                    uint q = FOLDR->cl_elems[c][g];
+                    for (uint k = 0; k < FOLDL->cl_size[d]; k++) {
+                        uint t = FOLDL->cl_elems[d][k];
                         union_ufind(ef, mor_mult(M, q, t), uf);
                     }
                 }
@@ -252,8 +234,8 @@ ufind* iden_bpolmod_mono(morphism* M) {
             free(pairs);
         }
     }
-    delete_nfa(BR);
-    delete_nfa(BL);
+    delete_dgraph(gr);
+    delete_dgraph(glinv);
     delete_parti(FOLDR);
     delete_parti(FOLDL);
 
@@ -271,13 +253,13 @@ ufind* iden_bpolamt_mono(morphism* M) {
     num_span_trees* lspans = compute_num_span_trees(M, false);
 
     // Loop over all idempotents e = qr
-    for (uint i = 0; i < size_dequeue(M->idem_list); i++) {
+    for (uint i = 0; i < M->nb_idems; i++) {
 
-        uint e = lefread_dequeue(M->idem_list, i);
+        uint e = M->idem_list[i];
 
         // Loop over all idempotents f = st
-        for (uint j = 0; j < size_dequeue(M->idem_list); j++) {
-            uint f = lefread_dequeue(M->idem_list, j);
+        for (uint j = 0; j < M->nb_idems; j++) {
+            uint f = M->idem_list[j];
             uint ef = mor_mult(M, e, f);
 
 
@@ -309,12 +291,12 @@ ufind* iden_blockg_mono(morphism* M) {
     green* G = M->rels;
     ufind* uf = create_ufind(M->r_cayley->size_graph);
     for (uint i = 0; i < G->RCL->size_par;i++) {
-        if (!G->regular_array[lefread_dequeue(G->RCL->cl[i], 0)]) {
+        uint e = G->RCL->cl_elems[i][0];
+        if (!G->regular_array[e]) {
             continue;
         }
-        uint e = lefread_dequeue(G->RCL->cl[i], 0);
-        for (uint j = 1; j < size_dequeue(G->RCL->cl[i]); j++) {
-            uint f = lefread_dequeue(G->RCL->cl[i], j);
+        for (uint j = 1; j < G->RCL->cl_size[i]; j++) {
+            uint f = G->RCL->cl_elems[i][j];
             if (M->idem_array[f]) {
                 if (M->idem_array[e]) {
                     union_ufind(e, f, uf);
@@ -327,12 +309,12 @@ ufind* iden_blockg_mono(morphism* M) {
     }
 
     for (uint i = 0; i < G->LCL->size_par;i++) {
-        uint e = lefread_dequeue(G->LCL->cl[i], 0);
+        uint e = G->LCL->cl_elems[i][0];
         if (!G->regular_array[e]) {
             continue;
         }
-        for (uint j = 1; j < size_dequeue(G->LCL->cl[i]); j++) {
-            uint f = lefread_dequeue(G->LCL->cl[i], j);
+        for (uint j = 1; j < G->LCL->cl_size[i]; j++) {
+            uint f = G->LCL->cl_elems[i][j];
             if (M->idem_array[f]) {
                 if (M->idem_array[e]) {
                     union_ufind(e, f, uf);
@@ -368,9 +350,11 @@ ufind* iden_knast_mono(orbits* L) {
 
         // Union of all J-classes in the DD-orbit of e.
         for (uint k = 0; k < L->orbits[i]->rels->JCL->size_par; k++) {
-            uint s = lefread_dequeue(L->orbits[i]->rels->JCL->cl[k], 0);
-            for (uint j = 1; j < size_dequeue(L->orbits[i]->rels->JCL->cl[k]); j++) {
-                uint t = lefread_dequeue(L->orbits[i]->rels->JCL->cl[k], j);
+            uint s = L->orbits[i]->rels->JCL->cl_elems[k][0];
+            //uint s = lefread_dequeue(L->orbits[i]->rels->JCL->cl[k], 0);
+            for (uint j = 1; j < L->orbits[i]->rels->JCL->cl_size[k]; j++) {
+                uint t = L->orbits[i]->rels->JCL->cl_elems[k][j];
+                //uint t = lefread_dequeue(L->orbits[i]->rels->JCL->cl[k], j);
                 union_ufind(L->orbits[i]->sub_to_mono[s], L->orbits[i]->sub_to_mono[t], uf);
             }
         }
@@ -384,7 +368,8 @@ ufind* iden_knast_mono(orbits* L) {
             dequeue* MfM = compute_j_ideal(M, f, L->orbits[i]->mono_in_sub);
 
             // Idempotents in the intersection of MfM and eMe
-            dequeue* idems = make_inter_sorted_dequeue(MfM, M->idem_list);
+
+            dequeue* idems = make_inter_sorted_dequeue_array(MfM, M->idem_list, M->nb_idems);
             delete_dequeue(MfM);
 
             // Ideals
@@ -398,7 +383,8 @@ ufind* iden_knast_mono(orbits* L) {
                 uint g = lefread_dequeue(idems, x);
 
                 // The elements eqf such that eqf R g
-                dequeue* lset = make_inter_sorted_dequeue(Mf, G->RCL->cl[G->RCL->numcl[g]]);
+                dequeue* lset = make_inter_sorted_dequeue_array(Mf, G->RCL->cl_elems[G->RCL->numcl[g]], G->RCL->cl_size[G->RCL->numcl[g]]);
+                //dequeue* lset = make_inter_sorted_dequeue(Mf, G->RCL->cl[G->RCL->numcl[g]]);
                 for (uint u = 0; u < size_dequeue(lset); u++) {
                     uint q = lefread_dequeue(lset, u);
 
@@ -408,7 +394,8 @@ ufind* iden_knast_mono(orbits* L) {
                         uint gh = mor_mult(M, g, h);
 
                         // The elements fte such that fte L h
-                        dequeue* rset = make_inter_sorted_dequeue(fM, G->LCL->cl[G->LCL->numcl[h]]);
+                        dequeue* rset = make_inter_sorted_dequeue_array(fM, G->LCL->cl_elems[G->LCL->numcl[h]], G->LCL->cl_size[G->LCL->numcl[h]]);
+                        //dequeue* rset = make_inter_sorted_dequeue(fM, G->LCL->cl[G->LCL->numcl[h]]);
                         for (uint v = 0; v < size_dequeue(rset); v++) {
                             uint t = lefread_dequeue(rset, v);
                             union_ufind(gh, mor_mult(M, q, t), uf);
@@ -446,9 +433,11 @@ ufind* iden_qknast_mono(orbits* L, subsemi* mker) {
 
         // Union of all J-classes in the MOD⁺-orbit of e.
         for (uint k = 0; k < L->orbits[i]->rels->JCL->size_par; k++) {
-            uint s = lefread_dequeue(L->orbits[i]->rels->JCL->cl[k], 0);
-            for (uint j = 1; j < size_dequeue(L->orbits[i]->rels->JCL->cl[k]); j++) {
-                uint t = lefread_dequeue(L->orbits[i]->rels->JCL->cl[k], j);
+            uint s = L->orbits[i]->rels->JCL->cl_elems[k][0];
+            //uint s = lefread_dequeue(L->orbits[i]->rels->JCL->cl[k], 0);
+            for (uint j = 1; j < L->orbits[i]->rels->JCL->cl_size[k]; j++) {
+                uint t = L->orbits[i]->rels->JCL->cl_elems[k][j];
+                //uint t = lefread_dequeue(L->orbits[i]->rels->JCL->cl[k], j);
                 union_ufind(L->orbits[i]->sub_to_mono[s], L->orbits[i]->sub_to_mono[t], uf);
             }
         }
@@ -460,8 +449,8 @@ ufind* iden_qknast_mono(orbits* L, subsemi* mker) {
             // Intersection of MfM and the MOD⁺-orbit of e
             dequeue* MfM = compute_j_ideal(M, f, L->orbits[i]->mono_in_sub);
 
-            // Restriction to the idempotents
-            dequeue* idems = make_inter_sorted_dequeue(MfM, M->idem_list);
+            // Restriction to the idempotents            
+            dequeue* idems = make_inter_sorted_dequeue_array(MfM, M->idem_list, M->nb_idems);
             delete_dequeue(MfM);
 
 
@@ -476,7 +465,8 @@ ufind* iden_qknast_mono(orbits* L, subsemi* mker) {
                 uint g = lefread_dequeue(idems, x);
 
                 // The eqf in the MOD-kernel such that eqf R g
-                dequeue* lset = make_inter_sorted_dequeue(Mf, G->RCL->cl[G->RCL->numcl[g]]);
+                dequeue* lset = make_inter_sorted_dequeue_array(Mf, G->RCL->cl_elems[G->RCL->numcl[g]], G->RCL->cl_size[G->RCL->numcl[g]]);
+                //dequeue* lset = make_inter_sorted_dequeue(Mf, G->RCL->cl[G->RCL->numcl[g]]);
                 for (uint u = 0; u < size_dequeue(lset); u++) {
                     uint q = lefread_dequeue(lset, u);
 
@@ -486,7 +476,8 @@ ufind* iden_qknast_mono(orbits* L, subsemi* mker) {
                         uint gh = mor_mult(M, g, h);
 
                         // The fte in the MOD-kernel such fte L h
-                        dequeue* rset = make_inter_sorted_dequeue(fM, G->LCL->cl[G->LCL->numcl[h]]);
+                        dequeue* rset = make_inter_sorted_dequeue_array(fM, G->LCL->cl_elems[G->LCL->numcl[h]], G->LCL->cl_size[G->LCL->numcl[h]]);
+                        //dequeue* rset = make_inter_sorted_dequeue(fM, G->LCL->cl[G->LCL->numcl[h]]);
                         for (uint v = 0; v < size_dequeue(rset); v++) {
                             uint t = lefread_dequeue(rset, v);
                             union_ufind(gh, mor_mult(M, q, t), uf);
@@ -530,8 +521,7 @@ ufind* iden_bpolamtp_mono(orbits* L) {
             uint f = M->regular_idems[j];
 
             dequeue* MfM = compute_j_ideal(M, f, L->orbits[i]->mono_in_sub);
-
-            dequeue* candidates = make_inter_sorted_dequeue(M->idem_list, MfM);
+            dequeue* candidates = make_inter_sorted_dequeue_array(MfM, M->idem_list, M->nb_idems);
             delete_dequeue(MfM);
 
             for (uint k = 0; k < size_dequeue(candidates); k++) {
@@ -571,24 +561,12 @@ ufind* iden_bpolgrp_mono(orbits* L) {
     morphism* M = L->original;
     ufind* uf = create_ufind(M->r_cayley->size_graph);
 
-    nfa* AR = morphism_to_dfa_rcl(M);
-    nfa* AL = morphism_to_dfa_lcl(M);
-    parti* SCCSR = nfa_inv_ext(AR);
-    parti* SCCSL = nfa_inv_ext(AL);
-    parti* FOLDR = nfa_stal_fold(AR, SCCSR);
-    parti* FOLDL = nfa_stal_fold(AL, SCCSL);
-    delete_parti(SCCSR);
-    delete_parti(SCCSL);
 
-    nfa* BR = nfa_merge_states(AR, FOLDR);
-    nfa* BL = nfa_merge_states(AL, FOLDL);
+    parti* FOLDR = mor_stal_fold(M, true, true);
+    parti* FOLDL = mor_stal_fold(M, true, false);
 
-    delete_nfa(AR);
-    delete_nfa(AL);
-
-    lgraph* temp = BL->trans;
-    BL->trans = BL->trans_i;
-    BL->trans_i = temp;
+    dgraph* gr = shrink_grp(M->r_cayley, FOLDR, M->rels->RCL);
+    dgraph* glinv = shrink_grp_mirror(M->l_cayley, FOLDL, M->rels->LCL);
 
 
     uint size = 0;
@@ -601,8 +579,7 @@ ufind* iden_bpolgrp_mono(orbits* L) {
             uint f = M->regular_idems[j];
 
             dequeue* MfM = compute_j_ideal(M, f, L->orbits[i]->mono_in_sub);
-
-            dequeue* candidates = make_inter_sorted_dequeue(M->idem_list, MfM);
+            dequeue* candidates = make_inter_sorted_dequeue_array(MfM, M->idem_list, M->nb_idems);
             delete_dequeue(MfM);
 
             for (uint k = 0; k < size_dequeue(candidates); k++) {
@@ -610,19 +587,21 @@ ufind* iden_bpolgrp_mono(orbits* L) {
                 for (uint l = 0; l < size_dequeue(candidates); l++) {
                     uint h = lefread_dequeue(candidates, l);
                     uint gh = mor_mult(M, g, h);
-                    nfa_prod_pair* pairs = nfa_intersec_reach(BR, BL, FOLDR->numcl[g], FOLDL->numcl[h], &size);
+                    prod_pair* pairs = dgraph_intersec(gr, glinv, FOLDR->numcl[g], FOLDL->numcl[h], &size);
                     for (uint p = 0; p < size; p++) {
                         uint c = pairs[p].q1;
                         uint d = pairs[p].q2;
 
-                        for (uint x = 0; x < size_dequeue(FOLDR->cl[c]); x++) {
-                            uint q = lefread_dequeue(FOLDR->cl[c], x);
+                        for (uint x = 0; x < FOLDR->cl_size[c]; x++) {
+                            uint q = FOLDR->cl_elems[c][x];
+                            //uint q = lefread_dequeue(FOLDR->cl[c], x);
                             if (mor_mult(M, q, f) != q) {
                                 continue;
                             }
 
-                            for (uint y = 0; y < size_dequeue(FOLDL->cl[d]); y++) {
-                                uint t = lefread_dequeue(FOLDL->cl[d], y);
+                            for (uint y = 0; y < FOLDL->cl_size[d]; y++) {
+                                uint t = FOLDL->cl_elems[d][y];
+                                //uint t = lefread_dequeue(FOLDL->cl[d], y);
                                 if (mor_mult(M, f, t) != t) {
                                     continue;
                                 }
@@ -636,8 +615,8 @@ ufind* iden_bpolgrp_mono(orbits* L) {
             delete_dequeue(candidates);
         }
     }
-    delete_nfa(BR);
-    delete_nfa(BL);
+    delete_dgraph(gr);
+    delete_dgraph(glinv);
     delete_parti(FOLDR);
     delete_parti(FOLDL);
 
@@ -655,25 +634,27 @@ ufind* iden_mpolc_mono(morphism* M, parti* C) {
 
     // For each class in the equivalence C
     for (uint c = 0; c < C->size_par; c++) {
-        if (size_dequeue(C->cl[c]) < 2) {
+        if (C->cl_size[c] < 2) {
             continue;
         }
 
         // We take the first element s in the class.
-        for (uint i = 0; i < size_dequeue(C->cl[c]); i++) {
+        for (uint i = 0; i < C->cl_size[c]; i++) {
 
-            uint s = lefread_dequeue(C->cl[c], i);
+            uint s = C->cl_elems[c][i];
+            //uint s = lefread_dequeue(C->cl[c], i);
 
             // Idempotents in sM and Ms
             dequeue* sM = compute_r_ideal(M, s, M->idem_array);
             dequeue* Ms = compute_l_ideal(M, s, M->idem_array);
 
             // We take a second distinct element t in the class
-            for (uint j = 0; j < size_dequeue(C->cl[c]); j++) {
+            for (uint j = 0; j < C->cl_size[c]; j++) {
                 if (i == j) {
                     continue;
                 }
-                uint t = lefread_dequeue(C->cl[c], j);
+                uint t = C->cl_elems[c][j];
+                //uint t = lefread_dequeue(C->cl[c], j);
                 for (uint k = 0; k < size_dequeue(sM); k++) {
                     uint sq = lefread_dequeue(sM, k);
                     uint sqs = mor_mult(M, sq, s);
@@ -703,10 +684,11 @@ ufind* iden_lpolc_mono(morphism* M, parti* C) {
     ufind* theuf = create_ufind(M->r_cayley->size_graph);
 
     // For every idempotent e
-    for (uint i = 0; i < size_dequeue(M->idem_list); i++) {
-        uint e = lefread_dequeue(M->idem_list, i);
+    for (uint i = 0; i < M->nb_idems; i++) {
+        uint e = M->idem_list[i];
         dequeue* rideal = compute_r_ideal(M, e, NULL);
-        dequeue* req = make_inter_sorted_dequeue(C->cl[C->numcl[e]], rideal);
+        dequeue* req = make_inter_sorted_dequeue_array(rideal, C->cl_elems[C->numcl[e]], C->cl_size[C->numcl[e]]);
+        //dequeue* req = make_inter_sorted_dequeue(C->cl[C->numcl[e]], rideal);
         delete_dequeue(rideal);
 
         // We merge e with all element et such that et C-eq e
@@ -729,10 +711,11 @@ ufind* iden_rpolc_mono(morphism* M, parti* C) {
     ufind* theuf = create_ufind(M->r_cayley->size_graph);
 
     // For every idempotent e
-    for (uint i = 0; i < size_dequeue(M->idem_list); i++) {
-        uint e = lefread_dequeue(M->idem_list, i);
+    for (uint i = 0; i < M->nb_idems; i++) {
+        uint e = M->idem_list[i];
         dequeue* lideal = compute_l_ideal(M, e, NULL);
-        dequeue* leq = make_inter_sorted_dequeue(C->cl[C->numcl[e]], lideal);
+        dequeue* leq = make_inter_sorted_dequeue_array(lideal, C->cl_elems[C->numcl[e]], C->cl_size[C->numcl[e]]);
+        //dequeue* leq = make_inter_sorted_dequeue(C->cl[C->numcl[e]], lideal);
         delete_dequeue(lideal);
 
         // We merge e with all element te such that te C-eq e

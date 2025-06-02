@@ -56,6 +56,7 @@ static avlnode* rotate_left_right(avlnode* p) {
         return NULL;
     }
     p->left = rotate_left(p->left);
+    fix_height(p);
     return rotate_right(p);
 }
 
@@ -65,6 +66,7 @@ static avlnode* rotate_right_left(avlnode* p) {
         return NULL;
     }
     p->right = rotate_right(p->right);
+    fix_height(p);
     return rotate_left(p);
 }
 
@@ -74,6 +76,7 @@ static avlnode* repare_balance_avl(avlnode* p) {
         return NULL;
     }
     int b = get_balance_avl(p);
+    //printf("Balance of node: %d\n", b);
     if (b == 2) {
         int bd = get_balance_avl(p->right);
         if (bd >= 0) {
@@ -92,6 +95,7 @@ static avlnode* repare_balance_avl(avlnode* p) {
             return rotate_left_right(p);
         }
     }
+    fix_height(p);
     return p;
 }
 
@@ -139,11 +143,13 @@ avlnode* avl_insert(void* val, avlnode* p, int (*f)(void*, void*), void (*d)(voi
     else if ((*f) (val, p->value) >= 1) {
         // Si la valeur est strictement inférieure à celle de la racine
         p->left = avl_insert(val, p->left, f, d);
+        fix_height(p);
         return repare_balance_avl(p);
     }
     else {
         // Si la valeur est strictement supérieure à celle de la racine
         p->right = avl_insert(val, p->right, f, d);
+        fix_height(p);
         return repare_balance_avl(p);
     }
 }
@@ -207,6 +213,15 @@ void avl_free_strong(avlnode* p, void (*f)(void*)) {
     }
 }
 
+int avl_height(avlnode* tree) {
+    if (tree == NULL) {
+        return -1;
+    }
+    else {
+        return max(avl_height(tree->left), avl_height(tree->right)) + 1;
+    }
+}
+
 /********************************/
 /* Version légère pour les uint */
 /********************************/
@@ -266,6 +281,7 @@ static uint_avlnode* uint_rotate_left_right(uint_avlnode* p) {
         return NULL;
     }
     p->left = uint_rotate_left(p->left);
+    uint_fix_height(p);
     return uint_rotate_right(p);
 }
 
@@ -275,6 +291,7 @@ static uint_avlnode* uint_rotate_right_left(uint_avlnode* p) {
         return NULL;
     }
     p->right = uint_rotate_right(p->right);
+    uint_fix_height(p);
     return uint_rotate_left(p);
 }
 
@@ -344,11 +361,13 @@ uint_avlnode* uint_avl_insert(uint val, uint_avlnode* p) {
     else if (val < p->value) {
         // Si la valeur est strictement inférieure à celle de la racine
         p->left = uint_avl_insert(val, p->left);
+        uint_fix_height(p);
         return repare_balance_uint_avl(p);
     }
     else {
         // Si la valeur est strictement supérieure à celle de la racine
         p->right = uint_avl_insert(val, p->right);
+        uint_fix_height(p);
         return repare_balance_uint_avl(p);
     }
 }

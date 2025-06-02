@@ -193,6 +193,10 @@ void init_class_info(void);
  */
 classes command_to_class(com_command*);
 
+
+
+
+
 /**
  * @brief
  * Print information on a class

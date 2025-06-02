@@ -8,11 +8,11 @@
 #ifndef PARTITIONS_H
 #define PARTITIONS_H
 
-/*  ____            _   _ _   _                  */
-/* |  _ \ __ _ _ __| |_(_) |_(_) ___  _ __  ___  */
-/* | |_) / _` | '__| __| | __| |/ _ \| '_ \/ __| */
-/* |  __/ (_| | |  | |_| | |_| | (_) | | | \__ \ */
-/* |_|   \__,_|_|   \__|_|\__|_|\___/|_| |_|___/ */
+ /*  ____            _   _ _   _                  */
+ /* |  _ \ __ _ _ __| |_(_) |_(_) ___  _ __  ___  */
+ /* | |_) / _` | '__| __| | __| |/ _ \| '_ \/ __| */
+ /* |  __/ (_| | |  | |_| | |_| | (_) | | | \__ \ */
+ /* |_|   \__,_|_|   \__|_|\__|_|\___/|_| |_|___/ */
 
 #include "alloc.h"
 #include "stdbool.h"
@@ -34,21 +34,36 @@
  * been computed.
  */
 typedef struct {
-    uint size_set; //!< Size of the partitioned set (the set itself is
-                   //!< {0,...,size_set-1}).
+    uint size_set; //!< Size of the partitioned set (the set itself is {0,...,size_set-1}).
     uint size_par; //!< Size of the partition.
-    uint *numcl; //!< Array indexed by the partitioned set. Each element in the
-                 //!< set is mapped to its class.
-    dequeue *
-        *cl; //!< Array indexed by the classes. Each class is mapped to the list
-             //!< sorted in increasing order of all elements that it contains.
+    uint* numcl; //!< Array indexed by the partitioned set. Each element in the set is mapped to its class.
+    uint* storage; //!< Used to the classes contiguously in memory (size size_set).
+    uint** cl_elems; //!< Array of classes. For each class c cl_elems[c] contains a point to its firts element in storage.
+    uint* cl_size; //!< Array indexed by the classes. Each class is mapped to its size.
+
+
+    //dequeue** cl; //!< Array indexed by the classes. Each class is mapped to the list
+    //!< sorted in increasing order of all elements that it contains.
 } parti;
+
+/**
+ * @brief
+ * Creation of a partition.
+ *
+ * @return
+ * The partition.
+ */
+parti* create_parti(uint size_set, //!< The size of the partitioned set.
+    uint size_par, //!< The size of the partition.
+    uint* numcl //!< The array mapping each element to its class (used in the structure as numcl)
+);
+
 
 /**
  * @brief
  * Release of a partition.
  */
-void delete_parti(parti * //!< The partition that needs to be freed.
+void delete_parti(parti* //!< The partition that needs to be freed.
 );
 
 /**
@@ -58,7 +73,7 @@ void delete_parti(parti * //!< The partition that needs to be freed.
  * @return
  * A Boolean indicating whether the partition is trivial.
  */
-bool istrivial_parti(parti * //!< The partition.
+bool istrivial_parti(parti* //!< The partition.
 );
 
 /**
@@ -71,11 +86,11 @@ bool istrivial_parti(parti * //!< The partition.
  * @return
  * The restricted partition.
  */
-parti *restrict_parti(
-    parti *, //!< The partition.
+parti* restrict_parti(
+    parti*, //!< The partition.
     uint,    //!< The size of the subset.
-    bool *, //!< The array of Booleans indicating which elements are to be kept.
-    uint *  //!< The array mapping each kept element to its index in the subset.
+    bool*, //!< The array of Booleans indicating which elements are to be kept.
+    uint*  //!< The array mapping each kept element to its index in the subset.
 );
 
 /**
@@ -89,12 +104,12 @@ parti *restrict_parti(
  * @return
  * The restricted partition.
  */
-parti *restrict_parti_subset(
-    parti *, //!< The partition.
+parti* restrict_parti_subset(
+    parti*, //!< The partition.
     uint,    //!< The size of the subset.
-    bool *, //!< The array of Booleans indicating which elements are to be kept.
-    uint *, //!< The array mapping each kept element to its index in the subset.
-    uint *  // Mapping from the original subset to the full set.
+    bool*, //!< The array of Booleans indicating which elements are to be kept.
+    uint*, //!< The array mapping each kept element to its index in the subset.
+    uint*  // Mapping from the original subset to the full set.
 );
 
 /**************/
@@ -111,9 +126,9 @@ typedef struct {
     uint size_set; //!< Size of the partitionned set (the set itself is
     //!< {0,...,size_set-1}).
     uint size_par; //!< Size of the partition.
-    uint *parent;  //!< Array encoding the parent relation.
-    uint *rank;    //!< Array of ranks (meaningful only for roots).
-    uint *sizec;   //!< Array of classes sizes (meaningful only for roots).
+    uint* parent;  //!< Array encoding the parent relation.
+    uint* rank;    //!< Array of ranks (meaningful only for roots).
+    uint* sizec;   //!< Array of classes sizes (meaningful only for roots).
 } ufind;
 
 /**
@@ -123,14 +138,14 @@ typedef struct {
  * @return
  * The union-find partition.
  */
-ufind *create_ufind(uint //!< The size of the partitioned set.
+ufind* create_ufind(uint //!< The size of the partitioned set.
 );
 
 /**
  * @brief
  * Release of a union-find partition.
  */
-void delete_ufind(ufind * //!< The union-find partition.
+void delete_ufind(ufind* //!< The union-find partition.
 );
 
 /**
@@ -140,7 +155,7 @@ void delete_ufind(ufind * //!< The union-find partition.
  * @return
  * The size of the partitioned set.
  */
-uint sizeset_ufind(ufind * //!< The union-find partition.
+uint sizeset_ufind(ufind* //!< The union-find partition.
 );
 
 /**
@@ -150,7 +165,7 @@ uint sizeset_ufind(ufind * //!< The union-find partition.
  * @return
  * The size of the partition.
  */
-uint sizepar_ufind(ufind * //!< The union-find partition.
+uint sizepar_ufind(ufind* //!< The union-find partition.
 );
 
 /**
@@ -160,7 +175,7 @@ uint sizepar_ufind(ufind * //!< The union-find partition.
  * @remark
  * The class of the new element is a singleton.
  */
-void makeset_ufind(ufind * //!< The union-find partition.
+void makeset_ufind(ufind* //!< The union-find partition.
 );
 
 /**
@@ -171,7 +186,7 @@ void makeset_ufind(ufind * //!< The union-find partition.
  * The class number of the element.
  */
 uint find_ufind(uint,   //!< The element.
-                ufind * //!< The union-find partition.
+    ufind* //!< The union-find partition.
 );
 
 /**
@@ -182,7 +197,7 @@ uint find_ufind(uint,   //!< The element.
  * The size of the class of the element.
  */
 uint sizeclass_ufind(uint,   //!< The element.
-                     ufind * //!< The union-find partition.
+    ufind* //!< The union-find partition.
 );
 
 /**
@@ -190,15 +205,15 @@ uint sizeclass_ufind(uint,   //!< The element.
  * Merging of the classes of two elements in a union-find partition.
  */
 void union_ufind(uint,   //!< The first element.
-                 uint,   //!< The second element.
-                 ufind * //!< The union-find partition.
+    uint,   //!< The second element.
+    ufind* //!< The union-find partition.
 );
 
 /**
  * @brief
  * Displays a union-find partition.
  */
-void print_ufind(ufind * //!< The union-find partition.
+void print_ufind(ufind* //!< The union-find partition.
 );
 
 /**
@@ -208,7 +223,7 @@ void print_ufind(ufind * //!< The union-find partition.
  * @return
  * A representation of the input partition in the union-find type.
  */
-ufind *parti_to_ufind(parti * //!< The partition.
+ufind* parti_to_ufind(parti* //!< The partition.
 );
 
 /**
@@ -218,7 +233,7 @@ ufind *parti_to_ufind(parti * //!< The partition.
  * @return
  * A representation of the input partition in the partition type.
  */
-parti *ufind_to_parti(ufind * //!< The union-find partition.
+parti* ufind_to_parti(ufind* //!< The union-find partition.
 );
 
 /**
@@ -230,9 +245,9 @@ parti *ufind_to_parti(ufind * //!< The union-find partition.
  * @return
  * A representation of the input partition in the partition type.
  */
-parti *ufind_to_parti_refined(
-    ufind *, //!< The union-find partition.
-    parti *  //!< A partition coarser than the union-find partition.
+parti* ufind_to_parti_refined(
+    ufind*, //!< The union-find partition.
+    parti*  //!< A partition coarser than the union-find partition.
 );
 
 #endif

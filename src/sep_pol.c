@@ -87,7 +87,7 @@ bool decid_polst_sep(nfa* A, nfa* B, bool details, FILE* out)
 
     // Phase 2
     nfa* INTERSECT = nfa_intersect(A, BEPS, true);
-    delete_nfa(BEPS);
+    nfa_delete(BEPS);
     if (out && details)
     {
         print_sep_line(100, out);
@@ -101,7 +101,7 @@ bool decid_polst_sep(nfa* A, nfa* B, bool details, FILE* out)
         {
             fprintf(out, "#### This NFA recognizes the empty language\n");
         }
-        delete_nfa(INTERSECT);
+        nfa_delete(INTERSECT);
         return true;
     }
     else
@@ -111,7 +111,7 @@ bool decid_polst_sep(nfa* A, nfa* B, bool details, FILE* out)
             fprintf(out, "#### This NFA recognizes a nonempty language\n");
         }
 
-        delete_nfa(INTERSECT);
+        nfa_delete(INTERSECT);
         return false;
     }
 }
@@ -154,10 +154,10 @@ bool decid_polmod_sep(nfa* A, nfa* B, bool details, FILE* out)
     nfa* BEPS = nfa_merge_states(B, FOLD);
     nfa* BPROJEPS = nfa_dyck_ext(BPROJ, FOLD);
     delete_parti(FOLD);
-    delete_nfa(BPROJ);
+    nfa_delete(BPROJ);
     BEPS->trans_e = BPROJEPS->trans_e;
     BPROJEPS->trans_e = NULL;
-    delete_nfa(BPROJEPS);
+    nfa_delete(BPROJEPS);
     nfa_remove_inv(BEPS);
     nfa_elimeps_mod(BEPS);
     if (out && details)
@@ -177,7 +177,7 @@ bool decid_polmod_sep(nfa* A, nfa* B, bool details, FILE* out)
 
     // Phase 2
     nfa* INTERSECT = nfa_intersect(A, BEPS, true);
-    delete_nfa(BEPS);
+    nfa_delete(BEPS);
     if (out && details)
     {
         print_sep_line(100, out);
@@ -191,7 +191,7 @@ bool decid_polmod_sep(nfa* A, nfa* B, bool details, FILE* out)
         {
             fprintf(out, "#### This NFA recognizes the empty language\n");
         }
-        delete_nfa(INTERSECT);
+        nfa_delete(INTERSECT);
         return true;
     }
     else
@@ -201,7 +201,7 @@ bool decid_polmod_sep(nfa* A, nfa* B, bool details, FILE* out)
             fprintf(out, "#### This NFA recognizes a nonempty language\n");
         }
 
-        delete_nfa(INTERSECT);
+        nfa_delete(INTERSECT);
         return false;
     }
 }
@@ -262,7 +262,7 @@ bool decid_polgr_sep(nfa* A, nfa* B, bool details, FILE* out)
 
     // Phase 2
     nfa* INTERSECT = nfa_intersect(A, BEPS, true);
-    delete_nfa(BEPS);
+    nfa_delete(BEPS);
     if (out && details)
     {
         print_sep_line(100, out);
@@ -276,7 +276,7 @@ bool decid_polgr_sep(nfa* A, nfa* B, bool details, FILE* out)
         {
             fprintf(out, "#### This NFA recognizes the empty language\n");
         }
-        delete_nfa(INTERSECT);
+        nfa_delete(INTERSECT);
         return true;
     }
     else
@@ -286,7 +286,7 @@ bool decid_polgr_sep(nfa* A, nfa* B, bool details, FILE* out)
             fprintf(out, "#### This NFA recognizes a nonempty language\n");
         }
 
-        delete_nfa(INTERSECT);
+        nfa_delete(INTERSECT);
         return false;
     }
 }

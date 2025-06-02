@@ -76,12 +76,27 @@ uint mor_max_name_size(morphism*, //!< The morphism.
     dequeue*   //!< The subset of elements (all elements are considered when NULL).
 );
 
+uint mor_max_name_size_array(morphism*, //!< The morphism.
+    uint*,   //!< The subset of elements (all elements are considered when NULL).
+    uint size
+);
+
 /**
  * @brief
  * Displays a subset of elements on a given stream.
  */
 void mor_print_sub(morphism*, //!< The morphism.
     dequeue*,  //!< The subset.
+    FILE*      //!< The stream.
+);
+
+/**
+ * @brief
+ * Displays a subset of elements on a given stream.
+ */
+void mor_print_sub_array(morphism*, //!< The morphism.
+    uint*,  //!< The subset.
+    uint,   //!< The size of the subset.
     FILE*      //!< The stream.
 );
 
@@ -101,6 +116,21 @@ void mor_print_sub_aligned(morphism*, //!< The morphism.
 
 /**
  * @brief
+ * Displays a subset of elements on a given stream inside a partial box.
+ *
+ * @remark
+ * Line breaks are made automatically.
+ */
+void mor_print_sub_array_aligned(morphism*, //!< The morphism.
+    uint*,  //!< The subset.
+    uint,   //!< The size of the subset.
+    uint,       //!< The width of the box.
+    uint,       //!< Padding before the display on the first line.
+    FILE*      //!< The stream.
+);
+
+/**
+ * @brief
  * Displays a subset of elements on a given stream inside a complete titled box.
  *
  * @remark
@@ -112,6 +142,22 @@ void mor_print_sub_titled(morphism*, //!< The morphism.
     char*,     //!< The title.
     FILE*      //!< The stream.
 );
+
+/**
+ * @brief
+ * Displays a subset of elements on a given stream inside a complete titled box.
+ *
+ * @remark
+ * Line breaks are made automatically.
+ */
+void mor_print_sub_array_titled(morphism*, //!< The morphism.
+    uint*,  //!< The subset.
+    uint,   //!< The size of the subset.
+    uint,       //!< The width of the box.
+    char*,     //!< The title.
+    FILE*      //!< The stream.
+);
+
 
 /**
  * @brief
@@ -147,21 +193,21 @@ void mor_mult_print(morphism*, //!< The morphism.
 );
 
 
-/**
- * @brief
- * Displays the idempotents in a subsemigroup.
- */
-void submono_print_idems(subsemi*, //!< The subsemigroup.
-    FILE* //!< The stream.
-);
+// /**
+//  * @brief
+//  * Displays the idempotents in a subsemigroup.
+//  */
+// void submono_print_idems(subsemi*, //!< The subsemigroup.
+//     FILE* //!< The stream.
+// );
 
-/**
- * @brief
- * Displays the ordering on the elements of a subsemigroup.
- */
-void submono_print_order(subsemi*, //!< The subsemigroup.
-    FILE* //!< The stream.
-);
+// /**
+//  * @brief
+//  * Displays the ordering on the elements of a subsemigroup.
+//  */
+// void submono_print_order(subsemi*, //!< The subsemigroup.
+//     FILE* //!< The stream.
+// );
 
 
 

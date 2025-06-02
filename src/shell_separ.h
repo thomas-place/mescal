@@ -31,19 +31,6 @@ extern bool (*class_separation[CL_END]) (nfa*, nfa*, bool, FILE*);
 void init_separation(void);
 
 
-/*********************************/
-/* Generic separation procedures */
-/*********************************/
-
-/**
- * @brief
- * Generic separation function called by the shell.
- *
- * @return
- * True if the languages are separable by the class, false otherwise.
- */
-bool shell_separation(com_parameters* //!< Command parameters (should include the class and the two input languages).
-);
 
 
 

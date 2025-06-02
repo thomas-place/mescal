@@ -93,6 +93,9 @@ void avl_free_strong(avlnode*, //!< Root node of the AVL tree.
     void (*f)(void*)        //!< Function used to release the values.
 );
 
+int avl_height(avlnode* //!< Root node of the AVL tree.
+);
+
 
 /***********************************************/
 /* Light version specific to unsigned integers */

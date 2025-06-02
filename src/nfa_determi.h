@@ -22,13 +22,12 @@
  *
  * @remark
  * The input Boolean is used to indicate whether the names of the states have to be saved (this only
- * impacts display).  The name of a state is the set of states to which it corresponds in the subset
- * construction.
+ * impacts display). A stated is named by the corresponding set of states in the subset construction.
  *
  * @return
  * The complete DFA built with the subset construction.
  */
-nfa* nfa_determinize(nfa*, //!< The NFA.
+dfa* nfa_determinize(nfa*, //!< The NFA.
     bool                   //!< A Boolean indicating whether the state names have to be saved.
 );
 
@@ -41,5 +40,17 @@ nfa* nfa_determinize(nfa*, //!< The NFA.
  */
 nfa* nfa_complement(nfa* //!< The NFA.
 );
+
+
+/**
+ * @brief
+ * Complementation of a DFA.
+ *
+ * @return
+ * A complete DFA recognizing the complement of the input language.
+ */
+dfa* dfa_complement(dfa* //!< The DFA.
+);
+
 
 #endif

@@ -30,9 +30,9 @@ graph* compute_dag_of_sccs(graph* G, parti* clist)
     graph* new = create_graph_noedges(clist->size_par);
     for (uint c = 0; c < clist->size_par; c++)
     {
-        for (uint i = 0; i < size_dequeue(clist->cl[c]); i++)
+        for (uint i = 0; i < clist->cl_size[c]; i++)
         {
-            merge_sorted_dequeue(new->edges[c], adjclass[lefread_dequeue(clist->cl[c], i)]);
+            merge_sorted_dequeue(new->edges[c], adjclass[clist->cl_elems[c][i]]);
         }
     }
     for (uint q = 0; q < clist->size_set; q++)
@@ -143,33 +143,33 @@ graph* compute_tclos_dag(graph* G, dequeue* topo_sort)
 /*****************************************/
 
 // Prend un graphe quelconque en entrée et l'étend en faisant sa clôture transitive
-void make_tclos_graph(graph* G)
-{
+// void make_tclos_graph(graph* G)
+// {
 
-    // Calcul du graphe des SCCs
-    parti* clist = tarjan(G);
-    graph* dag_of_sccs = compute_dag_of_sccs(G, clist);
+//     // Calcul du graphe des SCCs
+//     parti* clist = tarjan(G);
+//     graph* dag_of_sccs = compute_dag_of_sccs(G, clist);
 
-    // graph_printing_test(dag_of_sccs, stdout);
+//     // graph_printing_test(dag_of_sccs, stdout);
 
-    // Calcul de la cloture transitive du graphe des SCCs
-    // Les sommets sont déjà triés selon un ordre topologique (conséquence de tarjan)
-    graph* tc_dag_of_scss = compute_tclos_dag(dag_of_sccs, NULL);
+//     // Calcul de la cloture transitive du graphe des SCCs
+//     // Les sommets sont déjà triés selon un ordre topologique (conséquence de tarjan)
+//     graph* tc_dag_of_scss = compute_tclos_dag(dag_of_sccs, NULL);
 
-    // graph_printing_test(tc_dag_of_scss, stdout);
+//     // graph_printing_test(tc_dag_of_scss, stdout);
 
-    for (uint q = 0; q < G->size; q++)
-    {
-        uint c = clist->numcl[q]; // La classe de q
-        for (uint i = 0; i < size_dequeue(tc_dag_of_scss->edges[c]); i++)
-        { // On lit les classes adjacentes dans la TC
-            uint d = lefread_dequeue(tc_dag_of_scss->edges[c], i);
-            merge_sorted_dequeue(G->edges[q], clist->cl[d]);
-        }
-    }
+//     for (uint q = 0; q < G->size; q++)
+//     {
+//         uint c = clist->numcl[q]; // La classe de q
+//         for (uint i = 0; i < size_dequeue(tc_dag_of_scss->edges[c]); i++)
+//         { // On lit les classes adjacentes dans la TC
+//             uint d = lefread_dequeue(tc_dag_of_scss->edges[c], i);
+//             merge_sorted_dequeue(G->edges[q], clist->cl[d]);
+//         }
+//     }
 
-    // Libération des objets temporaires
-    delete_parti(clist);
-    delete_graph(dag_of_sccs);
-    delete_graph(tc_dag_of_scss);
-}
+//     // Libération des objets temporaires
+//     delete_parti(clist);
+//     delete_graph(dag_of_sccs);
+//     delete_graph(tc_dag_of_scss);
+// }

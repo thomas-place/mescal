@@ -108,6 +108,17 @@ int compare_letters(const void*, //!< The first letter.
 
 /**
  * @brief
+ * Creates a copy of an array of letters.
+ *
+ * @return
+ * A copy of the array of letters.
+ */
+letter* duplicate_alphabet(const letter*, //!< The array of letters.
+    uint              //!< The size of the array of letters.
+);
+
+/**
+ * @brief
  * The type used to represent a word.
  *
  * @details

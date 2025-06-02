@@ -61,9 +61,13 @@ dequeue_gen* dgraph_to_multi_edges(dgraph* //!< The deterministic graph.
 
 void named_lgedges_print(dequeue_gen* theedges, nfa* A, FILE* out);
 
+void named_dfaedges_print(dequeue_gen* theedges, dfa* A, FILE* out);
+
 void named_dedges_print(dequeue_gen* theedges, morphism* M, FILE* out);
 
 void nfa_print(nfa* A, FILE* out);
+
+void dfa_print(dfa* A, FILE* out);
 
 void cayley_print(morphism* mor, FILE* out);
 
@@ -76,6 +80,8 @@ void cayley_left_print(morphism* mor, FILE* out);
 
 void view_nfa(nfa* nfa);
 
+void view_dfa(dfa* dfa);
+
 void view_cayley(morphism* mor);
 
 void view_left_cayley(morphism* mor);
@@ -87,7 +93,9 @@ void view_left_cayley(morphism* mor);
 
 void latex_init(void);
 
-void latex_print_automaton(nfa* A, FILE* out);
+void latex_print_nfa(nfa* A, FILE* out);
+
+void latex_print_dfa(dfa* A, FILE* out);
 
 void latex_print_cayley(morphism* M, FILE* out);
 

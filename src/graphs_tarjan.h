@@ -17,6 +17,8 @@
  /* /_/   \_\_|\__, |\___/|_|  |_|\__|_| |_|_| |_| |_|                       */
  /*            |___/                                                         */
 
+//#define DEBUG_TARJAN
+
 
 #include "type_partitions.h"
 #include "graphs.h"
@@ -36,7 +38,7 @@
  * @return
  * The partition of the graph into strongly connected components.
  */
-parti* tarjan(graph* //!< The unlabeled graph.
+parti* tarjan(graph* g //!< The unlabeled graph.
 );
 
 /**
@@ -49,7 +51,8 @@ parti* tarjan(graph* //!< The unlabeled graph.
  * @return
  * The partition of the graph into strongly connected components.
  */
-parti* ltarjan(lgraph* //!< The labeled graph.
+parti* ltarjan(lgraph* g, //!< The labeled graph.
+    bool* alph //!< An array of Booleans indexed by the labels. Only the edges labeled by a letter marked true are considered. NULL means all labels are considered.
 );
 
 /**
@@ -62,17 +65,16 @@ parti* ltarjan(lgraph* //!< The labeled graph.
  * @return
  * The partition of the graph into strongly connected components.
  */
-parti* dtarjan(dgraph* //!< The complete deterministic labeled graph.
+parti* dtarjan(dgraph* g, //!< The complete deterministic labeled graph.
+    bool* alph, //!< An array of Booleans indexed by the labels. Only the edges labeled by a letter marked true are considered. NULL means all labels are considered.
+    bool ismor      //!< If true, the algorithm is run on a Cayley graph (all vertices are reachable from ONE = 0).
 );
-
-/*********************************************/
-/* Restriction of algorithm to sub-alphabets */
-/*********************************************/
 
 
 /**
  * @brief
- * Tarjan's algorihtm for labeled graphs. Restricted variant.
+ * Tarjan's algorihtm for two complete deterministic labeled graphs sharing the same state set and alphabet.
+ * Computation is done in the merge of the two graphs.
  *
  * @remark
  * The classes are sorted in topological order.
@@ -80,22 +82,11 @@ parti* dtarjan(dgraph* //!< The complete deterministic labeled graph.
  * @return
  * The partition of the graph into strongly connected components.
  */
-parti* ltarjan_alph(lgraph*, //!< The labeled graph.
-    bool*                 //!< An array of Booleans indexed by the labels. Only the edges labeled by a letter marked true are considered.
+parti* dualdtarjan(dgraph* g1, //!< The first complete deterministic labeled graph.
+    dgraph* g2, //!< The second complete deterministic labeled graph.
+    bool* alph, //!< An array of Booleans indexed by the labels. Only the edges labeled by a letter marked true are considered. NULL means all labels are considered.
+    bool ismor //!< If true, the algorithm is run on Cayley graphs (all vertices are reachable from ONE = 0).
 );
 
-/**
- * @brief
- * Tarjan's algorihtm for complete deterministic labeled graphs. Restricted variant.
- *
- * @remark
- * The classes are sorted in topological order.
- *
- * @return
- * The partition of the graph into strongly connected components.
- */
-parti* dtarjan_alph(dgraph*, //!< The complete deterministic labeled graph.
-    bool*                 //!< An array of Booleans indexed by the labels. Only the edges labeled by a letter marked true are considered.
-);
 
 #endif // TARJAN_H_

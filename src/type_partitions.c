@@ -7,46 +7,125 @@
 /* First Type */
 /**************/
 
+parti* create_parti(uint size_set, uint size_par, uint* numcl) {
+    if (size_set == 0 || size_par == 0) {
+        fprintf(stderr, "Warning, cannot create a partition of size zero. Returned NULL.\n");
+        return NULL;
+    }
+    parti* new;
+    MALLOC(new, 1);
+    new->size_set = size_set;
+    new->size_par = size_par;
+    new->numcl = numcl;
+
+    MALLOC(new->storage, size_set);
+    MALLOC(new->cl_elems, size_par);
+    CALLOC(new->cl_size, size_par);
+
+    // Initialization of the classes sizes
+    for (uint i = 0; i < size_set; i++) {
+        new->cl_size[numcl[i]]++;
+    }
+
+    // Strating point of each class in the storage
+    new->cl_elems[0] = new->storage; // The first class starts at the beginning of the storage
+    for (uint i = 1; i < size_par; i++) {
+        new->cl_elems[i] = new->cl_elems[i - 1] + new->cl_size[i - 1]; // Each class starts after the previous one
+    }
+
+
+    // We now fill the storage.
+    uint* c;
+    CALLOC(c, size_par);
+
+    for (uint i = 0; i < size_set; i++) {
+        // Each element is stored in the storage at the position of its class
+        new->cl_elems[numcl[i]][c[numcl[i]]] = i;
+        c[numcl[i]]++; // Increment the counter for the class
+    }
+    free(c);
+    return new;
+}
+
+// void delete_parti(parti* p)
+// {
+//     if (p == NULL)
+//     {
+//         return;
+//     }
+//     for (uint c = 0; c < p->size_par; c++)
+//     {
+//         delete_dequeue(p->cl[c]);
+//     }
+//     free(p->cl);
+//     free(p->numcl);
+//     free(p);
+// }
+
+
 void delete_parti(parti* p)
 {
     if (p == NULL)
     {
         return;
     }
-    for (uint c = 0; c < p->size_par; c++)
-    {
-        delete_dequeue(p->cl[c]);
-    }
-    free(p->cl);
+    free(p->storage);
+    free(p->cl_elems);
+    free(p->cl_size);
     free(p->numcl);
     free(p);
 }
 
 bool istrivial_parti(parti* p)
 {
-    for (uint c = 0; c < p->size_par; c++)
-    {
-        if (size_dequeue(p->cl[c]) != 1)
-        {
-            return false;
-        }
-    }
-    return true;
+    return p->size_par == p->size_set;
 }
+
+// parti* restrict_parti(parti* P, uint size, bool* insub, uint* tosub)
+// {
+//     parti* new;
+//     MALLOC(new, 1);
+//     new->size_set = size;
+//     MALLOC(new->numcl, size);
+//     uint num = 0;
+//     for (uint i = 0; i < P->size_par; i++) {
+//         bool inter = false;
+//         for (uint j = 0; j < size_dequeue(P->cl[i]); j++) {
+//             if (insub[lefread_dequeue(P->cl[i], j)]) {
+//                 inter = true;
+//                 new->numcl[tosub[lefread_dequeue(P->cl[i], j)]] = num;
+//             }
+//         }
+//         if (inter) {
+//             num++;
+//         }
+//     }
+
+//     MALLOC(new->cl, num);
+//     new->size_par = num;
+//     for (uint i = 0; i < num; i++) {
+//         new->cl[i] = create_dequeue();
+//     }
+
+//     for (uint s = 0; s < size; s++) {
+//         rigins_dequeue(s, new->cl[new->numcl[s]]);
+//     }
+
+//     return new;
+
+// }
 
 parti* restrict_parti(parti* P, uint size, bool* insub, uint* tosub)
 {
-    parti* new;
-    MALLOC(new, 1);
-    new->size_set = size;
-    MALLOC(new->numcl, size);
+    uint* newnumcl;
+    MALLOC(newnumcl, size);
     uint num = 0;
     for (uint i = 0; i < P->size_par; i++) {
         bool inter = false;
-        for (uint j = 0; j < size_dequeue(P->cl[i]); j++) {
-            if (insub[lefread_dequeue(P->cl[i], j)]) {
+        for (uint j = 0; j < P->cl_size[i]; j++) {
+            if (insub[P->cl_elems[i][j]]) {
                 inter = true;
-                new->numcl[tosub[lefread_dequeue(P->cl[i], j)]] = num;
+                newnumcl[tosub[P->cl_elems[i][j]]] = num;
             }
         }
         if (inter) {
@@ -54,54 +133,65 @@ parti* restrict_parti(parti* P, uint size, bool* insub, uint* tosub)
         }
     }
 
-    MALLOC(new->cl, num);
-    new->size_par = num;
-    for (uint i = 0; i < num; i++) {
-        new->cl[i] = create_dequeue();
-    }
-
-    for (uint s = 0; s < size; s++) {
-        rigins_dequeue(s, new->cl[new->numcl[s]]);
-    }
-
-    return new;
-
+    return create_parti(size, num, newnumcl);
 }
+
+
+// parti* restrict_parti_subset(parti* P, uint size, bool* insub, uint* tosub, uint* fromind)
+// {
+//     parti* new;
+//     MALLOC(new, 1);
+//     new->size_set = size;
+//     MALLOC(new->numcl, size);
+//     uint num = 0;
+//     for (uint i = 0; i < P->size_par; i++) {
+//         bool inter = false;
+//         for (uint j = 0; j < size_dequeue(P->cl[i]); j++) {
+//             uint s = fromind[lefread_dequeue(P->cl[i], j)];
+//             if (insub[s]) {
+//                 inter = true;
+//                 new->numcl[tosub[s]] = num;
+//             }
+//         }
+//         if (inter) {
+//             num++;
+//         }
+//     }
+
+//     MALLOC(new->cl, num);
+//     new->size_par = num;
+//     for (uint i = 0; i < num; i++) {
+//         new->cl[i] = create_dequeue();
+//     }
+
+//     for (uint s = 0; s < size; s++) {
+//         rigins_dequeue(s, new->cl[new->numcl[s]]);
+//     }
+
+//     return new;
+
+// }
 
 
 parti* restrict_parti_subset(parti* P, uint size, bool* insub, uint* tosub, uint* fromind)
 {
-    parti* new;
-    MALLOC(new, 1);
-    new->size_set = size;
-    MALLOC(new->numcl, size);
+    uint* newnumcl;
+    MALLOC(newnumcl, size);
     uint num = 0;
     for (uint i = 0; i < P->size_par; i++) {
         bool inter = false;
-        for (uint j = 0; j < size_dequeue(P->cl[i]); j++) {
-            uint s = fromind[lefread_dequeue(P->cl[i], j)];
+        for (uint j = 0; j < P->cl_size[i]; j++) {
+            uint s = fromind[P->cl_elems[i][j]];
             if (insub[s]) {
                 inter = true;
-                new->numcl[tosub[s]] = num;
+                newnumcl[tosub[s]] = num;
             }
         }
         if (inter) {
             num++;
         }
     }
-
-    MALLOC(new->cl, num);
-    new->size_par = num;
-    for (uint i = 0; i < num; i++) {
-        new->cl[i] = create_dequeue();
-    }
-
-    for (uint s = 0; s < size; s++) {
-        rigins_dequeue(s, new->cl[new->numcl[s]]);
-    }
-
-    return new;
-
+    return create_parti(size, num, newnumcl);
 }
 
 
@@ -310,106 +400,175 @@ void print_ufind(ufind* uf)
 
 
 // Conversion en Union-Find
+// ufind* parti_to_ufind(parti* p)
+// {
+//     ufind* uf = create_ufind(p->size_set);
+//     for (uint c = 0; c < p->size_par; c++)
+//     {
+//         for (uint i = 1; i < size_dequeue(p->cl[c]); i++)
+//         {
+//             union_ufind(lefread_dequeue(p->cl[c], 0), lefread_dequeue(p->cl[c], i), uf);
+//         }
+//     }
+//     return uf;
+// }
+
 ufind* parti_to_ufind(parti* p)
 {
     ufind* uf = create_ufind(p->size_set);
     for (uint c = 0; c < p->size_par; c++)
     {
-        for (uint i = 1; i < size_dequeue(p->cl[c]); i++)
+        for (uint i = 1; i < p->cl_size[c]; i++)
         {
-            union_ufind(lefread_dequeue(p->cl[c], 0), lefread_dequeue(p->cl[c], i), uf);
+            union_ufind(p->cl_elems[c][0], p->cl_elems[c][i], uf);
         }
     }
     return uf;
 }
 
+// // Construction depuis Union-Find
+// parti* ufind_to_parti(ufind* uf)
+// {
+//     // Initialisation de la partition
+//     parti* new;
+//     MALLOC(new, 1);
+//     new->size_par = uf->size_par;
+//     new->size_set = uf->size_set;
+//     MALLOC(new->cl, new->size_par);
+//     for (uint c = 0; c < new->size_par; c++)
+//     {
+//         new->cl[c] = create_dequeue();
+//     }
+//     MALLOC(new->numcl, new->size_set);
+
+//     // Tableau qui mémorise les éléments déjà traités
+//     bool* doelems;
+//     CALLOC(doelems, new->size_set);
+
+//     // Prochain numéro de classe
+//     uint num_class = 0;
+
+//     // Calcul des classes
+//     for (uint e = 0; e < uf->size_set; e++)
+//     {
+//         uint r = find_ufind(e, uf);
+//         if (doelems[r] == false)
+//         {
+//             new->numcl[r] = num_class;
+//             num_class++;
+//             doelems[r] = true;
+//         }
+
+//         uint c = new->numcl[r];
+//         new->numcl[e] = c;
+//         rigins_dequeue(e, new->cl[c]);
+//     }
+//     free(doelems);
+//     return new;
+// }
+
+
 // Construction depuis Union-Find
 parti* ufind_to_parti(ufind* uf)
 {
-    // Initialisation de la partition
-    parti* new;
-    MALLOC(new, 1);
-    new->size_par = uf->size_par;
-    new->size_set = uf->size_set;
-    MALLOC(new->cl, new->size_par);
-    for (uint c = 0; c < new->size_par; c++)
+    uint* numcl;
+    MALLOC(numcl, uf->size_set);
+    for (uint i = 0; i < uf->size_set; i++)
     {
-        new->cl[c] = create_dequeue();
+        numcl[i] = UINT_MAX;
     }
-    MALLOC(new->numcl, new->size_set);
-
-    // Tableau qui mémorise les éléments déjà traités
-    bool doelems[new->size_set];
-    for (uint e = 0; e < uf->size_set; e++)
-    {
-        doelems[e] = false;
-    }
-
-    // Prochain numéro de classe
     uint num_class = 0;
 
-    // Calcul des classes
     for (uint e = 0; e < uf->size_set; e++)
     {
         uint r = find_ufind(e, uf);
-        if (doelems[r] == false)
+        if (numcl[r] == UINT_MAX)
         {
-            new->numcl[r] = num_class;
+            numcl[r] = num_class;
             num_class++;
-            doelems[r] = true;
         }
-
-        uint c = new->numcl[r];
-        new->numcl[e] = c;
-        rigins_dequeue(e, new->cl[c]);
+        numcl[e] = numcl[r];
     }
-    return new;
+
+    return create_parti(uf->size_set, num_class, numcl);
 }
+
+// parti* ufind_to_parti_refined(ufind* uf, parti* P)
+// {
+//     // Initialisation de la partition
+//     parti* new;
+//     MALLOC(new, 1);
+//     new->size_par = uf->size_par;
+//     new->size_set = uf->size_set;
+
+
+//     MALLOC(new->cl, new->size_par);
+//     for (uint c = 0; c < new->size_par; c++)
+//     {
+//         new->cl[c] = create_dequeue();
+//     }
+//     MALLOC(new->numcl, new->size_set);
+
+
+//     // Tableau qui mémorise les éléments déjà traités
+//     bool* doelems;
+//     CALLOC(doelems, new->size_set);
+
+
+//     // Prochain numéro de classe
+//     uint num_class = 0;
+
+
+//     // Calcul des classes
+//     for (uint d = 0; d < P->size_par; d++)
+//     {
+//         for (uint i = 0; i < size_dequeue(P->cl[d]); i++)
+//         {
+//             uint e = lefread_dequeue(P->cl[d], i);
+
+//             uint r = find_ufind(e, uf);
+//             if (doelems[r] == false)
+//             {
+//                 new->numcl[r] = num_class;
+//                 num_class++;
+//                 doelems[r] = true;
+//             }
+
+//             uint c = new->numcl[r];
+//             new->numcl[e] = c;
+//             rigins_dequeue(e, new->cl[c]);
+//         }
+//     }
+//     free(doelems);
+//     return new;
+// }
+
 
 parti* ufind_to_parti_refined(ufind* uf, parti* P)
 {
-    // Initialisation de la partition
-    parti* new;
-    MALLOC(new, 1);
-    new->size_par = uf->size_par;
-    new->size_set = uf->size_set;
-    MALLOC(new->cl, new->size_par);
-    for (uint c = 0; c < new->size_par; c++)
+    uint* numcl;
+    MALLOC(numcl, uf->size_set);
+    for (uint i = 0; i < uf->size_set; i++)
     {
-        new->cl[c] = create_dequeue();
+        numcl[i] = UINT_MAX;
     }
-    MALLOC(new->numcl, new->size_set);
-
-    // Tableau qui mémorise les éléments déjà traités
-    bool doelems[new->size_set];
-    for (uint e = 0; e < uf->size_set; e++)
-    {
-        doelems[e] = false;
-    }
-
-    // Prochain numéro de classe
     uint num_class = 0;
+
 
     // Calcul des classes
     for (uint d = 0; d < P->size_par; d++)
     {
-        for (uint i = 0; i < size_dequeue(P->cl[d]); i++)
+        for (uint i = 0; i < P->cl_size[d]; i++)
         {
-            uint e = lefread_dequeue(P->cl[d], i);
-
+            uint e = P->cl_elems[d][i];
             uint r = find_ufind(e, uf);
-            if (doelems[r] == false)
+            if (numcl[r] == UINT_MAX)
             {
-                new->numcl[r] = num_class;
+                numcl[r] = num_class;
                 num_class++;
-                doelems[r] = true;
             }
-
-            uint c = new->numcl[r];
-            new->numcl[e] = c;
-            rigins_dequeue(e, new->cl[c]);
+            numcl[e] = numcl[r];
         }
     }
-
-    return new;
+    return create_parti(uf->size_set, num_class, numcl);
 }

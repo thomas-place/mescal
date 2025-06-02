@@ -1,7 +1,7 @@
 #include "nfa_enum.h"
 
-nfa_enum* nfa_enum_init(short states, short alpha) {
-    nfa_enum* A;
+dfa_enum* dfa_enum_init(short states, short alpha) {
+    dfa_enum* A;
     CALLOC(A, 1);
     A->states = states;
     A->alpha = alpha;
@@ -25,7 +25,7 @@ nfa_enum* nfa_enum_init(short states, short alpha) {
     return A;
 }
 
-void nfa_enum_free(nfa_enum* A) {
+void dfa_enum_free(dfa_enum* A) {
     for (short q = 0; q < A->states; q++) {
         free(A->graph[q]);
         free(A->parti[q]);
@@ -38,7 +38,7 @@ void nfa_enum_free(nfa_enum* A) {
     free(A);
 }
 
-bool nfa_enum_next(nfa_enum* A) {
+bool dfa_enum_next(dfa_enum* A) {
     /* if (A->final < A->used[A->states - 1] - 1) {
         A->final++;
         return true;
@@ -225,11 +225,15 @@ short iterate_integer_partition(short* part, short n) {
 
 
 
-nfa* nfa_enum_to_nfa(nfa_enum* E) {
-    nfa* A = nfa_init();
-    rigins_dequeue(0, A->initials);
-    rigins_dequeue(E->used[E->states - 1] - 1, A->finals);
-    A->trans = create_lgraph_noedges(E->states, E->alpha);
+dfa* dfa_enum_to_dfa(dfa_enum* E) {
+    dfa* A;
+    CALLOC(A, 1);
+    A->initial = 0;
+    A->nb_finals = 1;
+    MALLOC(A->finals, 1);
+    A->finals[0] = E->used[E->states - 1] - 1;
+
+    A->trans = create_dgraph_noedges(E->states, E->alpha);
 
     MALLOC(A->alphabet, E->alpha);
     for (short a = 0; a < E->alpha; a++) {
@@ -238,13 +242,13 @@ nfa* nfa_enum_to_nfa(nfa_enum* E) {
     }
 
     for (short a = 0; a < E->inisep; a++) {
-        rigins_dequeue(0, A->trans->edges[0][a]);
+        A->trans->edges[0][a] = 0;
     }
 
     short b = E->alpha - E->outlabs[0];
     for (short i = 1; i <= E->parsize[0]; i++) {
         for (short j = 0; j < E->parti[0][i - 1]; j++) {
-            rigins_dequeue(i, A->trans->edges[0][b]);
+            A->trans->edges[0][b] = i;
             b++;
         }
     }
@@ -260,20 +264,20 @@ nfa* nfa_enum_to_nfa(nfa_enum* E) {
                 continue;
             }
             if (E->graph[q][a] < E->used[q]) {
-                rigins_dequeue(E->graph[q][a], A->trans->edges[q][a]);
+                A->trans->edges[q][a] = E->graph[q][a];
                 continue;
             }
 
             //   printf("there\n");
 
             if (con < E->parti[q][ind]) {
-                rigins_dequeue(E->used[q] + ind, A->trans->edges[q][a]);
+                A->trans->edges[q][a] = E->used[q] + ind;
                 con++;
             }
             else {
                 con = 0;
                 ind++;
-                rigins_dequeue(E->used[q] + ind, A->trans->edges[q][a]);
+                A->trans->edges[q][a] = E->used[q] + ind;
             }
 
         }
@@ -285,7 +289,7 @@ nfa* nfa_enum_to_nfa(nfa_enum* E) {
 }
 
 
-void nfa_enum_print(nfa_enum* E) {
+void dfa_enum_print(dfa_enum* E) {
     printf("States: %d\n", E->states);
     printf("Alphabet: %d\n", E->alpha);
     printf("Graph:\n");

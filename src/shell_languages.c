@@ -5,6 +5,7 @@
 #include "nfa.h"
 #include "regexp.h"
 #include "shell_errors.h"
+#include "printing.h"
 
 
 object** objects; //[nb_objects-1] = { NULL };
@@ -104,11 +105,24 @@ static void object_free_aux(object* theob) {
     }
     free(theob->name);
 
+
+
+
     if (theob->type == REGEXP) {
         reg_free(theob->exp);
     }
     else if (theob->type == AUTOMATON) {
-        delete_nfa(theob->nfa);
+        if (theob->aut) {
+            if (theob->aut->dfa) {
+                dfa_delete(theob->aut->obj_dfa);
+            }
+            else {
+                // If the automaton is not deterministic, it is an NFA.
+                // We delete the NFA.
+                nfa_delete(theob->aut->obj_nfa);
+            }
+        }
+        free(theob->aut);
     }
     else if (theob->type == MORPHISM) {
         if (theob->mor) {
@@ -142,7 +156,7 @@ static void object_free_aux(object* theob) {
 
 void object_free(int i) {
     if (i < 0 || i >= nb_objects || !objects[i]) {
-        fprintf(stderr, "%d Error: tried to delete an invalid object.\n", i);
+        //fprintf(stderr, "%d Error: tried to delete an invalid object.\n", i);
         return;
     }
 
@@ -228,7 +242,7 @@ int object_add_regexp(const char* name, regexp* theregexp) {
     return i;
 }
 
-int object_add_automaton(const char* name, nfa* A) {
+int object_add_automaton_nfa(const char* name, nfa* A) {
     if (A == NULL) {
         shell_error_null();
         return -1;
@@ -252,7 +266,39 @@ int object_add_automaton(const char* name, nfa* A) {
     int i = nb_objects++;
     objects[i] = object_init(name);
     objects[i]->type = AUTOMATON;
-    objects[i]->nfa = A;
+    MALLOC(objects[i]->aut, 1);
+    objects[i]->aut->obj_nfa = A;
+    objects[i]->aut->dfa = false;
+    return i;
+}
+
+int object_add_automaton_dfa(const char* name, dfa* A) {
+    if (A == NULL) {
+        shell_error_null();
+        return -1;
+    }
+
+    if (name != NULL) {
+        int i = object_get_from_name(name);
+        if (i != -1) {
+            object_free(i);
+        }
+    }
+
+    grow_objects_array();
+    /*
+        if (nb_objects >= nb_objects-1) {
+            shell_error_full();
+            return -1;
+        }
+     */
+
+    int i = nb_objects++;
+    objects[i] = object_init(name);
+    objects[i]->type = AUTOMATON;
+    MALLOC(objects[i]->aut, 1);
+    objects[i]->aut->obj_dfa = A;
+    objects[i]->aut->dfa = true;
     return i;
 }
 
@@ -290,6 +336,27 @@ int object_add_morphism(char* name, morphism* M) {
     }
 
     return i;
+}
+
+int shell_copy_generic(int i, char* newname) {
+    if (i == -1) {
+        return -1;
+    }
+    switch (objects[i]->type) {
+    case AUTOMATON:
+        if (objects[i]->aut->dfa) {
+            return object_add_automaton_dfa(newname, dfa_copy(objects[i]->aut->obj_dfa));
+        }
+        else {
+            return object_add_automaton_nfa(newname, nfa_copy(objects[i]->aut->obj_nfa));
+        }
+        break;
+    case REGEXP:
+        return object_add_regexp(newname, reg_copy(objects[i]->exp));
+    default:
+        return -1;
+        break;
+    }
 }
 
 int object_compare(int i1, int i2) {
@@ -347,7 +414,7 @@ int object_compare_mini(int i1, int i2) {
     }
     int j1 = shell_compute_minimal(i1);
     int j2 = shell_compute_minimal(i2);
-    return objects[j1]->nfa->trans->size_graph - objects[j2]->nfa->trans->size_graph;
+    return objects[j1]->aut->obj_dfa->trans->size_graph - objects[j2]->aut->obj_dfa->trans->size_graph;
 }
 
 static void max_heapify(int i, int max, int (*comp)(int, int)) {
@@ -403,26 +470,37 @@ int shell_compute_minimal(int i) {
         return objects[i]->depend[OD_MINI];
     }
 
-    nfa* mini;
+    dfa* mini;
     if (objects[i]->type == REGEXP) {
         nfa* A = reg_thompson(objects[i]->exp);
         mini = nfa_brzozowski(A);
-        delete_nfa(A);
+        nfa_delete(A);
     }
 
     if (objects[i]->type == AUTOMATON) {
-        mini = nfa_brzozowski(objects[i]->nfa);
+        if (objects[i]->aut->dfa) {
+            mini = dfa_hopcroft(objects[i]->aut->obj_dfa);
+        }
+        else {
+            mini = nfa_brzozowski(objects[i]->aut->obj_nfa);
+        }
     }
 
     if (objects[i]->type == MORPHISM) {
-        nfa* A = morphism_to_dfa(objects[i]->mor->obj);
-        mini = nfa_hopcroft(A);
-        delete_nfa(A);
+        dfa A;
+        A.alphabet = objects[i]->mor->obj->alphabet;
+        A.ancestors = NULL;
+        A.finals = objects[i]->mor->obj->accept_list;
+        A.initial = ONE;
+        A.nb_finals = objects[i]->mor->obj->nb_accept;
+        A.state_names = NULL;
+        A.trans = objects[i]->mor->obj->r_cayley;
+        mini = dfa_hopcroft(&A);
     }
 
-    int j = object_add_automaton(NULL, mini);
+    int j = object_add_automaton_dfa(NULL, mini);
     if (j == -1) {
-        delete_nfa(mini);
+        dfa_delete(mini);
         return j;
     }
     objects[i]->depend[OD_MINI] = j;
@@ -459,13 +537,13 @@ int shell_compute_syntac(int i, bool order) {
 
     bool** dfa_order = NULL;
     if (order) {
-        dfa_order = nfa_mini_canonical_ordering(objects[j]->nfa);
+        dfa_order = dfa_mini_canonical_ordering(objects[j]->aut->obj_dfa);
     }
 
 
 
     int error = 0;
-    morphism* synt = dfa_to_morphism(objects[j]->nfa, dfa_order, &error);
+    morphism* synt = dfa_to_morphism(objects[j]->aut->obj_dfa, dfa_order, &error);
     if (interrupt_flag) {
         interrupt_flag = false;
     }
@@ -564,28 +642,28 @@ orbits* shell_compute_orbits(int i, orbits_type type, sub_level level) {
             objects[i]->mor->orbs[type] = compute_gplusorbits(shell_compute_ker(i, KER_GR, level));
             break;
         case ORB_PT:
-            objects[i]->mor->orbs[type] = compute_ptorbits(objects[i]->mor->obj);
+            objects[i]->mor->orbs[type] = compute_ptorbits(objects[i]->mor->obj, level);
             break;
         case ORB_BPMOD:
-            objects[i]->mor->orbs[type] = compute_bpgorbits(shell_compute_ker(i, KER_MOD, LV_REG), level);
+            objects[i]->mor->orbs[type] = compute_bpgorbits(objects[i]->mor->obj, level, BPG_MOD);
             break;
         case ORB_BPAMT:
-            objects[i]->mor->orbs[type] = compute_bpgorbits(shell_compute_ker(i, KER_AMT, LV_REG), level);
+            objects[i]->mor->orbs[type] = compute_bpgorbits(objects[i]->mor->obj, level, BPG_AMT);
             break;
         case ORB_BPGR:
-            objects[i]->mor->orbs[type] = compute_bpgorbits(shell_compute_ker(i, KER_GR, LV_REG), level);
+            objects[i]->mor->orbs[type] = compute_bpgorbits(objects[i]->mor->obj, level, BPG_GR);
             break;
         case ORB_BPDD:
-            objects[i]->mor->orbs[type] = compute_bpgplusorbits(shell_compute_orbits(i, ORB_DD, LV_REG), level);
+            objects[i]->mor->orbs[type] = compute_bpgplusorbits(objects[i]->mor->obj, level, BPG_ST);
             break;
         case ORB_BPMODP:
-            objects[i]->mor->orbs[type] = compute_bpgplusorbits(shell_compute_orbits(i, ORB_MODP, LV_REG), level);
+            objects[i]->mor->orbs[type] = compute_bpgplusorbits(objects[i]->mor->obj, level, BPG_MOD);
             break;
         case ORB_BPAMTP:
-            objects[i]->mor->orbs[type] = compute_bpgplusorbits(shell_compute_orbits(i, ORB_AMTP, LV_REG), level);
+            objects[i]->mor->orbs[type] = compute_bpgplusorbits(objects[i]->mor->obj, level, BPG_AMT);
             break;
         case ORB_BPGRP:
-            objects[i]->mor->orbs[type] = compute_bpgplusorbits(shell_compute_orbits(i, ORB_GRP, LV_REG), level);
+            objects[i]->mor->orbs[type] = compute_bpgplusorbits(objects[i]->mor->obj, level, BPG_GR);
             break;
         default:
             break;
@@ -867,4 +945,57 @@ void shell_rec_display(ob_recursion* obj, FILE* out) {
 
     symbolic_count = 0;
     symbolic_names = NULL;
+}
+
+
+/***********/
+/* Display */
+/***********/
+
+
+
+void shell_view_object(object* ob, bool title) {
+    if (!ob) {
+        return;
+    }
+    switch (ob->type) {
+    case REGEXP:
+        if (title) {
+            print_title_box(100, true, stdout, 1, "Regular expression");
+        }
+        reg_print(ob->exp);
+        return;
+        break;
+    case AUTOMATON:
+        if (title) {
+            print_title_box(100, true, stdout, 1, "Automaton");
+        }
+        if (ob->aut->dfa) {
+            view_dfa(ob->aut->obj_dfa);
+
+        }
+        else {
+            view_nfa(ob->aut->obj_nfa);
+        }
+        return;
+        break;
+    case MORPHISM:
+        if (title) {
+            print_title_box(100, true, stdout, 1, "Morphism");
+        }
+        view_morphism(ob->mor->obj, stdout);
+        return;
+        break;
+    case RECDEF:
+        if (title) {
+            print_title_box(100, true, stdout, 1, "Recursive definition of regular expressions");
+            shell_rec_display(ob->rec, stdout);
+        }
+        return;
+        break;
+
+    default:
+        return;
+        break;
+    }
 }
