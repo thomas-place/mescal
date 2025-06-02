@@ -1281,6 +1281,7 @@ void dfa_delete(dfa* A) {
     free(A->finals);
     free(A->ancestors);
     dfa_reset_state_names(A);
+    delete_dgraph(A->trans);
     free(A);
 }
 

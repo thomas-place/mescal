@@ -658,6 +658,7 @@ static classes command_to_class_aux(keylist* list) {
             break;
         case CL_LT:
         case CL_LTT:
+        case CL_BPOLDD:
         case CL_POL2DD:
         case CL_TLDD:
         case CL_FLDD:

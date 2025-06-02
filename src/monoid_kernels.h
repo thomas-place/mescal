@@ -17,7 +17,7 @@
 #include "monoid_sub.h"
 #include "sep_group.h"
 
-// #define DEBUG_KERNEL
+//#define DEBUG_KERNEL
 
 /**
  * @brief

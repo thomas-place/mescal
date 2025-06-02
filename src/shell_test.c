@@ -21,19 +21,32 @@ void test(void) {
 
     //shell_exall_dfatest();
 
-    dfa_enum* E = dfa_enum_init(7, 2);
+    dfa_enum* E = dfa_enum_init(6, 2);
     ulong count = 0;
     ulong size = 0;
     while (dfa_enum_next(E)) {
         count++;
+        if (count < 2200000) {
+            continue;
+        }
         dfa* A = dfa_enum_to_dfa(E);
         dfa* MINI = dfa_hopcroft(A);
         dfa_delete(A);
-        size = max(size, dfa_to_morphism_size(MINI));
+        morphism* M = dfa_to_morphism(MINI, NULL, NULL);
+        dfa_delete(MINI);
+        subsemi* S = get_grp_kernel(M, LV_REG);
+        if (S->rels->HCL->size_par == S->rels->HCL->size_set) {
+            size = max(size, S->original->r_cayley->size_graph);
+        }
+        delete_subsemi(S);
+        delete_morphism(M);
+
+
+        //size = max(size, dfa_to_morphism_size(MINI));
         if (count % 100000 == 0) {
             printf("count: %lu, size: %lu\n", count, size);
         }
-        dfa_delete(MINI);
+        //    dfa_delete(MINI);
     }
     printf("final count: %lu\n", count);
     printf("final size: %lu\n", size);

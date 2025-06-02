@@ -72,6 +72,7 @@ static parti* folding_to_green(parti* F, uint* jord, subsemi* S) {
 static subsemi* get_kernel(morphism* M, sub_level level, bool mod) {
 
 #ifdef DEBUG_KERNEL
+    printf("Computing the kernel.\n");
     ulong thetime = time(NULL);
 #endif
     // Allocation of the submonoid
@@ -139,6 +140,7 @@ static subsemi* get_kernel(morphism* M, sub_level level, bool mod) {
                 }
             }
         }
+        delete_parti(FOLD);
     }
 
     // Computation of the other tables of the submonoid
@@ -154,7 +156,7 @@ static subsemi* get_kernel(morphism* M, sub_level level, bool mod) {
     uint* jord = compute_jord_subsemi(ker);
 
 
-    if (level != LV_REG) {
+    if (level != LV_REG && !mor_all_regular(M)) {
         // Computing the R-classes (two elements are R-equivalent if they have been folded together).
         ker->rels->RCL = folding_to_green(FOLD, jord, ker);
         delete_parti(FOLD);

@@ -204,6 +204,7 @@ parti* dgraph_stal_fold(dgraph* g, bool grp) {
     free(ltrans);
     free(litrans);
     free(storage);
+    free(istorage);
     delete_dequeue(tofold);
     parti* result = ufind_to_parti(merge);
     delete_ufind(merge);
@@ -396,6 +397,7 @@ parti* mor_stal_fold(morphism* M, bool grp, bool rcl) {
     free(ltrans);
     free(litrans);
     free(storage);
+    free(istorage);
     delete_dequeue(tofold);
     parti* result = ufind_to_parti_refined(merge, sccs);
     delete_ufind(merge);

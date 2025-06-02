@@ -670,6 +670,7 @@ prod_pair* dgraph_intersec(dgraph* g1, dgraph* g2, uint s1, uint s2, uint* psize
 #endif
 
     * psize = inter_elem; // Set the size of the result array
+    inter_delete(); // Delete the arrays used in the product construction
     return result;
 
 

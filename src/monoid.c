@@ -705,6 +705,7 @@ static void mor_cons_order(morphism* M, bool** order) {
                 rigins_dequeue(q, order_temp[i]);
             }
         }
+        delete_dequeue(eMe);
         M->order_size[i] = size_dequeue(order_temp[i]);
         size_storage += M->order_size[i];
     }

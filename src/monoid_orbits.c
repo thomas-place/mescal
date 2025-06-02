@@ -376,9 +376,8 @@ subsemi* compute_one_ptorb(morphism* M, uint e, sub_level level) {
     // delete_lgraph(jgraph);
 
     // We may now compute the Green's relations in the submonoid
-    CALLOC(S->rels, 1);
-
     if (level == LV_FULL) {
+        CALLOC(S->rels, 1);
         parti* right = dtarjan(M->r_cayley, malph, false);
         parti* left = dtarjan(M->l_cayley, malph, false);
         parti* thej = dualdtarjan(M->r_cayley, M->l_cayley, malph, false);
@@ -397,6 +396,7 @@ subsemi* compute_one_ptorb(morphism* M, uint e, sub_level level) {
         gr_green_compute(S->idem_list, S->nb_idems, S->rels);
     }
     else {
+        free(malph);
         green_compute_sub_reg(S);
     }
 
@@ -426,7 +426,7 @@ orbits* compute_ptorbits(morphism* M, sub_level level) {
     }
 
     for (uint j = 0; j < M->nb_regular_jcl; j++) {
-        res->orbits[j] = compute_one_ptorb(M, M->regular_idems[j], level);
+        res->orbits[j] = compute_one_ptorb(M, M->regular_idems[j], res->level);
     }
     return res;
 }
@@ -543,6 +543,7 @@ subsemi* compute_one_bpgorb(morphism* M, uint e, sub_level level, bpg_type type)
             rigins_dequeue(prod[i].q1, protorb);
         }
     }
+    free(prod);
     sort_dequeue_norepeat(protorb);
 
 
@@ -1037,6 +1038,7 @@ subsemi* compute_one_bpgplusorb(morphism* M, uint e, sub_level level, bpg_type t
 
         free(mults[k - 1]);
     }
+    free(mults);
 
     subsemi* theorb = compute_one_orbit_from_pairs(M, e, eM, visited, level);
 

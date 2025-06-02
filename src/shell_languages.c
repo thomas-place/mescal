@@ -544,6 +544,13 @@ int shell_compute_syntac(int i, bool order) {
 
     int error = 0;
     morphism* synt = dfa_to_morphism(objects[j]->aut->obj_dfa, dfa_order, &error);
+    if (dfa_order) {
+        for (uint h = 0; h < objects[j]->aut->obj_dfa->trans->size_graph;h++) {
+            free(dfa_order[h]);
+        }
+        free(dfa_order);
+    }
+
     if (interrupt_flag) {
         interrupt_flag = false;
     }
@@ -619,7 +626,6 @@ orbits* shell_compute_orbits(int i, orbits_type type, sub_level level) {
         return NULL;
     }
 
-
     // If part of the orbits have already been computed and we now want more, we delete the old orbits.
     if (objects[i]->mor->orbs[type] && objects[i]->mor->orbs[type]->level < level) {
         delete_orbits(objects[i]->mor->orbs[type]);
@@ -669,7 +675,6 @@ orbits* shell_compute_orbits(int i, orbits_type type, sub_level level) {
             break;
         }
     }
-
 
     return objects[i]->mor->orbs[type];
 }
