@@ -7,6 +7,7 @@ var words_8h =
     [ "create_empty_word", "words_8h.html#a3c0b1829a5f9730cdc546956ab42fe07", null ],
     [ "delete_word", "words_8h.html#a282311627c33a3430899319ab6000831", null ],
     [ "display_word", "words_8h.html#ac37cb104de3d1383de3014cc5ae1fc3c", null ],
+    [ "duplicate_alphabet", "words_8h.html#a84e561702457c18cf2dda48aab6ba8d8", null ],
     [ "fprint_letter_gviz", "words_8h.html#acc35b232a0c3636bb8644397a7b3b59f", null ],
     [ "fprint_letter_latex", "words_8h.html#abe45c50ad190aafb8cb431c24220bc6c", null ],
     [ "fprint_letter_utf8", "words_8h.html#a385c2a53d1704920490e6328d5857b1a", null ],

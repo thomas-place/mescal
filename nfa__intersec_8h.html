@@ -113,8 +113,8 @@ $(function(){initNavTree('nfa__intersec_8h.html',''); initResizable(true); });
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnfa__prod__pair.html">nfa_prod_pair</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type used for representing a pair of states.  <a href="structnfa__prod__pair.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structprod__pair.html">prod_pair</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type used for representing a pair of states.  <a href="structprod__pair.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
@@ -122,28 +122,71 @@ Functions</h2></td></tr>
 <tr class="memitem:a35d6831b9e0fa65e52a0d5be492fcad8" id="r_a35d6831b9e0fa65e52a0d5be492fcad8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a35d6831b9e0fa65e52a0d5be492fcad8">nfa_intersect</a> (<a class="el" href="structnfa.html">nfa</a> *, <a class="el" href="structnfa.html">nfa</a> *, bool)</td></tr>
 <tr class="memdesc:a35d6831b9e0fa65e52a0d5be492fcad8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intersection of two NFAs with the product automaton construction.  <br /></td></tr>
 <tr class="separator:a35d6831b9e0fa65e52a0d5be492fcad8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a308e1fac1acc224298e426d584384c70" id="r_a308e1fac1acc224298e426d584384c70"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa__prod__pair.html">nfa_prod_pair</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a308e1fac1acc224298e426d584384c70">nfa_intersec_reach</a> (<a class="el" href="structnfa.html">nfa</a> *, <a class="el" href="structnfa.html">nfa</a> *, uint, uint, uint *)</td></tr>
-<tr class="memdesc:a308e1fac1acc224298e426d584384c70"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intersection of two NFAs with the product automaton construction. Returns only the pairs of reachable states.  <br /></td></tr>
-<tr class="separator:a308e1fac1acc224298e426d584384c70"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a7b2ca05886cdf218b254938c771cfa" id="r_a7a7b2ca05886cdf218b254938c771cfa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdfa.html">dfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7a7b2ca05886cdf218b254938c771cfa">dfa_intersect</a> (<a class="el" href="structdfa.html">dfa</a> *, <a class="el" href="structdfa.html">dfa</a> *, bool)</td></tr>
+<tr class="memdesc:a7a7b2ca05886cdf218b254938c771cfa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intersection of two DFAs with the product automaton construction.  <br /></td></tr>
+<tr class="separator:a7a7b2ca05886cdf218b254938c771cfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5443edc9d88227244d11e1beb2df314" id="r_aa5443edc9d88227244d11e1beb2df314"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa5443edc9d88227244d11e1beb2df314">nfa_intersect_mixed</a> (void *I1, bool is_dfa_I1, void *I2, bool is_dfa_I2, bool names)</td></tr>
+<tr class="memdesc:aa5443edc9d88227244d11e1beb2df314"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intersection of two NFAs or DFAs.  <br /></td></tr>
+<tr class="separator:aa5443edc9d88227244d11e1beb2df314"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d30b78648c8ad4c7d3a90fdd29ad09d" id="r_a7d30b78648c8ad4c7d3a90fdd29ad09d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structprod__pair.html">prod_pair</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7d30b78648c8ad4c7d3a90fdd29ad09d">dgraph_intersec</a> (<a class="el" href="structdgraph.html">dgraph</a> *, <a class="el" href="structdgraph.html">dgraph</a> *, uint, uint, uint *)</td></tr>
+<tr class="separator:a7d30b78648c8ad4c7d3a90fdd29ad09d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Intersection of NFAs. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a308e1fac1acc224298e426d584384c70" name="a308e1fac1acc224298e426d584384c70"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a308e1fac1acc224298e426d584384c70">&#9670;&#160;</a></span>nfa_intersec_reach()</h2>
+<a id="a7a7b2ca05886cdf218b254938c771cfa" name="a7a7b2ca05886cdf218b254938c771cfa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7a7b2ca05886cdf218b254938c771cfa">&#9670;&#160;</a></span>dfa_intersect()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structnfa__prod__pair.html">nfa_prod_pair</a> * nfa_intersec_reach </td>
+          <td class="memname"><a class="el" href="structdfa.html">dfa</a> * dfa_intersect </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A1</em></span>, </td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A1</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A2</em></span>, </td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A2</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>names</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Intersection of two DFAs with the product automaton construction. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The input Boolean is used to indicate whether the names of the states have to be saved (this only impacts display). The name of a state is the pair of states to which it corresponds.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The product automaton of the two inputs. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A1</td><td>The first DFA.  </td></tr>
+    <tr><td class="paramname">A2</td><td>The second DFA.  </td></tr>
+    <tr><td class="paramname">names</td><td>A Boolean indicating whether the state names have to be saved. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a7d30b78648c8ad4c7d3a90fdd29ad09d" name="a7d30b78648c8ad4c7d3a90fdd29ad09d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7d30b78648c8ad4c7d3a90fdd29ad09d">&#9670;&#160;</a></span>dgraph_intersec()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structprod__pair.html">prod_pair</a> * dgraph_intersec </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdgraph.html">dgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>g1</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structdgraph.html">dgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>g2</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -158,21 +201,17 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint *</td>          <td class="paramname"><span class="paramname"><em>size</em></span>&#160;)</td>
+          <td class="paramtype">uint *</td>          <td class="paramname"><span class="paramname"><em>psize</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Intersection of two NFAs with the product automaton construction. Returns only the pairs of reachable states. </p>
-<dl class="section remark"><dt>Remarks</dt><dd>The size of the computed array is returned via the pointer size.</dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>An array containing the pairs of reachable states in the product automaton. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">A1</td><td>The first NFA.  </td></tr>
-    <tr><td class="paramname">A2</td><td>The second NFA.  </td></tr>
-    <tr><td class="paramname">s1</td><td>Starting state in the first NFA.  </td></tr>
-    <tr><td class="paramname">s2</td><td>Starting state in the second NFA.  </td></tr>
-    <tr><td class="paramname">size</td><td>Pointer used to return the size of the computed array. </td></tr>
+    <tr><td class="paramname">g1</td><td>The first graph  </td></tr>
+    <tr><td class="paramname">g2</td><td>The second graph  </td></tr>
+    <tr><td class="paramname">s1</td><td>Starting state in the first graph.  </td></tr>
+    <tr><td class="paramname">s2</td><td>Starting state in the second graph.  </td></tr>
+    <tr><td class="paramname">psize</td><td>Pointer used to return the size of the computed array. </td></tr>
   </table>
   </dd>
 </dl>
@@ -210,6 +249,57 @@ Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">A1</td><td>The first NFA.  </td></tr>
     <tr><td class="paramname">A2</td><td>The second NFA.  </td></tr>
+    <tr><td class="paramname">names</td><td>A Boolean indicating whether the state names have to be saved. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aa5443edc9d88227244d11e1beb2df314" name="aa5443edc9d88227244d11e1beb2df314"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5443edc9d88227244d11e1beb2df314">&#9670;&#160;</a></span>nfa_intersect_mixed()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void * nfa_intersect_mixed </td>
+          <td>(</td>
+          <td class="paramtype">void *</td>          <td class="paramname"><span class="paramname"><em>I1</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>is_dfa_I1</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *</td>          <td class="paramname"><span class="paramname"><em>I2</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>is_dfa_I2</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>names</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Intersection of two NFAs or DFAs. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The two inputs may have distinct alphabets. In this case, the alphabet of the computed NFA is the union of the two alphabets.</dd></dl>
+<dl class="section attention"><dt>Attention</dt><dd>The two inputs must be either both NFAs or both DFAs. If one of the inputs is a DFA and the other is a NFA, the function will return a NFA.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A NFA or DFA recognizing the intersection of the two input languages. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">I1</td><td>First NFA or DFA.  </td></tr>
+    <tr><td class="paramname">is_dfa_I1</td><td>True if the first input is a DFA, false if it is a NFA.  </td></tr>
+    <tr><td class="paramname">I2</td><td>Second NFA or DFA.  </td></tr>
+    <tr><td class="paramname">is_dfa_I2</td><td>True if the second input is a DFA, false if it is a NFA.  </td></tr>
     <tr><td class="paramname">names</td><td>A Boolean indicating whether the state names have to be saved. </td></tr>
   </table>
   </dd>

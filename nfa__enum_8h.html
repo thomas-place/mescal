@@ -104,7 +104,7 @@ $(function(){initNavTree('nfa__enum_8h.html',''); initResizable(true); });
 </div><!--header-->
 <div class="contents">
 
-<p>Enumeration of NFAs.  
+<p>Enumeration of DFAs.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="nfa_8h_source.html">nfa.h</a>&quot;</code><br />
 </div>
@@ -112,69 +112,41 @@ $(function(){initNavTree('nfa__enum_8h.html',''); initResizable(true); });
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnfa__enum.html">nfa_enum</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdfa__enum.html">dfa_enum</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a7c317aebaed3c6e9cfb815d043b2b674" id="r_a7c317aebaed3c6e9cfb815d043b2b674"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa__enum.html">nfa_enum</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7c317aebaed3c6e9cfb815d043b2b674">nfa_enum_init</a> (short, short)</td></tr>
-<tr class="memdesc:a7c317aebaed3c6e9cfb815d043b2b674"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes an enumeration of NFAs.  <br /></td></tr>
-<tr class="separator:a7c317aebaed3c6e9cfb815d043b2b674"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a27df1dbd1790a5550c2e8cc43ed1ccb3" id="r_a27df1dbd1790a5550c2e8cc43ed1ccb3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a27df1dbd1790a5550c2e8cc43ed1ccb3">nfa_enum_free</a> (<a class="el" href="structnfa__enum.html">nfa_enum</a> *)</td></tr>
-<tr class="memdesc:a27df1dbd1790a5550c2e8cc43ed1ccb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees the memory allocated for an enumeration of NFAs.  <br /></td></tr>
-<tr class="separator:a27df1dbd1790a5550c2e8cc43ed1ccb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aff89375049d248aa5b7ccc977ff0a268" id="r_aff89375049d248aa5b7ccc977ff0a268"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aff89375049d248aa5b7ccc977ff0a268">nfa_enum_next</a> (<a class="el" href="structnfa__enum.html">nfa_enum</a> *)</td></tr>
-<tr class="memdesc:aff89375049d248aa5b7ccc977ff0a268"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the next NFA in the enumeration.  <br /></td></tr>
-<tr class="separator:aff89375049d248aa5b7ccc977ff0a268"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9e8ffc541bd28671551a66e4137bce0" id="r_ac9e8ffc541bd28671551a66e4137bce0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdfa__enum.html">dfa_enum</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac9e8ffc541bd28671551a66e4137bce0">dfa_enum_init</a> (short, short)</td></tr>
+<tr class="memdesc:ac9e8ffc541bd28671551a66e4137bce0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes an enumeration of NFAs.  <br /></td></tr>
+<tr class="separator:ac9e8ffc541bd28671551a66e4137bce0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ab2d618928d9fd6c41998bcdc151768" id="r_a0ab2d618928d9fd6c41998bcdc151768"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0ab2d618928d9fd6c41998bcdc151768">dfa_enum_free</a> (<a class="el" href="structdfa__enum.html">dfa_enum</a> *)</td></tr>
+<tr class="memdesc:a0ab2d618928d9fd6c41998bcdc151768"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees the memory allocated for an enumeration of NFAs.  <br /></td></tr>
+<tr class="separator:a0ab2d618928d9fd6c41998bcdc151768"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a7dbbb4c570cd0ae8f176a8d0ae0802" id="r_a1a7dbbb4c570cd0ae8f176a8d0ae0802"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1a7dbbb4c570cd0ae8f176a8d0ae0802">dfa_enum_next</a> (<a class="el" href="structdfa__enum.html">dfa_enum</a> *)</td></tr>
+<tr class="memdesc:a1a7dbbb4c570cd0ae8f176a8d0ae0802"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the next NFA in the enumeration.  <br /></td></tr>
+<tr class="separator:a1a7dbbb4c570cd0ae8f176a8d0ae0802"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a13663cefb234609281957beffbe438" id="r_a0a13663cefb234609281957beffbe438"><td class="memItemLeft" align="right" valign="top">short&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0a13663cefb234609281957beffbe438">iterate_integer_partition</a> (short *, short)</td></tr>
 <tr class="separator:a0a13663cefb234609281957beffbe438"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af29081be1222472e485aec428508ff8b" id="r_af29081be1222472e485aec428508ff8b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af29081be1222472e485aec428508ff8b">nfa_enum_to_nfa</a> (<a class="el" href="structnfa__enum.html">nfa_enum</a> *)</td></tr>
-<tr class="separator:af29081be1222472e485aec428508ff8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3dabb3c3cd86fe9222eaefa1a39a32b3" id="r_a3dabb3c3cd86fe9222eaefa1a39a32b3"><td class="memItemLeft" align="right" valign="top"><a id="a3dabb3c3cd86fe9222eaefa1a39a32b3" name="a3dabb3c3cd86fe9222eaefa1a39a32b3"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_enum_print</b> (<a class="el" href="structnfa__enum.html">nfa_enum</a> *E)</td></tr>
-<tr class="separator:a3dabb3c3cd86fe9222eaefa1a39a32b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5bb34be5787b5adb068b3f302ce5cd81" id="r_a5bb34be5787b5adb068b3f302ce5cd81"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdfa.html">dfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5bb34be5787b5adb068b3f302ce5cd81">dfa_enum_to_dfa</a> (<a class="el" href="structdfa__enum.html">dfa_enum</a> *)</td></tr>
+<tr class="separator:a5bb34be5787b5adb068b3f302ce5cd81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a516965c21a088b75dbaf4addf73a98a9" id="r_a516965c21a088b75dbaf4addf73a98a9"><td class="memItemLeft" align="right" valign="top"><a id="a516965c21a088b75dbaf4addf73a98a9" name="a516965c21a088b75dbaf4addf73a98a9"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>dfa_enum_print</b> (<a class="el" href="structdfa__enum.html">dfa_enum</a> *E)</td></tr>
+<tr class="separator:a516965c21a088b75dbaf4addf73a98a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Enumeration of NFAs. </p>
+<div class="textblock"><p>Enumeration of DFAs. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a0a13663cefb234609281957beffbe438" name="a0a13663cefb234609281957beffbe438"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0a13663cefb234609281957beffbe438">&#9670;&#160;</a></span>iterate_integer_partition()</h2>
+<a id="a0ab2d618928d9fd6c41998bcdc151768" name="a0ab2d618928d9fd6c41998bcdc151768"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ab2d618928d9fd6c41998bcdc151768">&#9670;&#160;</a></span>dfa_enum_free()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">short iterate_integer_partition </td>
+          <td class="memname">void dfa_enum_free </td>
           <td>(</td>
-          <td class="paramtype">short *</td>          <td class="paramname"><span class="paramname"><em>part</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">short</td>          <td class="paramname"><span class="paramname"><em>n</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">part</td><td>The partition.  </td></tr>
-    <tr><td class="paramname">n</td><td>The partitioned integer </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a27df1dbd1790a5550c2e8cc43ed1ccb3" name="a27df1dbd1790a5550c2e8cc43ed1ccb3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a27df1dbd1790a5550c2e8cc43ed1ccb3">&#9670;&#160;</a></span>nfa_enum_free()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void nfa_enum_free </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structnfa__enum.html">nfa_enum</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structdfa__enum.html">dfa_enum</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -190,14 +162,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_enum_print</b> (<
 
 </div>
 </div>
-<a id="a7c317aebaed3c6e9cfb815d043b2b674" name="a7c317aebaed3c6e9cfb815d043b2b674"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7c317aebaed3c6e9cfb815d043b2b674">&#9670;&#160;</a></span>nfa_enum_init()</h2>
+<a id="ac9e8ffc541bd28671551a66e4137bce0" name="ac9e8ffc541bd28671551a66e4137bce0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9e8ffc541bd28671551a66e4137bce0">&#9670;&#160;</a></span>dfa_enum_init()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structnfa__enum.html">nfa_enum</a> * nfa_enum_init </td>
+          <td class="memname"><a class="el" href="structdfa__enum.html">dfa_enum</a> * dfa_enum_init </td>
           <td>(</td>
           <td class="paramtype">short</td>          <td class="paramname"><span class="paramname"><em>states</em></span>, </td>
         </tr>
@@ -220,16 +192,16 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_enum_print</b> (<
 
 </div>
 </div>
-<a id="aff89375049d248aa5b7ccc977ff0a268" name="aff89375049d248aa5b7ccc977ff0a268"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aff89375049d248aa5b7ccc977ff0a268">&#9670;&#160;</a></span>nfa_enum_next()</h2>
+<a id="a1a7dbbb4c570cd0ae8f176a8d0ae0802" name="a1a7dbbb4c570cd0ae8f176a8d0ae0802"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1a7dbbb4c570cd0ae8f176a8d0ae0802">&#9670;&#160;</a></span>dfa_enum_next()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool nfa_enum_next </td>
+          <td class="memname">bool dfa_enum_next </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structnfa__enum.html">nfa_enum</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structdfa__enum.html">dfa_enum</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -245,16 +217,16 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_enum_print</b> (<
 
 </div>
 </div>
-<a id="af29081be1222472e485aec428508ff8b" name="af29081be1222472e485aec428508ff8b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af29081be1222472e485aec428508ff8b">&#9670;&#160;</a></span>nfa_enum_to_nfa()</h2>
+<a id="a5bb34be5787b5adb068b3f302ce5cd81" name="a5bb34be5787b5adb068b3f302ce5cd81"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5bb34be5787b5adb068b3f302ce5cd81">&#9670;&#160;</a></span>dfa_enum_to_dfa()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structnfa.html">nfa</a> * nfa_enum_to_nfa </td>
+          <td class="memname"><a class="el" href="structdfa.html">dfa</a> * dfa_enum_to_dfa </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structnfa__enum.html">nfa_enum</a> *</td>          <td class="paramname"><span class="paramname"><em>E</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structdfa__enum.html">dfa_enum</a> *</td>          <td class="paramname"><span class="paramname"><em>E</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -262,6 +234,34 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_enum_print</b> (<
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">E</td><td>The enumeration. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a0a13663cefb234609281957beffbe438" name="a0a13663cefb234609281957beffbe438"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a13663cefb234609281957beffbe438">&#9670;&#160;</a></span>iterate_integer_partition()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">short iterate_integer_partition </td>
+          <td>(</td>
+          <td class="paramtype">short *</td>          <td class="paramname"><span class="paramname"><em>part</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">short</td>          <td class="paramname"><span class="paramname"><em>n</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">part</td><td>The partition.  </td></tr>
+    <tr><td class="paramname">n</td><td>The partitioned integer </td></tr>
   </table>
   </dd>
 </dl>

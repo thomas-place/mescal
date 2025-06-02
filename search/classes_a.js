@@ -1,7 +1,8 @@
 var searchData=
 [
-  ['nfa_0',['nfa',['../structnfa.html',1,'']]],
-  ['nfa_5fenum_1',['nfa_enum',['../structnfa__enum.html',1,'']]],
-  ['nfa_5fprod_5fpair_2',['nfa_prod_pair',['../structnfa__prod__pair.html',1,'']]],
-  ['num_5fspan_5ftrees_3',['num_span_trees',['../structnum__span__trees.html',1,'']]]
+  ['ob_5fautomaton_0',['ob_automaton',['../structob__automaton.html',1,'']]],
+  ['ob_5fmorphism_1',['ob_morphism',['../structob__morphism.html',1,'']]],
+  ['ob_5frecursion_2',['ob_recursion',['../structob__recursion.html',1,'']]],
+  ['object_3',['object',['../structobject.html',1,'']]],
+  ['orbits_4',['orbits',['../structorbits.html',1,'']]]
 ];

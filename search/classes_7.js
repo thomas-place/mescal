@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['keylist_0',['keylist',['../structkeylist.html',1,'']]]
+  ['letter_0',['letter',['../structletter.html',1,'']]],
+  ['lgraph_1',['lgraph',['../structlgraph.html',1,'']]]
 ];

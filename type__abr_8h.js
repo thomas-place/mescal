@@ -5,6 +5,7 @@ var type__abr_8h =
     [ "avlnode", "type__abr_8h.html#a251923139fab6704d38c26e5554232bc", null ],
     [ "uint_avlnode", "type__abr_8h.html#a8d26e9d08cbbe6567d252ba6d129675b", null ],
     [ "avl_free_strong", "type__abr_8h.html#a5c47a476d63888318449bc727ebe9636", null ],
+    [ "avl_height", "type__abr_8h.html#a6660749eeca25233c69f34bc7ebdb11f", null ],
     [ "avl_insert", "type__abr_8h.html#a7985fd216e081bd631a7be0ffeccaab1", null ],
     [ "avl_search", "type__abr_8h.html#a5240f5e0fa81eefcba536d4aa059366c", null ],
     [ "getsize_avl", "type__abr_8h.html#a0eb2a2cf92c8fc64d29d825b2c0a9e1d", null ],

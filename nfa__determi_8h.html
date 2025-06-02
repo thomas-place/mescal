@@ -112,16 +112,45 @@ $(function(){initNavTree('nfa__determi_8h.html',''); initResizable(true); });
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ad7f6aa9cdc38da633ff35979eb0afdcf" id="r_ad7f6aa9cdc38da633ff35979eb0afdcf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad7f6aa9cdc38da633ff35979eb0afdcf">nfa_determinize</a> (<a class="el" href="structnfa.html">nfa</a> *, bool)</td></tr>
-<tr class="memdesc:ad7f6aa9cdc38da633ff35979eb0afdcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determinization of a NFA with the subset construction.  <br /></td></tr>
-<tr class="separator:ad7f6aa9cdc38da633ff35979eb0afdcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e1a0a215ca6198ad15b58916c399197" id="r_a0e1a0a215ca6198ad15b58916c399197"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdfa.html">dfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0e1a0a215ca6198ad15b58916c399197">nfa_determinize</a> (<a class="el" href="structnfa.html">nfa</a> *, bool)</td></tr>
+<tr class="memdesc:a0e1a0a215ca6198ad15b58916c399197"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determinization of a NFA with the subset construction.  <br /></td></tr>
+<tr class="separator:a0e1a0a215ca6198ad15b58916c399197"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2f91c4c2e2317374d3cf1e14ea25588e" id="r_a2f91c4c2e2317374d3cf1e14ea25588e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2f91c4c2e2317374d3cf1e14ea25588e">nfa_complement</a> (<a class="el" href="structnfa.html">nfa</a> *)</td></tr>
 <tr class="memdesc:a2f91c4c2e2317374d3cf1e14ea25588e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Complementation of a NFA.  <br /></td></tr>
 <tr class="separator:a2f91c4c2e2317374d3cf1e14ea25588e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c01d189950cd0249a008bf600a93f1b" id="r_a3c01d189950cd0249a008bf600a93f1b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdfa.html">dfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3c01d189950cd0249a008bf600a93f1b">dfa_complement</a> (<a class="el" href="structdfa.html">dfa</a> *)</td></tr>
+<tr class="memdesc:a3c01d189950cd0249a008bf600a93f1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Complementation of a DFA.  <br /></td></tr>
+<tr class="separator:a3c01d189950cd0249a008bf600a93f1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Determinization and complementation of NFAs. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="a3c01d189950cd0249a008bf600a93f1b" name="a3c01d189950cd0249a008bf600a93f1b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3c01d189950cd0249a008bf600a93f1b">&#9670;&#160;</a></span>dfa_complement()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdfa.html">dfa</a> * dfa_complement </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Complementation of a DFA. </p>
+<dl class="section return"><dt>Returns</dt><dd>A complete DFA recognizing the complement of the input language. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The DFA. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a2f91c4c2e2317374d3cf1e14ea25588e" name="a2f91c4c2e2317374d3cf1e14ea25588e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2f91c4c2e2317374d3cf1e14ea25588e">&#9670;&#160;</a></span>nfa_complement()</h2>
 
@@ -148,14 +177,14 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ad7f6aa9cdc38da633ff35979eb0afdcf" name="ad7f6aa9cdc38da633ff35979eb0afdcf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad7f6aa9cdc38da633ff35979eb0afdcf">&#9670;&#160;</a></span>nfa_determinize()</h2>
+<a id="a0e1a0a215ca6198ad15b58916c399197" name="a0e1a0a215ca6198ad15b58916c399197"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e1a0a215ca6198ad15b58916c399197">&#9670;&#160;</a></span>nfa_determinize()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structnfa.html">nfa</a> * nfa_determinize </td>
+          <td class="memname"><a class="el" href="structdfa.html">dfa</a> * nfa_determinize </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span>, </td>
         </tr>
@@ -168,7 +197,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Determinization of a NFA with the subset construction. </p>
-<dl class="section remark"><dt>Remarks</dt><dd>The input Boolean is used to indicate whether the names of the states have to be saved (this only impacts display). The name of a state is the set of states to which it corresponds in the subset construction.</dd></dl>
+<dl class="section remark"><dt>Remarks</dt><dd>The input Boolean is used to indicate whether the names of the states have to be saved (this only impacts display). A stated is named by the corresponding set of states in the subset construction.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>The complete DFA built with the subset construction. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">

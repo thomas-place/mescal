@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['letter_0',['letter',['../structletter.html',1,'']]],
-  ['lgraph_1',['lgraph',['../structlgraph.html',1,'']]]
+  ['mccluskey_5fauto_0',['mccluskey_auto',['../structmccluskey__auto.html',1,'']]],
+  ['morphism_1',['morphism',['../structmorphism.html',1,'']]],
+  ['multi_5fedge_2',['multi_edge',['../structmulti__edge.html',1,'']]]
 ];

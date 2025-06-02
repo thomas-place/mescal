@@ -11,7 +11,7 @@ var searchData=
   ['lefread_5fdequeue_8',['lefread_dequeue',['../type__dequeue_8h.html#ae83a04a1428f29ad9137ebd13546ddad',1,'type_dequeue.c']]],
   ['lefread_5fdequeue_5fgen_9',['lefread_dequeue_gen',['../type__dequeue__gen_8h.html#aee3ad2548acb1af5b87638c4df01856d',1,'type_dequeue_gen.c']]],
   ['lefread_5fword_10',['lefread_word',['../words_8h.html#a122ce20f12d43db6e01a8bb3e4e975d8',1,'words.c']]],
-  ['left_5fmorphism_5fto_5fdfa_11',['left_morphism_to_dfa',['../monoid_8h.html#a17a625c2d89c85f4135062ef5864a149',1,'monoid.c']]],
+  ['left_5fmorphism_5fto_5fdfa_11',['left_morphism_to_dfa',['../monoid_8h.html#adccad96dae38fb75b5713d351e2d35ee',1,'monoid.c']]],
   ['length_5fletter_5futf8_12',['length_letter_utf8',['../words_8h.html#af63d85375dfef8fdfbad667a7e860250',1,'words.c']]],
   ['lgraph_5fmirror_13',['lgraph_mirror',['../graphs_8h.html#a1320dc14ae37171752a32162e7318794',1,'graphs.c']]],
   ['lgraph_5fnb_5fedges_14',['lgraph_nb_edges',['../graphs_8h.html#af658f08157b289523d755188a95ebd39',1,'graphs.c']]],
@@ -23,6 +23,5 @@ var searchData=
   ['listen_5finterrupt_20',['listen_interrupt',['../interrupt_8h.html#ad9733108dc59f30e1552d275aa704a17',1,'interrupt.c']]],
   ['listen_5ftimeout_21',['listen_timeout',['../interrupt_8h.html#ae22c315569cade11cfad2c1b9e74fc41',1,'interrupt.c']]],
   ['listening_5fmode_22',['listening_mode',['../interrupt_8h.html#af165da926e7da93c5fcc68797aedc20e',1,'interrupt.c']]],
-  ['ltarjan_23',['ltarjan',['../graphs__tarjan_8h.html#a1056a2c05386186a2b6acf54a373aa33',1,'graphs_tarjan.c']]],
-  ['ltarjan_5falph_24',['ltarjan_alph',['../graphs__tarjan_8h.html#a1ae025020a832977dcc7a63cd3537d02',1,'graphs_tarjan.c']]]
+  ['ltarjan_23',['ltarjan',['../graphs__tarjan_8h.html#a8de7d8fde350720c85d7a58af7c055be',1,'graphs_tarjan.c']]]
 ];

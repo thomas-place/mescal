@@ -114,17 +114,24 @@ $(function(){initNavTree('nfa__determi_8h_source.html',''); initResizable(true);
 <div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &quot;<a class="code" href="nfa_8h.html">nfa.h</a>&quot;</span></div>
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#include &quot;printing.h&quot;</span></div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span></div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><a class="code hl_struct" href="structnfa.html">nfa</a>* <a class="code hl_function" href="nfa__determi_8h.html#ad7f6aa9cdc38da633ff35979eb0afdcf">nfa_determinize</a>(<a class="code hl_struct" href="structnfa.html">nfa</a>*, </div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    <span class="keywordtype">bool</span>                   </div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>);</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span></div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span><a class="code hl_struct" href="structnfa.html">nfa</a>* <a class="code hl_function" href="nfa__determi_8h.html#a2f91c4c2e2317374d3cf1e14ea25588e">nfa_complement</a>(<a class="code hl_struct" href="structnfa.html">nfa</a>* </div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>);</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><a class="code hl_struct" href="structdfa.html">dfa</a>* <a class="code hl_function" href="nfa__determi_8h.html#a0e1a0a215ca6198ad15b58916c399197">nfa_determinize</a>(<a class="code hl_struct" href="structnfa.html">nfa</a>*, </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    <span class="keywordtype">bool</span>                   </div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>);</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><a class="code hl_struct" href="structnfa.html">nfa</a>* <a class="code hl_function" href="nfa__determi_8h.html#a2f91c4c2e2317374d3cf1e14ea25588e">nfa_complement</a>(<a class="code hl_struct" href="structnfa.html">nfa</a>* </div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>);</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span></div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><a class="code hl_struct" href="structdfa.html">dfa</a>* <a class="code hl_function" href="nfa__determi_8h.html#a3c01d189950cd0249a008bf600a93f1b">dfa_complement</a>(<a class="code hl_struct" href="structdfa.html">dfa</a>* </div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>);</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="preprocessor">#endif</span></div>
 <div class="ttc" id="anfa_8h_html"><div class="ttname"><a href="nfa_8h.html">nfa.h</a></div><div class="ttdoc">Implementation of NFAs.</div></div>
-<div class="ttc" id="anfa__determi_8h_html_a2f91c4c2e2317374d3cf1e14ea25588e"><div class="ttname"><a href="nfa__determi_8h.html#a2f91c4c2e2317374d3cf1e14ea25588e">nfa_complement</a></div><div class="ttdeci">nfa * nfa_complement(nfa *)</div><div class="ttdoc">Complementation of a NFA.</div><div class="ttdef"><b>Definition</b> nfa_determi.c:239</div></div>
-<div class="ttc" id="anfa__determi_8h_html_ad7f6aa9cdc38da633ff35979eb0afdcf"><div class="ttname"><a href="nfa__determi_8h.html#ad7f6aa9cdc38da633ff35979eb0afdcf">nfa_determinize</a></div><div class="ttdeci">nfa * nfa_determinize(nfa *, bool)</div><div class="ttdoc">Determinization of a NFA with the subset construction.</div><div class="ttdef"><b>Definition</b> nfa_determi.c:128</div></div>
+<div class="ttc" id="anfa__determi_8h_html_a0e1a0a215ca6198ad15b58916c399197"><div class="ttname"><a href="nfa__determi_8h.html#a0e1a0a215ca6198ad15b58916c399197">nfa_determinize</a></div><div class="ttdeci">dfa * nfa_determinize(nfa *, bool)</div><div class="ttdoc">Determinization of a NFA with the subset construction.</div><div class="ttdef"><b>Definition</b> nfa_determi.c:131</div></div>
+<div class="ttc" id="anfa__determi_8h_html_a2f91c4c2e2317374d3cf1e14ea25588e"><div class="ttname"><a href="nfa__determi_8h.html#a2f91c4c2e2317374d3cf1e14ea25588e">nfa_complement</a></div><div class="ttdeci">nfa * nfa_complement(nfa *)</div><div class="ttdoc">Complementation of a NFA.</div><div class="ttdef"><b>Definition</b> nfa_determi.c:273</div></div>
+<div class="ttc" id="anfa__determi_8h_html_a3c01d189950cd0249a008bf600a93f1b"><div class="ttname"><a href="nfa__determi_8h.html#a3c01d189950cd0249a008bf600a93f1b">dfa_complement</a></div><div class="ttdeci">dfa * dfa_complement(dfa *)</div><div class="ttdoc">Complementation of a DFA.</div><div class="ttdef"><b>Definition</b> nfa_determi.c:307</div></div>
+<div class="ttc" id="astructdfa_html"><div class="ttname"><a href="structdfa.html">dfa</a></div><div class="ttdoc">Type used to represent a complete DFA.</div><div class="ttdef"><b>Definition</b> nfa.h:60</div></div>
 <div class="ttc" id="astructnfa_html"><div class="ttname"><a href="structnfa.html">nfa</a></div><div class="ttdoc">Type used to represent a NFA.</div><div class="ttdef"><b>Definition</b> nfa.h:41</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->

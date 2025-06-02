@@ -122,13 +122,71 @@ Functions</h2></td></tr>
 <tr class="memitem:a2bdcb20c09f3c77cf46bab55ada9db53" id="r_a2bdcb20c09f3c77cf46bab55ada9db53"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structmccluskey__auto.html">mccluskey_auto</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2bdcb20c09f3c77cf46bab55ada9db53">nfa_to_mccluskey</a> (<a class="el" href="structnfa.html">nfa</a> *)</td></tr>
 <tr class="memdesc:a2bdcb20c09f3c77cf46bab55ada9db53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a generalized automaton from an arbitrary NFA.  <br /></td></tr>
 <tr class="separator:a2bdcb20c09f3c77cf46bab55ada9db53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7eb6a0d130118775d3f4541e100c7f50" id="r_a7eb6a0d130118775d3f4541e100c7f50"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structmccluskey__auto.html">mccluskey_auto</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7eb6a0d130118775d3f4541e100c7f50">dfa_to_mccluskey</a> (<a class="el" href="structdfa.html">dfa</a> *)</td></tr>
+<tr class="memdesc:a7eb6a0d130118775d3f4541e100c7f50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a generalized automaton from an arbitrary DFA.  <br /></td></tr>
+<tr class="separator:a7eb6a0d130118775d3f4541e100c7f50"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a695a05c671197d3027f23af4f445a9dc" id="r_a695a05c671197d3027f23af4f445a9dc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structregexp.html">regexp</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a695a05c671197d3027f23af4f445a9dc">nfa_mccluskey</a> (<a class="el" href="structnfa.html">nfa</a> *)</td></tr>
-<tr class="memdesc:a695a05c671197d3027f23af4f445a9dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Brzozowski-McCluskey algorithm.  <br /></td></tr>
+<tr class="memdesc:a695a05c671197d3027f23af4f445a9dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Brzozowski-McCluskey algorithm (NFAs).  <br /></td></tr>
 <tr class="separator:a695a05c671197d3027f23af4f445a9dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a09bf2ff7b024020c8da7c8f40a238599" id="r_a09bf2ff7b024020c8da7c8f40a238599"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structregexp.html">regexp</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a09bf2ff7b024020c8da7c8f40a238599">dfa_mccluskey</a> (<a class="el" href="structdfa.html">dfa</a> *)</td></tr>
+<tr class="memdesc:a09bf2ff7b024020c8da7c8f40a238599"><td class="mdescLeft">&#160;</td><td class="mdescRight">Brzozowski-McCluskey algorithm (DFAs).  <br /></td></tr>
+<tr class="separator:a09bf2ff7b024020c8da7c8f40a238599"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Computation of a regular expression from a NFA with the Brzozowski-McCluskey algorithm. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="a09bf2ff7b024020c8da7c8f40a238599" name="a09bf2ff7b024020c8da7c8f40a238599"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a09bf2ff7b024020c8da7c8f40a238599">&#9670;&#160;</a></span>dfa_mccluskey()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structregexp.html">regexp</a> * dfa_mccluskey </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Brzozowski-McCluskey algorithm (DFAs). </p>
+<dl class="section return"><dt>Returns</dt><dd>A regular expression recognizing the same language as the input NFA. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The DFA. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a7eb6a0d130118775d3f4541e100c7f50" name="a7eb6a0d130118775d3f4541e100c7f50"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7eb6a0d130118775d3f4541e100c7f50">&#9670;&#160;</a></span>dfa_to_mccluskey()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structmccluskey__auto.html">mccluskey_auto</a> * dfa_to_mccluskey </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Computes a generalized automaton from an arbitrary DFA. </p>
+<dl class="section return"><dt>Returns</dt><dd>A generalized automaton recognizing the same language as the input DFA. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The DFA. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a695a05c671197d3027f23af4f445a9dc" name="a695a05c671197d3027f23af4f445a9dc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a695a05c671197d3027f23af4f445a9dc">&#9670;&#160;</a></span>nfa_mccluskey()</h2>
 
@@ -144,7 +202,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Brzozowski-McCluskey algorithm. </p>
+<p>Brzozowski-McCluskey algorithm (NFAs). </p>
 <dl class="section return"><dt>Returns</dt><dd>A regular expression recognizing the same language as the input NFA. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">

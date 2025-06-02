@@ -117,11 +117,14 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnum__span__trees.html">num_span_trees</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type used to store the information needed to compute the AMT-kernel.  <a href="structnum__span__trees.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsingle__num__span__tree.html">single_num_span_tree</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type used to store the information needed to compute the FOLDING of a R-class.  <a href="structsingle__num__span__tree.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a847714c8b835ca8e92cef6b27a013aab" id="r_a847714c8b835ca8e92cef6b27a013aab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a847714c8b835ca8e92cef6b27a013aab">morphism_to_dfa_kernel</a> (<a class="el" href="structmorphism.html">morphism</a> *)</td></tr>
-<tr class="memdesc:a847714c8b835ca8e92cef6b27a013aab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a DFA from the right Cayley graph of a morphism. Discards all transitions which entering a new regular R-class.  <br /></td></tr>
+<tr class="memdesc:a847714c8b835ca8e92cef6b27a013aab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a DFA from the right Cayley graph of a morphism. Discards all transitions which are entering a new regular R-class.  <br /></td></tr>
 <tr class="separator:a847714c8b835ca8e92cef6b27a013aab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a990ba79cd7a69d344c30b25a5adc108a" id="r_a990ba79cd7a69d344c30b25a5adc108a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a990ba79cd7a69d344c30b25a5adc108a">morphism_to_dfa_rcl</a> (<a class="el" href="structmorphism.html">morphism</a> *)</td></tr>
 <tr class="memdesc:a990ba79cd7a69d344c30b25a5adc108a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a DFA from the right Cayley graph of a morphism. Discards all transitions which are not internal to the R-classes.  <br /></td></tr>
@@ -135,12 +138,20 @@ Functions</h2></td></tr>
 <tr class="memitem:a4cb8f9617960d35361464732357de54b" id="r_a4cb8f9617960d35361464732357de54b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structsubsemi.html">subsemi</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4cb8f9617960d35361464732357de54b">get_mod_kernel</a> (<a class="el" href="structmorphism.html">morphism</a> *, sub_level)</td></tr>
 <tr class="memdesc:a4cb8f9617960d35361464732357de54b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the MOD-kernel of a morphism.  <br /></td></tr>
 <tr class="separator:a4cb8f9617960d35361464732357de54b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f3c805e51e9fe566a3a0f2484b242fd" id="r_a8f3c805e51e9fe566a3a0f2484b242fd"><td class="memItemLeft" align="right" valign="top"><a id="a8f3c805e51e9fe566a3a0f2484b242fd" name="a8f3c805e51e9fe566a3a0f2484b242fd"></a>
+<a class="el" href="structsingle__num__span__tree.html">single_num_span_tree</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>compute_single_span_tree</b> (<a class="el" href="structdgraph.html">dgraph</a> *G)</td></tr>
+<tr class="separator:a8f3c805e51e9fe566a3a0f2484b242fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3998fe454ee50665e7505b11dcc4d2b5" id="r_a3998fe454ee50665e7505b11dcc4d2b5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnum__span__trees.html">num_span_trees</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3998fe454ee50665e7505b11dcc4d2b5">compute_num_span_trees</a> (<a class="el" href="structmorphism.html">morphism</a> *, bool)</td></tr>
 <tr class="memdesc:a3998fe454ee50665e7505b11dcc4d2b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the spanning trees from a morphism.  <br /></td></tr>
 <tr class="separator:a3998fe454ee50665e7505b11dcc4d2b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa90b72ef5fa0568c10824b65dd6d9250" id="r_aa90b72ef5fa0568c10824b65dd6d9250"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa90b72ef5fa0568c10824b65dd6d9250">delete_num_span_trees</a> (<a class="el" href="structnum__span__trees.html">num_span_trees</a> *)</td></tr>
 <tr class="memdesc:aa90b72ef5fa0568c10824b65dd6d9250"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes the structure used to store the spanning trees.  <br /></td></tr>
 <tr class="separator:aa90b72ef5fa0568c10824b65dd6d9250"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab86a0a8771f67739c613660c8fbb0e2" id="r_aab86a0a8771f67739c613660c8fbb0e2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aab86a0a8771f67739c613660c8fbb0e2">delete_single_num_span_tree</a> (<a class="el" href="structsingle__num__span__tree.html">single_num_span_tree</a> *)</td></tr>
+<tr class="separator:aab86a0a8771f67739c613660c8fbb0e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d0edbf160f9bd87b910e829c1a76098" id="r_a1d0edbf160f9bd87b910e829c1a76098"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structparti.html">parti</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1d0edbf160f9bd87b910e829c1a76098">compute_amt_fold</a> (<a class="el" href="structdgraph.html">dgraph</a> *)</td></tr>
+<tr class="memdesc:a1d0edbf160f9bd87b910e829c1a76098"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the regular elements of the AMT-kernel in a morphism.  <br /></td></tr>
+<tr class="separator:a1d0edbf160f9bd87b910e829c1a76098"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a62bb23de74dbc668ee0e0846abe432bc" id="r_a62bb23de74dbc668ee0e0846abe432bc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a62bb23de74dbc668ee0e0846abe432bc">compute_amt_kernel_regular</a> (<a class="el" href="structmorphism.html">morphism</a> *, bool *, uint *)</td></tr>
 <tr class="memdesc:a62bb23de74dbc668ee0e0846abe432bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the regular elements of the AMT-kernel in a morphism.  <br /></td></tr>
 <tr class="separator:a62bb23de74dbc668ee0e0846abe432bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -154,6 +165,31 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Computation of kernels. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="a1d0edbf160f9bd87b910e829c1a76098" name="a1d0edbf160f9bd87b910e829c1a76098"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d0edbf160f9bd87b910e829c1a76098">&#9670;&#160;</a></span>compute_amt_fold()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structparti.html">parti</a> * compute_amt_fold </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdgraph.html">dgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>g</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Computes the regular elements of the AMT-kernel in a morphism. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">g</td><td>The morphism. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a62bb23de74dbc668ee0e0846abe432bc" name="a62bb23de74dbc668ee0e0846abe432bc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a62bb23de74dbc668ee0e0846abe432bc">&#9670;&#160;</a></span>compute_amt_kernel_regular()</h2>
 
@@ -300,6 +336,29 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="aab86a0a8771f67739c613660c8fbb0e2" name="aab86a0a8771f67739c613660c8fbb0e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aab86a0a8771f67739c613660c8fbb0e2">&#9670;&#160;</a></span>delete_single_num_span_tree()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void delete_single_num_span_tree </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structsingle__num__span__tree.html">single_num_span_tree</a> *</td>          <td class="paramname"><span class="paramname"><em>S</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">S</td><td>The structure to delete. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a1dfe3ace499a7f927418c7b06b97cd00" name="a1dfe3ace499a7f927418c7b06b97cd00"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1dfe3ace499a7f927418c7b06b97cd00">&#9670;&#160;</a></span>get_amt_kernel()</h2>
 
@@ -410,7 +469,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Computes a DFA from the right Cayley graph of a morphism. Discards all transitions which entering a new regular R-class. </p>
+<p>Computes a DFA from the right Cayley graph of a morphism. Discards all transitions which are entering a new regular R-class. </p>
 <dl class="section remark"><dt>Remarks</dt><dd>Used to compute full Kernels.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>The DFA. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>

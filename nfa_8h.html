@@ -126,6 +126,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnfa.html">nfa</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type used to represent a NFA.  <a href="structnfa.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdfa.html">dfa</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type used to represent a complete DFA.  <a href="structdfa.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -148,12 +151,9 @@ Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_reset_state_names</b> (<a class="el" href="structnfa.html">nfa</a> *)</td></tr>
 <tr class="memdesc:a6e2d782f90b7018353b137bca3d4a01a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release the state names in a NFA (if there are states names). <br /></td></tr>
 <tr class="separator:a6e2d782f90b7018353b137bca3d4a01a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a63e0bac87a1588aa56a430593f3a239d" id="r_a63e0bac87a1588aa56a430593f3a239d"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a63e0bac87a1588aa56a430593f3a239d">nfa_copy_one_name</a> (const <a class="el" href="structnfa.html">nfa</a> *, uint)</td></tr>
-<tr class="memdesc:a63e0bac87a1588aa56a430593f3a239d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copies the name of a single state in a NFA.  <br /></td></tr>
-<tr class="separator:a63e0bac87a1588aa56a430593f3a239d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a265bce1dd46a4132a9150a2e32dc9d43" id="r_a265bce1dd46a4132a9150a2e32dc9d43"><td class="memItemLeft" align="right" valign="top">char **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a265bce1dd46a4132a9150a2e32dc9d43">nfa_copy_all_names</a> (const <a class="el" href="structnfa.html">nfa</a> *)</td></tr>
-<tr class="memdesc:a265bce1dd46a4132a9150a2e32dc9d43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a copy of the array of state names in a NFA.  <br /></td></tr>
-<tr class="separator:a265bce1dd46a4132a9150a2e32dc9d43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeaee4c0f63bdb39e7c133f1fca465667" id="r_aeaee4c0f63bdb39e7c133f1fca465667"><td class="memItemLeft" align="right" valign="top">char **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aeaee4c0f63bdb39e7c133f1fca465667">copy_all_names</a> (char **names, uint size)</td></tr>
+<tr class="memdesc:aeaee4c0f63bdb39e7c133f1fca465667"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a copy of the array of state names.  <br /></td></tr>
+<tr class="separator:aeaee4c0f63bdb39e7c133f1fca465667"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a40687d4495d04ad390626111e4f44641" id="r_a40687d4495d04ad390626111e4f44641"><td class="memItemLeft" align="right" valign="top">uint *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a40687d4495d04ad390626111e4f44641">nfa_copy_ancestors</a> (const <a class="el" href="structnfa.html">nfa</a> *)</td></tr>
 <tr class="memdesc:a40687d4495d04ad390626111e4f44641"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a copy of the array of ancstors in a NFA.  <br /></td></tr>
 <tr class="separator:a40687d4495d04ad390626111e4f44641"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -172,24 +172,24 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_reset_state_names
 <tr class="memitem:af6575bc469f7d9c6c6b6d6c29d55f5e8" id="r_af6575bc469f7d9c6c6b6d6c29d55f5e8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af6575bc469f7d9c6c6b6d6c29d55f5e8">create_sing_word</a> (<a class="el" href="structword.html">word</a> *)</td></tr>
 <tr class="memdesc:af6575bc469f7d9c6c6b6d6c29d55f5e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a NFA recognizing a singleton language {w} for some input word w.  <br /></td></tr>
 <tr class="separator:af6575bc469f7d9c6c6b6d6c29d55f5e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9867131df17b4a62de39eecd7910c5ce" id="r_a9867131df17b4a62de39eecd7910c5ce"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9867131df17b4a62de39eecd7910c5ce">delete_nfa</a> (<a class="el" href="structnfa.html">nfa</a> *)</td></tr>
-<tr class="memdesc:a9867131df17b4a62de39eecd7910c5ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release of a NFA.  <br /></td></tr>
-<tr class="separator:a9867131df17b4a62de39eecd7910c5ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1e4df1d06f5db0d8c4250bb377f50832" id="r_a1e4df1d06f5db0d8c4250bb377f50832"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1e4df1d06f5db0d8c4250bb377f50832">overwrite_nfa</a> (<a class="el" href="structnfa.html">nfa</a> *, <a class="el" href="structnfa.html">nfa</a> *)</td></tr>
-<tr class="memdesc:a1e4df1d06f5db0d8c4250bb377f50832"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overwrites a NFA by copying another NFA and releasing this other NFA.  <br /></td></tr>
-<tr class="separator:a1e4df1d06f5db0d8c4250bb377f50832"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa44009e908e50ff7cebd3c83cf1b3d5a" id="r_aa44009e908e50ff7cebd3c83cf1b3d5a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa44009e908e50ff7cebd3c83cf1b3d5a">nfa_delete</a> (<a class="el" href="structnfa.html">nfa</a> *)</td></tr>
+<tr class="memdesc:aa44009e908e50ff7cebd3c83cf1b3d5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release of a NFA.  <br /></td></tr>
+<tr class="separator:aa44009e908e50ff7cebd3c83cf1b3d5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8476f837e787f05a0999dd32facba859" id="r_a8476f837e787f05a0999dd32facba859"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8476f837e787f05a0999dd32facba859">nfa_overwrite</a> (<a class="el" href="structnfa.html">nfa</a> *, <a class="el" href="structnfa.html">nfa</a> *)</td></tr>
+<tr class="memdesc:a8476f837e787f05a0999dd32facba859"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overwrites a NFA by copying another NFA and releasing this other NFA.  <br /></td></tr>
+<tr class="separator:a8476f837e787f05a0999dd32facba859"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed3b2fc93a473a58225e1f4bf0b91f89" id="r_aed3b2fc93a473a58225e1f4bf0b91f89"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aed3b2fc93a473a58225e1f4bf0b91f89">nfa_copy</a> (<a class="el" href="structnfa.html">nfa</a> *)</td></tr>
 <tr class="memdesc:aed3b2fc93a473a58225e1f4bf0b91f89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy of a NFA.  <br /></td></tr>
 <tr class="separator:aed3b2fc93a473a58225e1f4bf0b91f89"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60bcfeed501ad27f18809cc1fdfaa1bd" id="r_a60bcfeed501ad27f18809cc1fdfaa1bd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a60bcfeed501ad27f18809cc1fdfaa1bd">nfa_copy_exalpha</a> (<a class="el" href="structnfa.html">nfa</a> *, <a class="el" href="structletter.html">letter</a> *, uint)</td></tr>
 <tr class="memdesc:a60bcfeed501ad27f18809cc1fdfaa1bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extension of the alphabet of a NFA.  <br /></td></tr>
 <tr class="separator:a60bcfeed501ad27f18809cc1fdfaa1bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa8860f9b024ee213f5034c3e4d623097" id="r_aa8860f9b024ee213f5034c3e4d623097"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa8860f9b024ee213f5034c3e4d623097">nfa_union</a> (<a class="el" href="structnfa.html">nfa</a> *, <a class="el" href="structnfa.html">nfa</a> *)</td></tr>
-<tr class="memdesc:aa8860f9b024ee213f5034c3e4d623097"><td class="mdescLeft">&#160;</td><td class="mdescRight">Union of two NFAs.  <br /></td></tr>
-<tr class="separator:aa8860f9b024ee213f5034c3e4d623097"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a43a531c1bc75fe7b36a29a24b6913dae" id="r_a43a531c1bc75fe7b36a29a24b6913dae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a43a531c1bc75fe7b36a29a24b6913dae">nfa_concat</a> (<a class="el" href="structnfa.html">nfa</a> *, <a class="el" href="structnfa.html">nfa</a> *)</td></tr>
-<tr class="memdesc:a43a531c1bc75fe7b36a29a24b6913dae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concatenation of two NFAs.  <br /></td></tr>
-<tr class="separator:a43a531c1bc75fe7b36a29a24b6913dae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8cdd85e975d3885e09ba161497ea7f51" id="r_a8cdd85e975d3885e09ba161497ea7f51"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8cdd85e975d3885e09ba161497ea7f51">nfa_union</a> (void *I1, bool is_dfa_I1, void *I2, bool is_dfa_I2)</td></tr>
+<tr class="memdesc:a8cdd85e975d3885e09ba161497ea7f51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Union of two automata (NFAs or DFAs) into a single NFA.  <br /></td></tr>
+<tr class="separator:a8cdd85e975d3885e09ba161497ea7f51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d692df98fd32d70cbcf4248649fa422" id="r_a1d692df98fd32d70cbcf4248649fa422"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1d692df98fd32d70cbcf4248649fa422">nfa_concat</a> (void *I1, bool is_dfa_I1, void *I2, bool is_dfa_I2)</td></tr>
+<tr class="memdesc:a1d692df98fd32d70cbcf4248649fa422"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concatenation of two NFAs.  <br /></td></tr>
+<tr class="separator:a1d692df98fd32d70cbcf4248649fa422"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a981046da6bdcc0ae9e15e0af59fd49ab" id="r_a981046da6bdcc0ae9e15e0af59fd49ab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a981046da6bdcc0ae9e15e0af59fd49ab">nfa_star</a> (<a class="el" href="structnfa.html">nfa</a> *)</td></tr>
 <tr class="memdesc:a981046da6bdcc0ae9e15e0af59fd49ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kleene star of a NFA.  <br /></td></tr>
 <tr class="separator:a981046da6bdcc0ae9e15e0af59fd49ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -214,9 +214,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_reset_state_names
 <tr class="memitem:a5d5ed8a743ecf11962c3b2d981b42ad6" id="r_a5d5ed8a743ecf11962c3b2d981b42ad6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5d5ed8a743ecf11962c3b2d981b42ad6">nfa_random</a> (uint, uint, uint)</td></tr>
 <tr class="memdesc:a5d5ed8a743ecf11962c3b2d981b42ad6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a random NFA.  <br /></td></tr>
 <tr class="separator:a5d5ed8a743ecf11962c3b2d981b42ad6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5e2e81fe114c28cbdf7aa236a28c6410" id="r_a5e2e81fe114c28cbdf7aa236a28c6410"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5e2e81fe114c28cbdf7aa236a28c6410">dfa_random</a> (uint, uint, uint)</td></tr>
-<tr class="memdesc:a5e2e81fe114c28cbdf7aa236a28c6410"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a random DFA.  <br /></td></tr>
-<tr class="separator:a5e2e81fe114c28cbdf7aa236a28c6410"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f28ee052dc0be90bbab204827286e1a" id="r_a5f28ee052dc0be90bbab204827286e1a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5f28ee052dc0be90bbab204827286e1a">nfa_nb_trans</a> (<a class="el" href="structnfa.html">nfa</a> *)</td></tr>
 <tr class="memdesc:a5f28ee052dc0be90bbab204827286e1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the number of transitions in a NFA.  <br /></td></tr>
 <tr class="separator:a5f28ee052dc0be90bbab204827286e1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -238,13 +235,89 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_reset_state_names
 <tr class="memitem:a53e862a1c5b32e945145997a193fa7ed" id="r_a53e862a1c5b32e945145997a193fa7ed"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a53e862a1c5b32e945145997a193fa7ed">nfa_merge_states</a> (<a class="el" href="structnfa.html">nfa</a> *, <a class="el" href="structparti.html">parti</a> *)</td></tr>
 <tr class="memdesc:a53e862a1c5b32e945145997a193fa7ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Merges the states of a NFA according to the partition given as input.  <br /></td></tr>
 <tr class="separator:a53e862a1c5b32e945145997a193fa7ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab3d3f2f91459fcc94df97e7379a543f" id="r_aab3d3f2f91459fcc94df97e7379a543f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structlgraph.html">lgraph</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aab3d3f2f91459fcc94df97e7379a543f">nfa_get_lab_parti</a> (<a class="el" href="structnfa.html">nfa</a> *, <a class="el" href="structparti.html">parti</a> *)</td></tr>
-<tr class="memdesc:aab3d3f2f91459fcc94df97e7379a543f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given a NFA and a partition of its states, computes the labeled graph obtained by keeping only the transitions that connect states belonging to the same class.  <br /></td></tr>
-<tr class="separator:aab3d3f2f91459fcc94df97e7379a543f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a084e4d122d31ae2e7458638075867ef9" id="r_a084e4d122d31ae2e7458638075867ef9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdfa.html">dfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a084e4d122d31ae2e7458638075867ef9">dfa_init</a> (uint size_graph, uint size_alpha, uint nb_finals, <a class="el" href="structletter.html">letter</a> *alphabet)</td></tr>
+<tr class="memdesc:a084e4d122d31ae2e7458638075867ef9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes a DFA.  <br /></td></tr>
+<tr class="separator:a084e4d122d31ae2e7458638075867ef9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85fe1a30798c5af8e74230893fecfca4" id="r_a85fe1a30798c5af8e74230893fecfca4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a85fe1a30798c5af8e74230893fecfca4">dfa_reset_state_names</a> (<a class="el" href="structdfa.html">dfa</a> *A)</td></tr>
+<tr class="memdesc:a85fe1a30798c5af8e74230893fecfca4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release the state names in a DFA (if there are states names).  <br /></td></tr>
+<tr class="separator:a85fe1a30798c5af8e74230893fecfca4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68197f5343a9e2c85947ccc9a84f11b3" id="r_a68197f5343a9e2c85947ccc9a84f11b3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdfa.html">dfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a68197f5343a9e2c85947ccc9a84f11b3">dfa_copy</a> (<a class="el" href="structdfa.html">dfa</a> *A)</td></tr>
+<tr class="memdesc:a68197f5343a9e2c85947ccc9a84f11b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copies a DFA.  <br /></td></tr>
+<tr class="separator:a68197f5343a9e2c85947ccc9a84f11b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a918f5fe3c14cb0373c18c1abe562daf8" id="r_a918f5fe3c14cb0373c18c1abe562daf8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdfa.html">dfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a918f5fe3c14cb0373c18c1abe562daf8">dfa_copy_exalpha</a> (<a class="el" href="structdfa.html">dfa</a> *A, <a class="el" href="structletter.html">letter</a> *alpha, uint size)</td></tr>
+<tr class="memdesc:a918f5fe3c14cb0373c18c1abe562daf8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copies a DFA with an extended alphabet.  <br /></td></tr>
+<tr class="separator:a918f5fe3c14cb0373c18c1abe562daf8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaef744cc8d20f2f1606864672d2a0bde" id="r_aaef744cc8d20f2f1606864672d2a0bde"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaef744cc8d20f2f1606864672d2a0bde">dfa_delete</a> (<a class="el" href="structdfa.html">dfa</a> *A)</td></tr>
+<tr class="memdesc:aaef744cc8d20f2f1606864672d2a0bde"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes a DFA.  <br /></td></tr>
+<tr class="separator:aaef744cc8d20f2f1606864672d2a0bde"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adcd45d579350790a5180ca15543845b0" id="r_adcd45d579350790a5180ca15543845b0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdfa.html">dfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adcd45d579350790a5180ca15543845b0">detnfa_to_dfa</a> (<a class="el" href="structnfa.html">nfa</a> *A)</td></tr>
+<tr class="memdesc:adcd45d579350790a5180ca15543845b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a NFA which is deterministic into the complete DFA representation.  <br /></td></tr>
+<tr class="separator:adcd45d579350790a5180ca15543845b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abbf8171cffc00ce25c8e4d44d3628586" id="r_abbf8171cffc00ce25c8e4d44d3628586"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abbf8171cffc00ce25c8e4d44d3628586">dfa_to_nfa</a> (<a class="el" href="structdfa.html">dfa</a> *A)</td></tr>
+<tr class="memdesc:abbf8171cffc00ce25c8e4d44d3628586"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a DFA into a NFA.  <br /></td></tr>
+<tr class="separator:abbf8171cffc00ce25c8e4d44d3628586"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2bd6a5957f3e640b7e19b1213bec24d" id="r_aa2bd6a5957f3e640b7e19b1213bec24d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa2bd6a5957f3e640b7e19b1213bec24d">dfa_to_nfa_exalpha</a> (<a class="el" href="structdfa.html">dfa</a> *A, <a class="el" href="structletter.html">letter</a> *alpha, uint size)</td></tr>
+<tr class="memdesc:aa2bd6a5957f3e640b7e19b1213bec24d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a DFA into a NFA with an extended alphabet.  <br /></td></tr>
+<tr class="separator:aa2bd6a5957f3e640b7e19b1213bec24d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab2d7cf3110dc6238af5468ef3b0edfc9" id="r_ab2d7cf3110dc6238af5468ef3b0edfc9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab2d7cf3110dc6238af5468ef3b0edfc9">dfa_mirror</a> (<a class="el" href="structdfa.html">dfa</a> *)</td></tr>
+<tr class="memdesc:ab2d7cf3110dc6238af5468ef3b0edfc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mirror of a DFA.  <br /></td></tr>
+<tr class="separator:ab2d7cf3110dc6238af5468ef3b0edfc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11de7f8820befd2f1eb22b34f39a18ff" id="r_a11de7f8820befd2f1eb22b34f39a18ff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a11de7f8820befd2f1eb22b34f39a18ff">dfa_star</a> (<a class="el" href="structdfa.html">dfa</a> *)</td></tr>
+<tr class="memdesc:a11de7f8820befd2f1eb22b34f39a18ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Kleene star of a DFA.  <br /></td></tr>
+<tr class="separator:a11de7f8820befd2f1eb22b34f39a18ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac583e7eb1889f8630e35d19b2050472f" id="r_ac583e7eb1889f8630e35d19b2050472f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdfa.html">dfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac583e7eb1889f8630e35d19b2050472f">dfa_random</a> (uint, uint, uint)</td></tr>
+<tr class="memdesc:ac583e7eb1889f8630e35d19b2050472f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a random DFA.  <br /></td></tr>
+<tr class="separator:ac583e7eb1889f8630e35d19b2050472f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac605eaefcb6aa91dba4a97821a05cce" id="r_aac605eaefcb6aa91dba4a97821a05cce"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdfa.html">dfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aac605eaefcb6aa91dba4a97821a05cce">dfa_trim</a> (<a class="el" href="structdfa.html">dfa</a> *A)</td></tr>
+<tr class="memdesc:aac605eaefcb6aa91dba4a97821a05cce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes all non-accessible states from a DFA.  <br /></td></tr>
+<tr class="separator:aac605eaefcb6aa91dba4a97821a05cce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d85fc99b2f617f1759031f62a3eefbf" id="r_a6d85fc99b2f617f1759031f62a3eefbf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6d85fc99b2f617f1759031f62a3eefbf">dfa_print_state</a> (const <a class="el" href="structdfa.html">dfa</a> *, uint, FILE *)</td></tr>
+<tr class="memdesc:a6d85fc99b2f617f1759031f62a3eefbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Displays the name of a state in a DFA on a given stream.  <br /></td></tr>
+<tr class="separator:a6d85fc99b2f617f1759031f62a3eefbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41f09d825fc780ddd08daf7f3a6f722d" id="r_a41f09d825fc780ddd08daf7f3a6f722d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a41f09d825fc780ddd08daf7f3a6f722d">dfa_fprint_letter_utf8</a> (const <a class="el" href="structdfa.html">dfa</a> *, uint, FILE *)</td></tr>
+<tr class="memdesc:a41f09d825fc780ddd08daf7f3a6f722d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Displays a letter in the alphabet of a DFA on a given stream: utf8 version.  <br /></td></tr>
+<tr class="separator:a41f09d825fc780ddd08daf7f3a6f722d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ea5c472b08908f2fa8eda796b525aef" id="r_a4ea5c472b08908f2fa8eda796b525aef"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4ea5c472b08908f2fa8eda796b525aef">dfa_exists_path</a> (<a class="el" href="structdfa.html">dfa</a> *, uint, uint, bool *)</td></tr>
+<tr class="memdesc:a4ea5c472b08908f2fa8eda796b525aef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if there exists a path between two states in a DFA.  <br /></td></tr>
+<tr class="separator:a4ea5c472b08908f2fa8eda796b525aef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aee4441b4f94b62f16e03998ddbfcacce" id="r_aee4441b4f94b62f16e03998ddbfcacce"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aee4441b4f94b62f16e03998ddbfcacce">dfa_compute_run</a> (<a class="el" href="structdfa.html">dfa</a> *A, <a class="el" href="structword.html">word</a> *w)</td></tr>
+<tr class="memdesc:aee4441b4f94b62f16e03998ddbfcacce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the run of a DFA on a word.  <br /></td></tr>
+<tr class="separator:aee4441b4f94b62f16e03998ddbfcacce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Implementation of NFAs. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="aeaee4c0f63bdb39e7c133f1fca465667" name="aeaee4c0f63bdb39e7c133f1fca465667"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeaee4c0f63bdb39e7c133f1fca465667">&#9670;&#160;</a></span>copy_all_names()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char ** copy_all_names </td>
+          <td>(</td>
+          <td class="paramtype">char **</td>          <td class="paramname"><span class="paramname"><em>names</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>size</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns a copy of the array of state names. </p>
+<dl class="section return"><dt>Returns</dt><dd>A copy of the array of state names. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">names</td><td>The array of state names.  </td></tr>
+    <tr><td class="paramname">size</td><td>Size of the array of state names. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a04f187cff60afe911b2aec756a3ddcba" name="a04f187cff60afe911b2aec756a3ddcba"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a04f187cff60afe911b2aec756a3ddcba">&#9670;&#160;</a></span>create_emptylang()</h2>
 
@@ -341,14 +414,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_reset_state_names
 
 </div>
 </div>
-<a id="a9867131df17b4a62de39eecd7910c5ce" name="a9867131df17b4a62de39eecd7910c5ce"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9867131df17b4a62de39eecd7910c5ce">&#9670;&#160;</a></span>delete_nfa()</h2>
+<a id="adcd45d579350790a5180ca15543845b0" name="adcd45d579350790a5180ca15543845b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adcd45d579350790a5180ca15543845b0">&#9670;&#160;</a></span>detnfa_to_dfa()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void delete_nfa </td>
+          <td class="memname"><a class="el" href="structdfa.html">dfa</a> * detnfa_to_dfa </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
           <td></td>
@@ -356,7 +429,11 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_reset_state_names
       </table>
 </div><div class="memdoc">
 
-<p>Release of a NFA. </p>
+<p>Converts a NFA which is deterministic into the complete DFA representation. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The function fails if the NFA is not deterministic.</dd>
+<dd>
+If the NFA is not complete, an additional sink state is added.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The complete DFA. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">A</td><td>The NFA. </td></tr>
@@ -366,14 +443,320 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_reset_state_names
 
 </div>
 </div>
-<a id="a5e2e81fe114c28cbdf7aa236a28c6410" name="a5e2e81fe114c28cbdf7aa236a28c6410"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5e2e81fe114c28cbdf7aa236a28c6410">&#9670;&#160;</a></span>dfa_random()</h2>
+<a id="aee4441b4f94b62f16e03998ddbfcacce" name="aee4441b4f94b62f16e03998ddbfcacce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aee4441b4f94b62f16e03998ddbfcacce">&#9670;&#160;</a></span>dfa_compute_run()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structnfa.html">nfa</a> * dfa_random </td>
+          <td class="memname">uint dfa_compute_run </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structword.html">word</a> *</td>          <td class="paramname"><span class="paramname"><em>w</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Computes the run of a DFA on a word. </p>
+<dl class="section return"><dt>Returns</dt><dd>The final state reached by the DFA after reading the word. If the word contains an invalid letter, UINT_MAX is returned. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The DFA.  </td></tr>
+    <tr><td class="paramname">w</td><td>The word. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a68197f5343a9e2c85947ccc9a84f11b3" name="a68197f5343a9e2c85947ccc9a84f11b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68197f5343a9e2c85947ccc9a84f11b3">&#9670;&#160;</a></span>dfa_copy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdfa.html">dfa</a> * dfa_copy </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Copies a DFA. </p>
+<dl class="section return"><dt>Returns</dt><dd>A copy of the DFA. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The DFA. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a918f5fe3c14cb0373c18c1abe562daf8" name="a918f5fe3c14cb0373c18c1abe562daf8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a918f5fe3c14cb0373c18c1abe562daf8">&#9670;&#160;</a></span>dfa_copy_exalpha()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdfa.html">dfa</a> * dfa_copy_exalpha </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structletter.html">letter</a> *</td>          <td class="paramname"><span class="paramname"><em>alpha</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>size</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Copies a DFA with an extended alphabet. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>If there indeed new letters in the alphabet, the new DFA is ectended with a new sink state.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A copy of the DFA with an extended alphabet. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The DFA.  </td></tr>
+    <tr><td class="paramname">alpha</td><td>Array containing the new letters (sorted in increasing order).  </td></tr>
+    <tr><td class="paramname">size</td><td>Size of the array. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aaef744cc8d20f2f1606864672d2a0bde" name="aaef744cc8d20f2f1606864672d2a0bde"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaef744cc8d20f2f1606864672d2a0bde">&#9670;&#160;</a></span>dfa_delete()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void dfa_delete </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Deletes a DFA. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The DFA. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a4ea5c472b08908f2fa8eda796b525aef" name="a4ea5c472b08908f2fa8eda796b525aef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ea5c472b08908f2fa8eda796b525aef">&#9670;&#160;</a></span>dfa_exists_path()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool dfa_exists_path </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>in</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>out</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool *</td>          <td class="paramname"><span class="paramname"><em>alph</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Checks if there exists a path between two states in a DFA. </p>
+<dl class="section attention"><dt>Attention</dt><dd>The function does not check whether the input is indeed a DFA.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A Boolean indicating whether there exists a path. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The DFA.  </td></tr>
+    <tr><td class="paramname">in</td><td>The source state.  </td></tr>
+    <tr><td class="paramname">out</td><td>The target state.  </td></tr>
+    <tr><td class="paramname">alph</td><td>The restriction of the alphabet (NULL if no restriction). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a41f09d825fc780ddd08daf7f3a6f722d" name="a41f09d825fc780ddd08daf7f3a6f722d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a41f09d825fc780ddd08daf7f3a6f722d">&#9670;&#160;</a></span>dfa_fprint_letter_utf8()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void dfa_fprint_letter_utf8 </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>a</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">FILE *</td>          <td class="paramname"><span class="paramname"><em>out</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Displays a letter in the alphabet of a DFA on a given stream: utf8 version. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The DFA.  </td></tr>
+    <tr><td class="paramname">a</td><td>Index of the letter.  </td></tr>
+    <tr><td class="paramname">out</td><td>The stream. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a084e4d122d31ae2e7458638075867ef9" name="a084e4d122d31ae2e7458638075867ef9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a084e4d122d31ae2e7458638075867ef9">&#9670;&#160;</a></span>dfa_init()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdfa.html">dfa</a> * dfa_init </td>
+          <td>(</td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>size_graph</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>size_alpha</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>nb_finals</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structletter.html">letter</a> *</td>          <td class="paramname"><span class="paramname"><em>alphabet</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initializes a DFA. </p>
+<dl class="section return"><dt>Returns</dt><dd>The DFA. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">size_graph</td><td>Number of states.  </td></tr>
+    <tr><td class="paramname">size_alpha</td><td>Size of the alphabet.  </td></tr>
+    <tr><td class="paramname">nb_finals</td><td>Number of final states.  </td></tr>
+    <tr><td class="paramname">alphabet</td><td>The alphabet (NULL if the alphabet is empty). This will be copied. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ab2d7cf3110dc6238af5468ef3b0edfc9" name="ab2d7cf3110dc6238af5468ef3b0edfc9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2d7cf3110dc6238af5468ef3b0edfc9">&#9670;&#160;</a></span>dfa_mirror()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structnfa.html">nfa</a> * dfa_mirror </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Mirror of a DFA. </p>
+<dl class="section return"><dt>Returns</dt><dd>A NFA recognizing the mirror of the input language. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The NFA. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a6d85fc99b2f617f1759031f62a3eefbf" name="a6d85fc99b2f617f1759031f62a3eefbf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6d85fc99b2f617f1759031f62a3eefbf">&#9670;&#160;</a></span>dfa_print_state()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void dfa_print_state </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>q</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">FILE *</td>          <td class="paramname"><span class="paramname"><em>out</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Displays the name of a state in a DFA on a given stream. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>If no names are defined for the states, each state is named by its index. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The DFA.  </td></tr>
+    <tr><td class="paramname">q</td><td>Index of the state.  </td></tr>
+    <tr><td class="paramname">out</td><td>The stream. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ac583e7eb1889f8630e35d19b2050472f" name="ac583e7eb1889f8630e35d19b2050472f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac583e7eb1889f8630e35d19b2050472f">&#9670;&#160;</a></span>dfa_random()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdfa.html">dfa</a> * dfa_random </td>
           <td>(</td>
           <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>size_alpha</em></span>, </td>
         </tr>
@@ -397,6 +780,138 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_reset_state_names
     <tr><td class="paramname">size_alpha</td><td>Size of the alphabet.  </td></tr>
     <tr><td class="paramname">min_size</td><td>Minimum number of states.  </td></tr>
     <tr><td class="paramname">max_size</td><td>Maximum number of states. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a85fe1a30798c5af8e74230893fecfca4" name="a85fe1a30798c5af8e74230893fecfca4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a85fe1a30798c5af8e74230893fecfca4">&#9670;&#160;</a></span>dfa_reset_state_names()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void dfa_reset_state_names </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Release the state names in a DFA (if there are states names). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The DFA. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a11de7f8820befd2f1eb22b34f39a18ff" name="a11de7f8820befd2f1eb22b34f39a18ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a11de7f8820befd2f1eb22b34f39a18ff">&#9670;&#160;</a></span>dfa_star()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structnfa.html">nfa</a> * dfa_star </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Kleene star of a DFA. </p>
+<dl class="section return"><dt>Returns</dt><dd>A NFA recognizing the Kleene star of the input language. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The DFA. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="abbf8171cffc00ce25c8e4d44d3628586" name="abbf8171cffc00ce25c8e4d44d3628586"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abbf8171cffc00ce25c8e4d44d3628586">&#9670;&#160;</a></span>dfa_to_nfa()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structnfa.html">nfa</a> * dfa_to_nfa </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Converts a DFA into a NFA. </p>
+<dl class="section return"><dt>Returns</dt><dd>The NFA. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The DFA. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aa2bd6a5957f3e640b7e19b1213bec24d" name="aa2bd6a5957f3e640b7e19b1213bec24d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa2bd6a5957f3e640b7e19b1213bec24d">&#9670;&#160;</a></span>dfa_to_nfa_exalpha()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structnfa.html">nfa</a> * dfa_to_nfa_exalpha </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structletter.html">letter</a> *</td>          <td class="paramname"><span class="paramname"><em>alpha</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>size</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Converts a DFA into a NFA with an extended alphabet. </p>
+<dl class="section return"><dt>Returns</dt><dd>The NFA. </dd></dl>
+
+</div>
+</div>
+<a id="aac605eaefcb6aa91dba4a97821a05cce" name="aac605eaefcb6aa91dba4a97821a05cce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac605eaefcb6aa91dba4a97821a05cce">&#9670;&#160;</a></span>dfa_trim()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdfa.html">dfa</a> * dfa_trim </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Removes all non-accessible states from a DFA. </p>
+<dl class="section return"><dt>Returns</dt><dd>The trimmed DFA. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The DFA. </td></tr>
   </table>
   </dd>
 </dl>
@@ -465,8 +980,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_reset_state_names
 
 </div>
 </div>
-<a id="a43a531c1bc75fe7b36a29a24b6913dae" name="a43a531c1bc75fe7b36a29a24b6913dae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a43a531c1bc75fe7b36a29a24b6913dae">&#9670;&#160;</a></span>nfa_concat()</h2>
+<a id="a1d692df98fd32d70cbcf4248649fa422" name="a1d692df98fd32d70cbcf4248649fa422"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d692df98fd32d70cbcf4248649fa422">&#9670;&#160;</a></span>nfa_concat()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -474,12 +989,22 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_reset_state_names
         <tr>
           <td class="memname"><a class="el" href="structnfa.html">nfa</a> * nfa_concat </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span>, </td>
+          <td class="paramtype">void *</td>          <td class="paramname"><span class="paramname"><em>I1</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>B</em></span>&#160;)</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>is_dfa_I1</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *</td>          <td class="paramname"><span class="paramname"><em>I2</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>is_dfa_I2</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -489,8 +1014,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_reset_state_names
 <dl class="section return"><dt>Returns</dt><dd>A NFA recognizing the concatenation of the two input languages. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">A</td><td>First NFA.  </td></tr>
-    <tr><td class="paramname">B</td><td>Second NFA. </td></tr>
+    <tr><td class="paramname">I1</td><td>First NFA or DFA.  </td></tr>
+    <tr><td class="paramname">is_dfa_I1</td><td>True if the first input is a DFA, false if it is a NFA.  </td></tr>
+    <tr><td class="paramname">I2</td><td>Second NFA or DFA.  </td></tr>
+    <tr><td class="paramname">is_dfa_I2</td><td>True if the second input is a DFA, false if it is a NFA. </td></tr>
   </table>
   </dd>
 </dl>
@@ -514,33 +1041,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_reset_state_names
 
 <p>Copy of a NFA. </p>
 <dl class="section return"><dt>Returns</dt><dd>The copy </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">A</td><td>The NFA. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a265bce1dd46a4132a9150a2e32dc9d43" name="a265bce1dd46a4132a9150a2e32dc9d43"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a265bce1dd46a4132a9150a2e32dc9d43">&#9670;&#160;</a></span>nfa_copy_all_names()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">char ** nfa_copy_all_names </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns a copy of the array of state names in a NFA. </p>
-<dl class="section remark"><dt>Remarks</dt><dd>If no names are defined for the states, the function returns a NULL pointer.</dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>A copy of the array of state names. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">A</td><td>The NFA. </td></tr>
@@ -616,32 +1116,25 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_reset_state_names
 
 </div>
 </div>
-<a id="a63e0bac87a1588aa56a430593f3a239d" name="a63e0bac87a1588aa56a430593f3a239d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a63e0bac87a1588aa56a430593f3a239d">&#9670;&#160;</a></span>nfa_copy_one_name()</h2>
+<a id="aa44009e908e50ff7cebd3c83cf1b3d5a" name="aa44009e908e50ff7cebd3c83cf1b3d5a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa44009e908e50ff7cebd3c83cf1b3d5a">&#9670;&#160;</a></span>nfa_delete()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char * nfa_copy_one_name </td>
+          <td class="memname">void nfa_delete </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype"><a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
           <td></td>
-          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>q</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Copies the name of a single state in a NFA. </p>
-<dl class="section remark"><dt>Remarks</dt><dd>If no names are defined for the states, the function returns a NULL pointer.</dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>A copy of the name. </dd></dl>
+<p>Release of a NFA. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">A</td><td>The NFA.  </td></tr>
-    <tr><td class="paramname">q</td><td>Index of the state. </td></tr>
+    <tr><td class="paramname">A</td><td>The NFA. </td></tr>
   </table>
   </dd>
 </dl>
@@ -799,37 +1292,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_reset_state_names
     <tr><td class="paramname">A</td><td>The NFA.  </td></tr>
     <tr><td class="paramname">a</td><td>Index of the letter.  </td></tr>
     <tr><td class="paramname">out</td><td>The stream. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="aab3d3f2f91459fcc94df97e7379a543f" name="aab3d3f2f91459fcc94df97e7379a543f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aab3d3f2f91459fcc94df97e7379a543f">&#9670;&#160;</a></span>nfa_get_lab_parti()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structlgraph.html">lgraph</a> * nfa_get_lab_parti </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structparti.html">parti</a> *</td>          <td class="paramname"><span class="paramname"><em>P</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Given a NFA and a partition of its states, computes the labeled graph obtained by keeping only the transitions that connect states belonging to the same class. </p>
-<dl class="section return"><dt>Returns</dt><dd>The labeled graph. </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">A</td><td>The NFA.  </td></tr>
-    <tr><td class="paramname">P</td><td>Partition of the states. </td></tr>
   </table>
   </dd>
 </dl>
@@ -1051,6 +1513,36 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_reset_state_names
 
 </div>
 </div>
+<a id="a8476f837e787f05a0999dd32facba859" name="a8476f837e787f05a0999dd32facba859"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8476f837e787f05a0999dd32facba859">&#9670;&#160;</a></span>nfa_overwrite()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void nfa_overwrite </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>B</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Overwrites a NFA by copying another NFA and releasing this other NFA. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The NFA that is being overwritten (its original fields are released).  </td></tr>
+    <tr><td class="paramname">B</td><td>The NFA being copied (it is completely released). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a1ae133a4e6dddd6c69488a3613b17a83" name="a1ae133a4e6dddd6c69488a3613b17a83"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1ae133a4e6dddd6c69488a3613b17a83">&#9670;&#160;</a></span>nfa_plus()</h2>
 
@@ -1229,8 +1721,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_reset_state_names
 
 </div>
 </div>
-<a id="aa8860f9b024ee213f5034c3e4d623097" name="aa8860f9b024ee213f5034c3e4d623097"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa8860f9b024ee213f5034c3e4d623097">&#9670;&#160;</a></span>nfa_union()</h2>
+<a id="a8cdd85e975d3885e09ba161497ea7f51" name="a8cdd85e975d3885e09ba161497ea7f51"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8cdd85e975d3885e09ba161497ea7f51">&#9670;&#160;</a></span>nfa_union()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1238,53 +1730,35 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_reset_state_names
         <tr>
           <td class="memname"><a class="el" href="structnfa.html">nfa</a> * nfa_union </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span>, </td>
+          <td class="paramtype">void *</td>          <td class="paramname"><span class="paramname"><em>I1</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>B</em></span>&#160;)</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>is_dfa_I1</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">void *</td>          <td class="paramname"><span class="paramname"><em>I2</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>is_dfa_I2</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Union of two NFAs. </p>
-<dl class="section remark"><dt>Remarks</dt><dd>The two NFAs may have dsitinct alphabets. In this case, the alphabet of the computed NFA is the union of the two alphabets.</dd></dl>
+<p>Union of two automata (NFAs or DFAs) into a single NFA. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The two automata may have dsitinct alphabets. In this case, the alphabet of the computed NFA is the union of the two alphabets.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A NFA recognizing the union of the two input languages. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">A</td><td>First NFA.  </td></tr>
-    <tr><td class="paramname">B</td><td>Second NFA. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a1e4df1d06f5db0d8c4250bb377f50832" name="a1e4df1d06f5db0d8c4250bb377f50832"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1e4df1d06f5db0d8c4250bb377f50832">&#9670;&#160;</a></span>overwrite_nfa()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void overwrite_nfa </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>B</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Overwrites a NFA by copying another NFA and releasing this other NFA. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">A</td><td>The NFA that is being overwritten (its original fields are released).  </td></tr>
-    <tr><td class="paramname">B</td><td>The NFA being copied (it is completely released). </td></tr>
+    <tr><td class="paramname">I1</td><td>First NFA or DFA.  </td></tr>
+    <tr><td class="paramname">is_dfa_I1</td><td>True if the first input is a DFA, false if it is a NFA.  </td></tr>
+    <tr><td class="paramname">I2</td><td>Second NFA or DFA.  </td></tr>
+    <tr><td class="paramname">is_dfa_I2</td><td>True if the second input is a DFA, false if it is a NFA. </td></tr>
   </table>
   </dd>
 </dl>

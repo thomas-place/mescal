@@ -1,11 +1,12 @@
 var nfa__minimization_8h =
 [
     [ "hopcroft_partition", "structhopcroft__partition.html", "structhopcroft__partition" ],
-    [ "nfa_brzozowski", "nfa__minimization_8h.html#aa52bbd5361ba770b18b83a1dc50e0846", null ],
-    [ "nfa_hopcroft", "nfa__minimization_8h.html#a252f30cd5f206f6993af2db9dedbf496", null ],
-    [ "nfa_hopcroft_free", "nfa__minimization_8h.html#a65250736020a95b3b9624ea2b1233426", null ],
-    [ "nfa_hopcroft_genauto", "nfa__minimization_8h.html#a8983e7468bc971f2d0c426d1a66e35dd", null ],
-    [ "nfa_hopcroft_initial", "nfa__minimization_8h.html#a6d9d927752538a048fa0c9f2f3027b99", null ],
-    [ "nfa_mini_canonical_copy", "nfa__minimization_8h.html#ac3c99dd46335997b41b509e5b732b8dc", null ],
-    [ "nfa_mini_canonical_ordering", "nfa__minimization_8h.html#a2872aa87157e77326ab4b88fdb75f22b", null ]
+    [ "dfa_brzozowski", "nfa__minimization_8h.html#a34b346e61f248d4df092f88472720b6e", null ],
+    [ "dfa_hopcroft", "nfa__minimization_8h.html#a240bda45cca37dc21760552179df3cc6", null ],
+    [ "dfa_hopcroft_free", "nfa__minimization_8h.html#a806017b85bc7a4fdcdc0422e87d2fad3", null ],
+    [ "dfa_hopcroft_genauto", "nfa__minimization_8h.html#aba5434baa281ba3177a174f96111f970", null ],
+    [ "dfa_hopcroft_initial", "nfa__minimization_8h.html#a3bcda8764a319c5797c30dc4371944af", null ],
+    [ "dfa_mini_canonical_copy", "nfa__minimization_8h.html#af9766f66bf3595c38c419c32b3338d0e", null ],
+    [ "dfa_mini_canonical_ordering", "nfa__minimization_8h.html#a330219616b3371bbf441fa90e336d60d", null ],
+    [ "nfa_brzozowski", "nfa__minimization_8h.html#af2e35882041c1e5d6d437d0b0f844b61", null ]
 ];

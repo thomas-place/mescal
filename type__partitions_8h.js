@@ -2,6 +2,7 @@ var type__partitions_8h =
 [
     [ "parti", "structparti.html", "structparti" ],
     [ "ufind", "structufind.html", "structufind" ],
+    [ "create_parti", "type__partitions_8h.html#a1b92662291ef23e648de7543b8a65d3f", null ],
     [ "create_ufind", "type__partitions_8h.html#a09f94e2635329e4d1aeb680c6b5adef1", null ],
     [ "delete_parti", "type__partitions_8h.html#a2b192a71ebd9742e1215ae48955554d4", null ],
     [ "delete_ufind", "type__partitions_8h.html#adf4e8c3082debc8acc514e4bf109b87f", null ],

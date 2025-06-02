@@ -134,18 +134,21 @@ Functions</h2></td></tr>
 <tr class="memitem:ab80174fe5f2c6b11407ffc57d03d82c7" id="r_ab80174fe5f2c6b11407ffc57d03d82c7"><td class="memItemLeft" align="right" valign="top">json_object *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab80174fe5f2c6b11407ffc57d03d82c7">files_regexp_to_json</a> (<a class="el" href="structregexp.html">regexp</a> *)</td></tr>
 <tr class="memdesc:ab80174fe5f2c6b11407ffc57d03d82c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a regular expression into a json object.  <br /></td></tr>
 <tr class="separator:ab80174fe5f2c6b11407ffc57d03d82c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a10213276a901bc47f7cab0be8aa6a57e" id="r_a10213276a901bc47f7cab0be8aa6a57e"><td class="memItemLeft" align="right" valign="top">json_object *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a10213276a901bc47f7cab0be8aa6a57e">files_auto_to_json</a> (<a class="el" href="structnfa.html">nfa</a> *)</td></tr>
-<tr class="memdesc:a10213276a901bc47f7cab0be8aa6a57e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts an automaton into a json object.  <br /></td></tr>
-<tr class="separator:a10213276a901bc47f7cab0be8aa6a57e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a240628eb1a0a47d51e0ae00229488ec5" id="r_a240628eb1a0a47d51e0ae00229488ec5"><td class="memItemLeft" align="right" valign="top">json_object *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a240628eb1a0a47d51e0ae00229488ec5">files_nfa_to_json</a> (<a class="el" href="structnfa.html">nfa</a> *)</td></tr>
+<tr class="memdesc:a240628eb1a0a47d51e0ae00229488ec5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a NFA into a json object.  <br /></td></tr>
+<tr class="separator:a240628eb1a0a47d51e0ae00229488ec5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a829447c9377610282776eae83863490e" id="r_a829447c9377610282776eae83863490e"><td class="memItemLeft" align="right" valign="top">json_object *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a829447c9377610282776eae83863490e">files_dfa_to_json</a> (<a class="el" href="structdfa.html">dfa</a> *)</td></tr>
+<tr class="memdesc:a829447c9377610282776eae83863490e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a DFA into a json object.  <br /></td></tr>
+<tr class="separator:a829447c9377610282776eae83863490e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab33d386dfc1d64e7743d67490c35ba10" id="r_ab33d386dfc1d64e7743d67490c35ba10"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab33d386dfc1d64e7743d67490c35ba10">files_json_to_nfa</a> (json_object *)</td></tr>
 <tr class="memdesc:ab33d386dfc1d64e7743d67490c35ba10"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads a json object encoding an automaton and extracts this automaton.  <br /></td></tr>
 <tr class="separator:ab33d386dfc1d64e7743d67490c35ba10"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a029de89b7a1b4f1b23a9865148a5c4ca" id="r_a029de89b7a1b4f1b23a9865148a5c4ca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a029de89b7a1b4f1b23a9865148a5c4ca">files_save_object</a> (<a class="el" href="structobject.html">object</a> *, char *)</td></tr>
 <tr class="memdesc:a029de89b7a1b4f1b23a9865148a5c4ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Saves a shell object into a file.  <br /></td></tr>
 <tr class="separator:a029de89b7a1b4f1b23a9865148a5c4ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0cf8a7f9857e4bc8ce05344bf1a63d0a" id="r_a0cf8a7f9857e4bc8ce05344bf1a63d0a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0cf8a7f9857e4bc8ce05344bf1a63d0a">files_read_object</a> (char *, char *)</td></tr>
-<tr class="memdesc:a0cf8a7f9857e4bc8ce05344bf1a63d0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads a shell object from a file and assigns it to a variable name.  <br /></td></tr>
-<tr class="separator:a0cf8a7f9857e4bc8ce05344bf1a63d0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae852156774ee1a31e9dea70f946d3c4d" id="r_ae852156774ee1a31e9dea70f946d3c4d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae852156774ee1a31e9dea70f946d3c4d">files_read_object</a> (char *, char *)</td></tr>
+<tr class="memdesc:ae852156774ee1a31e9dea70f946d3c4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads a shell object from a file and assigns it to a variable name.  <br /></td></tr>
+<tr class="separator:ae852156774ee1a31e9dea70f946d3c4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaa9ea6ebedab61d6729571f347185377" id="r_aaa9ea6ebedab61d6729571f347185377"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaa9ea6ebedab61d6729571f347185377">files_save_session</a> (char *)</td></tr>
 <tr class="memdesc:aaa9ea6ebedab61d6729571f347185377"><td class="mdescLeft">&#160;</td><td class="mdescRight">Saves a complete session in a file.  <br /></td></tr>
 <tr class="separator:aaa9ea6ebedab61d6729571f347185377"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -158,22 +161,22 @@ Functions</h2></td></tr>
 <p>Contains all the functions that can be used to save objects in files and then load these files in the software.</p>
 <dl class="section remark"><dt>Remarks</dt><dd>Savefiles are formatted in JSON. All functions depend on the json-c library. </dd></dl>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a10213276a901bc47f7cab0be8aa6a57e" name="a10213276a901bc47f7cab0be8aa6a57e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a10213276a901bc47f7cab0be8aa6a57e">&#9670;&#160;</a></span>files_auto_to_json()</h2>
+<a id="a829447c9377610282776eae83863490e" name="a829447c9377610282776eae83863490e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a829447c9377610282776eae83863490e">&#9670;&#160;</a></span>files_dfa_to_json()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">json_object * files_auto_to_json </td>
+          <td class="memname">json_object * files_dfa_to_json </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Converts an automaton into a json object. </p>
+<p>Converts a DFA into a json object. </p>
 <dl class="section return"><dt>Returns</dt><dd>The json object </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -235,14 +238,40 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a0cf8a7f9857e4bc8ce05344bf1a63d0a" name="a0cf8a7f9857e4bc8ce05344bf1a63d0a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0cf8a7f9857e4bc8ce05344bf1a63d0a">&#9670;&#160;</a></span>files_read_object()</h2>
+<a id="a240628eb1a0a47d51e0ae00229488ec5" name="a240628eb1a0a47d51e0ae00229488ec5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a240628eb1a0a47d51e0ae00229488ec5">&#9670;&#160;</a></span>files_nfa_to_json()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void files_read_object </td>
+          <td class="memname">json_object * files_nfa_to_json </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Converts a NFA into a json object. </p>
+<dl class="section return"><dt>Returns</dt><dd>The json object </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The automaton. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ae852156774ee1a31e9dea70f946d3c4d" name="ae852156774ee1a31e9dea70f946d3c4d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae852156774ee1a31e9dea70f946d3c4d">&#9670;&#160;</a></span>files_read_object()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int files_read_object </td>
           <td>(</td>
           <td class="paramtype">char *</td>          <td class="paramname"><span class="paramname"><em>filename</em></span>, </td>
         </tr>
@@ -255,6 +284,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Reads a shell object from a file and assigns it to a variable name. </p>
+<dl class="section return"><dt>Returns</dt><dd>The index of the object in the table. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">filename</td><td>The path to the file that needs to be read.  </td></tr>

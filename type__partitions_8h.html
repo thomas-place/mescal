@@ -125,6 +125,9 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a1b92662291ef23e648de7543b8a65d3f" id="r_a1b92662291ef23e648de7543b8a65d3f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structparti.html">parti</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1b92662291ef23e648de7543b8a65d3f">create_parti</a> (uint size_set, uint size_par, uint *numcl)</td></tr>
+<tr class="memdesc:a1b92662291ef23e648de7543b8a65d3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creation of a partition.  <br /></td></tr>
+<tr class="separator:a1b92662291ef23e648de7543b8a65d3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2b192a71ebd9742e1215ae48955554d4" id="r_a2b192a71ebd9742e1215ae48955554d4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2b192a71ebd9742e1215ae48955554d4">delete_parti</a> (<a class="el" href="structparti.html">parti</a> *)</td></tr>
 <tr class="memdesc:a2b192a71ebd9742e1215ae48955554d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release of a partition.  <br /></td></tr>
 <tr class="separator:a2b192a71ebd9742e1215ae48955554d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -177,6 +180,43 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Types used to represent partitions. Includes the union-find algorithm. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="a1b92662291ef23e648de7543b8a65d3f" name="a1b92662291ef23e648de7543b8a65d3f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b92662291ef23e648de7543b8a65d3f">&#9670;&#160;</a></span>create_parti()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structparti.html">parti</a> * create_parti </td>
+          <td>(</td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>size_set</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>size_par</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint *</td>          <td class="paramname"><span class="paramname"><em>numcl</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Creation of a partition. </p>
+<dl class="section return"><dt>Returns</dt><dd>The partition. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">size_set</td><td>The size of the partitioned set.  </td></tr>
+    <tr><td class="paramname">size_par</td><td>The size of the partition.  </td></tr>
+    <tr><td class="paramname">numcl</td><td>The array mapping each element to its class (used in the structure as numcl) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a09f94e2635329e4d1aeb680c6b5adef1" name="a09f94e2635329e4d1aeb680c6b5adef1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a09f94e2635329e4d1aeb680c6b5adef1">&#9670;&#160;</a></span>create_ufind()</h2>
 

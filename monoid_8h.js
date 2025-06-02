@@ -5,11 +5,13 @@ var monoid_8h =
     [ "ONE", "monoid_8h.html#a206b6f5362e56b51ca957635350b70b6", null ],
     [ "delete_green", "monoid_8h.html#add9ea672052b921f90886575209eda7f", null ],
     [ "delete_morphism", "monoid_8h.html#a8ceee148f04c12a0bfbedc7fb5148201", null ],
-    [ "dfa_to_morphism", "monoid_8h.html#ae9e3edc4be251bcece4ac6f78cd57670", null ],
-    [ "gr_green_compute", "monoid_8h.html#a78610ef5cad71bf3a5c0522dd71638e1", null ],
+    [ "dfa_to_morphism", "monoid_8h.html#acdcd09fab627bc6916ef5984c6ffccce", null ],
+    [ "dfa_to_morphism_size", "monoid_8h.html#a434eaa46acba5bd102614880f63883f5", null ],
+    [ "gr_green_compute", "monoid_8h.html#ae7841e3bd071fb4b9213208fe40c8887", null ],
     [ "green_sorted_jclass", "monoid_8h.html#a74a354e588a47859ea5057f52b727dbc", null ],
     [ "h_green_compute", "monoid_8h.html#a95cbf4d4bec7f867f260cfb9c8bccf97", null ],
-    [ "left_morphism_to_dfa", "monoid_8h.html#a17a625c2d89c85f4135062ef5864a149", null ],
+    [ "left_morphism_to_dfa", "monoid_8h.html#adccad96dae38fb75b5713d351e2d35ee", null ],
+    [ "mor_all_regular", "monoid_8h.html#ac691e91591b2937fce58b1ddccad342c", null ],
     [ "mor_compute_green", "monoid_8h.html#a3b798d63b90a05b6fa3bde75c169399e", null ],
     [ "mor_compute_image", "monoid_8h.html#a6fe51b3b3716e0069d0a2abbd3841059", null ],
     [ "mor_compute_leftcayley", "monoid_8h.html#a2974ee23c705fd44a710011399eb31a2", null ],
@@ -18,6 +20,7 @@ var monoid_8h =
     [ "mor_compute_order", "monoid_8h.html#a482b68680d6e85a65b3c76a2874ecb2e", null ],
     [ "mor_compute_rep", "monoid_8h.html#a4c1c82d4d30dd01536743aebd7b3225d", null ],
     [ "mor_duplicate_alpha", "monoid_8h.html#a20a8835496c264827ad5387da2bb8d0a", null ],
+    [ "mor_extract_rcl", "monoid_8h.html#a38cb3a83ff90ced9738f6921601651dc", null ],
     [ "mor_letter_index", "monoid_8h.html#a9adf840d3b052cd0d236f1ba64b54dac", null ],
     [ "mor_lmirror", "monoid_8h.html#a68a36c1f4de7bd2c49f5d3b058de696a", null ],
     [ "mor_mult", "monoid_8h.html#a9e19682eb70d4b85aea8d7a49e4ef626", null ],
@@ -29,5 +32,5 @@ var monoid_8h =
     [ "mor_omega", "monoid_8h.html#aa2c1fb899228f5730b91e4875e2c3412", null ],
     [ "mor_regular_jclass", "monoid_8h.html#a557079ba18af91ad6d8ee175fa1872c0", null ],
     [ "mor_rmirror", "monoid_8h.html#acbf04050c8d1420de5d9dac17d9840a2", null ],
-    [ "morphism_to_dfa", "monoid_8h.html#ab005099be059e61183b625ef690498c0", null ]
+    [ "morphism_to_dfa", "monoid_8h.html#a0f0ef550c4f7a0067f4ebe20eede43c6", null ]
 ];

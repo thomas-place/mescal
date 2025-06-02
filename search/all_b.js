@@ -18,7 +18,7 @@ var searchData=
   ['lefread_5fdequeue_5fgen_15',['lefread_dequeue_gen',['../type__dequeue__gen_8h.html#aee3ad2548acb1af5b87638c4df01856d',1,'type_dequeue_gen.c']]],
   ['lefread_5fword_16',['lefread_word',['../words_8h.html#a122ce20f12d43db6e01a8bb3e4e975d8',1,'words.c']]],
   ['left_17',['left',['../structregexp.html#a09d8022e82fe806d6e34ab59b2977304',1,'regexp::left'],['../structavlnode.html#a2f4edec9d5d8030c7e8a7f51abe7560e',1,'avlnode::left'],['../structuint__avlnode.html#a61fa869c643bbe2c9caa642ebc3f8794',1,'uint_avlnode::left'],['../structdequeue.html#a58194f002d1cc694e3ccce32c6b97aa0',1,'dequeue::left'],['../structdequeue__gen.html#af2cb45479c5004020eb039aec5474362',1,'dequeue_gen::left'],['../structword.html#aa4a61f8f7bbc6fe5eb19ab5203034764',1,'word::left']]],
-  ['left_5fmorphism_5fto_5fdfa_18',['left_morphism_to_dfa',['../monoid_8h.html#a17a625c2d89c85f4135062ef5864a149',1,'monoid.c']]],
+  ['left_5fmorphism_5fto_5fdfa_18',['left_morphism_to_dfa',['../monoid_8h.html#adccad96dae38fb75b5713d351e2d35ee',1,'monoid.c']]],
   ['length_5fletter_5futf8_19',['length_letter_utf8',['../words_8h.html#af63d85375dfef8fdfbad667a7e860250',1,'words.c']]],
   ['letter_20',['letter',['../structletter.html',1,'letter'],['../structregexp.html#a3019f61b9f5ebeace2924d973a9e8875',1,'regexp::letter']]],
   ['level_21',['level',['../structorbits.html#a4252ea7a51132d2f993e2708274ed2cd',1,'orbits::level'],['../structsubsemi.html#af21a2993c64783ca19f4df0611d0e3fc',1,'subsemi::level']]],
@@ -39,6 +39,5 @@ var searchData=
   ['listening_5fmode_36',['listening_mode',['../interrupt_8h.html#af165da926e7da93c5fcc68797aedc20e',1,'interrupt.c']]],
   ['loading_37',['Saving and loading',['../index.html#autotoc_md10',1,'']]],
   ['lsent_38',['lsent',['../structdlist.html#a52bdbf827bdc6d628a12b06e4ff6db56',1,'dlist']]],
-  ['ltarjan_39',['ltarjan',['../graphs__tarjan_8h.html#a1056a2c05386186a2b6acf54a373aa33',1,'graphs_tarjan.c']]],
-  ['ltarjan_5falph_40',['ltarjan_alph',['../graphs__tarjan_8h.html#a1ae025020a832977dcc7a63cd3537d02',1,'graphs_tarjan.c']]]
+  ['ltarjan_39',['ltarjan',['../graphs__tarjan_8h.html#a8de7d8fde350720c85d7a58af7c055be',1,'graphs_tarjan.c']]]
 ];

@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['q1_0',['q1',['../structnfa__prod__pair.html#af431d4999a1f8ec04784c9083574d83b',1,'nfa_prod_pair']]],
-  ['q2_1',['q2',['../structnfa__prod__pair.html#a9ef4c3d8835d066822fdd1fdbd80eb3d',1,'nfa_prod_pair']]]
+  ['q1_0',['q1',['../structprod__pair.html#a1ca1d82400fdc36856d890fc018c7941',1,'prod_pair']]],
+  ['q2_1',['q2',['../structprod__pair.html#a2d55bd3319772125ad8883515c8ce601',1,'prod_pair']]]
 ];

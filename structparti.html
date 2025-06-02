@@ -123,10 +123,18 @@ uint&#160;</td><td class="memItemRight" valign="bottom"><b>size_par</b></td></tr
 uint *&#160;</td><td class="memItemRight" valign="bottom"><b>numcl</b></td></tr>
 <tr class="memdesc:acf596b7f9886e140bb3797a1fb0d511b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array indexed by the partitioned set. Each element in the set is mapped to its class. <br /></td></tr>
 <tr class="separator:acf596b7f9886e140bb3797a1fb0d511b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a67422ea3a1d249ae6655ec8c40f62e" id="r_a7a67422ea3a1d249ae6655ec8c40f62e"><td class="memItemLeft" align="right" valign="top"><a id="a7a67422ea3a1d249ae6655ec8c40f62e" name="a7a67422ea3a1d249ae6655ec8c40f62e"></a>
-<a class="el" href="structdequeue.html">dequeue</a> **&#160;</td><td class="memItemRight" valign="bottom"><b>cl</b></td></tr>
-<tr class="memdesc:a7a67422ea3a1d249ae6655ec8c40f62e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array indexed by the classes. Each class is mapped to the list sorted in increasing order of all elements that it contains. <br /></td></tr>
-<tr class="separator:a7a67422ea3a1d249ae6655ec8c40f62e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a309d4b26b38a716586e581a944c460fe" id="r_a309d4b26b38a716586e581a944c460fe"><td class="memItemLeft" align="right" valign="top"><a id="a309d4b26b38a716586e581a944c460fe" name="a309d4b26b38a716586e581a944c460fe"></a>
+uint *&#160;</td><td class="memItemRight" valign="bottom"><b>storage</b></td></tr>
+<tr class="memdesc:a309d4b26b38a716586e581a944c460fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used to the classes contiguously in memory (size size_set). <br /></td></tr>
+<tr class="separator:a309d4b26b38a716586e581a944c460fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26659c022afb0b04e79e24bbb388b603" id="r_a26659c022afb0b04e79e24bbb388b603"><td class="memItemLeft" align="right" valign="top"><a id="a26659c022afb0b04e79e24bbb388b603" name="a26659c022afb0b04e79e24bbb388b603"></a>
+uint **&#160;</td><td class="memItemRight" valign="bottom"><b>cl_elems</b></td></tr>
+<tr class="memdesc:a26659c022afb0b04e79e24bbb388b603"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array of classes. For each class c cl_elems[c] contains a point to its firts element in storage. <br /></td></tr>
+<tr class="separator:a26659c022afb0b04e79e24bbb388b603"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afaa45df12132da8cb66049f382844bf3" id="r_afaa45df12132da8cb66049f382844bf3"><td class="memItemLeft" align="right" valign="top"><a id="afaa45df12132da8cb66049f382844bf3" name="afaa45df12132da8cb66049f382844bf3"></a>
+uint *&#160;</td><td class="memItemRight" valign="bottom"><b>cl_size</b></td></tr>
+<tr class="memdesc:afaa45df12132da8cb66049f382844bf3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array indexed by the classes. Each class is mapped to its size. <br /></td></tr>
+<tr class="separator:afaa45df12132da8cb66049f382844bf3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>First type used to represent a partition. This is not the one used by Union-Find. </p>

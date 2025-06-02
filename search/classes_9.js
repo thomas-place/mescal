@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['mccluskey_5fauto_0',['mccluskey_auto',['../structmccluskey__auto.html',1,'']]],
-  ['morphism_1',['morphism',['../structmorphism.html',1,'']]],
-  ['morphism_5fstate_2',['morphism_state',['../structmorphism__state.html',1,'']]],
-  ['multi_5fedge_3',['multi_edge',['../structmulti__edge.html',1,'']]]
+  ['nfa_0',['nfa',['../structnfa.html',1,'']]],
+  ['num_5fspan_5ftrees_1',['num_span_trees',['../structnum__span__trees.html',1,'']]]
 ];

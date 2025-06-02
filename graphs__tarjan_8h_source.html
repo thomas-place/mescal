@@ -115,47 +115,46 @@ $(function(){initNavTree('graphs__tarjan_8h_source.html',''); initResizable(true
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> <span class="comment">/* /_/   \_\_|\__, |\___/|_|  |_|\__|_| |_|_| |_| |_|                       */</span></div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> <span class="comment">/*            |___/                                                         */</span></div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">#include &quot;<a class="code" href="type__partitions_8h.html">type_partitions.h</a>&quot;</span></div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="preprocessor">#include &quot;<a class="code" href="graphs_8h.html">graphs.h</a>&quot;</span></div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">#include &lt;stdbool.h&gt;</span></div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="comment">/***********************/</span></div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="comment">/* Classical algorithm */</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment">//#define DEBUG_TARJAN</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span> </div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">#include &quot;<a class="code" href="type__partitions_8h.html">type_partitions.h</a>&quot;</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#include &quot;<a class="code" href="graphs_8h.html">graphs.h</a>&quot;</span></div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span><span class="preprocessor">#include &lt;stdbool.h&gt;</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
 <div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="comment">/***********************/</span></div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span></div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><a class="code hl_struct" href="structparti.html">parti</a>* <a class="code hl_function" href="graphs__tarjan_8h.html#a111bcbb93e29b5d0840e30e694724e77">tarjan</a>(<a class="code hl_struct" href="structgraph.html">graph</a>* </div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>);</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span></div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><a class="code hl_struct" href="structparti.html">parti</a>* <a class="code hl_function" href="graphs__tarjan_8h.html#a1056a2c05386186a2b6acf54a373aa33">ltarjan</a>(<a class="code hl_struct" href="structlgraph.html">lgraph</a>* </div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>);</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span></div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><a class="code hl_struct" href="structparti.html">parti</a>* <a class="code hl_function" href="graphs__tarjan_8h.html#a82b3e0fa3faa0d631b8597f7b2aec36c">dtarjan</a>(<a class="code hl_struct" href="structdgraph.html">dgraph</a>* </div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>);</div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span> </div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="comment">/*********************************************/</span></div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="comment">/* Restriction of algorithm to sub-alphabets */</span></div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="comment">/*********************************************/</span></div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span></div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span><a class="code hl_struct" href="structparti.html">parti</a>* <a class="code hl_function" href="graphs__tarjan_8h.html#a1ae025020a832977dcc7a63cd3537d02">ltarjan_alph</a>(<a class="code hl_struct" href="structlgraph.html">lgraph</a>*, </div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <span class="keywordtype">bool</span>*                 </div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>);</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span></div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span><a class="code hl_struct" href="structparti.html">parti</a>* <a class="code hl_function" href="graphs__tarjan_8h.html#a6f81189fc50c4f77b6932df97d122a2c">dtarjan_alph</a>(<a class="code hl_struct" href="structdgraph.html">dgraph</a>*, </div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    <span class="keywordtype">bool</span>*                 </div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>);</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span> </div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span><span class="preprocessor">#endif </span><span class="comment">// TARJAN_H_</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="comment">/* Classical algorithm */</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="comment">/***********************/</span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span></div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><a class="code hl_struct" href="structparti.html">parti</a>* <a class="code hl_function" href="graphs__tarjan_8h.html#a2f14392decced8ce9b6d234a4c0ddc23">tarjan</a>(<a class="code hl_struct" href="structgraph.html">graph</a>* g </div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>);</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><a class="code hl_struct" href="structparti.html">parti</a>* <a class="code hl_function" href="graphs__tarjan_8h.html#a8de7d8fde350720c85d7a58af7c055be">ltarjan</a>(<a class="code hl_struct" href="structlgraph.html">lgraph</a>* g, </div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <span class="keywordtype">bool</span>* alph </div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>);</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><a class="code hl_struct" href="structparti.html">parti</a>* <a class="code hl_function" href="graphs__tarjan_8h.html#a626c4582b69f8ff34fff68c2f542838d">dtarjan</a>(<a class="code hl_struct" href="structdgraph.html">dgraph</a>* g, </div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    <span class="keywordtype">bool</span>* alph, </div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    <span class="keywordtype">bool</span> ismor      </div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>);</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span> </div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span></div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span><a class="code hl_struct" href="structparti.html">parti</a>* <a class="code hl_function" href="graphs__tarjan_8h.html#af79aee13cda46d3ee0c450bc2fd1b509">dualdtarjan</a>(<a class="code hl_struct" href="structdgraph.html">dgraph</a>* g1, </div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    <a class="code hl_struct" href="structdgraph.html">dgraph</a>* g2, </div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    <span class="keywordtype">bool</span>* alph, </div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    <span class="keywordtype">bool</span> ismor </div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>);</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="preprocessor">#endif </span><span class="comment">// TARJAN_H_</span></div>
 <div class="ttc" id="agraphs_8h_html"><div class="ttname"><a href="graphs_8h.html">graphs.h</a></div><div class="ttdoc">Implementation of graphs.</div></div>
-<div class="ttc" id="agraphs__tarjan_8h_html_a1056a2c05386186a2b6acf54a373aa33"><div class="ttname"><a href="graphs__tarjan_8h.html#a1056a2c05386186a2b6acf54a373aa33">ltarjan</a></div><div class="ttdeci">parti * ltarjan(lgraph *)</div><div class="ttdoc">Tarjan&#39;s algorihtm for labeled graphs.</div><div class="ttdef"><b>Definition</b> graphs_tarjan.c:472</div></div>
-<div class="ttc" id="agraphs__tarjan_8h_html_a111bcbb93e29b5d0840e30e694724e77"><div class="ttname"><a href="graphs__tarjan_8h.html#a111bcbb93e29b5d0840e30e694724e77">tarjan</a></div><div class="ttdeci">parti * tarjan(graph *)</div><div class="ttdoc">Tarjan&#39;s algorihtm for unlabeled graphs.</div><div class="ttdef"><b>Definition</b> graphs_tarjan.c:257</div></div>
-<div class="ttc" id="agraphs__tarjan_8h_html_a1ae025020a832977dcc7a63cd3537d02"><div class="ttname"><a href="graphs__tarjan_8h.html#a1ae025020a832977dcc7a63cd3537d02">ltarjan_alph</a></div><div class="ttdeci">parti * ltarjan_alph(lgraph *, bool *)</div><div class="ttdoc">Tarjan&#39;s algorihtm for labeled graphs. Restricted variant.</div><div class="ttdef"><b>Definition</b> graphs_tarjan.c:816</div></div>
-<div class="ttc" id="agraphs__tarjan_8h_html_a6f81189fc50c4f77b6932df97d122a2c"><div class="ttname"><a href="graphs__tarjan_8h.html#a6f81189fc50c4f77b6932df97d122a2c">dtarjan_alph</a></div><div class="ttdeci">parti * dtarjan_alph(dgraph *, bool *)</div><div class="ttdoc">Tarjan&#39;s algorihtm for complete deterministic labeled graphs. Restricted variant.</div><div class="ttdef"><b>Definition</b> graphs_tarjan.c:881</div></div>
-<div class="ttc" id="agraphs__tarjan_8h_html_a82b3e0fa3faa0d631b8597f7b2aec36c"><div class="ttname"><a href="graphs__tarjan_8h.html#a82b3e0fa3faa0d631b8597f7b2aec36c">dtarjan</a></div><div class="ttdeci">parti * dtarjan(dgraph *)</div><div class="ttdoc">Tarjan&#39;s algorihtm for complete deterministic labeled graphs.</div><div class="ttdef"><b>Definition</b> graphs_tarjan.c:539</div></div>
-<div class="ttc" id="astructdgraph_html"><div class="ttname"><a href="structdgraph.html">dgraph</a></div><div class="ttdoc">Type used to represent a complete deterministic directed labeled graph.</div><div class="ttdef"><b>Definition</b> graphs.h:71</div></div>
-<div class="ttc" id="astructgraph_html"><div class="ttname"><a href="structgraph.html">graph</a></div><div class="ttdoc">Type used to represent a directed unlabeled graph.</div><div class="ttdef"><b>Definition</b> graphs.h:41</div></div>
-<div class="ttc" id="astructlgraph_html"><div class="ttname"><a href="structlgraph.html">lgraph</a></div><div class="ttdoc">Type used to represent a directed labeled graph.</div><div class="ttdef"><b>Definition</b> graphs.h:56</div></div>
+<div class="ttc" id="agraphs__tarjan_8h_html_a2f14392decced8ce9b6d234a4c0ddc23"><div class="ttname"><a href="graphs__tarjan_8h.html#a2f14392decced8ce9b6d234a4c0ddc23">tarjan</a></div><div class="ttdeci">parti * tarjan(graph *g)</div><div class="ttdoc">Tarjan&#39;s algorihtm for unlabeled graphs.</div><div class="ttdef"><b>Definition</b> graphs_tarjan.c:7</div></div>
+<div class="ttc" id="agraphs__tarjan_8h_html_a626c4582b69f8ff34fff68c2f542838d"><div class="ttname"><a href="graphs__tarjan_8h.html#a626c4582b69f8ff34fff68c2f542838d">dtarjan</a></div><div class="ttdeci">parti * dtarjan(dgraph *g, bool *alph, bool ismor)</div><div class="ttdoc">Tarjan&#39;s algorihtm for complete deterministic labeled graphs.</div><div class="ttdef"><b>Definition</b> graphs_tarjan.c:287</div></div>
+<div class="ttc" id="agraphs__tarjan_8h_html_a8de7d8fde350720c85d7a58af7c055be"><div class="ttname"><a href="graphs__tarjan_8h.html#a8de7d8fde350720c85d7a58af7c055be">ltarjan</a></div><div class="ttdeci">parti * ltarjan(lgraph *g, bool *alph)</div><div class="ttdoc">Tarjan&#39;s algorihtm for labeled graphs.</div><div class="ttdef"><b>Definition</b> graphs_tarjan.c:134</div></div>
+<div class="ttc" id="agraphs__tarjan_8h_html_af79aee13cda46d3ee0c450bc2fd1b509"><div class="ttname"><a href="graphs__tarjan_8h.html#af79aee13cda46d3ee0c450bc2fd1b509">dualdtarjan</a></div><div class="ttdeci">parti * dualdtarjan(dgraph *g1, dgraph *g2, bool *alph, bool ismor)</div><div class="ttdoc">Tarjan&#39;s algorihtm for two complete deterministic labeled graphs sharing the same state set and alpha...</div><div class="ttdef"><b>Definition</b> graphs_tarjan.c:443</div></div>
+<div class="ttc" id="astructdgraph_html"><div class="ttname"><a href="structdgraph.html">dgraph</a></div><div class="ttdoc">Type used to represent a complete deterministic directed labeled graph.</div><div class="ttdef"><b>Definition</b> graphs.h:72</div></div>
+<div class="ttc" id="astructgraph_html"><div class="ttname"><a href="structgraph.html">graph</a></div><div class="ttdoc">Type used to represent a directed unlabeled graph.</div><div class="ttdef"><b>Definition</b> graphs.h:42</div></div>
+<div class="ttc" id="astructlgraph_html"><div class="ttname"><a href="structlgraph.html">lgraph</a></div><div class="ttdoc">Type used to represent a directed labeled graph.</div><div class="ttdef"><b>Definition</b> graphs.h:57</div></div>
 <div class="ttc" id="astructparti_html"><div class="ttname"><a href="structparti.html">parti</a></div><div class="ttdoc">First type used to represent a partition. This is not the one used by Union-Find.</div><div class="ttdef"><b>Definition</b> type_partitions.h:36</div></div>
 <div class="ttc" id="atype__partitions_8h_html"><div class="ttname"><a href="type__partitions_8h.html">type_partitions.h</a></div><div class="ttdoc">Types used to represent partitions. Includes the union-find algorithm.</div></div>
 </div><!-- fragment --></div><!-- contents -->

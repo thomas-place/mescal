@@ -119,92 +119,95 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ac3c99dd46335997b41b509e5b732b8dc" id="r_ac3c99dd46335997b41b509e5b732b8dc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac3c99dd46335997b41b509e5b732b8dc">nfa_mini_canonical_copy</a> (<a class="el" href="structnfa.html">nfa</a> *)</td></tr>
-<tr class="memdesc:ac3c99dd46335997b41b509e5b732b8dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Makes a copy of a minimal NFA. The ordering between the states is changed to make the copy canonical.  <br /></td></tr>
-<tr class="separator:ac3c99dd46335997b41b509e5b732b8dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa52bbd5361ba770b18b83a1dc50e0846" id="r_aa52bbd5361ba770b18b83a1dc50e0846"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa52bbd5361ba770b18b83a1dc50e0846">nfa_brzozowski</a> (<a class="el" href="structnfa.html">nfa</a> *)</td></tr>
-<tr class="memdesc:aa52bbd5361ba770b18b83a1dc50e0846"><td class="mdescLeft">&#160;</td><td class="mdescRight">Brzozowski's minimization algorithm.  <br /></td></tr>
-<tr class="separator:aa52bbd5361ba770b18b83a1dc50e0846"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6d9d927752538a048fa0c9f2f3027b99" id="r_a6d9d927752538a048fa0c9f2f3027b99"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structhopcroft__partition.html">hopcroft_partition</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6d9d927752538a048fa0c9f2f3027b99">nfa_hopcroft_initial</a> (uint, <a class="el" href="structdequeue.html">dequeue</a> *)</td></tr>
-<tr class="memdesc:a6d9d927752538a048fa0c9f2f3027b99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the initial partition of the states in Hopcroft's algorithm. The set of final states is assumed to be non-trivial.  <br /></td></tr>
-<tr class="separator:a6d9d927752538a048fa0c9f2f3027b99"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8983e7468bc971f2d0c426d1a66e35dd" id="r_a8983e7468bc971f2d0c426d1a66e35dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8983e7468bc971f2d0c426d1a66e35dd">nfa_hopcroft_genauto</a> (<a class="el" href="structnfa.html">nfa</a> *, <a class="el" href="structhopcroft__partition.html">hopcroft_partition</a> *)</td></tr>
-<tr class="memdesc:a8983e7468bc971f2d0c426d1a66e35dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computation of the minimal automaton from the partition computed by the Hopcroft's algorithm.  <br /></td></tr>
-<tr class="separator:a8983e7468bc971f2d0c426d1a66e35dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65250736020a95b3b9624ea2b1233426" id="r_a65250736020a95b3b9624ea2b1233426"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a65250736020a95b3b9624ea2b1233426">nfa_hopcroft_free</a> (<a class="el" href="structhopcroft__partition.html">hopcroft_partition</a> *)</td></tr>
-<tr class="memdesc:a65250736020a95b3b9624ea2b1233426"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release of a Hopcroft's partition.  <br /></td></tr>
-<tr class="separator:a65250736020a95b3b9624ea2b1233426"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a252f30cd5f206f6993af2db9dedbf496" id="r_a252f30cd5f206f6993af2db9dedbf496"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a252f30cd5f206f6993af2db9dedbf496">nfa_hopcroft</a> (<a class="el" href="structnfa.html">nfa</a> *)</td></tr>
-<tr class="memdesc:a252f30cd5f206f6993af2db9dedbf496"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hopcroft's minimization algorithm.  <br /></td></tr>
-<tr class="separator:a252f30cd5f206f6993af2db9dedbf496"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2872aa87157e77326ab4b88fdb75f22b" id="r_a2872aa87157e77326ab4b88fdb75f22b"><td class="memItemLeft" align="right" valign="top">bool **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2872aa87157e77326ab4b88fdb75f22b">nfa_mini_canonical_ordering</a> (<a class="el" href="structnfa.html">nfa</a> *)</td></tr>
-<tr class="memdesc:a2872aa87157e77326ab4b88fdb75f22b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the canonical ordering of the states of a minimal NFA.  <br /></td></tr>
-<tr class="separator:a2872aa87157e77326ab4b88fdb75f22b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9766f66bf3595c38c419c32b3338d0e" id="r_af9766f66bf3595c38c419c32b3338d0e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdfa.html">dfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af9766f66bf3595c38c419c32b3338d0e">dfa_mini_canonical_copy</a> (<a class="el" href="structdfa.html">dfa</a> *)</td></tr>
+<tr class="memdesc:af9766f66bf3595c38c419c32b3338d0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Makes a copy of a minimal DFA. The ordering between the states is changed to make the copy canonical.  <br /></td></tr>
+<tr class="separator:af9766f66bf3595c38c419c32b3338d0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2e35882041c1e5d6d437d0b0f844b61" id="r_af2e35882041c1e5d6d437d0b0f844b61"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdfa.html">dfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af2e35882041c1e5d6d437d0b0f844b61">nfa_brzozowski</a> (<a class="el" href="structnfa.html">nfa</a> *)</td></tr>
+<tr class="memdesc:af2e35882041c1e5d6d437d0b0f844b61"><td class="mdescLeft">&#160;</td><td class="mdescRight">Brzozowski's minimization algorithm (for input NFAs)  <br /></td></tr>
+<tr class="separator:af2e35882041c1e5d6d437d0b0f844b61"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a34b346e61f248d4df092f88472720b6e" id="r_a34b346e61f248d4df092f88472720b6e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdfa.html">dfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a34b346e61f248d4df092f88472720b6e">dfa_brzozowski</a> (<a class="el" href="structdfa.html">dfa</a> *)</td></tr>
+<tr class="memdesc:a34b346e61f248d4df092f88472720b6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Brzozowski's minimization algorithm (fo rinput DFAs)  <br /></td></tr>
+<tr class="separator:a34b346e61f248d4df092f88472720b6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3bcda8764a319c5797c30dc4371944af" id="r_a3bcda8764a319c5797c30dc4371944af"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structhopcroft__partition.html">hopcroft_partition</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3bcda8764a319c5797c30dc4371944af">dfa_hopcroft_initial</a> (uint, uint *, uint)</td></tr>
+<tr class="memdesc:a3bcda8764a319c5797c30dc4371944af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the initial partition of the states in Hopcroft's algorithm. The set of final states is assumed to be non-trivial.  <br /></td></tr>
+<tr class="separator:a3bcda8764a319c5797c30dc4371944af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba5434baa281ba3177a174f96111f970" id="r_aba5434baa281ba3177a174f96111f970"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdfa.html">dfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aba5434baa281ba3177a174f96111f970">dfa_hopcroft_genauto</a> (<a class="el" href="structdfa.html">dfa</a> *, <a class="el" href="structhopcroft__partition.html">hopcroft_partition</a> *)</td></tr>
+<tr class="memdesc:aba5434baa281ba3177a174f96111f970"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computation of the minimal automaton from the partition computed by the Hopcroft's algorithm.  <br /></td></tr>
+<tr class="separator:aba5434baa281ba3177a174f96111f970"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a806017b85bc7a4fdcdc0422e87d2fad3" id="r_a806017b85bc7a4fdcdc0422e87d2fad3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a806017b85bc7a4fdcdc0422e87d2fad3">dfa_hopcroft_free</a> (<a class="el" href="structhopcroft__partition.html">hopcroft_partition</a> *)</td></tr>
+<tr class="memdesc:a806017b85bc7a4fdcdc0422e87d2fad3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release of a Hopcroft's partition.  <br /></td></tr>
+<tr class="separator:a806017b85bc7a4fdcdc0422e87d2fad3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a240bda45cca37dc21760552179df3cc6" id="r_a240bda45cca37dc21760552179df3cc6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdfa.html">dfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a240bda45cca37dc21760552179df3cc6">dfa_hopcroft</a> (<a class="el" href="structdfa.html">dfa</a> *)</td></tr>
+<tr class="memdesc:a240bda45cca37dc21760552179df3cc6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hopcroft's minimization algorithm.  <br /></td></tr>
+<tr class="separator:a240bda45cca37dc21760552179df3cc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a330219616b3371bbf441fa90e336d60d" id="r_a330219616b3371bbf441fa90e336d60d"><td class="memItemLeft" align="right" valign="top">bool **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a330219616b3371bbf441fa90e336d60d">dfa_mini_canonical_ordering</a> (<a class="el" href="structdfa.html">dfa</a> *)</td></tr>
+<tr class="memdesc:a330219616b3371bbf441fa90e336d60d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the canonical ordering of the states of a minimal DFA.  <br /></td></tr>
+<tr class="separator:a330219616b3371bbf441fa90e336d60d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Minimization. </p>
 <p>Two independent algorithms are implemented: Brzozowski and Hopcroft. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="aa52bbd5361ba770b18b83a1dc50e0846" name="aa52bbd5361ba770b18b83a1dc50e0846"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa52bbd5361ba770b18b83a1dc50e0846">&#9670;&#160;</a></span>nfa_brzozowski()</h2>
+<a id="a34b346e61f248d4df092f88472720b6e" name="a34b346e61f248d4df092f88472720b6e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a34b346e61f248d4df092f88472720b6e">&#9670;&#160;</a></span>dfa_brzozowski()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structnfa.html">nfa</a> * nfa_brzozowski </td>
+          <td class="memname"><a class="el" href="structdfa.html">dfa</a> * dfa_brzozowski </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Brzozowski's minimization algorithm. </p>
+<p>Brzozowski's minimization algorithm (fo rinput DFAs) </p>
 <dl class="section return"><dt>Returns</dt><dd>The minimal automaton of the input language. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">A</td><td>The NFA. </td></tr>
+    <tr><td class="paramname">A</td><td>The DFA. </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="a252f30cd5f206f6993af2db9dedbf496" name="a252f30cd5f206f6993af2db9dedbf496"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a252f30cd5f206f6993af2db9dedbf496">&#9670;&#160;</a></span>nfa_hopcroft()</h2>
+<a id="a240bda45cca37dc21760552179df3cc6" name="a240bda45cca37dc21760552179df3cc6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a240bda45cca37dc21760552179df3cc6">&#9670;&#160;</a></span>dfa_hopcroft()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structnfa.html">nfa</a> * nfa_hopcroft </td>
+          <td class="memname"><a class="el" href="structdfa.html">dfa</a> * dfa_hopcroft </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Hopcroft's minimization algorithm. </p>
-<dl class="section return"><dt>Returns</dt><dd>The minimal automaton of the input language. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The minimal automaton of the input DFA. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">A</td><td>The NFA. </td></tr>
+    <tr><td class="paramname">A</td><td>The DFA. </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="a65250736020a95b3b9624ea2b1233426" name="a65250736020a95b3b9624ea2b1233426"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a65250736020a95b3b9624ea2b1233426">&#9670;&#160;</a></span>nfa_hopcroft_free()</h2>
+<a id="a806017b85bc7a4fdcdc0422e87d2fad3" name="a806017b85bc7a4fdcdc0422e87d2fad3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a806017b85bc7a4fdcdc0422e87d2fad3">&#9670;&#160;</a></span>dfa_hopcroft_free()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void nfa_hopcroft_free </td>
+          <td class="memname">void dfa_hopcroft_free </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structhopcroft__partition.html">hopcroft_partition</a> *</td>          <td class="paramname"><span class="paramname"><em>p</em></span></td><td>)</td>
           <td></td>
@@ -222,16 +225,16 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a8983e7468bc971f2d0c426d1a66e35dd" name="a8983e7468bc971f2d0c426d1a66e35dd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8983e7468bc971f2d0c426d1a66e35dd">&#9670;&#160;</a></span>nfa_hopcroft_genauto()</h2>
+<a id="aba5434baa281ba3177a174f96111f970" name="aba5434baa281ba3177a174f96111f970"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba5434baa281ba3177a174f96111f970">&#9670;&#160;</a></span>dfa_hopcroft_genauto()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structnfa.html">nfa</a> * nfa_hopcroft_genauto </td>
+          <td class="memname"><a class="el" href="structdfa.html">dfa</a> * dfa_hopcroft_genauto </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>D</em></span>, </td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>D</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -253,21 +256,26 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a6d9d927752538a048fa0c9f2f3027b99" name="a6d9d927752538a048fa0c9f2f3027b99"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6d9d927752538a048fa0c9f2f3027b99">&#9670;&#160;</a></span>nfa_hopcroft_initial()</h2>
+<a id="a3bcda8764a319c5797c30dc4371944af" name="a3bcda8764a319c5797c30dc4371944af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3bcda8764a319c5797c30dc4371944af">&#9670;&#160;</a></span>dfa_hopcroft_initial()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structhopcroft__partition.html">hopcroft_partition</a> * nfa_hopcroft_initial </td>
+          <td class="memname"><a class="el" href="structhopcroft__partition.html">hopcroft_partition</a> * dfa_hopcroft_initial </td>
           <td>(</td>
           <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>size_auto</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structdequeue.html">dequeue</a> *</td>          <td class="paramname"><span class="paramname"><em>finals</em></span>&#160;)</td>
+          <td class="paramtype">uint *</td>          <td class="paramname"><span class="paramname"><em>finals</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>nb_finals</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -278,62 +286,89 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">size_auto</td><td>The number of states in the automaton.  </td></tr>
-    <tr><td class="paramname">finals</td><td>The list of final states (assumed to be non-trivial). </td></tr>
+    <tr><td class="paramname">finals</td><td>The list of final states (assumed to be non-trivial).  </td></tr>
+    <tr><td class="paramname">nb_finals</td><td>The number of final states (assumed to be non-trivial). </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="ac3c99dd46335997b41b509e5b732b8dc" name="ac3c99dd46335997b41b509e5b732b8dc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac3c99dd46335997b41b509e5b732b8dc">&#9670;&#160;</a></span>nfa_mini_canonical_copy()</h2>
+<a id="af9766f66bf3595c38c419c32b3338d0e" name="af9766f66bf3595c38c419c32b3338d0e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af9766f66bf3595c38c419c32b3338d0e">&#9670;&#160;</a></span>dfa_mini_canonical_copy()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structnfa.html">nfa</a> * nfa_mini_canonical_copy </td>
+          <td class="memname"><a class="el" href="structdfa.html">dfa</a> * dfa_mini_canonical_copy </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Makes a copy of a minimal NFA. The ordering between the states is changed to make the copy canonical. </p>
-<dl class="section attention"><dt>Attention</dt><dd>The input NFA is assumed to be minimal. This is not checked.</dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>The canonical copy of the input NFA. </dd></dl>
+<p>Makes a copy of a minimal DFA. The ordering between the states is changed to make the copy canonical. </p>
+<dl class="section attention"><dt>Attention</dt><dd>The input DFA is assumed to be minimal. This is not checked.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The canonical copy of the input DFA. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">A</td><td>The NFA to copy. </td></tr>
+    <tr><td class="paramname">A</td><td>The DFA to copy. </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="a2872aa87157e77326ab4b88fdb75f22b" name="a2872aa87157e77326ab4b88fdb75f22b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2872aa87157e77326ab4b88fdb75f22b">&#9670;&#160;</a></span>nfa_mini_canonical_ordering()</h2>
+<a id="a330219616b3371bbf441fa90e336d60d" name="a330219616b3371bbf441fa90e336d60d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a330219616b3371bbf441fa90e336d60d">&#9670;&#160;</a></span>dfa_mini_canonical_ordering()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool ** nfa_mini_canonical_ordering </td>
+          <td class="memname">bool ** dfa_mini_canonical_ordering </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Computes the canonical ordering of the states of a minimal NFA. </p>
+<p>Computes the canonical ordering of the states of a minimal DFA. </p>
 <p>Canonical ordering </p>
 <dl class="section return"><dt>Returns</dt><dd>The canonical ordering of the states.</dd></dl>
 <p>Canonical ordering </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">A</td><td>The NFA to order (must be minimal). </td></tr>
+    <tr><td class="paramname">A</td><td>The DFA to order (must be minimal). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="af2e35882041c1e5d6d437d0b0f844b61" name="af2e35882041c1e5d6d437d0b0f844b61"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af2e35882041c1e5d6d437d0b0f844b61">&#9670;&#160;</a></span>nfa_brzozowski()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdfa.html">dfa</a> * nfa_brzozowski </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structnfa.html">nfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Brzozowski's minimization algorithm (for input NFAs) </p>
+<dl class="section return"><dt>Returns</dt><dd>The minimal automaton of the input language. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The NFA. </td></tr>
   </table>
   </dd>
 </dl>

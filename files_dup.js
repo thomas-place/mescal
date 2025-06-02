@@ -32,12 +32,15 @@ var files_dup =
     [ "regexp_tonfa.h", "regexp__tonfa_8h.html", "regexp__tonfa_8h" ],
     [ "sep_group.h", "sep__group_8h.html", "sep__group_8h" ],
     [ "sep_pol.h", "sep__pol_8h.html", "sep__pol_8h" ],
+    [ "shell_autoprops.h", "shell__autoprops_8h_source.html", null ],
     [ "shell_commands.h", "shell__commands_8h_source.html", null ],
     [ "shell_errors.h", "shell__errors_8h_source.html", null ],
+    [ "shell_filtering.h", "shell__filtering_8h.html", "shell__filtering_8h" ],
     [ "shell_help.h", "shell__help_8h.html", "shell__help_8h" ],
     [ "shell_keywords.h", "shell__keywords_8h.html", "shell__keywords_8h" ],
     [ "shell_languages.h", "shell__languages_8h_source.html", null ],
     [ "shell_memb.h", "shell__memb_8h_source.html", null ],
+    [ "shell_morprops.h", "shell__morprops_8h.html", "shell__morprops_8h" ],
     [ "shell_sclass.h", "shell__sclass_8h_source.html", null ],
     [ "shell_separ.h", "shell__separ_8h_source.html", null ],
     [ "shell_test.h", "shell__test_8h.html", "shell__test_8h" ],
@@ -49,6 +52,7 @@ var files_dup =
     [ "type_dequeue.h", "type__dequeue_8h.html", "type__dequeue_8h" ],
     [ "type_dequeue_gen.h", "type__dequeue__gen_8h.html", "type__dequeue__gen_8h" ],
     [ "type_dlist.h", "type__dlist_8h.html", "type__dlist_8h" ],
+    [ "type_hash.h", "type__hash_8h_source.html", null ],
     [ "type_partitions.h", "type__partitions_8h.html", "type__partitions_8h" ],
     [ "words.h", "words_8h.html", "words_8h" ]
 ];

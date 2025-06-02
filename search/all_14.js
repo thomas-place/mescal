@@ -11,7 +11,7 @@ var searchData=
   ['union_5fufind_8',['union_ufind',['../type__partitions_8h.html#a1de9d681c9616322c4d47173e3f81d91',1,'type_partitions.c']]],
   ['usage_9',['usage',['../main_8h.html#acab820e45682cb2b906e71318c90446e',1,'main.h']]],
   ['usage_20of_20a_20recursive_20definition_20variable_20r_10',['Usage of a recursive definition variable R',['../index.html#autotoc_md17',1,'']]],
-  ['used_11',['used',['../structnfa__enum.html#a1600a40d86b8d54f98782730b8cef7fa',1,'nfa_enum']]],
+  ['used_11',['used',['../structdfa__enum.html#a72bf04cb1232fcd6dc71a88d27d35158',1,'dfa_enum']]],
   ['using_20morphisms_20variables_12',['Using morphisms variables',['../index.html#autotoc_md20',1,'']]],
   ['using_20recurvive_20definitions_20variables_13',['Using recurvive definitions variables',['../index.html#autotoc_md14',1,'']]],
   ['using_20regular_20expressions_20variables_14',['Using regular expressions variables',['../index.html#autotoc_md11',1,'']]],

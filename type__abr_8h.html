@@ -151,6 +151,8 @@ Functions</h2></td></tr>
 <tr class="memitem:a5c47a476d63888318449bc727ebe9636" id="r_a5c47a476d63888318449bc727ebe9636"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5c47a476d63888318449bc727ebe9636">avl_free_strong</a> (<a class="el" href="structavlnode.html">avlnode</a> *, void(*f)(void *))</td></tr>
 <tr class="memdesc:a5c47a476d63888318449bc727ebe9636"><td class="mdescLeft">&#160;</td><td class="mdescRight">Release of a generic AVL tree.  <br /></td></tr>
 <tr class="separator:a5c47a476d63888318449bc727ebe9636"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6660749eeca25233c69f34bc7ebdb11f" id="r_a6660749eeca25233c69f34bc7ebdb11f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6660749eeca25233c69f34bc7ebdb11f">avl_height</a> (<a class="el" href="structavlnode.html">avlnode</a> *)</td></tr>
+<tr class="separator:a6660749eeca25233c69f34bc7ebdb11f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab8783b677eb9d8b1392a33ca97873d37" id="r_ab8783b677eb9d8b1392a33ca97873d37"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structuint__avlnode.html">uint_avlnode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab8783b677eb9d8b1392a33ca97873d37">uint_avl_search</a> (uint, <a class="el" href="structuint__avlnode.html">uint_avlnode</a> *)</td></tr>
 <tr class="memdesc:ab8783b677eb9d8b1392a33ca97873d37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Searches for a value inside an light AVL tree.  <br /></td></tr>
 <tr class="separator:ab8783b677eb9d8b1392a33ca97873d37"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -193,6 +195,29 @@ Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">p</td><td>Root node of the AVL tree.  </td></tr>
     <tr><td class="paramname">f</td><td>Function used to release the values. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a6660749eeca25233c69f34bc7ebdb11f" name="a6660749eeca25233c69f34bc7ebdb11f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6660749eeca25233c69f34bc7ebdb11f">&#9670;&#160;</a></span>avl_height()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int avl_height </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structavlnode.html">avlnode</a> *</td>          <td class="paramname"><span class="paramname"><em>tree</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tree</td><td>Root node of the AVL tree. </td></tr>
   </table>
   </dd>
 </dl>
