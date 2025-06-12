@@ -119,6 +119,22 @@ letter* duplicate_alphabet(const letter*, //!< The array of letters.
 
 /**
  * @brief
+ * Retrieves the index of a letter in an alphabet (sorted array of letters.
+ *
+ * @remark
+ * If the letter does not belong to the alphabet the invalid index UINT_MAX is returned.
+ *
+ * @return
+ * The index of the letter.
+ */
+uint letter_index(letter l,      //!< The letter.
+    const letter* alphabet, //!< The alphabet (sorted in increasing order).
+    uint size_alphabet //!< The size of the alphabet (number of letters).
+);
+
+
+/**
+ * @brief
  * The type used to represent a word.
  *
  * @details

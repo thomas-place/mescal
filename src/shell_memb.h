@@ -2,18 +2,20 @@
 #define SHELL_MEMB_H
 
 #include "alloc.h"
-#include "shell_sclass.h"
-#include "shell_languages.h"
-#include "shell_commands.h"
-#include "monoid_props.h"
 #include "monoid_congruences.h"
+#include "monoid_props.h"
 #include "nfa_enum.h"
+#include "shell_commands.h"
+#include "shell_languages.h"
+#include "shell_sclass.h"
+
+#include <stdint.h>
 
 /**
  * @brief
  * Array containing the membership functions for all classes.
  */
-extern bool (*class_membership[CL_END]) (int, FILE*);
+extern bool (*class_membership[CL_END])(int, FILE*);
 
 /**
  * @brief
@@ -26,19 +28,15 @@ void init_membership(void);
  * Checks if testing membership for a classes requires the syntactic ordering
  *
  * @return
- * True if the membership function requires the syntactic ordering, false otherwise.
+ * True if the membership function requires the syntactic ordering, false
+ * otherwise.
  */
 bool shell_membership_needs_order(classes //!< The class to check.
 );
 
-
-
-
-
 /**************************************/
 /* Membership functions for languages */
 /**************************************/
-
 
 /**
  * @brief
@@ -50,18 +48,15 @@ bool shell_membership_needs_order(classes //!< The class to check.
  * @return
  * True.
  */
-bool shell_membership_reg(int, //!< Index of the language in the objects array.
-    FILE*                   //!< Output stream (NULL is no output is desired).
+bool shell_membership_reg(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
-
-
-bool shell_membership_htgen(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_htgen(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
-
-
-
 
 /*****************/
 /* Group classes */
@@ -74,8 +69,9 @@ bool shell_membership_htgen(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is trivial, false otherwise.
  */
-bool shell_membership_st(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_st(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -85,8 +81,9 @@ bool shell_membership_st(int,  //!< Index of the language in the objects array.
  * @return
  * True if the language is in DD, false otherwise.
  */
-bool shell_membership_dd(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_dd(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -96,8 +93,9 @@ bool shell_membership_dd(int,  //!< Index of the language in the objects array.
  * @return
  * True if the language is in MOD, false otherwise.
  */
-bool shell_membership_mod(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_mod(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -107,8 +105,9 @@ bool shell_membership_mod(int,  //!< Index of the language in the objects array.
  * @return
  * True if the language is in MOD⁺, false otherwise.
  */
-bool shell_membership_modp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_modp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -118,8 +117,9 @@ bool shell_membership_modp(int,  //!< Index of the language in the objects array
  * @return
  * True if the language is in AMT, false otherwise.
  */
-bool shell_membership_amt(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_amt(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -129,8 +129,9 @@ bool shell_membership_amt(int,  //!< Index of the language in the objects array.
  * @return
  * True if the language is in AMT⁺, false otherwise.
  */
-bool shell_membership_amtp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_amtp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -140,8 +141,9 @@ bool shell_membership_amtp(int,  //!< Index of the language in the objects array
  * @return
  * True if the language is in GR, false otherwise.
  */
-bool shell_membership_gr(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_gr(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -151,16 +153,14 @@ bool shell_membership_gr(int,  //!< Index of the language in the objects array.
  * @return
  * True if the language is in GR⁺, false otherwise.
  */
-bool shell_membership_grp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_grp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
-
-
 
 /*****************/
 /* AT-ATT-LT-LTT */
 /*****************/
-
 
 /**
  * @brief
@@ -169,8 +169,9 @@ bool shell_membership_grp(int,  //!< Index of the language in the objects array.
  * @return
  * True if the language is in AT, false otherwise.
  */
-bool shell_membership_at(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_at(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -180,8 +181,9 @@ bool shell_membership_at(int,  //!< Index of the language in the objects array.
  * @return
  * True if the language is in ATT, false otherwise.
  */
-bool shell_membership_att(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_att(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -191,8 +193,9 @@ bool shell_membership_att(int,  //!< Index of the language in the objects array.
  * @return
  * True if the language is in LT, false otherwise.
  */
-bool shell_membership_lt(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_lt(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -202,10 +205,10 @@ bool shell_membership_lt(int,  //!< Index of the language in the objects array.
  * @return
  * True if the language is in LTT, false otherwise.
  */
-bool shell_membership_ltt(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_ltt(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
-
 
 /*********************/
 /* Star-free closure */
@@ -218,8 +221,9 @@ bool shell_membership_ltt(int,  //!< Index of the language in the objects array.
  * @return
  * True if the language is in SF, false otherwise.
  */
-bool shell_membership_sf(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_sf(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -229,10 +233,10 @@ bool shell_membership_sf(int,  //!< Index of the language in the objects array.
  * @return
  * True if the language is in SF(MOD), false otherwise.
  */
-bool shell_membership_sfmod(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_sfmod(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
-
 
 /**
  * @brief
@@ -241,8 +245,9 @@ bool shell_membership_sfmod(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is in SF(AMT), false otherwise.
  */
-bool shell_membership_sfamt(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_sfamt(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -252,8 +257,9 @@ bool shell_membership_sfamt(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is in SF(GR), false otherwise.
  */
-bool shell_membership_sfgr(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_sfgr(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**********************/
@@ -267,8 +273,9 @@ bool shell_membership_sfgr(int,  //!< Index of the language in the objects array
  * @return
  * True if the language is in PPT, false otherwise.
  */
-bool shell_membership_ppt(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_ppt(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -278,8 +285,9 @@ bool shell_membership_ppt(int,  //!< Index of the language in the objects array.
  * @return
  * True if the language is in Pol(MOD), false otherwise.
  */
-bool shell_membership_polmod(int, //!< Index of the language in the objects array.
-    FILE*                      //!< Output stream (NULL is no output is desired).
+bool shell_membership_polmod(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -289,8 +297,9 @@ bool shell_membership_polmod(int, //!< Index of the language in the objects arra
  * @return
  * True if the language is in Pol(GR), false otherwise.
  */
-bool shell_membership_polgr(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_polgr(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -300,8 +309,9 @@ bool shell_membership_polgr(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is in Pol(DD), false otherwise.
  */
-bool shell_membership_poldd(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_poldd(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -311,8 +321,9 @@ bool shell_membership_poldd(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is in Pol(MOD⁺), false otherwise.
  */
-bool shell_membership_polmodp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_polmodp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -322,8 +333,9 @@ bool shell_membership_polmodp(int,  //!< Index of the language in the objects ar
  * @return
  * True if the language is in Pol(GR⁺), false otherwise.
  */
-bool shell_membership_polgrp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_polgrp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -333,8 +345,9 @@ bool shell_membership_polgrp(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in Pol₂(ST), false otherwise.
  */
-bool shell_membership_pol2st(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_pol2st(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -344,8 +357,9 @@ bool shell_membership_pol2st(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in Pol₂(MOD), false otherwise.
  */
-bool shell_membership_pol2mod(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_pol2mod(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -355,8 +369,9 @@ bool shell_membership_pol2mod(int,  //!< Index of the language in the objects ar
  * @return
  * True if the language is in Pol₂(AMT), false otherwise.
  */
-bool shell_membership_pol2amt(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_pol2amt(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -366,8 +381,9 @@ bool shell_membership_pol2amt(int,  //!< Index of the language in the objects ar
  * @return
  * True if the language is in Pol₂(GR), false otherwise.
  */
-bool shell_membership_pol2gr(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_pol2gr(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -377,8 +393,9 @@ bool shell_membership_pol2gr(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in Pol₂(DD), false otherwise.
  */
-bool shell_membership_pol2dd(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_pol2dd(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -388,8 +405,9 @@ bool shell_membership_pol2dd(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in Pol₂(MOD⁺), false otherwise.
  */
-bool shell_membership_pol2modp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_pol2modp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -399,8 +417,9 @@ bool shell_membership_pol2modp(int,  //!< Index of the language in the objects a
  * @return
  * True if the language is in Pol₂(AMT⁺), false otherwise.
  */
-bool shell_membership_pol2amtp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_pol2amtp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -410,14 +429,14 @@ bool shell_membership_pol2amtp(int,  //!< Index of the language in the objects a
  * @return
  * True if the language is in Pol₂(GR⁺), false otherwise.
  */
-bool shell_membership_pol2grp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_pol2grp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /******************************/
 /* Boolean polynomial closure */
 /******************************/
-
 
 /**
  * @brief
@@ -426,8 +445,9 @@ bool shell_membership_pol2grp(int,  //!< Index of the language in the objects ar
  * @return
  * True if the language is in PT, false otherwise.
  */
-bool shell_membership_pt(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_pt(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -437,8 +457,9 @@ bool shell_membership_pt(int,  //!< Index of the language in the objects array.
  * @return
  * True if the language is in BPol(MOD), false otherwise.
  */
-bool shell_membership_bpolmod(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_bpolmod(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -448,8 +469,9 @@ bool shell_membership_bpolmod(int,  //!< Index of the language in the objects ar
  * @return
  * True if the language is in BPol(AMT), false otherwise.
  */
-bool shell_membership_bpolamt(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_bpolamt(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -459,8 +481,9 @@ bool shell_membership_bpolamt(int,  //!< Index of the language in the objects ar
  * @return
  * True if the language is in BPol(GR), false otherwise.
  */
-bool shell_membership_bpolgr(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_bpolgr(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -470,8 +493,9 @@ bool shell_membership_bpolgr(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in BPol(GR⁺), false otherwise.
  */
-bool shell_membership_bpolgrp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_bpolgrp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -481,8 +505,9 @@ bool shell_membership_bpolgrp(int,  //!< Index of the language in the objects ar
  * @return
  * True if the language is in BPol(DD), false otherwise.
  */
-bool shell_membership_bpoldd(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_bpoldd(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -492,10 +517,10 @@ bool shell_membership_bpoldd(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in BPol(MOD⁺), false otherwise.
  */
-bool shell_membership_bpolmodp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_bpolmodp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
-
 
 /**
  * @brief
@@ -504,8 +529,9 @@ bool shell_membership_bpolmodp(int,  //!< Index of the language in the objects a
  * @return
  * True if the language is in BPol(AMT⁺), false otherwise.
  */
-bool shell_membership_bpolamtp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_bpolamtp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -515,10 +541,10 @@ bool shell_membership_bpolamtp(int,  //!< Index of the language in the objects a
  * @return
  * True if the language is in BPol₂(ST), false otherwise.
  */
-bool shell_membership_bpol2st(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_bpol2st(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
-
 
 /**
  * @brief
@@ -527,8 +553,9 @@ bool shell_membership_bpol2st(int,  //!< Index of the language in the objects ar
  * @return
  * True if the language is in JOrb(MOD), false otherwise.
  */
-bool shell_membership_jorbmod(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_jorbmod(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -538,8 +565,9 @@ bool shell_membership_jorbmod(int,  //!< Index of the language in the objects ar
  * @return
  * True if the language is in JOrb(AMT), false otherwise.
  */
-bool shell_membership_jorbamt(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_jorbamt(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -549,8 +577,9 @@ bool shell_membership_jorbamt(int,  //!< Index of the language in the objects ar
  * @return
  * True if the language is in JOrb(DD), false otherwise.
  */
-bool shell_membership_jorbdd(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_jorbdd(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -560,8 +589,9 @@ bool shell_membership_jorbdd(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in JOrb(MOD⁺), false otherwise.
  */
-bool shell_membership_jorbmodp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_jorbmodp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -571,8 +601,9 @@ bool shell_membership_jorbmodp(int,  //!< Index of the language in the objects a
  * @return
  * True if the language is in JOrb(AMT⁺), false otherwise.
  */
-bool shell_membership_jorbamtp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_jorbamtp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -582,8 +613,9 @@ bool shell_membership_jorbamtp(int,  //!< Index of the language in the objects a
  * @return
  * True if the language is in JOrb(GR⁺), false otherwise.
  */
-bool shell_membership_jorbgrp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_jorbgrp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -593,8 +625,9 @@ bool shell_membership_jorbgrp(int,  //!< Index of the language in the objects ar
  * @return
  * True if the language is in JOrb(AT), false otherwise.
  */
-bool shell_membership_jorbat(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_jorbat(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -604,8 +637,9 @@ bool shell_membership_jorbat(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in KNASTAT, false otherwise.
  */
-bool shell_membership_knastat(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_knastat(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**********************************/
@@ -619,8 +653,9 @@ bool shell_membership_knastat(int,  //!< Index of the language in the objects ar
  * @return
  * True if the language is in UPol(DD), false otherwise.
  */
-bool shell_membership_upoldd(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_upoldd(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -630,8 +665,9 @@ bool shell_membership_upoldd(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in UPol(MOD⁺), false otherwise.
  */
-bool shell_membership_upolmodp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_upolmodp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -641,8 +677,9 @@ bool shell_membership_upolmodp(int,  //!< Index of the language in the objects a
  * @return
  * True if the language is in UPol(AMT⁺), false otherwise.
  */
-bool shell_membership_upolamtp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_upolamtp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -652,8 +689,9 @@ bool shell_membership_upolamtp(int,  //!< Index of the language in the objects a
  * @return
  * True if the language is in UPol(GR⁺), false otherwise.
  */
-bool shell_membership_upolgrp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_upolgrp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -663,8 +701,9 @@ bool shell_membership_upolgrp(int,  //!< Index of the language in the objects ar
  * @return
  * True if the language is in UPol(BPol₂(ST)), false otherwise.
  */
-bool shell_membership_ubpol2st(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_ubpol2st(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -674,8 +713,9 @@ bool shell_membership_ubpol2st(int,  //!< Index of the language in the objects a
  * @return
  * True if the language is in UPol(BPol₂(MOD)), false otherwise.
  */
-bool shell_membership_ubpol2mod(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_ubpol2mod(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -685,8 +725,9 @@ bool shell_membership_ubpol2mod(int,  //!< Index of the language in the objects 
  * @return
  * True if the language is in UPol(BPol₂(AMT)), false otherwise.
  */
-bool shell_membership_ubpol2amt(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_ubpol2amt(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -696,8 +737,9 @@ bool shell_membership_ubpol2amt(int,  //!< Index of the language in the objects 
  * @return
  * True if the language is in UPol(BPol₂(GR)), false otherwise.
  */
-bool shell_membership_ubpol2gr(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_ubpol2gr(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -707,8 +749,9 @@ bool shell_membership_ubpol2gr(int,  //!< Index of the language in the objects a
  * @return
  * True if the language is in UPol(BPol₂(DD)), false otherwise.
  */
-bool shell_membership_ubpol2dd(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_ubpol2dd(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -718,8 +761,9 @@ bool shell_membership_ubpol2dd(int,  //!< Index of the language in the objects a
  * @return
  * True if the language is in UPol(BPol₂(MOD⁺), false otherwise.
  */
-bool shell_membership_ubpol2modp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_ubpol2modp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -729,8 +773,9 @@ bool shell_membership_ubpol2modp(int,  //!< Index of the language in the objects
  * @return
  * True if the language is in UPol(BPol₂(AMT⁺), false otherwise.
  */
-bool shell_membership_ubpol2amtp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_ubpol2amtp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -740,8 +785,9 @@ bool shell_membership_ubpol2amtp(int,  //!< Index of the language in the objects
  * @return
  * True if the language is in UPol(BPol₂(GR⁺), false otherwise.
  */
-bool shell_membership_ubpol2grp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_ubpol2grp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /******************/
@@ -755,8 +801,9 @@ bool shell_membership_ubpol2grp(int,  //!< Index of the language in the objects 
  * @return
  * True if the language is in UL, false otherwise.
  */
-bool shell_membership_ul(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_ul(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -766,8 +813,9 @@ bool shell_membership_ul(int,  //!< Index of the language in the objects array.
  * @return
  * True if the language is in TL(MOD), false otherwise.
  */
-bool shell_membership_tlmod(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_tlmod(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -777,8 +825,9 @@ bool shell_membership_tlmod(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is in TL(AMT), false otherwise.
  */
-bool shell_membership_tlamt(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_tlamt(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -788,8 +837,9 @@ bool shell_membership_tlamt(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is in TL(GR), false otherwise.
  */
-bool shell_membership_tlgr(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_tlgr(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -799,8 +849,9 @@ bool shell_membership_tlgr(int,  //!< Index of the language in the objects array
  * @return
  * True if the language is in TL(DD), false otherwise.
  */
-bool shell_membership_tldd(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_tldd(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -810,8 +861,9 @@ bool shell_membership_tldd(int,  //!< Index of the language in the objects array
  * @return
  * True if the language is in TL(MOD⁺), false otherwise.
  */
-bool shell_membership_tlmodp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_tlmodp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -821,8 +873,9 @@ bool shell_membership_tlmodp(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in TL(AMT⁺), false otherwise.
  */
-bool shell_membership_tlamtp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_tlamtp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -832,10 +885,10 @@ bool shell_membership_tlamtp(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in TL(GR⁺), false otherwise.
  */
-bool shell_membership_tlgrp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_tlgrp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
-
 
 /**
  * @brief
@@ -844,8 +897,9 @@ bool shell_membership_tlgrp(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is in TL₂(ST), false otherwise.
  */
-bool shell_membership_tl2st(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_tl2st(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -855,8 +909,9 @@ bool shell_membership_tl2st(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is in TL₂(MOD), false otherwise.
  */
-bool shell_membership_tl2mod(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_tl2mod(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -866,8 +921,9 @@ bool shell_membership_tl2mod(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in TL₂(AMT), false otherwise.
  */
-bool shell_membership_tl2amt(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_tl2amt(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -877,8 +933,9 @@ bool shell_membership_tl2amt(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in TL₂(GR), false otherwise.
  */
-bool shell_membership_tl2gr(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_tl2gr(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -888,8 +945,9 @@ bool shell_membership_tl2gr(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is in TL₂(DD), false otherwise.
  */
-bool shell_membership_tl2dd(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_tl2dd(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -899,8 +957,9 @@ bool shell_membership_tl2dd(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is in TL₂(MOD⁺), false otherwise.
  */
-bool shell_membership_tl2modp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_tl2modp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -910,8 +969,9 @@ bool shell_membership_tl2modp(int,  //!< Index of the language in the objects ar
  * @return
  * True if the language is in TL₂(AMT⁺), false otherwise.
  */
-bool shell_membership_tl2amtp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_tl2amtp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -921,8 +981,9 @@ bool shell_membership_tl2amtp(int,  //!< Index of the language in the objects ar
  * @return
  * True if the language is in TL₂(GR⁺), false otherwise.
  */
-bool shell_membership_tl2grp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_tl2grp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -932,8 +993,9 @@ bool shell_membership_tl2grp(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in FL, false otherwise.
  */
-bool shell_membership_fl(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_fl(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -943,8 +1005,9 @@ bool shell_membership_fl(int,  //!< Index of the language in the objects array.
  * @return
  * True if the language is in FL(MOD), false otherwise.
  */
-bool shell_membership_flmod(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_flmod(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -954,8 +1017,9 @@ bool shell_membership_flmod(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is in FL(AMT), false otherwise.
  */
-bool shell_membership_flamt(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_flamt(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -965,8 +1029,9 @@ bool shell_membership_flamt(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is in FL(GR), false otherwise.
  */
-bool shell_membership_flgr(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_flgr(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -976,8 +1041,9 @@ bool shell_membership_flgr(int,  //!< Index of the language in the objects array
  * @return
  * True if the language is in FL(DD), false otherwise.
  */
-bool shell_membership_fldd(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_fldd(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -987,8 +1053,9 @@ bool shell_membership_fldd(int,  //!< Index of the language in the objects array
  * @return
  * True if the language is in FL(MOD⁺), false otherwise.
  */
-bool shell_membership_flmodp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_flmodp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -998,8 +1065,9 @@ bool shell_membership_flmodp(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in FL(AMT⁺), false otherwise.
  */
-bool shell_membership_flamtp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_flamtp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1009,8 +1077,9 @@ bool shell_membership_flamtp(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in FL(GR⁺), false otherwise.
  */
-bool shell_membership_flgrp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_flgrp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1020,8 +1089,9 @@ bool shell_membership_flgrp(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is in FL₂(ST), false otherwise.
  */
-bool shell_membership_fl2st(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_fl2st(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1031,8 +1101,9 @@ bool shell_membership_fl2st(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is in FL₂(MOD), false otherwise.
  */
-bool shell_membership_fl2mod(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_fl2mod(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1042,8 +1113,9 @@ bool shell_membership_fl2mod(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in FL₂(AMT), false otherwise.
  */
-bool shell_membership_fl2amt(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_fl2amt(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1053,8 +1125,9 @@ bool shell_membership_fl2amt(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in FL₂(GR), false otherwise.
  */
-bool shell_membership_fl2gr(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_fl2gr(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1064,8 +1137,9 @@ bool shell_membership_fl2gr(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is in FL₂(DD), false otherwise.
  */
-bool shell_membership_fl2dd(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_fl2dd(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1075,8 +1149,9 @@ bool shell_membership_fl2dd(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is in FL₂(MOD⁺), false otherwise.
  */
-bool shell_membership_fl2modp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_fl2modp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1086,8 +1161,9 @@ bool shell_membership_fl2modp(int,  //!< Index of the language in the objects ar
  * @return
  * True if the language is in FL₂(AMT⁺), false otherwise.
  */
-bool shell_membership_fl2amtp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_fl2amtp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1097,8 +1173,9 @@ bool shell_membership_fl2amtp(int,  //!< Index of the language in the objects ar
  * @return
  * True if the language is in FL₂(GR⁺), false otherwise.
  */
-bool shell_membership_fl2grp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_fl2grp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1108,8 +1185,9 @@ bool shell_membership_fl2grp(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in PL, false otherwise.
  */
-bool shell_membership_pl(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_pl(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1119,8 +1197,9 @@ bool shell_membership_pl(int,  //!< Index of the language in the objects array.
  * @return
  * True if the language is in PL(MOD), false otherwise.
  */
-bool shell_membership_plmod(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_plmod(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1130,8 +1209,9 @@ bool shell_membership_plmod(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is in PL(AMT), false otherwise.
  */
-bool shell_membership_plamt(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_plamt(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1141,8 +1221,9 @@ bool shell_membership_plamt(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is in PL(GR), false otherwise.
  */
-bool shell_membership_plgr(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_plgr(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1152,8 +1233,9 @@ bool shell_membership_plgr(int,  //!< Index of the language in the objects array
  * @return
  * True if the language is in PL(DD), false otherwise.
  */
-bool shell_membership_pldd(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_pldd(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1163,8 +1245,9 @@ bool shell_membership_pldd(int,  //!< Index of the language in the objects array
  * @return
  * True if the language is in PL(MOD⁺), false otherwise.
  */
-bool shell_membership_plmodp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_plmodp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1174,8 +1257,9 @@ bool shell_membership_plmodp(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in PL(AMT⁺), false otherwise.
  */
-bool shell_membership_plamtp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_plamtp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1185,8 +1269,9 @@ bool shell_membership_plamtp(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in PL(GR⁺), false otherwise.
  */
-bool shell_membership_plgrp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_plgrp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1196,8 +1281,9 @@ bool shell_membership_plgrp(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is in PL₂(ST), false otherwise.
  */
-bool shell_membership_pl2st(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_pl2st(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1207,8 +1293,9 @@ bool shell_membership_pl2st(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is in PL₂(MOD), false otherwise.
  */
-bool shell_membership_pl2mod(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_pl2mod(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1218,8 +1305,9 @@ bool shell_membership_pl2mod(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in PL₂(AMT), false otherwise.
  */
-bool shell_membership_pl2amt(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_pl2amt(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1229,8 +1317,9 @@ bool shell_membership_pl2amt(int,  //!< Index of the language in the objects arr
  * @return
  * True if the language is in PL₂(GR), false otherwise.
  */
-bool shell_membership_pl2gr(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_pl2gr(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1240,8 +1329,9 @@ bool shell_membership_pl2gr(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is in PL₂(DD), false otherwise.
  */
-bool shell_membership_pl2dd(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_pl2dd(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1251,8 +1341,9 @@ bool shell_membership_pl2dd(int,  //!< Index of the language in the objects arra
  * @return
  * True if the language is in PL₂(MOD⁺), false otherwise.
  */
-bool shell_membership_pl2modp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_pl2modp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1262,8 +1353,9 @@ bool shell_membership_pl2modp(int,  //!< Index of the language in the objects ar
  * @return
  * True if the language is in PL₂(AMT⁺), false otherwise.
  */
-bool shell_membership_pl2amtp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_pl2amtp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
 
 /**
@@ -1273,24 +1365,21 @@ bool shell_membership_pl2amtp(int,  //!< Index of the language in the objects ar
  * @return
  * True if the language is in PL₂(GR⁺), false otherwise.
  */
-bool shell_membership_pl2grp(int,  //!< Index of the language in the objects array.
-    FILE*                  //!< Output stream (NULL is no output is desired).
+bool shell_membership_pl2grp(
+    int,   //!< Index of the language in the objects array.
+    FILE* //!< Output stream (NULL is no output is desired).
 );
-
-
-
 
 /***************/
 /* Hierarchies */
 /***************/
 
-
-
 /**
  * @brief
  * Summary of all available tests for concatenation hierarchies.
  */
-void shell_chiera_summary(int i, //!< Index of the language in the objects array.
+void shell_chiera_summary(
+    int i,    //!< Index of the language in the objects array.
     FILE* out //!< Output stream (NULL is no output is desired).
 );
 
@@ -1299,7 +1388,7 @@ void shell_chiera_summary(int i, //!< Index of the language in the objects array
  * Computes the level of a language inside a negation hierarchy.
  */
 bool shell_neghiera(classes cl, //!< Base class of the hierarchy.
-    int i, //!< Index of the language in the objects array.
+    int i,      //!< Index of the language in the objects array.
     FILE* out //!< Output stream (NULL is no output is desired).
 );
 
@@ -1308,47 +1397,80 @@ bool shell_neghiera(classes cl, //!< Base class of the hierarchy.
  * Computes the level of a language inside a future/past hierarchy.
  */
 bool shell_fphiera(classes cl, //!< Base class of the hierarchy.
-    int i, //!< Index of the language in the objects array.
+    int i,      //!< Index of the language in the objects array.
     FILE* out //!< Output stream (NULL is no output is desired).
 );
-
 
 /***********************/
 /* Examples generators */
 /***********************/
 
+typedef enum {
+    EXAGEN_ALL, //!< Search for all DFAs satisfying the constraints.
+    EXAGEN_DETHIERA, //!< Search for DFAs at a given level in a negation hierarchy.
+    EXAGEN_FPHIERA, //!< Search for DFAs at a given level in a future/past hierarchy.
+    EXAGEN_SIZE
+} exagen_mode;
+
+typedef struct {
+    exagen_mode mode;  //!< Mode of the example generation.
+    classes low[16];     //!< Classes for negative tests.
+    uint nblow;          //!< Number of classes for negative tests (maximum 16).
+    classes high[16];    //!< Classes for positive tests.
+    uint nbhigh;         //!< Number of classes for positive tests (maximum 16).
+    int states;          //!< Number of states of the DFAs to be generated.
+    int alpha;           //!< Size of the alphabet of the DFAs to be generated.
+    uint64_t done;       //!< Number of indices already handled.
+    uint64_t nb_found;   //!< Number of DFAs found.
+    uint64_t size_found; //!< Size of the array of DFAs found.
+    uint64_t* found;     //!< Array of indices of the DFAs found.
+    bool finished;      //!< True if the search is finished.
+} exall_profile;
+
+void shell_memb_file(const char* filename);
+
+void shell_file_retrieve(const char* filename, const char* pref);
+
 /**
  * @brief
- * Searches for all DFAs of a given size satisfying a given set of membership constraints.
+ * Searches for all DFAs of a given size satisfying a given set of membership
+ * constraints.
  */
-void shell_exall(classes* low,  //!< Classes for negative tests.
-    int nblow, //!< Number of classes for negative tests.
+void shell_exall(
+    classes* low,  //!< Classes for negative tests.
+    int nblow,     //!< Number of classes for negative tests.
     classes* high, //!< Classes for positive tests.
-    int nbhigh, //!< Number of classes for positive tests.
-    int states, //!< Number of states of the DFAs to be generated.
-    int alpha //!< Size of the alphabet of the DFAs to be generated.
+    int nbhigh,    //!< Number of classes for positive tests.
+    int states,    //!< Number of states of the DFAs to be generated.
+    long start,    //!< Index of the first DFA to be tested.
+    long end,      //!< Index of the last DFA to be tested.
+    int alpha      //!< Size of the alphabet of the DFAs to be generated.
 );
 
 /**
  * @brief
- * Searches for all DFAs of a given size at a given level in a negation or future/past hierarchy.
+ * Searches for all DFAs of a given size at a given level in a negation or
+ * future/past hierarchy.
  */
-void shell_exall_dethiera(classes cl, //!< Base class of the hierarchy.
-    int level, //!< Desired level for the examples.
+void shell_exall_dethiera(
+    classes cl, //!< Base class of the hierarchy.
+    int level,  //!< Desired level for the examples.
     int states, //!< Number of states of the DFAs to be generated.
-    int alpha, //!< Size of the alphabet of the DFAs to be generated.
-    bool neg //!< True if the hierarchy is negation-based, false if it is future/past-based.
+    int alpha,  //!< Size of the alphabet of the DFAs to be generated.
+    long start, //!< Index of the first DFA to be tested.
+    long end,   //!< Index of the last DFA to be tested.
+    bool neg    //!< True if the hierarchy is negation-based, false if it is
+    //!< future/past-based.
 );
-
 
 // /**
 //  * @brief
 //  * Searches for random DFAs satisfying a given set of membership constraints.
 //  */
-// bool shell_exsearch(com_parameters* //!< Command parameters (should include the size of the DFAs and the membership constraints).
+// bool shell_exsearch(com_parameters* //!< Command parameters (should include
+// the size of the DFAs and the membership constraints).
 // );
 
 bool shell_exall_dfatest(void);
-
 
 #endif

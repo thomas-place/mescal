@@ -33,13 +33,18 @@ dfa* dfa_mini_canonical_copy(dfa* A) {
     }
     delete_dequeue(queue);
 
-    dfa* B = dfa_init(A->trans->size_graph, A->trans->size_alpha, A->nb_finals, A->alphabet);
+    dfa* B;
+    CALLOC(B, 1);
+    B->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha);
+    B->trans = create_dgraph_noedges(A->trans->size_graph, A->trans->size_alpha);
     for (uint q = 0; q < A->trans->size_graph;q++) {
         for (uint a = 0; a < A->trans->size_alpha;a++) {
             B->trans->edges[q][a] = map[A->trans->edges[imap[q]][a]];
         }
     }
     B->initial = 0;
+    B->nb_finals = A->nb_finals;
+    MALLOC(B->finals, A->nb_finals);
     for (uint i = 0; i < A->nb_finals;i++) {
         B->finals[i] = map[A->finals[i]];
     }
@@ -150,8 +155,11 @@ dfa* dfa_hopcroft_genauto(dfa* D, hopcroft_partition* p) {
         nb_finals++;
     }
 
-    dfa* MINI = dfa_init(p->size_par, D->trans->size_alpha, nb_finals, D->alphabet);
 
+    dfa* MINI;
+    CALLOC(MINI, 1);
+    MINI->alphabet = duplicate_alphabet(D->alphabet, D->trans->size_alpha);
+    MINI->trans = create_dgraph_noedges(p->size_par, D->trans->size_alpha);
 
     for (uint cq = 0; cq < p->size_par;cq++) {
         for (uint a = 0; a < D->trans->size_alpha;a++) {
@@ -161,6 +169,8 @@ dfa* dfa_hopcroft_genauto(dfa* D, hopcroft_partition* p) {
     }
     MINI->initial = p->classes[D->initial];
 
+    MALLOC(MINI->finals, nb_finals);
+    MINI->nb_finals = nb_finals;
     uint j = 0;
     for (uint cq = 0; cq < p->size_par;cq++) {
         if (finals[cq]) {
@@ -205,18 +215,24 @@ dfa* dfa_hopcroft(dfa* A) {
     A = dfa_trim(A);
     // Traitement du cas où l'ensemble des états finaux est trivial (on retourne un automate trivial).
     if (A->nb_finals == 0 || A->nb_finals == A->trans->size_graph) {
-        uint sizef = (A->nb_finals == 0) ? 0 : 1;
-        dfa* MINI = dfa_init(1, A->trans->size_alpha, sizef, A->alphabet);
+        dfa* MINI;
+        CALLOC(MINI, 1);
+        MINI->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha);
+        MINI->trans = create_dgraph_noedges(1, A->trans->size_alpha);
         MINI->initial = 0;
         for (uint a = 0; a < A->trans->size_alpha;a++) {
             MINI->trans->edges[0][a] = 0;
         }
         if (A->nb_finals > 0) {
+            MALLOC(MINI->finals, 1);
+            MINI->nb_finals = 1;
             MINI->finals[0] = 0;
         }
         else {
+            MINI->nb_finals = 0;
             MINI->finals = NULL;
         }
+        dfa_delete(A);
         return MINI;
     }
 

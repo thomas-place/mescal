@@ -188,7 +188,7 @@ void named_lgedges_print(dequeue_gen* theedges, nfa* A, FILE* out) {
 
         if (!isempty_dequeue(oneedge->lab)) {
             for (uint j = 0; j < size_dequeue(oneedge->lab); j++) {
-                nfa_fprint_letter_gviz(A, lefread_dequeue(oneedge->lab, j), out, false);
+                fprint_letter_gviz(A->alphabet[lefread_dequeue(oneedge->lab, j)], out, false);
                 if (j < size_dequeue(oneedge->lab) - 1 || !isempty_dequeue(oneedge->lab_i)) {
                     fprintf(out, ",");
                 }
@@ -197,7 +197,7 @@ void named_lgedges_print(dequeue_gen* theedges, nfa* A, FILE* out) {
 
         if (!isempty_dequeue(oneedge->lab_i)) {
             for (uint j = 0; j < size_dequeue(oneedge->lab_i); j++) {
-                nfa_fprint_letter_gviz(A, lefread_dequeue(oneedge->lab_i, j), out, true);
+                fprint_letter_gviz(A->alphabet[lefread_dequeue(oneedge->lab_i, j)], out, true);
                 if (j < size_dequeue(oneedge->lab_i) - 1) {
                     fprintf(out, ",");
                 }

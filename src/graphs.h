@@ -60,21 +60,23 @@ typedef struct {
     dequeue*** edges; //!< The edges: an array of arrays of size `size_graph * size_alpha`.
 } lgraph;
 
+
 /**
  * @brief
  * Type used to represent a complete deterministic directed labeled graph.
  *
  * @remark
- * The set of edges is represented by the array of arrays of usigned integers `edges`.
- * For each vertex `q` and each letter `a` the cell `edge[q][a]` contains the
- * unique vertex connected to `q` by an edge labeled by `a`.
+ * The set of edges is represented by the arrays. For each vertex "q" and each letter "a"
+ * the cell "edge[q][a]" (stored in storage) contains the unique vertex connected to "q"
+ * by an edge labeled by "a".
  */
 typedef struct {
     uint size_graph; //!< Number of vertices.
     uint size_alpha; //!< Number of labels.
-    uint* storage;   //!< The storage of the edges (one dimension array of size size_graph * size_alpha).
     uint** edges;    //!< The edges: two dimensions array of size "size_graph * size_alpha" (actually contains pointers to the storage).
+    uint* storage;   //!< The storage of the edges (one dimension array of size size_graph * size_alpha).
 } dgraph;
+
 
 /**************/
 /* Allocation */
@@ -109,6 +111,16 @@ void delete_graph(graph* //<! The graph that needs to be freed.
 
 /**
  * @brief
+ * Makes a copy of a directed graph.
+ *
+ * @return
+ * The copy.
+ */
+graph* copy_graph(graph* g //!< The graph.
+);
+
+/**
+ * @brief
  * Creates a directed graph without edges.
  *
  * @return
@@ -123,6 +135,16 @@ lgraph* create_lgraph_noedges(uint, //!< Number of vertices.
  * Releases a directed graph.
  */
 void delete_lgraph(lgraph* //<! The graph that needs to be freed.
+);
+
+/**
+ * @brief
+ * Makes a copy of a labeled graph.
+ *
+ * @return
+ * The copy.
+ */
+lgraph* copy_lgraph(lgraph* g //!< The graph.
 );
 
 /**
@@ -143,6 +165,16 @@ dgraph* create_dgraph_noedges(uint, //!< Number of vertices.
 void delete_dgraph(dgraph* //<! The graph that needs to be freed.
 );
 
+
+/**
+ * @brief
+ * Makes a copy of a complete deterministic directed graph.
+ *
+ * @return
+ * The copy.
+ */
+dgraph* copy_dgraph(dgraph* g //!< The graph.
+);
 
 /*******************/
 /* Basic functions */

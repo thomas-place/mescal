@@ -219,7 +219,10 @@ nfa* nfa_intersect(nfa* A1, nfa* A2, bool names) {
 
 
     // Construction of the product NFA.
-    nfa* PROD = nfa_init();
+    nfa* PROD;
+    CALLOC(PROD, 1); // Allocate memory for the product NFA
+    PROD->initials = create_dequeue(); // Create the dequeue for the initial states of the product NFA
+    PROD->finals = create_dequeue(); // Create the dequeue for the final states of the product NFA
 
     PROD->alphabet = duplicate_alphabet(A1->alphabet, A1->trans->size_alpha); // The alphabet of the product NFA is the same as the alphabets of A1 and A2.
 
@@ -463,7 +466,10 @@ dfa* dfa_intersect(dfa* A1, dfa* A2, bool names) {
 
 
     // Construction of the product NFA.
-    dfa* PROD = dfa_init(inter_elem, thealph, 0, A1->alphabet); // Create the product DFA with the number of states and the alphabet.
+    dfa* PROD;
+    CALLOC(PROD, 1); // Allocate memory for the product DFA
+    PROD->alphabet = duplicate_alphabet(A1->alphabet, A1->trans->size_alpha); // The alphabet of the product DFA is the same as the alphabets of A1 and A2.
+    PROD->trans = create_dgraph_noedges(inter_elem, thealph); // Create the graph for the product DFA with the number of states and the size of the alphabet.
 
 
     // Initial state.
@@ -674,4 +680,28 @@ prod_pair* dgraph_intersec(dgraph* g1, dgraph* g2, uint s1, uint s2, uint* psize
     return result;
 
 
+}
+
+
+bool dgraph_exists_intersec_path(dgraph* g1, dgraph* g2, uint s1, uint s2, uint e1, uint e2) {
+    // fprintf(stderr, "#### Checking for intersection path between two dgraphs.\n");
+    if (g1->size_alpha != g2->size_alpha) {
+        return false; // If the alphabets are not the same, we cannot find an intersection path
+    }
+
+    uint size;
+    prod_pair* pairs = dgraph_intersec(g1, g2, s1, s2, &size); // Get the intersection pairs
+    // fprintf(stderr, "#### Intersection pairs obtained.\n");
+    if (pairs == NULL) {
+        return false; // If the intersection pairs are NULL, we cannot find an intersection path
+    }
+
+    for (uint i = 0; i < size; i++) {
+        if (pairs[i].q1 == e1 && pairs[i].q2 == e2) { // If we find a pair that matches the end states
+            free(pairs); // Free the memory allocated for the pairs
+            return true; // We found an intersection path
+        }
+    }
+    free(pairs); // Free the memory allocated for the pairs
+    return false; // No intersection path found
 }

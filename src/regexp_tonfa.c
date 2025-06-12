@@ -217,7 +217,10 @@ nfa* reg_glushkov(regexp* exp) {
     REALLOC(alphabet, a_size);
 
 
-    nfa* A = nfa_init();
+    nfa* A;
+    CALLOC(A, 1);
+    A->initials = create_dequeue();
+    A->finals = create_dequeue();
     A->alphabet = alphabet;
     A->trans = create_lgraph_noedges(nleaves + 1, a_size);
 

@@ -28,10 +28,35 @@
 #include "parser.h"
 #include "regexp.h"
 #include "shell_languages.h"
+#include "shell_memb.h"
 #include "type_basic.h"
+#include "shell_memb.h"
 #include <json-c/json.h>
 
 #define OUTPUT_DIR "./outputs"
+
+
+/************************/
+/*+ Example Generation +*/
+/************************/
+
+/**
+ * @brief
+ * Initializes the json description for example generation.
+ *
+ * @return
+ * The json object.
+ */
+int files_save_exall(const char* filename, //!< The path to the file where the data has to be saved.
+    exall_profile* profile //!< The profile to save in the file.
+);
+
+
+int files_read_exall(const char* filename, //!< The path to the file that needs to be read.
+    exall_profile* profile //!< The profile to fill with the data read from the file.
+);
+
+
 
 /***********************/
 /* Regular expressions */
@@ -92,14 +117,29 @@ json_object* files_dfa_to_json(dfa* //!< The automaton.
 
 
 
+// /**
+//  * @brief
+//  * Reads a json object encoding an automaton and extracts this automaton.
+//  *
+//  * @return
+//  * The automaton (or NULL is the json object does not encode an automaton).
+//  */
+// nfa* files_json_to_nfa(json_object* //!< The json object.
+// );
+
 /**
  * @brief
  * Reads a json object encoding an automaton and extracts this automaton.
  *
+ * @remark
+ * The return point is eiether a DFA or a NFA, depending on the json object.
+ * A boolean is set to true if the automaton is a DFA, false if it is a NFA.
+ *
  * @return
  * The automaton (or NULL is the json object does not encode an automaton).
  */
-nfa* files_json_to_nfa(json_object* //!< The json object.
+void* files_json_to_automaton(json_object*, //!< The json object.
+    bool* //!< Set to true if the automaton is a DFA, false if it is a NFA.
 );
 
 /***********************/

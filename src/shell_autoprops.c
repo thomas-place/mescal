@@ -1,5 +1,4 @@
 #include "shell_autoprops.h"
-#include "nfa_props.h"
 #include "printing.h"
 
 
@@ -31,6 +30,33 @@ static bool object_make_dfa(int j, int* error, FILE* out) {
     return true;
 }
 
+
+bool shell_autoprop_trivial(int j, char* name, int* error, FILE* out) {
+    if (!object_make_dfa(j, error, out)) {
+        return false; // Error in making DFA
+    }
+    if (out) {
+        fprintf(out, "#### Checking if the %s is trivial.\n", name);
+    }
+    bool res = is_trivial_dfa(objects[j]->aut->obj_dfa, out);
+    if (*error < 0) {
+        return false;
+    }
+
+    if (res) {
+        if (out) {
+            fprintf(out, "#### The %s is trivial.\n", name);
+        }
+        return true;
+    }
+    else {
+        if (out) {
+            fprintf(out, "#### The %s is not trivial.\n", name);
+        }
+        return false;
+    }
+
+}
 
 bool shell_autoprop_letterind(int j, char* name, int* error, FILE* out) {
     if (!object_make_dfa(j, error, out)) {
@@ -170,28 +196,314 @@ bool shell_autoprop_dapat(int j, char* name, int* error, FILE* out) {
 }
 
 
-bool shell_autoprop_cycletrivial(int j, char* name, int* error, FILE* out) {
+bool shell_autoprop_dapluspat(int j, char* name, int* error, FILE* out) {
     if (!object_make_dfa(j, error, out)) {
         return false; // Error in making DFA
     }
     if (out) {
-        fprintf(out, "#### Checking if the %s is cycle trivial.\n", name);
+        fprintf(out, "#### Checking if the %s satisfies the DA(DD) pattern equation.\n", name);
     }
-    bool res = is_cycletrivial_dfa(objects[j]->aut->obj_dfa, error, out);
+    bool res = is_daplus_dfa(objects[j]->aut->obj_dfa, error);
     if (*error < 0) {
         return false;
     }
     if (res) {
         if (out) {
-            fprintf(out, "#### The %s is cycle trivial.\n", name);
+            fprintf(out, "#### The %s satisfies the DA(DD) pattern equation.\n", name);
         }
         return true;
     }
     else {
         if (out) {
-            fprintf(out, "#### The %s is not cycle trivial.\n", name);
+            fprintf(out, "#### The %s does not satisfy the DA(DD) pattern equation.\n", name);
         }
         return false;
     }
 
 }
+
+
+bool shell_autoprop_dagppat(int j, dfagp_mode mode, char* name, int* error, FILE* out) {
+    if (!object_make_dfa(j, error, out)) {
+        return false; // Error in making DFA
+    }
+    if (out) {
+        switch (mode)
+        {
+        case DFAGP_MOD:
+            fprintf(out, "#### Checking if the %s satisfies the DA(MOD) pattern equation.\n", name);
+            break;
+        case DFAGP_AMT:
+            fprintf(out, "#### Checking if the %s satisfies the DA(AMT) pattern equation.\n", name);
+            break;
+        case DFAGP_GR:
+            fprintf(out, "#### Checking if the %s satisfies the DA(GR) pattern equation.\n", name);
+            break;
+        default:
+            fprintf(out, "#### Checking if the %s satisfies an DA(UNKNOWN) pattern equation.\n", name);
+            break;
+        }
+    }
+    bool res = is_dagp_dfa(objects[j]->aut->obj_dfa, mode, error);
+    if (*error < 0) {
+        return false;
+    }
+    if (res) {
+        if (out) {
+            fprintf(out, "#### The %s satisfies the pattern equation.\n", name);
+        }
+        return true;
+    }
+    else {
+        if (out) {
+            fprintf(out, "#### The %s does not satisfy the pattern equation.\n", name);
+        }
+        return false;
+    }
+
+}
+
+bool shell_autoprop_daplusgppat(int j, dfagp_mode mode, char* name, int* error, FILE* out) {
+    if (!object_make_dfa(j, error, out)) {
+        return false; // Error in making DFA
+    }
+    if (out) {
+        switch (mode)
+        {
+        case DFAGP_MOD:
+            fprintf(out, "#### Checking if the %s satisfies the DA(MOD⁺) pattern equation.\n", name);
+            break;
+        case DFAGP_AMT:
+            fprintf(out, "#### Checking if the %s satisfies the DA(AMT⁺) pattern equation.\n", name);
+            break;
+        case DFAGP_GR:
+            fprintf(out, "#### Checking if the %s satisfies the DA(GR⁺) pattern equation.\n", name);
+            break;
+        default:
+            fprintf(out, "#### Checking if the %s satisfies an DA(UNKNOWN) pattern equation.\n", name);
+            break;
+        }
+    }
+    bool res = is_daplusgp_dfa(objects[j]->aut->obj_dfa, mode, error);
+    if (*error < 0) {
+        return false;
+    }
+    if (res) {
+        if (out) {
+            fprintf(out, "#### The %s satisfies the pattern equation.\n", name);
+        }
+        return true;
+    }
+    else {
+        if (out) {
+            fprintf(out, "#### The %s does not satisfy the pattern equation.\n", name);
+        }
+        return false;
+    }
+
+}
+
+
+bool shell_autoprop_cyclet(int j, char* name, int* error, FILE* out) {
+    if (!object_make_dfa(j, error, out)) {
+        return false; // Error in making DFA
+    }
+    if (out) {
+        fprintf(out, "#### Checking if the %s satisfies the R pattern equation.\n", name);
+    }
+    bool res = is_cyclet_dfa(objects[j]->aut->obj_dfa, error, out);
+    if (*error < 0) {
+        return false;
+    }
+    if (res) {
+        if (out) {
+            fprintf(out, "#### The %s satisfies the pattern equation.\n", name);
+        }
+        return true;
+    }
+    else {
+        if (out) {
+            fprintf(out, "#### The %s does not satisfy the pattern equation.\n", name);
+        }
+        return false;
+    }
+
+}
+
+
+bool shell_autoprop_cycletplus(int j, char* name, int* error, FILE* out) {
+    if (!object_make_dfa(j, error, out)) {
+        return false; // Error in making DFA
+    }
+    if (out) {
+        fprintf(out, "#### Checking if the %s satisfies the R(DD) pattern equation.\n", name);
+    }
+    bool res = is_cycletplus_dfa(objects[j]->aut->obj_dfa, error);
+    if (*error < 0) {
+        return false;
+    }
+    if (res) {
+        if (out) {
+            fprintf(out, "#### The %s satisfies the pattern equation.\n", name);
+        }
+        return true;
+    }
+    else {
+        if (out) {
+            fprintf(out, "#### The %s does not satisfy the pattern equation.\n", name);
+        }
+        return false;
+    }
+
+}
+
+
+bool shell_autoprop_cycletgp(int j, dfagp_mode mode, char* name, int* error, FILE* out) {
+    if (!object_make_dfa(j, error, out)) {
+        return false; // Error in making DFA
+    }
+    if (out) {
+        switch (mode)
+        {
+        case DFAGP_MOD:
+            fprintf(out, "#### Checking if the %s satisfies the R(MOD) pattern equation.\n", name);
+            break;
+        case DFAGP_AMT:
+            fprintf(out, "#### Checking if the %s satisfies the R(AMT) pattern equation.\n", name);
+            break;
+        case DFAGP_GR:
+            fprintf(out, "#### Checking if the %s satisfies the R(GR) pattern equation.\n", name);
+            break;
+        default:
+            fprintf(out, "#### Checking if the %s satisfies an R(UNKNOWN) pattern equation.\n", name);
+            break;
+        }
+    }
+    bool res = is_cycletgp_dfa(objects[j]->aut->obj_dfa, mode, error);
+    if (*error < 0) {
+        return false;
+    }
+    if (res) {
+        if (out) {
+            fprintf(out, "#### The %s satisfies the pattern equation.\n", name);
+        }
+        return true;
+    }
+    else {
+        if (out) {
+            fprintf(out, "#### The %s does not satisfy the pattern equation.\n", name);
+        }
+        return false;
+    }
+
+}
+
+bool shell_autoprop_cycletplusgp(int j, dfagp_mode mode, char* name, int* error, FILE* out) {
+    if (!object_make_dfa(j, error, out)) {
+        return false; // Error in making DFA
+    }
+    if (out) {
+        switch (mode)
+        {
+        case DFAGP_MOD:
+            fprintf(out, "#### Checking if the %s satisfies the R(MOD⁺) pattern equation.\n", name);
+            break;
+        case DFAGP_AMT:
+            fprintf(out, "#### Checking if the %s satisfies the R(AMT⁺) pattern equation.\n", name);
+            break;
+        case DFAGP_GR:
+            fprintf(out, "#### Checking if the %s satisfies the R(GR⁺) pattern equation.\n", name);
+            break;
+        default:
+            fprintf(out, "#### Checking if the %s satisfies an R(UNKNOWN) pattern equation.\n", name);
+            break;
+        }
+    }
+    bool res = is_cycletplusgp_dfa(objects[j]->aut->obj_dfa, mode, error);
+    if (*error < 0) {
+        return false;
+    }
+    if (res) {
+        if (out) {
+            fprintf(out, "#### The %s satisfies the pattern equation.\n", name);
+        }
+        return true;
+    }
+    else {
+        if (out) {
+            fprintf(out, "#### The %s does not satisfy the pattern equation.\n", name);
+        }
+        return false;
+    }
+
+}
+
+
+
+bool shell_autoprop_cycletbp(int j, char* name, int* error, FILE* out) {
+    if (!object_make_dfa(j, error, out)) {
+        return false; // Error in making DFA
+    }
+    if (out) {
+        fprintf(out, "#### Checking if the %s satisfies the R(BPol(ST)) pattern equation.\n", name);
+    }
+    bool res = is_cycletbp_dfa(objects[j]->aut->obj_dfa, error);
+    if (*error < 0) {
+        return false;
+    }
+    if (res) {
+        if (out) {
+            fprintf(out, "#### The %s satisfies the pattern equation.\n", name);
+        }
+        return true;
+    }
+    else {
+        if (out) {
+            fprintf(out, "#### The %s does not satisfy the pattern equation.\n", name);
+        }
+        return false;
+    }
+
+}
+
+
+bool shell_autoprop_cycletbpgp(int j, dfagp_mode mode, char* name, int* error, FILE* out) {
+    if (!object_make_dfa(j, error, out)) {
+        return false; // Error in making DFA
+    }
+    if (out) {
+        switch (mode)
+        {
+        case DFAGP_MOD:
+            fprintf(out, "#### Checking if the %s satisfies the R(BPol(MOD)) pattern equation.\n", name);
+            break;
+        case DFAGP_AMT:
+            fprintf(out, "#### Checking if the %s satisfies the R(BPol(AMT)) pattern equation.\n", name);
+            break;
+        case DFAGP_GR:
+            fprintf(out, "#### Checking if the %s satisfies the R(BPol(GR)) pattern equation.\n", name);
+            break;
+        default:
+            fprintf(out, "#### Checking if the %s satisfies an R(UNKNOWN) pattern equation.\n", name);
+            break;
+        }
+    }
+    bool res = is_cycletbpgp_dfa(objects[j]->aut->obj_dfa, mode, error);
+    if (*error < 0) {
+        return false;
+    }
+    if (res) {
+        if (out) {
+            fprintf(out, "#### The %s satisfies the pattern equation.\n", name);
+        }
+        return true;
+    }
+    else {
+        if (out) {
+            fprintf(out, "#### The %s does not satisfy the pattern equation.\n", name);
+        }
+        return false;
+    }
+
+}
+

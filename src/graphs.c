@@ -6,6 +6,7 @@
 #include "graphs.h"
 #include <limits.h>
 
+
 /*****************************/
 /*+ Création et suppression +*/
 /*****************************/
@@ -29,13 +30,13 @@ graph* create_graph_noedges(uint size) {
     return new;
 }
 
-graph* create_graph_selfloops(uint size) {
-    graph* new = create_graph_noedges(size);
-    for (uint q = 0; q < size; q++) {
-        rigins_dequeue(q, new->edges[q]);
-    }
-    return new;
-}
+// graph* create_graph_selfloops(uint size) {
+//     graph* new = create_graph_noedges(size);
+//     for (uint q = 0; q < size; q++) {
+//         rigins_dequeue(q, new->edges[q]);
+//     }
+//     return new;
+// }
 
 void delete_graph(graph* G) {
     if (G == NULL || G->edges == NULL) {
@@ -48,6 +49,19 @@ void delete_graph(graph* G) {
     free(G->edges);
     free(G);
 }
+
+graph* copy_graph(graph* g) {
+    if (!g) {
+        return NULL;
+    }
+    graph* new = create_graph_noedges(g->size);
+    for (uint q = 0; q < g->size; q++) {
+        copy_dequeue_right(new->edges[q], g->edges[q], 0);
+    }
+    return new;
+}
+
+
 
 lgraph* create_lgraph_noedges(uint size_graph, uint size_alpha) {
     // Création du graphe
@@ -87,6 +101,19 @@ void delete_lgraph(lgraph* G) {
     free(G);
 }
 
+lgraph* copy_lgraph(lgraph* g) {
+    if (!g) {
+        return NULL;
+    }
+    lgraph* new = create_lgraph_noedges(g->size_graph, g->size_alpha);
+    for (uint q = 0; q < g->size_graph; q++) {
+        for (uint a = 0; a < g->size_alpha; a++) {
+            copy_dequeue_right(new->edges[q][a], g->edges[q][a], 0);
+        }
+    }
+    return new;
+}
+
 dgraph* create_dgraph_noedges(uint size_graph, uint size_alpha) {
 
     // Création du graphe
@@ -116,6 +143,19 @@ void delete_dgraph(dgraph* G) {
     free(G->storage);
     free(G->edges);
     free(G);
+}
+
+dgraph* copy_dgraph(dgraph* g) {
+    if (!g) {
+        return NULL;
+    }
+    dgraph* new = create_dgraph_noedges(g->size_graph, g->size_alpha);
+    for (uint q = 0; q < g->size_graph; q++) {
+        for (uint a = 0; a < g->size_alpha; a++) {
+            new->edges[q][a] = g->edges[q][a];
+        }
+    }
+    return new;
 }
 
 /*******************/

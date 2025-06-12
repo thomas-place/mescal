@@ -46,6 +46,11 @@ void keywords_add_all_keys(void) {
     keywords_add_key(KY_SORT, "sort");
     keywords_add_key(KY_INFO, "info");
     keywords_add_key(KY_EXSEARCH, "exsearch");
+    keywords_add_key(KY_EXINIT, "exinit");
+    keywords_add_key(KY_EXINITNEG, "exinitneg");
+    keywords_add_key(KY_EXINITFP, "exinitfp");
+    keywords_add_key(KY_EXCONTINUE, "excontinue");
+    keywords_add_key(KY_EXRETRIEVE, "exretrieve");
     keywords_add_key(KY_EXALL, "exall");
     keywords_add_key(KY_NEXALL, "negexall");
     keywords_add_key(KY_FPEXALL, "fpexall");

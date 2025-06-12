@@ -802,7 +802,7 @@ morphism* dfa_to_morphism(dfa* A, bool** order, int*) {
     delete_hash_table(thehash); // Free the hash table.
 
 #ifdef DEBUG_MONO
-    printf("BFS done. Time: %f\n Elements: %lu", difftime(time(NULL), thetime), mor_cons_elem);
+    printf("BFS done. Time: %f Elements: %lu\n", difftime(time(NULL), thetime), mor_cons_elem);
 #endif
 
     // Initialization of the morphism.
@@ -908,8 +908,6 @@ morphism* dfa_to_morphism(dfa* A, bool** order, int*) {
     // We free the arrays used in the construction of the morphism.
     mor_cons_delete();
 
-    ignore_interrupt();
-    normal_mode();
     return M;
 
 }
@@ -980,13 +978,17 @@ uint dfa_to_morphism_size(dfa* A) {
 }
 
 dfa* morphism_to_dfa(morphism* M) {
-    dfa* D = dfa_init(M->r_cayley->size_graph, M->r_cayley->size_alpha, M->nb_accept, M->alphabet);
+    dfa* D;
+    CALLOC(D, 1);
+    D->alphabet = duplicate_alphabet(M->alphabet, M->r_cayley->size_alpha); // Copy letter names
+    D->trans = create_dgraph_noedges(M->r_cayley->size_graph, M->r_cayley->size_alpha); // Create the graph.
     for (uint i = 0; i < M->r_cayley->size_graph; i++) {
         for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
             D->trans->edges[i][a] = M->r_cayley->edges[i][a];
         }
     }
     D->initial = ONE;
+    MALLOC(D->finals, M->nb_accept); // Allocate the finals array.
     for (uint i = 0; i < M->nb_accept; i++) {
         D->finals[i] = M->accept_list[i];
     }
@@ -994,13 +996,17 @@ dfa* morphism_to_dfa(morphism* M) {
 }
 
 dfa* left_morphism_to_dfa(morphism* M) {
-    dfa* D = dfa_init(M->l_cayley->size_graph, M->l_cayley->size_alpha, M->nb_accept, M->alphabet);
+    dfa* D;
+    CALLOC(D, 1);
+    D->alphabet = duplicate_alphabet(M->alphabet, M->l_cayley->size_alpha); // Copy letter names
+    D->trans = create_dgraph_noedges(M->l_cayley->size_graph, M->l_cayley->size_alpha); // Create the graph.
     for (uint i = 0; i < M->l_cayley->size_graph; i++) {
         for (uint a = 0; a < M->l_cayley->size_alpha; a++) {
             D->trans->edges[i][a] = M->l_cayley->edges[i][a];
         }
     }
     D->initial = ONE;
+    MALLOC(D->finals, M->nb_accept); // Allocate the finals array.
     for (uint i = 0; i < M->nb_accept; i++) {
         D->finals[i] = M->accept_list[i];
     }
@@ -1295,10 +1301,12 @@ bool mor_neutral_letter(morphism* M, FILE* out) {
 
 bool mor_nonempty_neutral(morphism* M) {
     green* G = M->rels;
-    if (G->HCL->cl_size[G->HCL->numcl[ONE]] == 1) {
-        return false;
+    for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
+        if (G->HCL->numcl[M->r_cayley->edges[ONE][a]] == G->HCL->numcl[ONE]) {
+            return true;
+        }
     }
-    return true;
+    return false;
 }
 
 bool mor_all_regular(morphism* M) {

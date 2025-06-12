@@ -8,7 +8,7 @@
 #include "alloc.h"
 #include "error.h"
 
-#include "files.h"
+
 #include "monoid_kernels.h"
 #include "nfa_mccluskey.h"
 #include "nfa_minimization.h"
@@ -125,6 +125,19 @@ bool param_getinteger(com_parameters* pars, //!< The parameters list.
     int p,                                  //!< The parameter index.
     const char* str,                        //!< The string used to call the command.
     int* integer                            //!< The integer returned by pointer in case of success.
+);
+
+/**
+ * @brief
+ * Tries to retrieve a long integer from a parameter.
+ *
+ * @return
+ * True if the parameter is indeed an integer, false otherwise.
+ */
+bool param_getlong(com_parameters* pars, //!< The parameters list.
+    int p,                                  //!< The parameter index.
+    const char* str,                        //!< The string used to call the command.
+    long* integer                            //!< The integer returned by pointer in case of success.
 );
 
 typedef enum {
@@ -839,6 +852,64 @@ int shell_print_fphiera(com_parameters* pars, //!< Command parameters (should in
 /*************************/
 /*+ Examples generators +*/
 /*************************/
+
+
+/**
+ * @brief
+ * Initializes a file for example browsing: class separation.
+ *
+ * @return
+ * -1 on success, -2 on failure.
+ */
+int shell_initfile_exall(com_parameters* pars, //!< The parameters of the command.
+    const char* str //!< The string used to call the command.
+);
+
+/**
+ * @brief
+ * Initializes a file for example browsing: future/past hierarchies.
+ *
+ * @return
+ * -1 on success, -2 on failure.
+ */
+int shell_initfile_exfp(com_parameters* pars, //!< The parameters of the command.
+    const char* str //!< The string used to call the command.
+);
+
+/**
+ * @brief
+ * Initializes a file for example browsing: negation hierarchies.
+ *
+ * @return
+ * -1 on success, -2 on failure.
+ */
+int shell_initfile_exdet(com_parameters* pars, //!< The parameters of the command.
+    const char* str //!< The string used to call the command.
+);
+
+
+/**
+ * @brief
+ * COntinue example browsing from a file.
+ *
+ * @return
+ * -1 on success, -2 on failure.
+ */
+int shell_continuefile(com_parameters* pars, //!< The parameters of the command.
+    const char* str //!< The string used to call the command.
+);
+
+/**
+ * @brief
+ * Retrieve examples from a file.
+ *
+ * @return
+ * -1 on success, -2 on failure.
+ */
+int shell_retrievefile(com_parameters* pars, //!< The parameters of the command.
+    const char* str //!< The string used to call the command.
+);
+
 
 /**
  * @brief

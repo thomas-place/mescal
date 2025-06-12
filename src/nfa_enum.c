@@ -22,6 +22,7 @@ dfa_enum* dfa_enum_init(short states, short alpha) {
     }
     A->final = 0;
     A->inisep = 0;
+    A->run = true;
     return A;
 }
 
@@ -182,6 +183,8 @@ bool dfa_enum_next(dfa_enum* A) {
         return true;
     }
 
+    A->run = false;
+
     return false;
 
 }
@@ -233,7 +236,7 @@ dfa* dfa_enum_to_dfa(dfa_enum* E) {
     MALLOC(A->finals, 1);
     A->finals[0] = E->used[E->states - 1] - 1;
 
-    A->trans = create_dgraph_noedges(E->states, E->alpha);
+    A->trans = create_dgraph_noedges(E->states + 1, E->alpha);
 
     MALLOC(A->alphabet, E->alpha);
     for (short a = 0; a < E->alpha; a++) {
@@ -245,12 +248,17 @@ dfa* dfa_enum_to_dfa(dfa_enum* E) {
         A->trans->edges[0][a] = 0;
     }
 
-    short b = E->alpha - E->outlabs[0];
+    short b = E->inisep; //E->alpha - E->outlabs[0];
     for (short i = 1; i <= E->parsize[0]; i++) {
         for (short j = 0; j < E->parti[0][i - 1]; j++) {
             A->trans->edges[0][b] = i;
             b++;
         }
+    }
+
+    while (b < E->alpha) {
+        A->trans->edges[0][b] = E->states;
+        b++;
     }
 
     for (short q = 1; q < E->states; q++) {
@@ -261,6 +269,7 @@ dfa* dfa_enum_to_dfa(dfa_enum* E) {
         for (short a = 0; a < E->alpha; a++) {
             //  printf("Letter %d\n", a);
             if (E->graph[q][a] == -1) {
+                A->trans->edges[q][a] = E->states;;
                 continue;
             }
             if (E->graph[q][a] < E->used[q]) {
@@ -281,6 +290,9 @@ dfa* dfa_enum_to_dfa(dfa_enum* E) {
             }
 
         }
+    }
+    for (short a = 0; a < E->alpha; a++) {
+        A->trans->edges[E->states][a] = E->states;
     }
     //printf("Done\n");
 

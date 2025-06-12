@@ -1,4 +1,5 @@
 #include "nfa_props.h"
+#include "nfa_intersec.h"
 #include "monoid_display.h"
 #include "limits.h"
 
@@ -28,13 +29,13 @@ bool is_letterind_dfa(dfa* A, int*, FILE* out) {
                     fprintf(out, "(");
                     dfa_print_state(A, s, out);
                     fprintf(out, ",");
-                    dfa_fprint_letter_utf8(A, 0, out);
+                    fprint_letter_utf8(A->alphabet[0], out);
                     fprintf(out, ",");
                     dfa_print_state(A, A->trans->edges[s][0], out);
                     fprintf(out, ") and (");
                     dfa_print_state(A, s, out);
                     fprintf(out, ",");
-                    dfa_fprint_letter_utf8(A, a, out);
+                    fprint_letter_utf8(A->alphabet[a], out);
                     fprintf(out, ",");
                     dfa_print_state(A, A->trans->edges[s][a], out);
                     fprintf(out, ")\n");
@@ -62,13 +63,13 @@ bool is_comm_dfa(dfa* A, int*, FILE* out) {
                         fprintf(out, "     (");
                         dfa_print_state(A, q, out);
                         fprintf(out, ",");
-                        dfa_fprint_letter_utf8(A, a, out);
+                        fprint_letter_utf8(A->alphabet[a], out);
                         fprintf(out, ",");
                         dfa_print_state(A, qa, out);
                         fprintf(out, ") and (");
                         dfa_print_state(A, qa, out);
                         fprintf(out, ",");
-                        dfa_fprint_letter_utf8(A, b, out);
+                        fprint_letter_utf8(A->alphabet[b], out);
                         fprintf(out, ",");
                         dfa_print_state(A, qab, out);
                         fprintf(out, ")\n");
@@ -76,13 +77,13 @@ bool is_comm_dfa(dfa* A, int*, FILE* out) {
                         fprintf(out, "     (");
                         dfa_print_state(A, q, out);
                         fprintf(out, ",");
-                        dfa_fprint_letter_utf8(A, b, out);
+                        fprint_letter_utf8(A->alphabet[b], out);
                         fprintf(out, ",");
                         dfa_print_state(A, qb, out);
                         fprintf(out, ") and (");
                         dfa_print_state(A, qb, out);
                         fprintf(out, ",");
-                        dfa_fprint_letter_utf8(A, a, out);
+                        fprint_letter_utf8(A->alphabet[a], out);
                         fprintf(out, ",");
                         dfa_print_state(A, qba, out);
                         fprintf(out, ")\n");
@@ -115,13 +116,13 @@ bool is_permutation_dfa(dfa* A, int*, FILE* out) {
                     fprintf(out, "#### The DFA contains the transitions (");
                     dfa_print_state(A, reached[r], out);
                     fprintf(out, ",");
-                    dfa_fprint_letter_utf8(A, a, out);
+                    fprint_letter_utf8(A->alphabet[a], out);
                     fprintf(out, ",");
                     dfa_print_state(A, r, out);
                     fprintf(out, ") and (");
                     dfa_print_state(A, q, out);
                     fprintf(out, ",");
-                    dfa_fprint_letter_utf8(A, a, out);
+                    fprint_letter_utf8(A->alphabet[a], out);
                     fprintf(out, ",");
                     dfa_print_state(A, r, out);
                     fprintf(out, ").\n");
@@ -152,8 +153,11 @@ static uint dfa_function(dfa* A, uint s, dequeue* w) {
 // Seuls les états accessibles sont conservés. Si l'automate n'est pas
 // complet, celui-ci est complété en ajoutant un état supplémentaire.
 static dfa* dfa_from_scc(dfa* A, parti* sccs, uint p) {
-
-    dfa* D = dfa_init(sccs->cl_size[p] + 1, A->trans->size_alpha, 0, A->alphabet);
+    dfa* D;
+    CALLOC(D, 1);
+    D->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha);
+    D->trans = create_dgraph_noedges(sccs->cl_size[p] + 1, A->trans->size_alpha);
+    A->nb_finals = 0;
 
     for (uint i = 0; i < sccs->cl_size[p]; i++) {
         uint q = sccs->cl_elems[p][i];
@@ -290,6 +294,42 @@ static void compute_alph_scc_dgraph(dgraph* G, parti* SCC, uint num, bool* alph)
 
 
 
+static void dgraph_make_product_sccs(dgraph* g, parti* scca, dgraph** inter, parti** scci) {
+    uint size = g->size_graph * g->size_graph;
+    *inter = create_dgraph_noedges(size + 1, g->size_alpha);
+    for (uint q = 0; q < g->size_graph; q++) {
+        for (uint r = 0; r < g->size_graph; r++) {
+            for (uint a = 0; a < g->size_alpha; a++) {
+                uint qa = g->edges[q][a];
+                uint ra = g->edges[r][a];
+                if (scca->numcl[q] == scca->numcl[qa] && scca->numcl[r] == scca->numcl[ra]) {
+                    (*inter)->edges[q * g->size_graph + r][a] = qa * g->size_graph + ra;
+                }
+                else {
+                    (*inter)->edges[q * g->size_graph + r][a] = size;
+                }
+            }
+        }
+    }
+    for (uint a = 0; a < g->size_alpha; a++) {
+        (*inter)->edges[size][a] = size;
+    }
+
+    // Computes the SCCs of the product graph
+    *scci = dtarjan(*inter, NULL, false);
+
+    // Discards all edges that go from a state to a different SCC in the product graph
+    // (we make them go to the artificial sink)
+    for (uint s = 0; s < (*inter)->size_graph; s++) {
+        for (uint a = 0; a < (*inter)->size_alpha; a++) {
+            uint t = (*inter)->edges[s][a];
+            if ((*scci)->numcl[t] != (*scci)->numcl[s]) {
+                (*inter)->edges[s][a] = size;
+            }
+        }
+    }
+}
+
 
 
 bool is_da_dfa(dfa* A, int*) {
@@ -297,30 +337,9 @@ bool is_da_dfa(dfa* A, int*) {
     parti* scca = dtarjan(A->trans, NULL, false);
 
     uint size = A->trans->size_graph * A->trans->size_graph;
-
-    dgraph* inter = create_dgraph_noedges(size + 1, A->trans->size_alpha);
-
-
-    for (uint q = 0; q < A->trans->size_graph; q++) {
-        for (uint r = 0; r < A->trans->size_graph; r++) {
-            for (uint a = 0; a < A->trans->size_alpha; a++) {
-                uint qa = A->trans->edges[q][a];
-                uint ra = A->trans->edges[r][a];
-                if (scca->numcl[q] == scca->numcl[qa] && scca->numcl[r] == scca->numcl[ra]) {
-                    inter->edges[q * A->trans->size_graph + r][a] = qa * A->trans->size_graph + ra;
-                }
-                else {
-                    inter->edges[q * A->trans->size_graph + r][a] = size;
-                }
-            }
-        }
-    }
-    for (uint a = 0; a < A->trans->size_alpha; a++) {
-        inter->edges[size][a] = size;
-    }
-
-
-    parti* scci = dtarjan(inter, NULL, false);
+    dgraph* inter;
+    parti* scci;
+    dgraph_make_product_sccs(A->trans, scca, &inter, &scci);
 
 
     bool alpha[A->trans->size_alpha];
@@ -352,8 +371,330 @@ bool is_da_dfa(dfa* A, int*) {
 
 
 
+static dgraph* dgraph_extract(dgraph* G, parti* P, uint j) {
+    // Création du graphe
+    dgraph* res = create_dgraph_noedges(P->cl_size[j], G->size_alpha);
+    // Pour chaque élément du morphisme
+    for (uint i = 0; i < P->cl_size[j]; i++) {
+        uint q = P->cl_elems[j][i];
+        for (uint a = 0; a < G->size_alpha; a++) {
+            uint r = G->edges[q][a];
+            if (P->numcl[r] == j) {
+                mem_array_sorted(r, P->cl_elems[j], P->cl_size[j], &res->edges[i][a]);
+            }
+            else {
+                res->edges[i][a] = UINT_MAX;
+            }
+        }
+    }
+    return res;
+}
 
-bool is_cycletrivial_dfa(dfa* A, int*, FILE* out) {
+
+static void dgraph_make_product_sccs_local(dgraph* G, parti* P, uint j, dgraph** rinter, parti** rscci) {
+    dgraph* res = dgraph_extract(G, P, j);
+    uint size = P->cl_size[j] * P->cl_size[j];
+    dgraph* inter = create_dgraph_noedges(size + 1, G->size_alpha);
+    for (uint q = 0; q < P->cl_size[j]; q++) {
+        for (uint r = 0; r < P->cl_size[j]; r++) {
+            for (uint a = 0; a < G->size_alpha; a++) {
+                uint qa = res->edges[q][a];
+                uint ra = res->edges[r][a];
+                if (qa != UINT_MAX && ra != UINT_MAX) {
+                    inter->edges[q * P->cl_size[j] + r][a] = qa * P->cl_size[j] + ra;
+                }
+                else {
+                    inter->edges[q * P->cl_size[j] + r][a] = size;
+                }
+            }
+        }
+    }
+    for (uint a = 0; a < G->size_alpha; a++) {
+        inter->edges[size][a] = size;
+    }
+    delete_dgraph(res);
+    *rinter = inter;
+    *rscci = dtarjan(inter, NULL, false);
+}
+
+
+bool is_daplus_dfa(dfa* A, int*) {
+
+    // SCCs of the DFA
+    parti* scca = dtarjan(A->trans, NULL, false);
+
+    // Compute the product graph of the DFA with itself and its sccs
+    uint size = A->trans->size_graph * A->trans->size_graph;
+    dgraph* inter;
+    parti* scci;
+    dgraph_make_product_sccs(A->trans, scca, &inter, &scci);
+
+    // The double product of the DFA with itself and its SCCs (used to check the self-loops)
+
+
+    // For each SCC in the product graph
+    for (uint i = 0; i < scci->size_par; i++) {
+        // We skip the last class, which is the one containing the artificial sink
+        if (i == scci->numcl[size]) {
+            continue;
+        }
+
+        uint t = scci->cl_elems[i][0];
+        uint t1 = t / A->trans->size_graph;
+        uint t2 = t % A->trans->size_graph;
+        if (t1 == t2 || scca->numcl[t1] > scca->numcl[t2]) {
+            continue;
+        }
+
+        // We compute the local double product graph for this SCC
+        dgraph* quad;
+        parti* sccq;
+        dgraph_make_product_sccs_local(inter, scci, i, &quad, &sccq);
+
+        // We pick a pair of distinct states in the SCC. 
+        for (uint j = 0; j < scci->cl_size[i]; j++) {
+            for (uint k = j + 1; k < scci->cl_size[i]; k++) {
+                // We first check if there is a common self-loop using the double product graph
+                uint pq = scci->cl_elems[i][j];
+                uint pr = scci->cl_elems[i][k];
+                uint qstate = j * scci->cl_size[i] + k;
+                bool has_self_loop = false;
+                if (sccq->cl_size[sccq->numcl[qstate]] > 1) {
+                    has_self_loop = true;
+                }
+                else {
+                    for (uint a = 0; a < quad->size_alpha; a++) {
+                        if (quad->edges[qstate][a] == qstate) {
+                            has_self_loop = true;
+                            break;
+                        }
+                    }
+                }
+                if (!has_self_loop) {
+                    continue;
+                }
+
+                // We now know that there is a self-loop on the pair (pq, pr).
+
+                uint q1 = pq / A->trans->size_graph;
+                uint q2 = pq % A->trans->size_graph;
+                uint r1 = pr / A->trans->size_graph;
+                uint r2 = pr % A->trans->size_graph;
+
+                if (dgraph_exists_intersec_path(inter, A->trans, pq, r1, pr, r2) || dgraph_exists_intersec_path(inter, A->trans, pr, q1, pq, q2)) {
+                    delete_dgraph(inter);
+                    delete_parti(scca);
+                    delete_parti(scci);
+                    delete_dgraph(quad);
+                    delete_parti(sccq);
+                    return false;
+                }
+            }
+        }
+        delete_dgraph(quad);
+        delete_parti(sccq);
+
+    }
+    delete_dgraph(inter);
+    delete_parti(scca);
+    delete_parti(scci);
+    return true;
+
+}
+
+
+
+
+static void dfagp_fold(dgraph* g, parti* sccs, uint cl, dfagp_mode mode, parti** fold, dgraph** g_fold) {
+
+    dgraph* sub = dgraph_extract(g, sccs, cl);
+    switch (mode) {
+    case DFAGP_MOD:
+        *fold = dgraph_stal_fold(sub, false);
+        break;
+    case DFAGP_AMT:
+        *fold = compute_amt_fold(sub);
+        break;
+    case DFAGP_GR:
+        *fold = dgraph_stal_fold(sub, true);
+        break;
+    default:
+        delete_dgraph(sub);
+        fprintf(stderr, "dagp_fold: Unknown mode %d.\n", mode);
+        exit(EXIT_FAILURE);
+    }
+
+
+    // dgraph* sub = dgraph_extract(inter, scci, i);
+    // //printf("SCC extracted\n");
+    // parti* fold;
+    // dgraph* g_fold;
+    // damod_fold(sub, &fold, &g_fold);
+    // //printf("Folded graph created with %u classes.\n", fold->size_par);
+    // delete_dgraph(sub);
+    //*fold = dgraph_stal_fold(sub, false);
+    if (g_fold) {
+        *g_fold = create_dgraph_noedges((*fold)->size_par, sub->size_alpha);
+        for (uint i = 0; i < (*fold)->size_par; i++) {
+            for (uint a = 0; a < sub->size_alpha; a++) {
+                (*g_fold)->edges[i][a] = UINT_MAX;
+            }
+        }
+
+        for (uint i = 0; i < sub->size_graph;i++) {
+            for (uint a = 0; a < sub->size_alpha; a++) {
+                if (sub->edges[i][a] != UINT_MAX) {
+                    (*g_fold)->edges[(*fold)->numcl[i]][a] = (*fold)->numcl[sub->edges[i][a]];
+                }
+            }
+        }
+    }
+    delete_dgraph(sub);
+}
+
+
+bool is_dagp_dfa(dfa* A, dfagp_mode mode, int*) {
+
+
+    // SCCs of the DFA
+    parti* scca = dtarjan(A->trans, NULL, false);
+
+    // Compute the product graph of the DFA with itself and its sccs
+    uint size = A->trans->size_graph * A->trans->size_graph;
+    dgraph* inter;
+    parti* scci;
+    dgraph_make_product_sccs(A->trans, scca, &inter, &scci);
+
+    for (uint i = 0; i < scci->size_par; i++) {
+        if (i == scci->numcl[size]) {
+            continue;
+        }
+        uint qr = scci->cl_elems[i][0];
+        uint q = qr / A->trans->size_graph;
+        uint r = qr % A->trans->size_graph;
+        if (q == r || scca->numcl[q] > scca->numcl[r]) {
+            continue;
+        }
+        parti* fold;
+        dgraph* g_fold;
+        dfagp_fold(inter, scci, i, mode, &fold, &g_fold);
+
+        if (dgraph_exists_intersec_path(g_fold, A->trans, 0, q, 0, r)) {
+            delete_dgraph(g_fold);
+            delete_parti(fold);
+            delete_dgraph(inter);
+            delete_parti(scca);
+            delete_parti(scci);
+            return false;
+        }
+        delete_dgraph(g_fold);
+        delete_parti(fold);
+    }
+    delete_dgraph(inter);
+    delete_parti(scca);
+    delete_parti(scci);
+    return true;
+}
+
+
+bool is_daplusgp_dfa(dfa* A, dfagp_mode mode, int*) {
+    // SCCs of the DFA
+    parti* scca = dtarjan(A->trans, NULL, false);
+
+    // Compute the product graph of the DFA with itself and its sccs
+    uint size = A->trans->size_graph * A->trans->size_graph;
+    dgraph* inter;
+    parti* scci;
+    dgraph_make_product_sccs(A->trans, scca, &inter, &scci);
+
+
+
+
+
+    // We now check the pattern
+
+    // For each SCC in the product graph
+    for (uint i = 0; i < scci->size_par; i++) {
+        // We skip the last class, which is the one containing the artificial sink
+        if (i == scci->numcl[size]) {
+            continue;
+        }
+
+        uint t = scci->cl_elems[i][0];
+        uint t1 = t / A->trans->size_graph;
+        uint t2 = t % A->trans->size_graph;
+        if (t1 == t2 || scca->numcl[t1] > scca->numcl[t2]) {
+            continue;
+        }
+        // We compute the local double product graph for this SCC
+        dgraph* quad;
+        parti* sccq;
+        dgraph_make_product_sccs_local(inter, scci, i, &quad, &sccq);
+
+        // Folding according to the mode
+        parti* fold = NULL;
+        dfagp_fold(inter, scci, i, mode, &fold, NULL);
+
+        // We pick a pair of distinct states in the SCC. 
+        for (uint j = 0; j < scci->cl_size[i]; j++) {
+            for (uint k = j + 1; k < scci->cl_size[i]; k++) {
+
+                // We skip the pair if they are not in the same class in the fold
+                if (fold->numcl[j] != fold->numcl[k]) {
+                    continue;
+                }
+
+                // We first check if there is a common self-loop using the double product graph
+                uint pq = scci->cl_elems[i][j];
+                uint pr = scci->cl_elems[i][k];
+                uint qstate = j * scci->cl_size[i] + k;
+                bool has_self_loop = false;
+                if (sccq->cl_size[sccq->numcl[qstate]] > 1) {
+                    has_self_loop = true;
+                }
+                else {
+                    for (uint a = 0; a < quad->size_alpha; a++) {
+                        if (quad->edges[qstate][a] == qstate) {
+                            has_self_loop = true;
+                            break;
+                        }
+                    }
+                }
+                if (!has_self_loop) {
+                    continue;
+                }
+
+                // We now know that there is a self-loop on the pair (pq, pr).
+
+                uint q1 = pq / A->trans->size_graph;
+                uint q2 = pq % A->trans->size_graph;
+                uint r1 = pr / A->trans->size_graph;
+                uint r2 = pr % A->trans->size_graph;
+
+                if (dgraph_exists_intersec_path(inter, A->trans, pq, r1, pr, r2) || dgraph_exists_intersec_path(inter, A->trans, pr, q1, pq, q2)) {
+                    delete_dgraph(inter);
+                    delete_parti(scca);
+                    delete_parti(scci);
+                    delete_dgraph(quad);
+                    delete_parti(sccq);
+                    delete_parti(fold);
+                    return false;
+                }
+            }
+        }
+        delete_parti(fold);
+        delete_dgraph(quad);
+        delete_parti(sccq);
+
+    }
+    delete_dgraph(inter);
+    delete_parti(scca);
+    delete_parti(scci);
+    return true;
+
+}
+
+bool is_cyclet_dfa(dfa* A, int*, FILE* out) {
     parti* scca = dtarjan(A->trans, NULL, false);
     if (scca->size_par == A->trans->size_graph) {
         delete_parti(scca);
@@ -379,3 +720,204 @@ bool is_cycletrivial_dfa(dfa* A, int*, FILE* out) {
     return false;
 }
 
+
+bool is_cycletplus_dfa(dfa* A, int*) {
+
+    parti* scca = dtarjan(A->trans, NULL, false);
+    dgraph* inter;
+    parti* scci;
+    dgraph_make_product_sccs(A->trans, scca, &inter, &scci);
+
+
+    for (uint i = 0; i < scca->size_par; i++) {
+        if (scca->cl_size[i] <= 1) {
+            continue;
+        }
+        for (uint j = 0; j < scca->cl_size[i]; j++) {
+            for (uint k = j + 1; k < scca->cl_size[i]; k++) {
+                uint q = scca->cl_elems[i][j];
+                uint r = scca->cl_elems[i][k];
+                uint qr = q * A->trans->size_graph + r;
+                if (scci->cl_size[scci->numcl[qr]] > 1) {
+                    // If the class of (q,r) contains more than one element, we have a cycle labeled by a nonempty word.
+                    // This contradicts the pattern of the DFA.
+                    delete_dgraph(inter);
+                    delete_parti(scca);
+                    delete_parti(scci);
+                    return false;
+                }
+                for (uint a = 0; a < A->trans->size_alpha; a++) {
+                    if (qr == inter->edges[qr][a]) {
+                        // If there is an a-labeled loop on (q,r), we have a cycle labeled by a nonempty word.
+                        delete_dgraph(inter);
+                        delete_parti(scca);
+                        delete_parti(scci);
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+    delete_dgraph(inter);
+    delete_parti(scci);
+    delete_parti(scca);
+    return true;
+}
+
+
+bool is_cycletgp_dfa(dfa* A, dfagp_mode mode, int*) {
+    parti* scca = dtarjan(A->trans, NULL, false);
+
+    // For each class in the partition, we check if it can be folded.
+    for (uint i = 0; i < scca->size_par; i++) {
+        if (scca->cl_size[i] <= 1) {
+            continue;
+        }
+        parti* fold;
+        dfagp_fold(A->trans, scca, i, mode, &fold, NULL);
+        if (fold->size_par < fold->size_set) {
+            // If two states were folded, the DFA is not cycle-trivial for G
+            delete_parti(fold);
+            delete_parti(scca);
+            return false;
+        }
+        delete_parti(fold);
+    }
+    delete_parti(scca);
+    return true;
+}
+
+bool is_cycletplusgp_dfa(dfa* A, dfagp_mode mode, int*) {
+    parti* scca = dtarjan(A->trans, NULL, false);
+    dgraph* inter;
+    parti* scci;
+    dgraph_make_product_sccs(A->trans, scca, &inter, &scci);
+
+
+    for (uint i = 0; i < scca->size_par; i++) {
+        if (scca->cl_size[i] <= 1) {
+            continue;
+        }
+        parti* fold;
+        dfagp_fold(A->trans, scca, i, mode, &fold, NULL);
+        for (uint j = 0; j < scca->cl_size[i]; j++) {
+            for (uint k = j + 1; k < scca->cl_size[i]; k++) {
+                if (fold->numcl[j] != fold->numcl[k]) {
+                    // If the two elements are not in the same fold class, we can continue.
+                    continue;
+                }
+                uint q = scca->cl_elems[i][j];
+                uint r = scca->cl_elems[i][k];
+                uint qr = q * A->trans->size_graph + r;
+                if (scci->cl_size[scci->numcl[qr]] > 1) {
+                    // If the class of (q,r) contains more than one element, we have a cycle labeled by a nonempty word.
+                    // This contradicts the pattern of the DFA.
+                    delete_dgraph(inter);
+                    delete_parti(scca);
+                    delete_parti(scci);
+                    delete_parti(fold);
+                    return false;
+                }
+                for (uint a = 0; a < A->trans->size_alpha; a++) {
+                    if (qr == inter->edges[qr][a]) {
+                        // If there is an a-labeled loop on (q,r), we have a cycle labeled by a nonempty word.
+                        delete_dgraph(inter);
+                        delete_parti(scca);
+                        delete_parti(scci);
+                        delete_parti(fold);
+                        return false;
+                    }
+                }
+            }
+        }
+        delete_parti(fold);
+    }
+    delete_dgraph(inter);
+    delete_parti(scci);
+    delete_parti(scca);
+    return true;
+}
+
+
+bool is_cycletbp_dfa(dfa* A, int*) {
+    parti* scca = dtarjan(A->trans, NULL, false);
+    dgraph* inter;
+    parti* scci;
+    dgraph_make_product_sccs(A->trans, scca, &inter, &scci);
+
+
+
+    bool alpha[A->trans->size_alpha];
+    for (uint i = 0; i < scca->size_par; i++) {
+        if (scca->cl_size[i] <= 1) {
+            continue;
+        }
+        for (uint j = 0; j < scca->cl_size[i]; j++) {
+            for (uint k = j + 1; k < scca->cl_size[i]; k++) {
+                uint q = scca->cl_elems[i][j];
+                uint r = scca->cl_elems[i][k];
+                uint qr = q * A->trans->size_graph + r;
+
+                compute_alph_scc_dgraph(inter, scci, scci->numcl[qr], alpha);
+                if (dfa_exists_path(A, q, r, alpha) && dfa_exists_path(A, r, q, alpha)) {
+                    delete_dgraph(inter);
+                    delete_parti(scca);
+                    delete_parti(scci);
+                    return false;
+                }
+            }
+        }
+    }
+    delete_dgraph(inter);
+    delete_parti(scci);
+    delete_parti(scca);
+    return true;
+}
+
+bool is_cycletbpgp_dfa(dfa* A, dfagp_mode mode, int*) {
+    parti* scca = dtarjan(A->trans, NULL, false);
+    dgraph* inter;
+    parti* scci;
+    dgraph_make_product_sccs(A->trans, scca, &inter, &scci);
+
+    // printf("Size of the inter graph: %u\n", inter->size_graph);
+
+
+    for (uint i = 0; i < scca->size_par; i++) {
+        // printf("Class %u\n", i);
+        if (scca->cl_size[i] <= 1) {
+            continue;
+        }
+        for (uint j = 0; j < scca->cl_size[i]; j++) {
+            for (uint k = j + 1; k < scca->cl_size[i]; k++) {
+                uint q = scca->cl_elems[i][j];
+                uint r = scca->cl_elems[i][k];
+                uint qr = q * A->trans->size_graph + r;
+
+                parti* fold;
+                dgraph* g_fold;
+                // printf("Processing class %u (%u,%u)\n", i, q, r);
+                dfagp_fold(inter, scci, scci->numcl[qr], mode, &fold, &g_fold);
+                uint l = ((uint*)bsearch(&qr, scci->cl_elems[scci->numcl[qr]], scci->cl_size[scci->numcl[qr]], sizeof(uint), &compare_uint)) - scci->cl_elems[scci->numcl[qr]];
+                uint qrc = fold->numcl[l];
+                // printf("the fold has %u classes, qrc: %d\n", fold->size_par, qrc);
+                if (dgraph_exists_intersec_path(g_fold, A->trans, qrc, q, qrc, r) && dgraph_exists_intersec_path(g_fold, A->trans, qrc, r, qrc, q)) {
+                    // printf("Found a cycle in the folded graph.\n");
+                    delete_dgraph(g_fold);
+                    delete_parti(fold);
+                    delete_dgraph(inter);
+                    delete_parti(scca);
+                    delete_parti(scci);
+                    return false;
+                }
+                // printf("No cycle found in the folded graph.\n");
+                delete_dgraph(g_fold);
+                delete_parti(fold);
+            }
+        }
+    }
+    delete_dgraph(inter);
+    delete_parti(scci);
+    delete_parti(scca);
+    return true;
+}

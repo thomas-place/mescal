@@ -8,6 +8,7 @@
 #include "shell_memb.h"
 #include "shell_morprops.h"
 #include "shell_filtering.h"
+#include "files.h"
 
 sub_level optimization_level = LV_REG;
 
@@ -361,6 +362,21 @@ int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* s
             // case KY_EXSEARCH:
             //     return shell_exsearch(thecom->params);
             //     break;
+        case KY_EXINIT:
+            return shell_initfile_exall(thecom->params, thecom->main->string);
+            break;
+        case KY_EXINITFP:
+            return shell_initfile_exfp(thecom->params, thecom->main->string);
+            break;
+        case KY_EXINITNEG:
+            return shell_initfile_exdet(thecom->params, thecom->main->string);
+            break;
+        case KY_EXCONTINUE:
+            return shell_continuefile(thecom->params, thecom->main->string);
+            break;
+        case KY_EXRETRIEVE:
+            return shell_retrievefile(thecom->params, thecom->main->string);
+            break;
         case KY_EXALL:
             return shell_browse_dfas(thecom->params, thecom->main->string);
             break;
@@ -531,6 +547,21 @@ bool param_getrawtext(com_parameters* pars, int p, const char* str, char** rawte
 }
 
 bool param_getinteger(com_parameters* pars, int p, const char* str, int* res) {
+    com_command* arg = com_getparam(pars, p);
+    if (!com_single(arg)) {
+        fprintf(stderr, "#### Error  : parameter %d in the command \"%s\" is not an integer.\n", p + 1, str);
+        return false;
+    }
+    char* end;
+    *res = strtol(arg->main->string, &end, 10);
+    if (*end != '\0') {
+        fprintf(stderr, "#### Error  : parameter %d in the command \"%s\" is not an integer.\n", p + 1, str);
+        return false;
+    }
+    return true;
+}
+
+bool param_getlong(com_parameters* pars, int p, const char* str, long* res) {
     com_command* arg = com_getparam(pars, p);
     if (!com_single(arg)) {
         fprintf(stderr, "#### Error  : parameter %d in the command \"%s\" is not an integer.\n", p + 1, str);
@@ -2036,7 +2067,7 @@ int shell_cycletrivial(com_parameters* pars, const char* str) {
     }
 
     int error = 0;
-    shell_autoprop_cycletrivial(i, "DFA", &error, stdout);
+    shell_autoprop_cyclet(i, "DFA", &error, stdout);
     if (error < 0) {
         fprintf(stdout, "#### Error received while testing if a DFA is cycle trivial.\n");
     }
@@ -2288,17 +2319,261 @@ int shell_print_fphiera(com_parameters* pars, const char* str) {
 /*+ Examples generators +*/
 /*************************/
 
-static void usage_browse_dfas(const char* str) {
-    fprintf(stderr, "#### Usage  : %s(<classes1>, <classes2>, <nb_states>, <nb_letters>)\n", str);
+
+
+static void usage_initfile_exall(const char* str) {
+    fprintf(stderr, "#### Usage  : %s(<classes1>, <classes2>, <nb_states>, <nb_letters>, \"<path>\")\n", str);
     fprintf(stderr, "####          <classes1> is either a single class or of the form out(<cl1>, <cl2>, ...) where the <cli> are classes.\n");
     fprintf(stderr, "####          <classes2> is either a single class or of the form in(<cl1>, <cl2>, ...) where the <cli> are classes.\n");
     fprintf(stderr, "####          <nb_states> is the number of states.\n");
     fprintf(stderr, "####          <nb_letters> is the size of the alphabet.\n");
+    fprintf(stderr, "####          <path> is the path to the json file that will be created (or overwritten if it already exists).\n");
+    fprintf(stderr, "#### Return : nothing.\n");
+}
+int shell_initfile_exall(com_parameters* pars, const char* str) {
+    int n = com_nbparams(pars);
+    if (n != 5) {
+        fprintf(stderr, "#### Error  : wrong number of parameters in the command \"%s\".\n", str);
+        usage_initfile_exall(str);
+        return -2;
+    }
+
+    exall_profile theprofile;
+    theprofile.mode = EXAGEN_ALL;
+
+    // Classes to exclude
+    com_keyword lkey = key_from_string_chain_single(com_getparam(pars, 0)->main);
+    if (lkey == KY_OUTSIDE) {
+        theprofile.nblow = min(com_nbparams(com_getparam(pars, 0)->params), 32);
+    }
+    else {
+        theprofile.nblow = 1;
+    }
+
+    if (theprofile.nblow == 0) {
+        fprintf(stderr, "#### Error  : At least one forbidden class of languages is required.\n");
+        usage_initfile_exall(str);
+        return -2;
+    }
+
+    if (lkey != KY_OUTSIDE) {
+        theprofile.low[0] = command_to_class(com_getparam(pars, 0));
+    }
+    else {
+        com_parameters* lpars = com_getparam(pars, 0)->params;
+        for (uint i = 0; i < theprofile.nblow; i++) {
+            theprofile.low[i] = command_to_class(com_getparam(lpars, i));
+        }
+    }
+
+    for (uint i = 0; i < theprofile.nblow; i++) {
+        if (theprofile.low[i] == CL_END) {
+            fprintf(stdout, "#### Error : Unknow or unsupported class\n");
+            usage_initfile_exall(str);
+            return -2;
+        }
+        if (class_membership[theprofile.low[i]] == NULL) {
+            fprintf(stdout, "#### Error : Membership is unsupported for the class %s.\n", class_names[theprofile.low[i]]);
+            usage_initfile_exall(str);
+            return -2;
+        }
+    }
+
+    // Classes to include
+    com_keyword hkey = key_from_string_chain_single(com_getparam(pars, 1)->main);
+    if (hkey == KY_INSIDE) {
+        theprofile.nbhigh = min(32, com_nbparams(com_getparam(pars, 1)->params));
+    }
+    else {
+        theprofile.nbhigh = 1;
+    }
+
+    if (theprofile.nbhigh == 0) {
+        fprintf(stderr, "#### Error : At least one constraining class of languages is required.\n");
+        usage_initfile_exall(str);
+        return -2;
+    }
+
+
+    if (hkey != KY_INSIDE) {
+        theprofile.high[0] = command_to_class(com_getparam(pars, 1));
+    }
+    else {
+        com_parameters* hpars = com_getparam(pars, 1)->params;
+        for (uint i = 0; i < theprofile.nbhigh; i++) {
+            theprofile.high[i] = command_to_class(com_getparam(hpars, i));
+        }
+    }
+
+    for (uint i = 0; i < theprofile.nbhigh; i++) {
+        if (theprofile.high[i] == CL_END) {
+            fprintf(stdout, "#### Error : Unknow or unsupported class\n");
+            usage_initfile_exall(str);
+            return -2;
+        }
+        if (class_membership[theprofile.high[i]] == NULL) {
+            fprintf(stdout, "#### Error : Membership is unsupported for the class %s.\n", class_names[theprofile.high[i]]);
+            usage_initfile_exall(str);
+            return -2;
+        }
+    }
+
+
+    if (!param_getinteger(pars, 2, str, &theprofile.states)) {
+        usage_initfile_exall(str);
+        return -2;
+    }
+
+    if (!param_getinteger(pars, 3, str, &theprofile.alpha)) {
+        usage_initfile_exall(str);
+        return -2;
+    }
+
+    theprofile.done = 0;
+    theprofile.found = NULL;
+    theprofile.nb_found = 0;
+    theprofile.finished = false;
+
+    char* path;
+    if (!param_getrawtext(pars, 4, str, &path)) {
+        usage_initfile_exall(str);
+        return -2;
+    }
+
+    if (files_save_exall(path, &theprofile) != -1) {
+        fprintf(stderr, "#### Error  : Could not save the file %s.\n", path);
+        return -2;
+    }
+
+    fprintf(stdout, "#### The file %s has been created.\n", path);
+    return -1;
+}
+
+
+
+
+static void usage_initfile_negfp(const char* str) {
+    fprintf(stderr, "#### Usage  : %s(<class>, <level>, <nb_states>, <nb_letters>, \"<path>\")\n", str);
+    fprintf(stderr, "####          <class> is the base class of the hierarchy.\n");
+    fprintf(stderr, "####          <level> is the desired level in the hierarchy.\n");
+    fprintf(stderr, "####          <nb_states> is the number of states.\n");
+    fprintf(stderr, "####          <nb_letters> is the size of the alphabet.\n");
+    fprintf(stderr, "####          <path> is the path to the json file that will be created (or overwritten if it already exists).\n");
+    fprintf(stderr, "#### Return : nothing (directly stores multiple DFAs in memory).\n");
+}
+static int shell_initfile_negfp(com_parameters* pars, const char* str, bool fp) {
+    classes cl;
+    int nb[5];
+    char* path;
+    par_type types[] = { PAR_CLASS, PAR_INTEGER, PAR_INTEGER, PAR_INTEGER,PAR_RAWTEXT };
+    if (param_retrieve(pars, 5, 0, types, &cl, &path, nb, NULL, NULL, str) == -2) {
+        usage_initfile_negfp(str);
+        return -2;
+    }
+
+    if (!class_is_basis(cl)) {
+        fprintf(stderr, "#### Error: The class %s is not a valid basis.\n", class_names[cl]);
+        return -2;
+    }
+
+    exall_profile theprofile;
+    if (fp) {
+        theprofile.mode = EXAGEN_FPHIERA;
+    }
+    else {
+        theprofile.mode = EXAGEN_DETHIERA;
+    }
+
+    theprofile.nblow = nb[0];
+    theprofile.low[0] = cl;
+    theprofile.states = nb[1];
+    theprofile.alpha = nb[2];
+
+    theprofile.done = 0;
+    theprofile.found = NULL;
+    theprofile.nb_found = 0;
+    theprofile.finished = false;
+
+
+    if (files_save_exall(path, &theprofile) != -1) {
+        fprintf(stderr, "#### Error  : Could not save the file %s.\n", path);
+        return -2;
+    }
+
+    fprintf(stdout, "#### The file %s has been created.\n", path);
+    return -1;
+}
+
+int shell_initfile_exfp(com_parameters* pars, const char* str) {
+    return shell_initfile_negfp(pars, str, true);
+}
+
+int shell_initfile_exdet(com_parameters* pars, const char* str) {
+    return shell_initfile_negfp(pars, str, false);
+}
+
+
+
+
+
+static void usage_continuefile(const char* str) {
+    fprintf(stderr, "#### Usage  : %s(\"<path>\")\n", str);
+    fprintf(stderr, "####          <path> is the path to the json file containing the search information.\n");
+    fprintf(stderr, "#### Return : nothing.\n");
+}
+int shell_continuefile(com_parameters* pars, const char* str) {
+    par_type types[] = { PAR_RAWTEXT };
+    char* path;
+    if (param_retrieve(pars, 1, 0, types, NULL, &path, NULL, NULL, NULL, str) == -2) {
+        usage_continuefile(str);
+        return -2;
+    }
+    shell_memb_file(path);
+
+    return -1;
+
+}
+
+
+static void usage_retrievefile(const char* str) {
+    fprintf(stderr, "#### Usage  : %s(\"<path>\",\"<prefix>\")\n", str);
+    fprintf(stderr, "####          <path> is the path to the json file containing the search information.\n");
+    fprintf(stderr, "####          <prefix> is the desired prefix for the generated automata variables.\n");
+    fprintf(stderr, "#### Return : nothing.\n");
+}
+int shell_retrievefile(com_parameters* pars, const char* str) {
+    par_type types[] = { PAR_RAWTEXT,PAR_RAWTEXT };
+    char* text[2];
+    if (param_retrieve(pars, 2, 0, types, NULL, text, NULL, NULL, NULL, str) == -2) {
+        usage_retrievefile(str);
+        return -2;
+    }
+
+    if (!check_varname(text[1])) {
+        fprintf(stderr, "#### Error  : The prefix \"%s\" is not a valid variable name.\n", text[1]);
+        usage_retrievefile(str);
+        return -2;
+    }
+
+
+    shell_file_retrieve(text[0], text[1]);
+    return -1;
+}
+
+
+static void usage_browse_dfas(const char* str) {
+    fprintf(stderr, "#### Usage  : %s(<classes1>, <classes2>, <nb_states>, <nb_letters>[, <start>, <end>])\n", str);
+    fprintf(stderr, "####          <classes1> is either a single class or of the form out(<cl1>, <cl2>, ...) where the <cli> are classes.\n");
+    fprintf(stderr, "####          <classes2> is either a single class or of the form in(<cl1>, <cl2>, ...) where the <cli> are classes.\n");
+    fprintf(stderr, "####          <nb_states> is the number of states.\n");
+    fprintf(stderr, "####          <nb_letters> is the size of the alphabet.\n");
+    fprintf(stderr, "####          <start> is the enumeration index of the first DFA to test (optional).\n");
+    fprintf(stderr, "####          <end> is the enumeration index of the last DFA to test (optional).\n");
     fprintf(stderr, "#### Return : nothing (directly stores multiple DFAs in memory).\n");
 }
 int shell_browse_dfas(com_parameters* pars, const char* str) {
     int n = com_nbparams(pars);
-    if (n != 4) {
+    if (n < 4 || n > 6) {
         fprintf(stderr, "#### Error  : wrong number of parameters in the command \"%s\".\n", str);
         usage_browse_dfas(str);
         return -2;
@@ -2400,43 +2675,99 @@ int shell_browse_dfas(com_parameters* pars, const char* str) {
         return -2;
     }
 
-    shell_exall(low, nblow, high, nbhigh, states, alpha);
+    long start = 0;
+    long end = LONG_MAX;
+
+    if (n > 4) {
+        if (!param_getlong(pars, 4, str, &start)) {
+            usage_browse_dfas(str);
+            return -2;
+        }
+    }
+
+    if (n == 6) {
+        if (!param_getlong(pars, 5, str, &end)) {
+            usage_browse_dfas(str);
+            return -2;
+        }
+    }
+
+
+    shell_exall(low, nblow, high, nbhigh, states, start, end, alpha);
 
     return -1;
 }
 
 static void usage_browse_dfas_negfp(const char* str) {
-    fprintf(stderr, "#### Usage  : %s(<class>, <level>, <nb_states>, <nb_letters>)\n", str);
+    fprintf(stderr, "#### Usage  : %s(<class>, <level>, <nb_states>, <nb_letters>[, <start>, <end>])\n", str);
     fprintf(stderr, "####          <class> is the base class of the hierarchy.\n");
     fprintf(stderr, "####          <level> is the desired level in the hierarchy.\n");
     fprintf(stderr, "####          <nb_states> is the number of states.\n");
     fprintf(stderr, "####          <nb_letters> is the size of the alphabet.\n");
+    fprintf(stderr, "####          <start> is the enumeration index of the first DFA to test (optional).\n");
+    fprintf(stderr, "####          <end> is the enumeration index of the last DFA to test (optional).\n");
     fprintf(stderr, "#### Return : nothing (directly stores multiple DFAs in memory).\n");
 }
 int shell_browse_dfas_neg(com_parameters* pars, const char* str) {
     classes cl;
-    int nb[3];
-    par_type types[] = { PAR_CLASS, PAR_INTEGER, PAR_INTEGER, PAR_INTEGER };
-    if (param_retrieve(pars, 4, 0, types, &cl, NULL, nb, NULL, NULL, str) == -2) {
+    int nb[5];
+    par_type types[] = { PAR_CLASS, PAR_INTEGER, PAR_INTEGER, PAR_INTEGER,PAR_INTEGER, PAR_INTEGER };
+    if (param_retrieve(pars, 6, 2, types, &cl, NULL, nb, NULL, NULL, str) == -2) {
         usage_browse_dfas_negfp(str);
         return -2;
     }
 
-    shell_exall_dethiera(cl, nb[0], nb[1], nb[2], true);
+    int n = com_nbparams(pars);
+    long start = 0;
+    long end = LONG_MAX;
+    if (n > 4) {
+        if (!param_getlong(pars, 4, str, &start)) {
+            usage_browse_dfas_negfp(str);
+            return -2;
+        }
+    }
+
+    if (n == 6) {
+        if (!param_getlong(pars, 5, str, &end)) {
+            usage_browse_dfas_negfp(str);
+            return -2;
+        }
+    }
+
+    shell_exall_dethiera(cl, nb[0], nb[1], nb[2], start, end, true);
 
     return -1;
 }
 
 int shell_browse_dfas_fp(com_parameters* pars, const char* str) {
     classes cl;
-    int nb[3];
-    par_type types[] = { PAR_CLASS, PAR_INTEGER, PAR_INTEGER, PAR_INTEGER };
-    if (param_retrieve(pars, 4, 0, types, &cl, NULL, nb, NULL, NULL, str) == -2) {
+    int nb[5];
+    par_type types[] = { PAR_CLASS, PAR_INTEGER, PAR_INTEGER, PAR_INTEGER,PAR_INTEGER, PAR_INTEGER };
+    if (param_retrieve(pars, 6, 2, types, &cl, NULL, nb, NULL, NULL, str) == -2) {
         usage_browse_dfas_negfp(str);
         return -2;
     }
 
-    shell_exall_dethiera(cl, nb[0], nb[1], nb[2], false);
+    int n = com_nbparams(pars);
+    long start = 0;
+    long end = LONG_MAX;
+    if (n > 4) {
+        if (!param_getlong(pars, 4, str, &start)) {
+            usage_browse_dfas_negfp(str);
+            return -2;
+        }
+    }
+
+    if (n == 6) {
+        if (!param_getlong(pars, 5, str, &end)) {
+            usage_browse_dfas_negfp(str);
+            return -2;
+        }
+    }
+
+    shell_exall_dethiera(cl, nb[0], nb[1], nb[2], start, end, false);
+
+    return -1;
 
     return -1;
 }

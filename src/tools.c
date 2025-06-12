@@ -24,6 +24,26 @@ bool mem_array_sorted(uint e, uint* array, uint size, uint* ind) {
     return false;
 }
 
+uint array_sort_norepeat_uint(uint* array, uint size) {
+    if (size == 0) {
+        return 0; // No elements to sort
+    }
+    if (size == 1) {
+        return 1; // Only one element, no need to sort
+    }
+
+    qsort(array, size, sizeof(uint), compare_uint);
+
+    // Eliminate duplicates
+    uint new_size = 1; // At least one element will remain
+    for (uint i = 1; i < size; i++) {
+        if (array[i] != array[new_size - 1]) {
+            array[new_size++] = array[i];
+        }
+    }
+    return new_size;
+}
+
 uint get_uint_length(uint n) {
     if (n == 0) {
         return 1;

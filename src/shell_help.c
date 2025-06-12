@@ -8,9 +8,9 @@
 void help(void) {
     // FILE *p = popen("less", "w");
     // if (p == NULL)
-    FILE* p = stdout;
+    FILE *p = stdout;
 
-    print_dtitle_box(100, true, p, 1, "\"Welcome to the help of the MeSCaL program! ");
+    print_dtitle_box(100, true, p, 1, "Welcome to the help of the MeSCaL program!");
     print_title_box(100, true, p, 1, "Basic commands");
     fprintf(p, "\n#### General commands:\n\n");
     fprintf(p, "%4s%-*sThis help.\n", "", PAD1, "help");
@@ -206,13 +206,31 @@ void help(void) {
 
     fprintf(p, "\n");
 
-    fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state) and <n2> letters which are outside 𝒞 and inside 𝒟.\n", "", 56, "exall(𝒞,𝒟,<n1>,<n2>)");
-    fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state) and <n2> letters which are outside 𝒞₁,..,𝒞ₙ and inside 𝒟₁,..,𝒟ₘ.\n", "", 70,
-        "exall(out(𝒞₁,..,𝒞ₙ),in(𝒟₁,..,𝒟ₘ),<n1>,<n2>)");
-    fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state) and <n2> letters which are at level <n0> in the negation hierarchy of TL(𝒞).\n", "", 53,
-        "negexall(𝒞,<n0>,<n1>,<n2>)");
-    fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state) and <n2> letters which are at level <n0> in the future/past hierarchy of TL(𝒞).\n\n", "",
-        53, "fpexall(𝒞,<n0>,<n1>,<n2>)");
+    fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state),\n", "", 70, "exall(𝒞, 𝒟, <n1>, <n2>[, <start>, <end>])");
+    fprintf(p, "%4s%-*sone single final state and <n2> letters which are outside 𝒞 and inside 𝒟.\n", "", 64, "");
+    fprintf(p, "%4s%-*s<start> and <end> are used to restrict the search.\n\n", "", 64, "");
+
+    fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state),\n", "", 84, "exall(out(𝒞₁,..,𝒞ₙ), in(𝒟₁,..,𝒟ₘ), <n1>, <n2>[, <start>,<end>])");
+    fprintf(p, "%4s%-*sone single final state and <n2> letters which are outside 𝒞₁,..,𝒞ₙ and inside 𝒟₁,..,𝒟ₘ.\n", "", 64, "");
+    fprintf(p, "%4s%-*s<start> and <end> are used to restrict the search.\n\n", "", 64, "");
+
+    fprintf(p, "%4s%-*sInitializes a search for examples  of DFAs to be saved in a file.\n", "", 70, "exinit(𝒞, 𝒟, <n1>, <n2>,\"<path>\")");
+    fprintf(p, "%4s%-*sThe parameters have the same meaning as for exall, except for \"<path>\",\n", "", 64, "");
+    fprintf(p, "%4s%-*swhich is the name of the file.\n\n", "", 64, "");
+
+    fprintf(p, "%4s%-*sSearches examples whose initialization is stored in file \"<path>\",\n", "", 64, "excontinue(\"<path>\")");
+    fprintf(p, "%4s%-*sand stores the results in that file.\n\n", "", 64, "");
+
+    fprintf(p, "%4s%-*sReads examples in json file \"<path>\" and stores them in variables <varname>0000, <varname>0001, etc.\n", "", 64, "exretrieve(\"<path>\", \"<varname>\")");
+    fprintf(p, "%4s%-*s\"<varname>\" should be a string starting with an uppercase letter, such as \"Example_\" or \"MYTEST\".\n\n", "", 64, "");
+
+    fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state), one\n", "", 67, "negexall(𝒞, <n0>, <n1>, <n2>[, <start>, <end>])");
+    fprintf(p, "%4s%-*ssingle final state and <n2> letters that are at level <n0> in the negation hierarchy of TL(𝒞).\n", "", 64, "");
+    fprintf(p, "%4s%-*s<start> and <end> are used to restrict the search.\n\n", "", 64, "");
+
+    fprintf(p, "%4s%-*sComputes and stores in variables all DFAs with at most <n1> states (plus a sink state),\n", "", 67, "fpexall(𝒞, <n0>, <n1>, <n2>[, <start>, <end>])");
+    fprintf(p, "%4s%-*sone final state and <n2> letters which are at level <n0> in the future/past hierarchy of TL(𝒞).\n", "", 64, "");
+    fprintf(p, "%4s%-*s<start> and <end> are used to restrict the search.\n\n", "", 64, "");
 
     print_title_box(100, true, p, 1, "Separation tests");
 
@@ -228,25 +246,25 @@ void help(void) {
     fprintf(p, "%8s%-*sPolynomial closure (𝒞 ↦ Pol(𝒞)).\n", "", PADC, "Pol");
     fprintf(p, "\n");
 
+    print_dtitle_box(100, true, p, 1, "More help");
+    print_title_box(100, true, p, 2, "Typing a command with an incorrect syntax (such as its name alone if it requires arguments)", "gives a more detailed information for the command.");
     // if (p != stdout)
     // fclose(p);
 }
 
-static void print_class_info_status(classes class, FILE* out) {
+static void print_class_info_status(classes class, FILE *out) {
     if (class_infos[class]) {
         class_infos[class](out);
 
         print_dmid_line(100, out);
         if (class_membership[class]) {
             print_dline_box(109, out, " Membership : " ANSI_COLOR_GREEN "Implemented.   " ANSI_COLOR_RESET);
-        }
-        else {
+        } else {
             print_dline_box(109, out, " Membership : " ANSI_COLOR_RED "Not implemented." ANSI_COLOR_RESET);
         }
         if (class_separation[class]) {
             print_dline_box(109, out, " Separation : " ANSI_COLOR_GREEN "Implemented." ANSI_COLOR_RESET);
-        }
-        else {
+        } else {
             print_dline_box(109, out, " Separation : " ANSI_COLOR_RED "Not implemented." ANSI_COLOR_RESET);
         }
         print_dbot_line(100, out);

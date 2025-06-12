@@ -6,7 +6,10 @@
 
 nfa* morphism_to_dfa_kernel(morphism* M) {
     green* G = M->rels;
-    nfa* A = nfa_init();
+    nfa* A;
+    CALLOC(A, 1);
+    A->initials = create_dequeue();
+    A->finals = create_dequeue();
     A->alphabet = mor_duplicate_alpha(M);
     A->trans = create_lgraph_noedges(M->r_cayley->size_graph, M->r_cayley->size_alpha);
     for (uint q = 0; q < M->r_cayley->size_graph; q++) {
@@ -21,7 +24,10 @@ nfa* morphism_to_dfa_kernel(morphism* M) {
 
 static nfa* morphism_to_dfa_aux(morphism* M, dgraph* C, parti* P) {
     green* G = M->rels;
-    nfa* A = nfa_init();
+    nfa* A;
+    CALLOC(A, 1);
+    A->initials = create_dequeue();
+    A->finals = create_dequeue();
     A->alphabet = mor_duplicate_alpha(M);
     A->trans = create_lgraph_noedges(C->size_graph, C->size_alpha);
     for (uint q = 0; q < C->size_graph; q++) {

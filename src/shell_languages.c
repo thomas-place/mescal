@@ -489,7 +489,6 @@ int shell_compute_minimal(int i) {
     if (objects[i]->type == MORPHISM) {
         dfa A;
         A.alphabet = objects[i]->mor->obj->alphabet;
-        A.ancestors = NULL;
         A.finals = objects[i]->mor->obj->accept_list;
         A.initial = ONE;
         A.nb_finals = objects[i]->mor->obj->nb_accept;
@@ -551,9 +550,9 @@ int shell_compute_syntac(int i, bool order) {
         free(dfa_order);
     }
 
-    if (interrupt_flag) {
-        interrupt_flag = false;
-    }
+    // if (interrupt_flag) {
+    //     interrupt_flag = false;
+    // }
 
     if (!synt) {
         // The morphism could not be built, return immediately the error code.

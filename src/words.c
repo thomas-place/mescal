@@ -1,4 +1,5 @@
 #include "words.h"
+#include <limits.h>
 
 uint length_letter_utf8(letter l) {
     if (l.num >= 0) {
@@ -130,6 +131,16 @@ letter* duplicate_alphabet(const letter* alph, uint size) {
         new[i] = alph[i];
     }
     return new;
+}
+
+uint letter_index(letter l, const letter* alphabet, uint size_alphabet) {
+    letter* p = bsearch(&l, alphabet, size_alphabet, sizeof(letter), compare_letters);
+    if (p) {
+        return p - alphabet;
+    }
+    else {
+        return UINT_MAX;
+    }
 }
 
 

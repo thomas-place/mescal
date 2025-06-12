@@ -19,7 +19,7 @@ static nfa* nfa_add_eps(nfa* A)
     nfa_elimeps_mod(B);
 
     if (!B->trans_e) {
-        B->trans_e = create_graph_selfloops(B->trans->size_graph);
+        B->trans_e = create_graph_noedges(B->trans->size_graph);
     }
 
 

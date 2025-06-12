@@ -41,7 +41,9 @@ int compare_uint(const void* p1, //!< The first integer.
 
 bool mem_array_sorted(uint e, uint* array, uint size, uint* ind);
 
-
+uint array_sort_norepeat_uint(uint* array, //!< The array to sort.
+    uint size //!< The size of the array.
+);
 
 /**
  * @brief

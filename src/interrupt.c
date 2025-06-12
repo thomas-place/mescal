@@ -48,6 +48,7 @@ void listen_interrupt(void) {
     sigemptyset(&action.sa_mask);
     action.sa_flags = 0;
 
+    interrupt_flag = false;
     timeout_flag = false;
 
     sigaction(SIGINT, &action, NULL);
@@ -58,7 +59,7 @@ void handler(int signum) {
         WARNING("#### Computation interrupted!");
         interrupt_flag = true;
         alarm(0);
-        ignore_interrupt();
+        //ignore_interrupt();
         return;
     }
 

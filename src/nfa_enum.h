@@ -20,6 +20,7 @@ typedef struct
     short* parsize; //!< Sizes of the partition.
     short inisep;   //!< Number of letters looping on the initial state. 
     short final;    //!< Final state.
+    bool run;      //!< True if the enumeration is not finished.
 } dfa_enum;
 
 
@@ -45,6 +46,8 @@ void dfa_enum_free(dfa_enum* //!< The enumeration.
  */
 bool dfa_enum_next(dfa_enum* //!< The enumeration.
 );
+
+
 
 
 

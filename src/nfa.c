@@ -6,46 +6,8 @@
 #include "error.h"
 #include "printing.h"
 
-/*************/
-/* Alphabets */
-/*************/
 
-void nfa_fprint_letter_utf8(const nfa* A, uint a, FILE* out) {
-    if (!A || !out || !A->alphabet) {
-        return;
-    }
-    fprint_letter_utf8(A->alphabet[a], out);
-}
 
-void nfa_fprint_letter_gviz(const nfa* A, uint a, FILE* out, bool inv) {
-    if (!A || !out || !A->alphabet) {
-        return;
-    }
-    fprint_letter_gviz(A->alphabet[a], out, inv);
-}
-
-letter* nfa_duplicate_alpha(const nfa* A) {
-    if (!A) {
-        return NULL;
-    }
-
-    letter* alphabet;
-    MALLOC(alphabet, A->trans->size_alpha);
-    for (uint i = 0; i < A->trans->size_alpha; i++) {
-        alphabet[i] = A->alphabet[i];
-    }
-    return alphabet;
-}
-
-uint nfa_letter_index(const nfa* A, letter l) {
-    letter* p = bsearch(&l, A->alphabet, A->trans->size_alpha, sizeof(letter), compare_letters);
-    if (p) {
-        return p - A->alphabet;
-    }
-    else {
-        return A->trans->size_alpha;
-    }
-}
 
 /***************/
 /* State names */
@@ -57,6 +19,18 @@ void nfa_print_state(const nfa* A, uint q, FILE* out) {
     }
     if (A->state_names) {
         // fprintf(out, "%d", q);
+        fprintf(out, "%s", A->state_names[q]);
+    }
+    else {
+        fprintf(out, "%d", q);
+    }
+}
+
+void dfa_print_state(const dfa* A, uint q, FILE* out) {
+    if (!A || !out || q >= A->trans->size_graph) {
+        return;
+    }
+    if (A->state_names) {
         fprintf(out, "%s", A->state_names[q]);
     }
     else {
@@ -77,6 +51,18 @@ void nfa_reset_state_names(nfa* A) {
     A->state_names = NULL;
 }
 
+void dfa_reset_state_names(dfa* A) {
+    if (!A || !A->state_names) {
+        return;
+    }
+
+    for (uint i = 0; i < A->trans->size_graph; i++) {
+        free(A->state_names[i]);
+    }
+    free(A->state_names);
+    A->state_names = NULL;
+}
+
 char** copy_all_names(char** names, uint size) {
     if (!names) {
         return NULL;
@@ -89,91 +75,12 @@ char** copy_all_names(char** names, uint size) {
     return new_names;
 }
 
-/*************/
-/* Ancestors */
-/*************/
 
-uint* nfa_copy_ancestors(const nfa* A) {
-    if (!A || !A->ancestors) {
-        return NULL;
-    }
-    uint* ancestors;
-    MALLOC(ancestors, A->trans->size_graph);
-    for (uint i = 0; i < A->trans->size_graph; i++) {
-        ancestors[i] = A->ancestors[i];
-    }
-    return ancestors;
-}
 
-/******************************/
-/* Initialization and release */
-/******************************/
+/**********************/
+/*+ Copy and release +*/
+/**********************/
 
-nfa* nfa_init(void) {
-    nfa* A;
-    CALLOC(A, 1);
-
-    A->initials = create_dequeue();
-    A->finals = create_dequeue();
-
-    return A;
-}
-
-nfa* create_emptylang(void) {
-    nfa* A = nfa_init();
-
-    // Graphe des transitions (vide)
-    A->trans = create_lgraph_noedges(0, 0);
-
-    return A;
-}
-
-nfa* create_sing_epsilon(void) {
-    nfa* A = nfa_init();
-
-    A->trans = create_lgraph_noedges(1, 0);
-    lefins_dequeue(0, A->initials);
-    lefins_dequeue(0, A->finals);
-
-    return A;
-}
-
-nfa* create_sing_letter(letter the_letter) {
-    nfa* A = nfa_init();
-
-    // Graphe des transitions (un seul état)
-    A->trans = create_lgraph_noedges(2, 1);
-    lefins_dequeue(0, A->initials);
-    lefins_dequeue(1, A->finals);
-    lefins_dequeue(1, A->trans->edges[0][0]);
-
-    // Alphabet
-    MALLOC(A->alphabet, 1);
-    A->alphabet[0] = the_letter;
-
-    return A;
-}
-
-nfa* create_sing_word(word* the_word) {
-    nfa* A = nfa_init();
-
-    // Graphe des transitions (un seul état)
-
-    lefins_dequeue(0, A->initials);
-    lefins_dequeue(size_word(the_word), A->finals);
-    uint alpha_size;
-
-    A->alphabet = get_alphabet_word(the_word, &alpha_size);
-
-    A->trans = create_lgraph_noedges(size_word(the_word) + 1, alpha_size);
-
-    for (uint i = 0; i < size_word(the_word); i++) {
-        letter l = lefread_word(the_word, i);
-        letter* p = bsearch(&l, A->alphabet, alpha_size, sizeof(letter), compare_letters);
-        lefins_dequeue(i + 1, A->trans->edges[i][p - A->alphabet]);
-    }
-    return A;
-}
 
 void nfa_delete(nfa* A) {
     if (A == NULL) {
@@ -199,93 +106,82 @@ void nfa_delete(nfa* A) {
         delete_lgraph(A->trans_i);
     }
 
-    if (A->ancestors) {
-        free(A->ancestors);
-    }
-
     free(A);
 }
 
-void nfa_overwrite(nfa* A, nfa* B) {
-    if (A == NULL || B == NULL) {
+void dfa_delete(dfa* A) {
+    if (!A) {
         return;
     }
-
-    delete_lgraph(A->trans);
-    A->trans = B->trans;
-    if (A->trans_e) {
-        delete_graph(A->trans_e);
-        A->trans_e = B->trans_e;
-    }
-
-    if (A->trans_i) {
-        delete_lgraph(A->trans_i);
-        A->trans_i = B->trans_i;
-    }
-
-    delete_dequeue(A->initials);
-    A->initials = B->initials;
-    delete_dequeue(A->finals);
-    A->finals = B->finals;
     free(A->alphabet);
-    A->alphabet = B->alphabet;
-    nfa_reset_state_names(A);
-    A->state_names = B->state_names;
-
-    A->ancestors = B->ancestors;
-
-    free(B);
+    free(A->finals);
+    dfa_reset_state_names(A);
+    delete_dgraph(A->trans);
+    free(A);
 }
 
-/***********************************/
-/* Opérations simples sur les NFAs */
-/***********************************/
 
 nfa* nfa_copy(nfa* A) {
     if (!A) {
         return NULL;
     }
-    nfa* B = nfa_init();
+    nfa* B;
+    CALLOC(B, 1);
 
     // Copie du graphe des transitions.
-    B->trans = create_lgraph_noedges(A->trans->size_graph, A->trans->size_alpha);
-    for (uint q = 0; q < B->trans->size_graph; q++) {
-        for (uint a = 0; a < B->trans->size_alpha; a++) {
-            copy_dequeue_right(B->trans->edges[q][a], A->trans->edges[q][a], 0);
-        }
-    }
+    B->trans = copy_lgraph(A->trans);
 
     if (A->trans_e) {
-        B->trans_e = create_graph_noedges(A->trans_e->size);
-        for (uint q = 0; q < B->trans_e->size; q++) {
-            copy_dequeue_right(B->trans_e->edges[q], A->trans_e->edges[q], 0);
-        }
+        B->trans_e = copy_graph(A->trans_e);
     }
 
     if (A->trans_i) {
-        B->trans_i = create_lgraph_noedges(A->trans_i->size_graph, A->trans_i->size_alpha);
-        for (uint q = 0; q < B->trans_i->size_graph; q++) {
-            for (uint a = 0; a < B->trans_i->size_alpha; a++) {
-                copy_dequeue_right(B->trans_i->edges[q][a], A->trans_i->edges[q][a], 0);
-            }
-        }
+        B->trans_i = copy_lgraph(A->trans_i);
     }
 
     // Initiaux
+    B->initials = create_dequeue();
     copy_dequeue_right(B->initials, A->initials, 0);
+
     // Finaux
+    B->finals = create_dequeue();
     copy_dequeue_right(B->finals, A->finals, 0);
 
     // Noms des lettres
-    B->alphabet = nfa_duplicate_alpha(A);
+    B->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha);
 
     // Noms des états
     B->state_names = copy_all_names(A->state_names, A->trans->size_graph);
 
-    B->ancestors = nfa_copy_ancestors(A);
-
     return B;
 }
+
+dfa* dfa_copy(dfa* A) {
+    if (!A) {
+        return NULL;
+    }
+    //dfa* B = dfa_init(A->trans->size_graph, A->trans->size_alpha, A->nb_finals, A->alphabet);
+    dfa* B;
+    CALLOC(B, 1);
+    B->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha);
+    B->trans = copy_dgraph(A->trans);
+    B->initial = A->initial;
+    B->nb_finals = A->nb_finals;
+    if (B->nb_finals == 0) {
+        B->finals = NULL;
+    }
+    else {
+        MALLOC(B->finals, A->nb_finals);
+        for (uint i = 0; i < A->nb_finals; i++) {
+            B->finals[i] = A->finals[i];
+        }
+    }
+
+    B->state_names = copy_all_names(A->state_names, A->trans->size_graph);
+    return B;
+}
+
+
 
 
 static letter* merge_alphabet(letter* alpha1, uint size1, letter* alpha2, uint size2, uint* newsize) {
@@ -346,7 +242,8 @@ nfa* nfa_copy_exalpha(nfa* A, letter* alpha, uint size) {
     if (!A) {
         return NULL;
     }
-    nfa* B = nfa_init();
+    nfa* B;
+    CALLOC(B, 1);
 
     uint alpha_size;
     B->alphabet = merge_alphabet(A->alphabet, A->trans->size_alpha, alpha, size, &alpha_size);
@@ -370,9 +267,6 @@ nfa* nfa_copy_exalpha(nfa* A, letter* alpha, uint size) {
             copy_dequeue_right(B->trans_e->edges[q], A->trans_e->edges[q], 0);
         }
     }
-    else {
-        B->trans_e = NULL;
-    }
 
     if (A->trans_i) {
         B->trans_i = create_lgraph_noedges(A->trans_i->size_graph, alpha_size);
@@ -386,29 +280,177 @@ nfa* nfa_copy_exalpha(nfa* A, letter* alpha, uint size) {
         }
 
     }
-    else {
-        B->trans_i = NULL;
-    }
 
     // Initiaux
+    B->initials = create_dequeue();
     copy_dequeue_right(B->initials, A->initials, 0);
+
     // Finals
+    B->finals = create_dequeue();
     copy_dequeue_right(B->finals, A->finals, 0);
 
     // Copies des noms d'états
     B->state_names = copy_all_names(A->state_names, A->trans->size_graph);
-
-    B->ancestors = nfa_copy_ancestors(A);
-
     return B;
 }
+
+dfa* dfa_copy_exalpha(dfa* A, letter* alpha, uint size) {
+    if (!A) {
+        return NULL;
+    }
+
+    dfa* C;
+    CALLOC(C, 1);
+
+
+    uint alphasize;
+    C->alphabet = merge_alphabet(A->alphabet, A->trans->size_alpha, alpha, size, &alphasize);
+
+    uint statesize;
+    if (alphasize == A->trans->size_alpha) {
+        statesize = A->trans->size_graph;
+    }
+    else {
+        statesize = A->trans->size_graph + 1;
+    }
+
+    C->trans = create_dgraph_noedges(statesize, alphasize);
+    C->nb_finals = A->nb_finals;
+    if (C->nb_finals == 0) {
+        C->finals = NULL;
+    }
+    else {
+        MALLOC(C->finals, C->nb_finals);
+    }
+    C->initial = A->initial;
+    for (uint i = 0; i < C->nb_finals; i++) {
+        C->finals[i] = A->finals[i];
+    }
+
+    uint num = 0;
+    for (uint a = 0; a < C->trans->size_alpha; a++) {
+        if (num < A->trans->size_alpha && compare_letters(&A->alphabet[num], &C->alphabet[a]) == 0) {
+            for (uint q = 0; q < A->trans->size_graph; q++) {
+                C->trans->edges[q][a] = A->trans->edges[q][num];
+            }
+            num++;
+        }
+        else {
+            for (uint q = 0; q < A->trans->size_graph; q++) {
+                C->trans->edges[q][a] = A->trans->size_graph; // Sink state.
+            }
+        }
+    }
+
+    if (alphasize != A->trans->size_alpha) {
+        for (uint a = 0; a < C->trans->size_alpha; a++) {
+            C->trans->edges[A->trans->size_graph][a] = A->trans->size_graph;
+        }
+    }
+
+    C->state_names = copy_all_names(A->state_names, A->trans->size_graph);
+
+    return C;
+}
+
+
+void nfa_overwrite(nfa* A, nfa* B) {
+    if (A == NULL || B == NULL) {
+        return;
+    }
+
+    delete_lgraph(A->trans);
+    A->trans = B->trans;
+    if (A->trans_e) {
+        delete_graph(A->trans_e);
+        A->trans_e = B->trans_e;
+    }
+
+    if (A->trans_i) {
+        delete_lgraph(A->trans_i);
+        A->trans_i = B->trans_i;
+    }
+
+    delete_dequeue(A->initials);
+    A->initials = B->initials;
+    delete_dequeue(A->finals);
+    A->finals = B->finals;
+    free(A->alphabet);
+    A->alphabet = B->alphabet;
+    nfa_reset_state_names(A);
+    A->state_names = B->state_names;
+
+
+    free(B);
+}
+
+/**************************************************************/
+/*+ Computation of basic NFAs (used in Thompson's algorithm) +*/
+/**************************************************************/
+
+
+nfa* create_emptylang(void) {
+    nfa* A;
+    CALLOC(A, 1);
+    A->initials = create_dequeue();
+    A->finals = create_dequeue();
+    A->trans = create_lgraph_noedges(0, 0);
+    return A;
+}
+
+nfa* create_sing_epsilon(void) {
+    nfa* A;
+    CALLOC(A, 1);
+    A->initials = create_dequeue();
+    A->finals = create_dequeue();
+    A->trans = create_lgraph_noedges(1, 0);
+    lefins_dequeue(0, A->initials);
+    lefins_dequeue(0, A->finals);
+    return A;
+}
+
+nfa* create_sing_letter(letter the_letter) {
+    nfa* A;
+    CALLOC(A, 1);
+    A->initials = create_dequeue();
+    A->finals = create_dequeue();
+    A->trans = create_lgraph_noedges(2, 1);
+    lefins_dequeue(0, A->initials);
+    lefins_dequeue(1, A->finals);
+    lefins_dequeue(1, A->trans->edges[0][0]);
+    MALLOC(A->alphabet, 1);
+    A->alphabet[0] = the_letter;
+    return A;
+}
+
+nfa* create_sing_word(word* the_word) {
+    nfa* A;
+    CALLOC(A, 1);
+    A->initials = create_dequeue();
+    A->finals = create_dequeue();
+    lefins_dequeue(0, A->initials);
+    lefins_dequeue(size_word(the_word), A->finals);
+    uint alpha_size;
+    A->alphabet = get_alphabet_word(the_word, &alpha_size);
+    A->trans = create_lgraph_noedges(size_word(the_word) + 1, alpha_size);
+    for (uint i = 0; i < size_word(the_word); i++) {
+        letter l = lefread_word(the_word, i);
+        letter* p = bsearch(&l, A->alphabet, alpha_size, sizeof(letter), compare_letters);
+        lefins_dequeue(i + 1, A->trans->edges[i][p - A->alphabet]);
+    }
+    return A;
+}
+
+/*******************************/
+/*+ Simple operations on NFAs +*/
+/*******************************/
+
+
 
 static void unify_alphabets(void* I1, bool is_dfa_I1, void* I2, bool is_dfa_I2, nfa** A, nfa** B) {
     if (!I1 || !I2 || !A || !B) {
         return;
     }
-
-
     // We retrieve the alphabets.
     uint size_alpha1;
     uint size_alpha2;
@@ -457,19 +499,22 @@ nfa* nfa_union(void* I1, bool is_dfa_I1, void* I2, bool is_dfa_I2) {
     nfa* B = NULL;
     unify_alphabets(I1, is_dfa_I1, I2, is_dfa_I2, &A, &B);
 
-    nfa* UNION = nfa_init();
+    nfa* UNION;
+    CALLOC(UNION, 1);
+    UNION->initials = create_dequeue();
+    UNION->finals = create_dequeue();
 
 
     uint lag[2];
 
     if (A->trans_e || B->trans_e) {
         if (!A->trans_e) {
-            graph* Ae = create_graph_selfloops(A->trans->size_graph);
+            graph* Ae = create_graph_noedges(A->trans->size_graph);
             UNION->trans_e = merge_graphs(lag, 2, Ae, B->trans_e);
             delete_graph(Ae);
         }
         else if (!B->trans_e) {
-            graph* Be = create_graph_selfloops(B->trans->size_graph);
+            graph* Be = create_graph_noedges(B->trans->size_graph);
             UNION->trans_e = merge_graphs(lag, 2, A->trans_e, Be);
             delete_graph(Be);
         }
@@ -499,7 +544,7 @@ nfa* nfa_union(void* I1, bool is_dfa_I1, void* I2, bool is_dfa_I2) {
     copy_dequeue_right(UNION->finals, A->finals, 0);
     copy_dequeue_right(UNION->finals, B->finals, A->trans->size_graph);
 
-    UNION->alphabet = nfa_duplicate_alpha(A);
+    UNION->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha);
     UNION->state_names = NULL;
 
     nfa_delete(A);
@@ -519,19 +564,22 @@ nfa* nfa_concat(void* I1, bool is_dfa_I1, void* I2, bool is_dfa_I2) {
     nfa* B = NULL;
     unify_alphabets(I1, is_dfa_I1, I2, is_dfa_I2, &A, &B);
 
-    nfa* CONCAT = nfa_init();
+    nfa* CONCAT;
+    CALLOC(CONCAT, 1);
+    CONCAT->initials = create_dequeue();
+    CONCAT->finals = create_dequeue();
 
     uint lag[2];
     if (!A->trans_e && !B->trans_e) {
-        CONCAT->trans_e = create_graph_selfloops(A->trans->size_graph + B->trans->size_graph);
+        CONCAT->trans_e = create_graph_noedges(A->trans->size_graph + B->trans->size_graph);
     }
     else if (!A->trans_e) {
-        graph* Ae = create_graph_selfloops(A->trans->size_graph);
+        graph* Ae = create_graph_noedges(A->trans->size_graph);
         CONCAT->trans_e = merge_graphs(lag, 2, Ae, B->trans_e);
         delete_graph(Ae);
     }
     else if (!B->trans_e) {
-        graph* Be = create_graph_selfloops(B->trans->size_graph);
+        graph* Be = create_graph_noedges(B->trans->size_graph);
         CONCAT->trans_e = merge_graphs(lag, 2, A->trans_e, Be);
         delete_graph(Be);
     }
@@ -564,7 +612,7 @@ nfa* nfa_concat(void* I1, bool is_dfa_I1, void* I2, bool is_dfa_I2) {
     copy_dequeue_right(CONCAT->initials, A->initials, lag[0]);
     copy_dequeue_right(CONCAT->finals, B->finals, lag[1]);
 
-    CONCAT->alphabet = nfa_duplicate_alpha(A);
+    CONCAT->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha);
     CONCAT->state_names = NULL;
 
     nfa_delete(A);
@@ -576,15 +624,18 @@ nfa* nfa_concat(void* I1, bool is_dfa_I1, void* I2, bool is_dfa_I2) {
 nfa* nfa_star(nfa* A) {
 
     // Création de l'automate
-    nfa* STAR = nfa_init();
+    nfa* STAR;
+    CALLOC(STAR, 1);
+    STAR->initials = create_dequeue();
+    STAR->finals = create_dequeue();
 
     uint lag[2];
-    graph* oeps = create_graph_selfloops(1);
+    graph* oeps = create_graph_noedges(1);
     if (A->trans_e) {
         STAR->trans_e = merge_graphs(lag, 2, oeps, A->trans_e);
     }
     else {
-        graph* geps = create_graph_selfloops(A->trans->size_graph);
+        graph* geps = create_graph_noedges(A->trans->size_graph);
         STAR->trans_e = merge_graphs(lag, 2, oeps, geps);
         delete_graph(geps);
     }
@@ -614,7 +665,41 @@ nfa* nfa_star(nfa* A) {
         lefins_dequeue(0, STAR->trans_e->edges[lefread_dequeue(A->finals, i) + lag[1]]);
     }
 
-    STAR->alphabet = nfa_duplicate_alpha(A);
+    STAR->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha);
+    STAR->state_names = NULL;
+    return STAR;
+}
+
+
+nfa* dfa_star(dfa* A) {
+
+    // Création de l'automate
+    nfa* STAR;
+    CALLOC(STAR, 1);
+    STAR->initials = create_dequeue();
+    STAR->finals = create_dequeue();
+
+    STAR->trans_e = create_graph_noedges(A->trans->size_graph + 1);
+    rigins_dequeue(A->initial + 1, STAR->trans_e->edges[0]);
+    for (uint i = 0; i < A->nb_finals; i++) {
+        rigins_dequeue(0, STAR->trans_e->edges[A->finals[i] + 1]);
+    }
+    rigins_dequeue(0, STAR->initials);
+    rigins_dequeue(0, STAR->finals);
+
+    STAR->trans = create_lgraph_noedges(A->trans->size_graph + 1, A->trans->size_alpha);
+    for (uint q = 0; q < A->trans->size_graph; q++) {
+        for (uint a = 0; a < A->trans->size_alpha; a++) {
+            rigins_dequeue(A->trans->edges[q][a] + 1, STAR->trans->edges[q + 1][a]);
+        }
+    }
+
+
+
+    MALLOC(STAR->alphabet, A->trans->size_alpha);
+    for (uint i = 0; i < A->trans->size_alpha; i++) {
+        STAR->alphabet[i] = A->alphabet[i];
+    }
     STAR->state_names = NULL;
     return STAR;
 }
@@ -622,15 +707,18 @@ nfa* nfa_star(nfa* A) {
 nfa* nfa_plus(nfa* A) {
 
     // Création de l'automate
-    nfa* PLUS = nfa_init();
+    nfa* PLUS;
+    CALLOC(PLUS, 1);
+    PLUS->initials = create_dequeue();
+    PLUS->finals = create_dequeue();
 
     uint lag[2];
-    graph* oeps = create_graph_selfloops(1);
+    graph* oeps = create_graph_noedges(1);
     if (A->trans_e) {
         PLUS->trans_e = merge_graphs(lag, 2, oeps, A->trans_e);
     }
     else {
-        graph* geps = create_graph_selfloops(A->trans->size_graph);
+        graph* geps = create_graph_noedges(A->trans->size_graph);
         PLUS->trans_e = merge_graphs(lag, 2, oeps, geps);
         delete_graph(geps);
     }
@@ -659,7 +747,7 @@ nfa* nfa_plus(nfa* A) {
         lefins_dequeue(0, PLUS->trans_e->edges[lefread_dequeue(A->finals, i) + lag[1]]);
     }
 
-    PLUS->alphabet = nfa_duplicate_alpha(A);
+    PLUS->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha);
     PLUS->state_names = NULL;
     return PLUS;
 }
@@ -667,8 +755,12 @@ nfa* nfa_plus(nfa* A) {
 // Miroir
 nfa* nfa_mirror(nfa* A) {
     // Création du miroir
-    nfa* themirror = nfa_init();
-    themirror->alphabet = nfa_duplicate_alpha(A);
+    nfa* themirror;
+    CALLOC(themirror, 1);
+    themirror->initials = create_dequeue();
+    themirror->finals = create_dequeue();
+
+    themirror->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha);
     themirror->state_names = NULL;
 
     // Création des états initiaux et finaux (swap de l'automate d'origine)
@@ -679,6 +771,33 @@ nfa* nfa_mirror(nfa* A) {
     themirror->trans = lgraph_mirror(A->trans);
     themirror->trans_e = graph_mirror(A->trans_e);
     themirror->trans_i = lgraph_mirror(A->trans_i);
+
+    return themirror;
+}
+
+
+
+nfa* dfa_mirror(dfa* A) {
+    // Creation of the mirror
+    nfa* themirror;
+    CALLOC(themirror, 1);
+    themirror->initials = create_dequeue();
+    themirror->finals = create_dequeue();
+
+    MALLOC(themirror->alphabet, A->trans->size_alpha);
+    for (uint i = 0; i < A->trans->size_alpha; i++) {
+        themirror->alphabet[i] = A->alphabet[i];
+    }
+    themirror->state_names = copy_all_names(A->state_names, A->trans->size_graph);
+
+    // Initial and final states
+    rigins_dequeue(A->initial, themirror->finals);
+    for (uint i = 0; i < A->nb_finals; i++) {
+        rigins_dequeue(A->finals[i], themirror->initials);
+    }
+    // Création du graph des transitions
+    themirror->trans = dgraph_mirror(A->trans);
+
 
     return themirror;
 }
@@ -754,7 +873,10 @@ nfa* nfa_trim(nfa* A) {
         }
     }
 
-    nfa* TRIM = nfa_init();
+    nfa* TRIM;
+    CALLOC(TRIM, 1);
+    TRIM->initials = create_dequeue();
+    TRIM->finals = create_dequeue();
 
     TRIM->trans = create_lgraph_noedges(size_dequeue(statelist), A->trans->size_alpha);
 
@@ -805,7 +927,7 @@ nfa* nfa_trim(nfa* A) {
         }
     }
 
-    TRIM->alphabet = nfa_duplicate_alpha(A);
+    TRIM->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha);
 
     // Gestion des noms
     if (A->state_names) {
@@ -825,6 +947,76 @@ nfa* nfa_trim(nfa* A) {
 
     return TRIM;
 }
+
+
+
+dfa* dfa_trim(dfa* A) {
+    if (!A) {
+        return NULL;
+    }
+
+    uint* map;
+    MALLOC(map, A->trans->size_graph);
+    for (uint q = 0; q < A->trans->size_graph; q++) {
+        map[q] = UINT_MAX; // Marque les états non visités
+    }
+    dequeue* stack = create_dequeue();
+    rigins_dequeue(A->initial, stack);
+    uint nb_visted = 0;
+
+    while (!isempty_dequeue(stack)) {
+        uint q = rigpull_dequeue(stack);
+        if (map[q] != UINT_MAX) {
+            continue;
+        }
+        map[q] = nb_visted++;
+        for (uint a = 0; a < A->trans->size_alpha; a++) {
+            rigins_dequeue(A->trans->edges[q][a], stack);
+        }
+    }
+
+    delete_dequeue(stack);
+
+    uint nb_finals = 0;
+    for (uint i = 0; i < A->nb_finals; i++) {
+        if (map[A->finals[i]] != UINT_MAX) {
+            nb_finals++;
+        }
+    }
+
+    dfa* TRIM;
+    CALLOC(TRIM, 1);
+    TRIM->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha);
+    TRIM->nb_finals = nb_finals;
+    if (TRIM->nb_finals == 0) {
+        TRIM->finals = NULL;
+    }
+    else {
+        MALLOC(TRIM->finals, TRIM->nb_finals);
+    }
+    TRIM->trans = create_dgraph_noedges(nb_visted, A->trans->size_alpha);
+
+
+    TRIM->initial = map[A->initial];
+    for (uint q = 0; q < A->trans->size_graph; q++) {
+        if (map[q] == UINT_MAX) {
+            continue;
+        }
+
+        for (uint a = 0; a < A->trans->size_alpha; a++) {
+            TRIM->trans->edges[map[q]][a] = map[A->trans->edges[q][a]];
+        }
+    }
+    uint i = 0;
+    for (uint j = 0; j < A->nb_finals; j++) {
+        if (map[A->finals[j]] != UINT_MAX) {
+            TRIM->finals[i++] = map[A->finals[j]];
+        }
+    }
+    free(map);
+    return TRIM;
+}
+
 
 // Élimination des états non-accessibles (modifie le NFA originel)
 void nfa_trim_mod(nfa* A) {
@@ -917,14 +1109,17 @@ void nfa_elimeps_mod(nfa* A) {
 /* Generation of random NFAs */
 /*****************************/
 
-// Génération d'un NFA aléatoire
+
 nfa* nfa_random(uint size_alpha, uint min_size, uint max_size) {
     min_size = max(1, min_size);
     uint sizea = max(1, size_alpha);
 
     uint size = min_size + (rand() % (1 + max_size - min_size));
 
-    nfa* A = nfa_init();
+    nfa* A;
+    CALLOC(A, 1);
+    A->initials = create_dequeue();
+    A->finals = create_dequeue();
 
     //!< At least one initial state.
     rigins_dequeue(0, A->initials);
@@ -974,11 +1169,70 @@ nfa* nfa_random(uint size_alpha, uint min_size, uint max_size) {
     return A;
 }
 
+dfa* dfa_random(uint size_alpha, uint min_size, uint max_size) {
+    min_size = max(1, min_size);
+    uint sizea = max(1, size_alpha);
+
+    uint size = min_size + (rand() % (1 + max_size - min_size));
+
+    dfa* A;
+    CALLOC(A, 1);
+    MALLOC(A->alphabet, sizea);
+    for (uint i = 0; i < sizea; i++) {
+        A->alphabet[i].lab = i + 'a';
+        A->alphabet[i].num = -1;
+    }
+    A->state_names = NULL;
+    A->initial = 0;
 
 
-/***********************/
-/* Information sur nfa */
-/***********************/
+    dequeue* finals = create_dequeue();
+    int cf = 0;
+    for (int i = size - 1; i >= 0; i--) {
+        if (!(rand() % (2 + cf++))) {
+            lefins_dequeue(i, finals);
+        }
+    }
+    if (isempty_dequeue(finals)) {
+        rigins_dequeue(size - 1, finals);
+    }
+    A->nb_finals = size_dequeue(finals);
+    MALLOC(A->finals, A->nb_finals);
+    for (uint i = 0; i < A->nb_finals; i++) {
+        A->finals[i] = lefread_dequeue(finals, i);
+    }
+    delete_dequeue(finals);
+
+
+    A->trans = create_dgraph_noedges(size, sizea);
+    for (uint q = 0; q < size; q++) {
+        for (uint a = 0; a < sizea; a++) {
+            uint count = 0;
+            uint r = (q + 1) % size;
+            ;
+            while (count == 0) {
+                if (r >= q && rand() % 2 == 0) {
+                    A->trans->edges[q][a] = r;
+                    count = 1;
+                }
+                else if (rand() % 8 == 0) {
+                    A->trans->edges[q][a] = r;
+                    count = 1;
+                }
+                else {
+                    r = (r + 1) % size;
+                }
+            }
+        }
+    }
+    return A;
+}
+
+
+
+/*****************/
+/*+ Information +*/
+/*****************/
 
 int nfa_nb_trans(nfa* A) {
     uint nb = 0;
@@ -1047,12 +1301,12 @@ dequeue* nfa_compute_runs(nfa* A, word* w) {
 
     // Lecture du mot
     for (uint i = 0; i < size_word(w); i++) {
-        uint letter_index = nfa_letter_index(A, lefread_word(w, i));
-        if (letter_index == A->trans->size_alpha) {
+        uint ind = letter_index(lefread_word(w, i), A->alphabet, A->trans->size_alpha);
+        if (ind >= A->trans->size_alpha) {
             delete_dequeue(states);
             return NULL;
         }
-        dequeue* temp = lgraph_reachable(A->trans, states, letter_index);
+        dequeue* temp = lgraph_reachable(A->trans, states, ind);
         delete_dequeue(states);
         states = temp;
         if (isempty_dequeue(states)) {
@@ -1064,6 +1318,57 @@ dequeue* nfa_compute_runs(nfa* A, word* w) {
 }
 
 
+bool dfa_exists_path(dfa* A, uint in, uint out, bool* alph) {
+    if (in == out) {
+        return true;
+    }
+
+    dequeue* stack = create_dequeue();
+    rigins_dequeue(in, stack);
+    bool* visited;
+    CALLOC(visited, A->trans->size_graph);
+
+    while (!isempty_dequeue(stack)) {
+        uint q = rigpull_dequeue(stack);
+        if (visited[q]) {
+            continue;
+        }
+        if (q == out) {
+            delete_dequeue(stack);
+            free(visited);
+            return true;
+        }
+        visited[q] = true;
+        for (uint a = 0; a < A->trans->size_alpha; a++) {
+            if (alph[a]) {
+                rigins_dequeue(A->trans->edges[q][a], stack);
+            }
+        }
+    }
+
+    delete_dequeue(stack);
+    free(visited);
+    return false;
+}
+
+
+
+// Calcule les états qui sont atteints par un mot dans un NFA.
+uint dfa_compute_run(dfa* A, word* w) {
+
+    uint q = A->initial;
+
+    // Lecture du mot
+    for (uint i = 0; i < size_word(w); i++) {
+        letter l = lefread_word(w, i);
+        uint letter_index = ((letter*)bsearch(&l, A->alphabet, A->trans->size_alpha, sizeof(letter), compare_letters)) - A->alphabet;
+        if (letter_index == A->trans->size_alpha) {
+            return UINT_MAX; // Invalid letter.
+        }
+        q = A->trans->edges[q][letter_index];
+    }
+    return q;
+}
 
 
 /************************/
@@ -1072,8 +1377,12 @@ dequeue* nfa_compute_runs(nfa* A, word* w) {
 
 nfa* nfa_merge_states(nfa* A, parti* P) {
     // Création de l'automate fusionné
-    nfa* B = nfa_init();
-    B->alphabet = nfa_duplicate_alpha(A);
+    nfa* B;
+    CALLOC(B, 1);
+    B->initials = create_dequeue();
+    B->finals = create_dequeue();
+
+    B->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha);
     // Création des listes d'états initiaux et finaux
     uint_avlnode* initree = NULL;
     for (uint i = 0; i < size_dequeue(A->initials); i++) {
@@ -1157,133 +1466,10 @@ nfa* nfa_merge_states(nfa* A, parti* P) {
 
 
 
-/**********/
-/*+ DFAs +*/
-/**********/
+/****************/
+/*+ Conversion +*/
+/****************/
 
-dfa* dfa_init(uint size_graph, uint size_alpha, uint nb_finals, letter* alphabet) {
-    dfa* A;
-    CALLOC(A, 1);
-    A->trans = create_dgraph_noedges(size_graph, size_alpha);
-    A->nb_finals = nb_finals;
-    if (nb_finals == 0) {
-        A->finals = NULL;
-    }
-    else {
-        MALLOC(A->finals, nb_finals);
-    }
-
-
-    MALLOC(A->alphabet, size_alpha);
-    for (uint i = 0; i < size_alpha; i++) {
-        A->alphabet[i] = alphabet[i];
-    }
-    return A;
-}
-
-void dfa_reset_state_names(dfa* A) {
-    if (!A || !A->state_names) {
-        return;
-    }
-
-    for (uint i = 0; i < A->trans->size_graph; i++) {
-        free(A->state_names[i]);
-    }
-    free(A->state_names);
-    A->state_names = NULL;
-}
-
-dfa* dfa_copy(dfa* A) {
-    if (!A) {
-        return NULL;
-    }
-    dfa* B = dfa_init(A->trans->size_graph, A->trans->size_alpha, A->nb_finals, A->alphabet);
-    B->initial = A->initial;
-    for (uint i = 0; i < A->nb_finals; i++) {
-        B->finals[i] = A->finals[i];
-    }
-    for (uint q = 0; q < A->trans->size_graph; q++) {
-        for (uint a = 0; a < A->trans->size_alpha; a++) {
-            B->trans->edges[q][a] = A->trans->edges[q][a];
-        }
-    }
-
-    B->ancestors = NULL;
-    B->state_names = copy_all_names(A->state_names, A->trans->size_graph);
-    return B;
-}
-
-dfa* dfa_copy_exalpha(dfa* A, letter* alpha, uint size) {
-    if (!A) {
-        return NULL;
-    }
-
-    dfa* C;
-    CALLOC(C, 1);
-
-
-    uint alphasize;
-    C->alphabet = merge_alphabet(A->alphabet, A->trans->size_alpha, alpha, size, &alphasize);
-
-    uint statesize;
-    if (alphasize == A->trans->size_alpha) {
-        statesize = A->trans->size_graph;
-    }
-    else {
-        statesize = A->trans->size_graph + 1;
-    }
-
-    C->trans = create_dgraph_noedges(statesize, alphasize);
-    C->nb_finals = A->nb_finals;
-    if (C->nb_finals == 0) {
-        C->finals = NULL;
-    }
-    else {
-        MALLOC(C->finals, C->nb_finals);
-    }
-    C->initial = A->initial;
-    for (uint i = 0; i < C->nb_finals; i++) {
-        C->finals[i] = A->finals[i];
-    }
-
-    uint num = 0;
-    for (uint a = 0; a < C->trans->size_alpha; a++) {
-        if (num < A->trans->size_alpha && compare_letters(&A->alphabet[num], &C->alphabet[a]) == 0) {
-            for (uint q = 0; q < A->trans->size_graph; q++) {
-                C->trans->edges[q][a] = A->trans->edges[q][num];
-            }
-            num++;
-        }
-        else {
-            for (uint q = 0; q < A->trans->size_graph; q++) {
-                C->trans->edges[q][a] = A->trans->size_graph; // Sink state.
-            }
-        }
-    }
-
-    if (alphasize != A->trans->size_alpha) {
-        for (uint a = 0; a < C->trans->size_alpha; a++) {
-            C->trans->edges[A->trans->size_graph][a] = A->trans->size_graph;
-        }
-    }
-
-    C->ancestors = NULL;
-    C->state_names = NULL;
-
-    return C;
-}
-
-void dfa_delete(dfa* A) {
-    if (!A) {
-        return;
-    }
-    free(A->alphabet);
-    free(A->finals);
-    free(A->ancestors);
-    dfa_reset_state_names(A);
-    delete_dgraph(A->trans);
-    free(A);
-}
 
 
 dfa* detnfa_to_dfa(nfa* A) {
@@ -1294,11 +1480,18 @@ dfa* detnfa_to_dfa(nfa* A) {
     if (!nfa_is_comp(A)) {
         size++;
     }
-    dfa* D = dfa_init(size, A->trans->size_alpha, size_dequeue(A->finals), A->alphabet);
+
+    dfa* D;
+    CALLOC(D, 1);
+    D->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha);
     D->initial = lefread_dequeue(A->initials, 0);
+    D->nb_finals = size_dequeue(A->finals);
+    MALLOC(D->finals, D->nb_finals);
     for (uint i = 0; i < D->nb_finals; i++) {
         D->finals[i] = lefread_dequeue(A->finals, i);
     }
+
+    D->trans = create_dgraph_noedges(size, A->trans->size_alpha);
     for (uint q = 0; q < A->trans->size_graph; q++) {
         for (uint a = 0; a < A->trans->size_alpha; a++) {
             if (size_dequeue(A->trans->edges[q][a]) > 0) {
@@ -1327,7 +1520,10 @@ nfa* dfa_to_nfa(dfa* A) {
     }
 
     // Initialize the NFA
-    nfa* N = nfa_init();
+    nfa* N;
+    CALLOC(N, 1);
+    N->initials = create_dequeue();
+    N->finals = create_dequeue();
 
     // Copy the alphabet
     MALLOC(N->alphabet, A->trans->size_alpha);
@@ -1363,17 +1559,14 @@ nfa* dfa_to_nfa(dfa* A) {
 
 }
 
-
-
-
-
-
-
 nfa* dfa_to_nfa_exalpha(dfa* A, letter* alpha, uint size) {
     if (!A) {
         return NULL;
     }
-    nfa* B = nfa_init();
+    nfa* B;
+    CALLOC(B, 1);
+    B->initials = create_dequeue();
+    B->finals = create_dequeue();
 
     uint alpha_size;
 
@@ -1403,260 +1596,20 @@ nfa* dfa_to_nfa_exalpha(dfa* A, letter* alpha, uint size) {
     // Copies des noms d'états
     B->state_names = copy_all_names(A->state_names, A->trans->size_graph);
 
-    B->ancestors = NULL;
-
-    //B->ancestors = nfa_copy_ancestors(A);
 
     return B;
 }
 
 
 
-nfa* dfa_mirror(dfa* A) {
-    // Creation of the mirror
-    nfa* themirror = nfa_init();
-    MALLOC(themirror->alphabet, A->trans->size_alpha);
-    for (uint i = 0; i < A->trans->size_alpha; i++) {
-        themirror->alphabet[i] = A->alphabet[i];
-    }
-    themirror->state_names = copy_all_names(A->state_names, A->trans->size_graph);
-
-    // Initial and final states
-    rigins_dequeue(A->initial, themirror->finals);
-    for (uint i = 0; i < A->nb_finals; i++) {
-        rigins_dequeue(A->finals[i], themirror->initials);
-    }
-    // Création du graph des transitions
-    themirror->trans = dgraph_mirror(A->trans);
-
-
-    return themirror;
-}
-
-nfa* dfa_star(dfa* A) {
-
-    // Création de l'automate
-    nfa* STAR = nfa_init();
-
-    STAR->trans_e = create_graph_selfloops(A->trans->size_graph + 1);
-    rigins_dequeue(A->initial + 1, STAR->trans_e->edges[0]);
-    for (uint i = 0; i < A->nb_finals; i++) {
-        rigins_dequeue(0, STAR->trans_e->edges[A->finals[i] + 1]);
-    }
-    rigins_dequeue(0, STAR->initials);
-    rigins_dequeue(0, STAR->finals);
-
-    STAR->trans = create_lgraph_noedges(A->trans->size_graph + 1, A->trans->size_alpha);
-    for (uint q = 0; q < A->trans->size_graph; q++) {
-        for (uint a = 0; a < A->trans->size_alpha; a++) {
-            rigins_dequeue(A->trans->edges[q][a] + 1, STAR->trans->edges[q + 1][a]);
-        }
-    }
-
-
-
-    MALLOC(STAR->alphabet, A->trans->size_alpha);
-    for (uint i = 0; i < A->trans->size_alpha; i++) {
-        STAR->alphabet[i] = A->alphabet[i];
-    }
-    STAR->state_names = NULL;
-    return STAR;
-}
-
-
-// Génération d'un DFA aléatoire
-dfa* dfa_random(uint size_alpha, uint min_size, uint max_size) {
-    min_size = max(1, min_size);
-    uint sizea = max(1, size_alpha);
-
-    uint size = min_size + (rand() % (1 + max_size - min_size));
-
-    dfa* A;
-    CALLOC(A, 1);
-    MALLOC(A->alphabet, sizea);
-    for (uint i = 0; i < sizea; i++) {
-        A->alphabet[i].lab = i + 'a';
-        A->alphabet[i].num = -1;
-    }
-    A->state_names = NULL;
-    A->ancestors = NULL;
-
-    A->initial = 0;
-
-
-    dequeue* finals = create_dequeue();
-    int cf = 0;
-    for (int i = size - 1; i >= 0; i--) {
-        if (!(rand() % (2 + cf++))) {
-            lefins_dequeue(i, finals);
-        }
-    }
-    if (isempty_dequeue(finals)) {
-        rigins_dequeue(size - 1, finals);
-    }
-    A->nb_finals = size_dequeue(finals);
-    MALLOC(A->finals, A->nb_finals);
-    for (uint i = 0; i < A->nb_finals; i++) {
-        A->finals[i] = lefread_dequeue(finals, i);
-    }
-    delete_dequeue(finals);
-
-
-    A->trans = create_dgraph_noedges(size, sizea);
-    for (uint q = 0; q < size; q++) {
-        for (uint a = 0; a < sizea; a++) {
-            uint count = 0;
-            uint r = (q + 1) % size;
-            ;
-            while (count == 0) {
-                if (r >= q && rand() % 2 == 0) {
-                    A->trans->edges[q][a] = r;
-                    count = 1;
-                }
-                else if (rand() % 8 == 0) {
-                    A->trans->edges[q][a] = r;
-                    count = 1;
-                }
-                else {
-                    r = (r + 1) % size;
-                }
-            }
-        }
-    }
-    return A;
-}
-
-
-dfa* dfa_trim(dfa* A) {
-    if (!A) {
-        return NULL;
-    }
-
-    uint* map;
-    MALLOC(map, A->trans->size_graph);
-    for (uint q = 0; q < A->trans->size_graph; q++) {
-        map[q] = UINT_MAX; // Marque les états non visités
-    }
-    dequeue* stack = create_dequeue();
-    rigins_dequeue(A->initial, stack);
-    uint nb_visted = 0;
-
-    while (!isempty_dequeue(stack)) {
-        uint q = rigpull_dequeue(stack);
-        if (map[q] != UINT_MAX) {
-            continue;
-        }
-        map[q] = nb_visted++;
-        for (uint a = 0; a < A->trans->size_alpha; a++) {
-            rigins_dequeue(A->trans->edges[q][a], stack);
-        }
-    }
-
-    delete_dequeue(stack);
-
-    uint nb_finals = 0;
-    for (uint i = 0; i < A->nb_finals; i++) {
-        if (map[A->finals[i]] != UINT_MAX) {
-            nb_finals++;
-        }
-    }
-
-    dfa* TRIM = dfa_init(nb_visted, A->trans->size_alpha, nb_finals, A->alphabet);
-
-
-    TRIM->initial = map[A->initial];
-    for (uint q = 0; q < A->trans->size_graph; q++) {
-        if (map[q] == UINT_MAX) {
-            continue;
-        }
-
-        for (uint a = 0; a < A->trans->size_alpha; a++) {
-            TRIM->trans->edges[map[q]][a] = map[A->trans->edges[q][a]];
-        }
-    }
-    uint i = 0;
-    for (uint j = 0; j < A->nb_finals; j++) {
-        if (map[A->finals[j]] != UINT_MAX) {
-            TRIM->finals[i++] = map[A->finals[j]];
-        }
-    }
-    free(map);
-    return TRIM;
-}
-
-
-void dfa_print_state(const dfa* A, uint q, FILE* out) {
-    if (!A || !out || q >= A->trans->size_graph) {
-        return;
-    }
-    if (A->state_names) {
-        fprintf(out, "%s", A->state_names[q]);
-    }
-    else {
-        fprintf(out, "%d", q);
-    }
-}
-
-
-void dfa_fprint_letter_utf8(const dfa* A, uint a, FILE* out) {
-    if (!A || !out || !A->alphabet || a >= A->trans->size_alpha) {
-        return;
-    }
-    fprint_letter_utf8(A->alphabet[a], out);
-}
 
 
 
 
 
-bool dfa_exists_path(dfa* A, uint in, uint out, bool* alph) {
-    if (in == out) {
-        return true;
-    }
-
-    dequeue* stack = create_dequeue();
-    rigins_dequeue(in, stack);
-    bool* visited;
-    CALLOC(visited, A->trans->size_graph);
-
-    while (!isempty_dequeue(stack)) {
-        uint q = rigpull_dequeue(stack);
-        if (visited[q]) {
-            continue;
-        }
-        if (q == out) {
-            delete_dequeue(stack);
-            free(visited);
-            return true;
-        }
-        visited[q] = true;
-        for (uint a = 0; a < A->trans->size_alpha; a++) {
-            if (alph[a]) {
-                rigins_dequeue(A->trans->edges[q][a], stack);
-            }
-        }
-    }
-
-    delete_dequeue(stack);
-    free(visited);
-    return false;
-}
 
 
 
-// Calcule les états qui sont atteints par un mot dans un NFA.
-uint dfa_compute_run(dfa* A, word* w) {
 
-    uint q = A->initial;
 
-    // Lecture du mot
-    for (uint i = 0; i < size_word(w); i++) {
-        letter l = lefread_word(w, i);
-        uint letter_index = ((letter*)bsearch(&l, A->alphabet, A->trans->size_alpha, sizeof(letter), compare_letters)) - A->alphabet;
-        if (letter_index == A->trans->size_alpha) {
-            return UINT_MAX; // Invalid letter.
-        }
-        q = A->trans->edges[q][letter_index];
-    }
-    return q;
-}
+

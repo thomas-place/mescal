@@ -17,7 +17,6 @@
 #include <unistd.h>
 
 #include "alloc.h"
-#include "files.h"
 #include "interrupt.h"
 #include "nfa.h"
 #include "printing.h"
@@ -28,17 +27,17 @@
 #include "time.h"
 #include "tools.h"
 
-/**
- * @brief
- * Print the usage of the program.
- */
-void usage(char *argv[]);
+ /**
+  * @brief
+  * Print the usage of the program.
+  */
+void usage(char* argv[]);
 
 /**
  * @brief
  * Parse the command line arguments.
  */
-void parse_argv(int argc, char *argv[]);
+void parse_argv(int argc, char* argv[]);
 
 /**
  * @brief

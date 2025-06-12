@@ -9,41 +9,83 @@
  /* Computation of congruences */
  /******************************/
 
+typedef struct {
+    uint left;
+    uint right;
+    uint size;
+
+} cong_sent;
+
+
+static void concat_cong_lists(uint* map, cong_sent** trans, uint asize, uint r, uint s) {
+    for (uint a = 0; a < asize; a++) {
+        if (trans[r][a].size == 0) {
+            trans[r][a] = trans[s][a];
+        }
+        else if (trans[s][a].size == 0) {
+            trans[s][a] = trans[r][a];
+        }
+        else {
+            map[trans[r][a].right] = trans[s][a].left;
+            trans[r][a].right = trans[s][a].right;
+            trans[s][a].left = trans[r][a].left;
+            trans[r][a].size += trans[s][a].size;
+            trans[s][a].size = trans[r][a].size;
+        }
+    }
+}
+
+
 // Computes the least partition containing the input one and compatible with
 // the graph transitions: if q ≣ r then qa ≣ ra.
 static void cong_fold(dgraph* G, ufind* uf) {
     // A queue that will contain the elements that are yet to treat.
     dequeue* tofold = create_dequeue();
 
-    // Doubly linked lists memorizing edges.
-    // Only the lists corresponding to a root in the union-find are filled.
-    dlist* ltrans[G->size_graph][G->size_alpha];
+
+    uint* map;
+    uint* states;
+    MALLOC(map, G->size_graph * G->size_alpha);
+    MALLOC(states, G->size_graph * G->size_alpha);
+    cong_sent** ltrans;
+    MALLOC(ltrans, G->size_graph);
+    cong_sent* storage;
+    CALLOC(storage, G->size_graph * G->size_alpha);
+
     for (uint q = 0; q < G->size_graph; q++) {
+        ltrans[q] = storage + q * G->size_alpha;
+        for (uint a = 0; a < G->size_alpha; a++) {
+            ltrans[q][a].left = UINT_MAX;
+            ltrans[q][a].right = UINT_MAX;
+            ltrans[q][a].size = 0;
+        }
         if (q == find_ufind(q, uf)) {
             rigins_dequeue(q, tofold);
-            for (uint a = 0; a < G->size_alpha; a++) {
-                ltrans[q][a] = create_dlist();
-            }
-        }
-        else {
-            for (uint a = 0; a < G->size_alpha; a++) {
-                ltrans[q][a] = NULL;
-            }
         }
     }
 
-    // The lists are filled with the original transitions.
+    uint num = 0;
     for (uint q = 0; q < G->size_graph; q++) {
         uint r = find_ufind(q, uf);
-
         for (uint a = 0; a < G->size_alpha; a++) {
-            insertprevious_dlist(ltrans[r][a], ltrans[r][a]->rsent, G->edges[q][a]);
+            states[num] = G->edges[q][a];
+            map[num] = ltrans[r][a].left;
+            ltrans[r][a].left = num;
+            if (ltrans[r][a].right == UINT_MAX) {
+                ltrans[r][a].right = num;
+            }
+            ltrans[r][a].size++;
+            num++;
         }
     }
+
+
+
 
     // As long as there exists an element to treat
     while (!isempty_dequeue(tofold)) {
 
+        //printf("treating\n");
         // We take the representative of the class of the element to treat
         uint s = find_ufind(lefpull_dequeue(tofold), uf);
 
@@ -52,15 +94,16 @@ static void cong_fold(dgraph* G, ufind* uf) {
         while (!folded && a < G->size_alpha) {
 
             // If there are two outgoing edges labelled by a
-            if (ltrans[s][a]->size > 1)
+            if (ltrans[s][a].size > 1)
             {
                 // We take the representatives of the destinations of the two
                 // first edges (if it has not been done before)
-                uint r = find_ufind(ltrans[s][a]->lsent->next->val, uf);
-                uint t = find_ufind(ltrans[s][a]->lsent->next->next->val, uf);
+                uint r = find_ufind(states[ltrans[s][a].left], uf);
+                uint t = find_ufind(states[map[ltrans[s][a].left]], uf);
 
-                // We delete the first edge
-                deletecell_dlist(ltrans[s][a], ltrans[s][a]->lsent->next);
+                ltrans[s][a].left = map[ltrans[s][a].left];
+                ltrans[s][a].size--;
+
 
                 // If the two adjacent vertices have not been merged yet
                 if (r != t)
@@ -69,21 +112,7 @@ static void cong_fold(dgraph* G, ufind* uf) {
                     union_ufind(r, t, uf);
 
                     // Concatenation of the lists of adjacent vertices
-                    for (uint b = 0; b < G->size_alpha; b++)
-                    {
-                        concat_dlist(ltrans[r][b], ltrans[t][b]);
-
-                        // We only keep the list of the new representative
-                        if (find_ufind(r, uf) == r)
-                        {
-                            free(ltrans[t][b]);
-                            ltrans[t][b] = NULL;
-                        }
-                        else {
-                            free(ltrans[r][b]);
-                            ltrans[r][b] = NULL;
-                        }
-                    }
+                    concat_cong_lists(map, ltrans, G->size_alpha, r, t);
 
                     // We possibly have to treat the new class
                     rigins_dequeue(find_ufind(r, uf), tofold);
@@ -100,14 +129,115 @@ static void cong_fold(dgraph* G, ufind* uf) {
         }
     }
 
+
+
     // Release of the lists
-    for (uint q = 0; q < G->size_graph; q++) {
-        for (uint a = 0; a < G->size_alpha; a++) {
-            delete_dlist(ltrans[q][a]);
-        }
-    }
+    free(map);
+    free(states);
+    free(ltrans);
+    free(storage);
     delete_dequeue(tofold);
 }
+
+// // Computes the least partition containing the input one and compatible with
+// // the graph transitions: if q ≣ r then qa ≣ ra.
+// static void cong_fold(dgraph* G, ufind* uf) {
+//     // A queue that will contain the elements that are yet to treat.
+//     dequeue* tofold = create_dequeue();
+
+//     // Doubly linked lists memorizing edges.
+//     // Only the lists corresponding to a root in the union-find are filled.
+//     dlist* ltrans[G->size_graph][G->size_alpha];
+//     for (uint q = 0; q < G->size_graph; q++) {
+//         if (q == find_ufind(q, uf)) {
+//             rigins_dequeue(q, tofold);
+//             for (uint a = 0; a < G->size_alpha; a++) {
+//                 ltrans[q][a] = create_dlist();
+//             }
+//         }
+//         else {
+//             for (uint a = 0; a < G->size_alpha; a++) {
+//                 ltrans[q][a] = NULL;
+//             }
+//         }
+//     }
+
+//     // The lists are filled with the original transitions.
+//     for (uint q = 0; q < G->size_graph; q++) {
+//         uint r = find_ufind(q, uf);
+
+//         for (uint a = 0; a < G->size_alpha; a++) {
+//             insertprevious_dlist(ltrans[r][a], ltrans[r][a]->rsent, G->edges[q][a]);
+//         }
+//     }
+
+//     // As long as there exists an element to treat
+//     while (!isempty_dequeue(tofold)) {
+
+//         // We take the representative of the class of the element to treat
+//         uint s = find_ufind(lefpull_dequeue(tofold), uf);
+
+//         bool folded = false;
+//         uint a = 0;
+//         while (!folded && a < G->size_alpha) {
+
+//             // If there are two outgoing edges labelled by a
+//             if (ltrans[s][a]->size > 1)
+//             {
+//                 // We take the representatives of the destinations of the two
+//                 // first edges (if it has not been done before)
+//                 uint r = find_ufind(ltrans[s][a]->lsent->next->val, uf);
+//                 uint t = find_ufind(ltrans[s][a]->lsent->next->next->val, uf);
+
+//                 // We delete the first edge
+//                 deletecell_dlist(ltrans[s][a], ltrans[s][a]->lsent->next);
+
+//                 // If the two adjacent vertices have not been merged yet
+//                 if (r != t)
+//                 {
+//                     // We merge them
+//                     union_ufind(r, t, uf);
+
+//                     // Concatenation of the lists of adjacent vertices
+//                     for (uint b = 0; b < G->size_alpha; b++)
+//                     {
+//                         concat_dlist(ltrans[r][b], ltrans[t][b]);
+
+//                         // We only keep the list of the new representative
+//                         if (find_ufind(r, uf) == r)
+//                         {
+//                             free(ltrans[t][b]);
+//                             ltrans[t][b] = NULL;
+//                         }
+//                         else {
+//                             free(ltrans[r][b]);
+//                             ltrans[r][b] = NULL;
+//                         }
+//                     }
+
+//                     // We possibly have to treat the new class
+//                     rigins_dequeue(find_ufind(r, uf), tofold);
+//                     if (find_ufind(r, uf) != find_ufind(s, uf)) {
+//                         rigins_dequeue(find_ufind(s, uf), tofold);
+//                     }
+//                     folded = true;
+//                 }
+//                 else {
+//                     rigins_dequeue(find_ufind(s, uf), tofold);
+//                 }
+//             }
+//             a++;
+//         }
+//     }
+
+//     // Release of the lists
+//     for (uint q = 0; q < G->size_graph; q++) {
+//         for (uint a = 0; a < G->size_alpha; a++) {
+//             delete_dlist(ltrans[q][a]);
+//         }
+//     }
+//     delete_dequeue(tofold);
+// }
 
 // Computes the least congruence containing the partition given as input.
 // The partition is given as a union-find partition

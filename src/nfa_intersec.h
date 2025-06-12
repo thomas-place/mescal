@@ -121,6 +121,14 @@ prod_pair* dgraph_intersec(dgraph*, //!< The first graph
     uint*                            //!< Pointer used to return the size of the computed array.
 );
 
+bool dgraph_exists_intersec_path(dgraph*, //!< The first graph
+    dgraph*,                         //!< The second graph
+    uint,                          //!< Starting state in the first graph.
+    uint,                           //!< Starting state in the second graph.
+    uint,                           //!< Ending state in the first graph.
+    uint                            //!< Ending state in the second graph.
+);
+
 
 
 #endif

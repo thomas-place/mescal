@@ -61,16 +61,22 @@ static uint det_cons_hash(uint i, uint size_hash) {
 
     uint a = 0x9e3779b9; // fractional bits of the golden ratio
 
-    uint count = 0;
+    //uint count = 0;
 
     for (uint j = 0; j < det_cons_states; j++) {
         if (!det_cons_sets[e + j]) {
-            continue; // If the state is not in the set, we skip it.
+            hash = (hash * 3 + 1 * a) % size_hash;
+            //continue; // If the state is not in the set, we skip it.
         }
-        hash = (hash * (det_cons_states + 1) + j * a) % size_hash;
-        count++;
+        else
+        {
+            hash = (hash * 3 + 2 * a) % size_hash;
+        }
+
+        //hash = (hash * (det_cons_states + 1) + j * a) % size_hash;
+        //count++;
     }
-    hash = (hash * (det_cons_states + 1) + count * a) % size_hash;
+    //hash = (hash * (det_cons_states + 1) + count * a) % size_hash;
     return hash;
 }
 
@@ -207,28 +213,32 @@ dfa* nfa_determinize(nfa* A, bool names) {
     delete_hash_table(thehash); // Delete the hash table.
     delete_dequeue(thestack);
 
+    // We can now build the DFA.
+    dfa* DFA;
+    CALLOC(DFA, 1);
+    DFA->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha); // Copy letter names
+    DFA->trans = create_dgraph_noedges(det_cons_elem, A->trans->size_alpha); // Create the graph.
+
+    DFA->initial = 0; // The initial state of the DFA is the first state constructed.
+
     // Computing the final states.
     bool* tempfinals;
     CALLOC(tempfinals, det_cons_elem);
-    uint nb_finals = 0; // Number of final states in the DFA.
+    DFA->nb_finals = 0;
     for (uint i = 0; i < det_cons_elem; i++) {
         // For each state in the DFA, we check if it contains a final state of the NFA.
         for (uint j = 0; j < size_dequeue(A->finals); j++) {
             if (det_cons_sets[i * det_cons_states + lefread_dequeue(A->finals, j)]) {
                 tempfinals[i] = true; // If it contains a final state, we mark it as a final state.
-                nb_finals++;
+                DFA->nb_finals++;
                 break;
             }
         }
     }
 
-    // We can now build the DFA.
-    dfa* DFA = dfa_init(det_cons_elem, A->trans->size_alpha, nb_finals, A->alphabet);
-
-    DFA->initial = 0; // The initial state of the DFA is the first state constructed.
-
     // Assigning the finals states.
     uint h = 0;
+    MALLOC(DFA->finals, DFA->nb_finals); // Allocate the finals array.
     for (uint i = 0; i < det_cons_elem; i++) {
         if (tempfinals[i]) {
             DFA->finals[h] = i; // If the state is a final state, we add it to the list of finals states of the DFA.
@@ -238,12 +248,12 @@ dfa* nfa_determinize(nfa* A, bool names) {
     free(tempfinals); // We can delete the temporary array used to store the final states.
 
     // Computing the transitions of the DFA.
+    DFA->trans = create_dgraph_noedges(det_cons_elem, A->trans->size_alpha);
     for (uint i = 0; i < det_cons_elem; i++) {
         for (uint a = 0; a < A->trans->size_alpha; a++) {
             DFA->trans->edges[i][a] = det_cons_next[i * det_cons_letters + a]; // The next state for the letter a.
         }
     }
-
 
     // Computation of the state names    
     if (names) {
@@ -252,6 +262,7 @@ dfa* nfa_determinize(nfa* A, bool names) {
     else {
         DFA->state_names = NULL;
     }
+
 
     // We can delete the arrays used in the subset construction.
     det_cons_delete();
@@ -305,17 +316,14 @@ nfa* nfa_complement(nfa* A) {
 
 // Complementation
 dfa* dfa_complement(dfa* A) {
-    dfa* B = dfa_init(A->trans->size_graph, A->trans->size_alpha, A->trans->size_graph - A->nb_finals, A->alphabet);
-
+    dfa* B;
+    CALLOC(B, 1);
+    B->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha); // Copy letter names
     B->initial = A->initial; // The initial state is the same as in the original DFA.
+    B->trans = copy_dgraph(A->trans); // Copy the transitions from the original DFA.
 
-    for (uint q = 0; q < A->trans->size_graph; q++) {
-        for (uint a = 0; a < A->trans->size_alpha; a++) {
-            B->trans->edges[q][a] = A->trans->edges[q][a]; // The transitions are the same as in the original DFA.
-        }
-    }
-
-
+    B->nb_finals = A->trans->size_graph - A->nb_finals; // The number of final states is the total number of states minus the number of final states in the original DFA.
+    MALLOC(B->finals, B->nb_finals); // Allocate the finals array.
     uint ja = 0;
     uint jb = 0;
     for (uint q = 0; q < A->trans->size_graph; q++) {
@@ -332,8 +340,6 @@ dfa* dfa_complement(dfa* A) {
 
     // Noms des états
     B->state_names = copy_all_names(A->state_names, A->trans->size_graph);
-
-    B->ancestors = NULL; // No ancestors in the complement DFA.
 
     return B;
 }

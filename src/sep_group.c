@@ -974,7 +974,11 @@ nfa* nfa_proj_unary(nfa* A) {
     nfa_elimeps_mod(A);
 
     // Création du nouveau NFA
-    nfa* B = nfa_init();
+    nfa* B;
+    CALLOC(B, 1);
+    B->initials = create_dequeue();
+    B->finals = create_dequeue();
+
     copy_dequeue_right(B->initials, A->initials, 0);
     copy_dequeue_right(B->finals, A->finals, 0);
     B->trans = create_lgraph_noedges(A->trans->size_graph, 1);

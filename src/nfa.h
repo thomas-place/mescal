@@ -49,7 +49,6 @@ typedef struct {
     graph* trans_e; //!< Graph of espilon transitions (NULL if there are no such transitions).
     lgraph* trans_i;    //!< Graph of inverse transitions (NULL if there are no such transitions).
     char** state_names; //!< Array of state names (only utilized when displaying the NFA). Each state is mapped to its name (NULL if unused).
-    uint* ancestors; //!< Array of ancestors. Useful when the NFA has been built from another NFA by merging and/or removing states. Maps each state to an ancestor state in the original NFA (NULL if unused).
 } nfa;
 
 
@@ -67,70 +66,11 @@ typedef struct {
 
     /* Optional */
     char** state_names; //!< Array of state names (only utilized when displaying the DFA). Each state is mapped to its name (NULL if unused).
-    uint* ancestors; //!< Array of ancestors. Useful when the DFA has been built from another NFA by merging and/or removing states. (NULL if unused).
 } dfa;
 
-
-/*************/
-/* Alphabets */
-/*************/
-
-/**
- * @brief
- * Displays a letter in the alphabet of a NFA on a given stream: utf8 version.
- */
-void nfa_fprint_letter_utf8(const nfa*, //!< The NFA.
-    uint,        //!< Index of the letter.
-    FILE*       //!< The stream.
-);
-
-/**
- * @brief
- * Displays a letter in the alphabet of a NFA on a given stream: graphviz
- * version.
- *
- * @remark
- * Includes an option for displaying an inverse power "-1" on the letter.
- * This is used for displaying inverse transitions.
- */
-void nfa_fprint_letter_gviz(
-    const nfa*, //!< The NFA.
-    uint, //!< Index of the letter.
-    FILE*, //!< The stream.
-    bool //!< True if an inverse power has to be displayed, false otherwise.
-);
-
-/**
- * @brief
- * Copies the alphabet array of a NFA.
- *
- * @remark
- * Auxiliary function utilized when copying a NFA.
- *
- * @return
- * A copy of the alphabet array.
- */
-letter* nfa_duplicate_alpha(const nfa* //!< The NFA.
-);
-
-/**
- * @brief
- * Retrieves the index of a letter in the alphabet of a NFA.
- *
- * @remark
- * If the letter does not belong to the alphabet the invalid index
- * A->trans->size_alpha is returned
- *
- * @return
- * The index of the letter.
- */
-uint nfa_letter_index(const nfa*, //!< The NFA.
-    letter       //!< The letter.
-);
-
-/***************/
-/* State names */
-/***************/
+/*****************/
+/*+ State names +*/
+/*****************/
 
 /**
  * @brief
@@ -146,11 +86,29 @@ void nfa_print_state(const nfa*, //!< The NFA.
 
 /**
  * @brief
+ * Displays the name of a state in a DFA on a given stream.
+ *
+ * @remark
+ * If no names are defined for the states, each state is named by its index.
+ */
+void dfa_print_state(const dfa*, //!< The DFA.
+    uint,        //!< Index of the state.
+    FILE*       //!< The stream.
+);
+
+/**
+ * @brief
  * Release the state names in a NFA (if there are states names).
  */
 void nfa_reset_state_names(nfa* // The NFA.
 );
 
+/**
+ * @brief
+ * Release the state names in a DFA (if there are states names).
+ */
+void dfa_reset_state_names(dfa* A //!< The DFA.
+);
 
 /**
  * @brief
@@ -164,41 +122,92 @@ char** copy_all_names(char** names, //!< The array of state names.
     uint size //!< Size of the array of state names.
 );
 
-/*************/
-/* Ancestors */
-/*************/
+/**********************/
+/*+ Copy and release +*/
+/**********************/
 
 /**
  * @brief
- * Returns a copy of the array of ancstors in a NFA.
- *
- * @remark
- * If no ancestors are defined for the states, the function returns a NULL
- * pointer.
- *
- * @return
- * A copy of the array of ancestors.
+ * Release of a NFA.
  */
-uint* nfa_copy_ancestors(const nfa* //!< The NFA.
+void nfa_delete(nfa* //!< The NFA.
 );
 
-/******************************/
-/* Initialization and release */
-/******************************/
+/**
+ * @brief
+ * Deletes a DFA.
+ */
+void dfa_delete(dfa* A //!< The DFA.
+);
+
 
 /**
  * @brief
- * Initialization of an NFA.
- *
- * @attention
- * Transitions are not initialized (this would require the number of states
- * and the size of the alphabets). On the other hand, the dequeues containing
- * the intial and final states are initialized.
+ * Copy of a NFA.
  *
  * @return
- * Le NFA.
+ * The copy
  */
-nfa* nfa_init(void);
+nfa* nfa_copy(nfa* //!< The NFA.
+);
+
+/**
+ * @brief
+ * Copies a DFA.
+ *
+ * @return
+ * A copy of the DFA.
+ */
+dfa* dfa_copy(dfa* A //!< The DFA.
+);
+
+/**
+ * @brief
+ * Copies an NFA with an extended alphabet.
+ *
+ * @remark
+ * The input array contains the letters that should be added to the alphabet. It
+ * may contain letters which are already in the alphabet.  The new alphabet is
+ * the union between the old one and the set of letters contains in this array.
+ *
+ * @attention
+ * The array containing the new letter must be sorted in increasing order.
+ *
+ * @return
+ * A copy of the original NFA with its alphabet extended.
+ */
+nfa* nfa_copy_exalpha(nfa*,    //!< The NFA.
+    letter*, //!< Array containing the new letters (sorted in increasing order).
+    uint      //!< Size of the array.
+);
+
+/**
+ * @brief
+ * Copies a DFA with an extended alphabet.
+ *
+ * @remark
+ * If there indeed new letters in the alphabet, the new DFA is ectended with a new sink
+ * state.
+ *
+ * @return
+ * A copy of the DFA with an extended alphabet.
+ */
+dfa* dfa_copy_exalpha(dfa* A, //!< The DFA.
+    letter* alpha, //!< Array containing the new letters (sorted in increasing order).
+    uint size //!< Size of the array.
+);
+
+/**
+ * @brief
+ * Overwrites a NFA by copying another NFA and releasing this other NFA.
+ */
+void nfa_overwrite(nfa*, //!< The NFA that is being overwritten (its original fields are released).
+    nfa*  //!< The NFA being copied (it is completely released).
+);
+
+/**************************************************************/
+/*+ Computation of basic NFAs (used in Thompson's algorithm) +*/
+/**************************************************************/
 
 /**
  * @brief
@@ -252,55 +261,10 @@ nfa* create_sing_letter(letter //!< The letter.
 nfa* create_sing_word(word* //!< The word.
 );
 
-/**
- * @brief
- * Release of a NFA.
- */
-void nfa_delete(nfa* //!< The NFA.
-);
+/*******************************/
+/*+ Simple operations on NFAs +*/
+/*******************************/
 
-/**
- * @brief
- * Overwrites a NFA by copying another NFA and releasing this other NFA.
- */
-void nfa_overwrite(nfa*, //!< The NFA that is being overwritten (its original
-    //!< fields are released).
-    nfa*  //!< The NFA being copied (it is completely released).
-);
-
-/*****************************/
-/* Simple operations on NFAs */
-/*****************************/
-
-/**
- * @brief
- * Copy of a NFA.
- *
- * @return
- * The copy
- */
-nfa* nfa_copy(nfa* //!< The NFA.
-);
-
-/**
- * @brief
- * Extension of the alphabet of a NFA.
- *
- * @remark
- * The input array contains the letters that should be added to the alphabet. It
- * may contain letters which are already in the alphabet.  The new alphabet is
- * the union between the old one and the set of letters contains in this array.
- *
- * @attention
- * The array containing the new letter must be sorted in increasing order.
- *
- * @return
- * A copy of the original NFA with its alphabet extended.
- */
-nfa* nfa_copy_exalpha(nfa*,    //!< The NFA.
-    letter*, //!< Array containing the new letters (sorted in increasing order).
-    uint      //!< Size of the array.
-);
 
 /**
  * @brief
@@ -346,6 +310,17 @@ nfa* nfa_concat(void* I1, //!< First NFA or DFA.
 nfa* nfa_star(nfa* //!< The NFA.
 );
 
+
+/**
+ * @brief
+ * Kleene star of a DFA.
+ *
+ * @return
+ * A NFA recognizing the Kleene star of the input language.
+ */
+nfa* dfa_star(dfa* //!< The DFA.
+);
+
 /**
  * @brief
  * Kleene plus of a NFA.
@@ -364,6 +339,16 @@ nfa* nfa_plus(nfa* //!< The NFA.
  * A NFA recognizing the mirror of the input language.
  */
 nfa* nfa_mirror(nfa* //!< The NFA.
+);
+
+/**
+ * @brief
+ * Mirror of a DFA.
+ *
+ * @return
+ * A NFA recognizing the mirror of the input language.
+ */
+nfa* dfa_mirror(dfa* //!< The NFA.
 );
 
 /**
@@ -396,15 +381,25 @@ nfa* nfa_trim(nfa* //!< The NFA.
 
 /**
  * @brief
+ * Removes all non-accessible states from a DFA.
+ *
+ * @return
+ * The trimmed DFA.
+ */
+dfa* dfa_trim(dfa* A //!< The DFA.
+);
+
+/**
+ * @brief
  * Elimination of all states that are not simultaneously reachable from an
  * initial state and co-reachable from a final state. Overwrites the input NFA.
  */
 void nfa_trim_mod(nfa* //!< The NFA.
 );
 
-/*****************************/
-/* Generation of random NFAs */
-/*****************************/
+/***********************************/
+/*+ Generation of random automata +*/
+/***********************************/
 
 /**
  * @brief
@@ -418,10 +413,22 @@ nfa* nfa_random(uint, //!< Size of the alphabet.
     uint  //!< Maximum number of states.
 );
 
+/**
+ * @brief
+ * Generates a random DFA.
+ *
+ * @return
+ * The random DFA.
+ */
+dfa* dfa_random(uint, //!< Size of the alphabet.
+    uint, //!< Minimum number of states.
+    uint  //!< Maximum number of states.
+);
 
-/***********************/
-/* Information on NFAs */
-/***********************/
+
+/*****************/
+/*+ Information +*/
+/*****************/
 
 /**
  * @brief
@@ -486,6 +493,39 @@ dequeue* nfa_compute_runs(nfa*, //!< The NFA.
 );
 
 
+/**
+ * @brief
+ * Checks if there exists a path between two states in a DFA.
+ *
+ * @attention
+ * The function does not check whether the input is indeed a DFA.
+ *
+ * @return
+ * A Boolean indicating whether there exists a path.
+ */
+bool dfa_exists_path(dfa*, //!< The DFA.
+    uint,   //!< The source state.
+    uint,   //!< The target state.
+    bool* //!< The restriction of the alphabet (NULL if no restriction).
+);
+
+/**
+ * @brief
+ * Computes the run of a DFA on a word.
+ *
+ * @return
+ * The final state reached by the DFA after reading the word.
+ * If the word contains an invalid letter, UINT_MAX is returned.
+ */
+uint dfa_compute_run(dfa* A, //!< The DFA.
+    word* w //!< The word.
+);
+
+
+
+
+
+
 
 
 /************************/
@@ -512,64 +552,9 @@ nfa* nfa_merge_states(nfa*,  //!< The NFA.
 
 
 
-/**********/
-/*+ DFAs +*/
-/**********/
-
-/**
- * @brief
- * Initializes a DFA.
- *
- * @return
- * The DFA.
- */
-dfa* dfa_init(uint size_graph, //!< Number of states.
-    uint size_alpha, //!< Size of the alphabet.
-    uint nb_finals, //!< Number of final states.
-    letter* alphabet //!< The alphabet (NULL if the alphabet is empty). This will be copied.
-);
-
-/**
- * @brief
- * Release the state names in a DFA (if there are states names).
- */
-void dfa_reset_state_names(dfa* A //!< The DFA.
-);
-
-/**
- * @brief
- * Copies a DFA.
- *
- * @return
- * A copy of the DFA.
- */
-dfa* dfa_copy(dfa* A //!< The DFA.
-);
-
-/**
- * @brief
- * Copies a DFA with an extended alphabet.
- *
- * @remark
- * If there indeed new letters in the alphabet, the new DFA is ectended with a new sink
- * state.
- *
- * @return
- * A copy of the DFA with an extended alphabet.
- */
-dfa* dfa_copy_exalpha(dfa* A, //!< The DFA.
-    letter* alpha, //!< Array containing the new letters (sorted in increasing order).
-    uint size //!< Size of the array.
-);
-
-
-
-/**
- * @brief
- * Deletes a DFA.
- */
-void dfa_delete(dfa* A //!< The DFA.
-);
+/****************/
+/*+ Conversion +*/
+/****************/
 
 /**
  * @brief
@@ -607,100 +592,9 @@ nfa* dfa_to_nfa(dfa* A //!< The DFA.
 nfa* dfa_to_nfa_exalpha(dfa* A, letter* alpha, uint size);
 
 
-/**
- * @brief
- * Mirror of a DFA.
- *
- * @return
- * A NFA recognizing the mirror of the input language.
- */
-nfa* dfa_mirror(dfa* //!< The NFA.
-);
 
 
-/**
- * @brief
- * Kleene star of a DFA.
- *
- * @return
- * A NFA recognizing the Kleene star of the input language.
- */
-nfa* dfa_star(dfa* //!< The DFA.
-);
 
-
-/**
- * @brief
- * Generates a random DFA.
- *
- * @return
- * The random DFA.
- */
-dfa* dfa_random(uint, //!< Size of the alphabet.
-    uint, //!< Minimum number of states.
-    uint  //!< Maximum number of states.
-);
-
-
-/**
- * @brief
- * Removes all non-accessible states from a DFA.
- *
- * @return
- * The trimmed DFA.
- */
-dfa* dfa_trim(dfa* A //!< The DFA.
-);
-
-
-/**
- * @brief
- * Displays the name of a state in a DFA on a given stream.
- *
- * @remark
- * If no names are defined for the states, each state is named by its index.
- */
-void dfa_print_state(const dfa*, //!< The DFA.
-    uint,        //!< Index of the state.
-    FILE*       //!< The stream.
-);
-
-/**
- * @brief
- * Displays a letter in the alphabet of a DFA on a given stream: utf8 version.
- */
-void dfa_fprint_letter_utf8(const dfa*, //!< The DFA.
-    uint,        //!< Index of the letter.
-    FILE*       //!< The stream.
-);
-
-/**
- * @brief
- * Checks if there exists a path between two states in a DFA.
- *
- * @attention
- * The function does not check whether the input is indeed a DFA.
- *
- * @return
- * A Boolean indicating whether there exists a path.
- */
-bool dfa_exists_path(dfa*, //!< The DFA.
-    uint,   //!< The source state.
-    uint,   //!< The target state.
-    bool* //!< The restriction of the alphabet (NULL if no restriction).
-);
-
-/**
- * @brief
- * Computes the run of a DFA on a word.
- *
- * @return
- * The final state reached by the DFA after reading the word.
- * If the word contains an invalid letter, UINT_MAX is returned.
- */
-uint dfa_compute_run(dfa* A, //!< The DFA.
-    word* w //!< The word.
-);
 
 
 

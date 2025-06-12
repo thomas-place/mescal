@@ -1,9 +1,10 @@
 #include "main.h"
 
+#include "files.h"
 // TODO Clean thes (used to pass values to the 'test' command).
 uint slice_test = 1, width_test = 5000000;
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     // avoid warning unused argument.
     assert(argc > 0);
 
