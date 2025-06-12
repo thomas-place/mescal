@@ -119,18 +119,18 @@ uint&#160;</td><td class="memItemRight" valign="bottom"><b>size_graph</b></td></
 uint&#160;</td><td class="memItemRight" valign="bottom"><b>size_alpha</b></td></tr>
 <tr class="memdesc:ab1fd38d56798962590f050d4a68d2ed1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of labels. <br /></td></tr>
 <tr class="separator:ab1fd38d56798962590f050d4a68d2ed1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac79fae3314319677c37cd42a3517ffdd" id="r_ac79fae3314319677c37cd42a3517ffdd"><td class="memItemLeft" align="right" valign="top"><a id="ac79fae3314319677c37cd42a3517ffdd" name="ac79fae3314319677c37cd42a3517ffdd"></a>
-uint *&#160;</td><td class="memItemRight" valign="bottom"><b>storage</b></td></tr>
-<tr class="memdesc:ac79fae3314319677c37cd42a3517ffdd"><td class="mdescLeft">&#160;</td><td class="mdescRight">The storage of the edges (one dimension array of size size_graph * size_alpha). <br /></td></tr>
-<tr class="separator:ac79fae3314319677c37cd42a3517ffdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a90c94c69fc5caa0c412eb3c888acebeb" id="r_a90c94c69fc5caa0c412eb3c888acebeb"><td class="memItemLeft" align="right" valign="top"><a id="a90c94c69fc5caa0c412eb3c888acebeb" name="a90c94c69fc5caa0c412eb3c888acebeb"></a>
 uint **&#160;</td><td class="memItemRight" valign="bottom"><b>edges</b></td></tr>
 <tr class="memdesc:a90c94c69fc5caa0c412eb3c888acebeb"><td class="mdescLeft">&#160;</td><td class="mdescRight">The edges: two dimensions array of size "size_graph * size_alpha" (actually contains pointers to the storage). <br /></td></tr>
 <tr class="separator:a90c94c69fc5caa0c412eb3c888acebeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac79fae3314319677c37cd42a3517ffdd" id="r_ac79fae3314319677c37cd42a3517ffdd"><td class="memItemLeft" align="right" valign="top"><a id="ac79fae3314319677c37cd42a3517ffdd" name="ac79fae3314319677c37cd42a3517ffdd"></a>
+uint *&#160;</td><td class="memItemRight" valign="bottom"><b>storage</b></td></tr>
+<tr class="memdesc:ac79fae3314319677c37cd42a3517ffdd"><td class="mdescLeft">&#160;</td><td class="mdescRight">The storage of the edges (one dimension array of size size_graph * size_alpha). <br /></td></tr>
+<tr class="separator:ac79fae3314319677c37cd42a3517ffdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Type used to represent a complete deterministic directed labeled graph. </p>
-<dl class="section remark"><dt>Remarks</dt><dd>The set of edges is represented by the array of arrays of usigned integers <code>edges</code>. For each vertex <code>q</code> and each letter <code>a</code> the cell <code>edge[q][a]</code> contains the unique vertex connected to <code>q</code> by an edge labeled by <code>a</code>. </dd></dl>
+<dl class="section remark"><dt>Remarks</dt><dd>The set of edges is represented by the arrays. For each vertex "q" and each letter "a" the cell "edge[q][a]" (stored in storage) contains the unique vertex connected to "q" by an edge labeled by "a". </dd></dl>
 </div><hr/>The documentation for this struct was generated from the following file:<ul>
 <li><a class="el" href="graphs_8h_source.html">graphs.h</a></li>
 </ul>

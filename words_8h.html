@@ -146,6 +146,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a84e561702457c18cf2dda48aab6ba8d8" id="r_a84e561702457c18cf2dda48aab6ba8d8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structletter.html">letter</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a84e561702457c18cf2dda48aab6ba8d8">duplicate_alphabet</a> (const <a class="el" href="structletter.html">letter</a> *, uint)</td></tr>
 <tr class="memdesc:a84e561702457c18cf2dda48aab6ba8d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a copy of an array of letters.  <br /></td></tr>
 <tr class="separator:a84e561702457c18cf2dda48aab6ba8d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6909aa432e4eac1f525e84b80211efbb" id="r_a6909aa432e4eac1f525e84b80211efbb"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6909aa432e4eac1f525e84b80211efbb">letter_index</a> (<a class="el" href="structletter.html">letter</a> l, const <a class="el" href="structletter.html">letter</a> *alphabet, uint size_alphabet)</td></tr>
+<tr class="memdesc:a6909aa432e4eac1f525e84b80211efbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the index of a letter in an alphabet (sorted array of letters.  <br /></td></tr>
+<tr class="separator:a6909aa432e4eac1f525e84b80211efbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c0b1829a5f9730cdc546956ab42fe07" id="r_a3c0b1829a5f9730cdc546956ab42fe07"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structword.html">word</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3c0b1829a5f9730cdc546956ab42fe07">create_empty_word</a> (void)</td></tr>
 <tr class="memdesc:a3c0b1829a5f9730cdc546956ab42fe07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creation of an empty word.  <br /></td></tr>
 <tr class="separator:a3c0b1829a5f9730cdc546956ab42fe07"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -625,6 +628,44 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">l</td><td>The letter. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a6909aa432e4eac1f525e84b80211efbb" name="a6909aa432e4eac1f525e84b80211efbb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6909aa432e4eac1f525e84b80211efbb">&#9670;&#160;</a></span>letter_index()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint letter_index </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structletter.html">letter</a></td>          <td class="paramname"><span class="paramname"><em>l</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structletter.html">letter</a> *</td>          <td class="paramname"><span class="paramname"><em>alphabet</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>size_alphabet</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Retrieves the index of a letter in an alphabet (sorted array of letters. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>If the letter does not belong to the alphabet the invalid index UINT_MAX is returned.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The index of the letter. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">l</td><td>The letter.  </td></tr>
+    <tr><td class="paramname">alphabet</td><td>The alphabet (sorted in increasing order).  </td></tr>
+    <tr><td class="paramname">size_alphabet</td><td>The size of the alphabet (number of letters). </td></tr>
   </table>
   </dd>
 </dl>

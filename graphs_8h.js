@@ -7,6 +7,9 @@ var graphs_8h =
       [ "DFS", "graphs_8h.html#af79428132abe4bab1bda312319693dc8a2b7c6716fdffcec8a334556833e4997c", null ],
       [ "BFS", "graphs_8h.html#af79428132abe4bab1bda312319693dc8a9c2f133bd60477f2a4ece3dc959fef96", null ]
     ] ],
+    [ "copy_dgraph", "graphs_8h.html#a0b8a154099b1de9a184476ba30df7afb", null ],
+    [ "copy_graph", "graphs_8h.html#abe82614bf3e450bc5604e3d816420370", null ],
+    [ "copy_lgraph", "graphs_8h.html#a6e182821558818a23e67a0a04c8158ed", null ],
     [ "create_dgraph_noedges", "graphs_8h.html#a1a732d4c9d1a518b14acc8e1516c46a5", null ],
     [ "create_graph_noedges", "graphs_8h.html#a387700484e72c4cfe219203d5dae8dae", null ],
     [ "create_graph_selfloops", "graphs_8h.html#a4251bf45eff73ef9edcfcada89b5bcb0", null ],

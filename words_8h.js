@@ -17,6 +17,7 @@ var words_8h =
     [ "lefpull_word", "words_8h.html#a6dd8e84a3ab9f3d1a8474929aff60aa1", null ],
     [ "lefread_word", "words_8h.html#a122ce20f12d43db6e01a8bb3e4e975d8", null ],
     [ "length_letter_utf8", "words_8h.html#af63d85375dfef8fdfbad667a7e860250", null ],
+    [ "letter_index", "words_8h.html#a6909aa432e4eac1f525e84b80211efbb", null ],
     [ "rigcon_word", "words_8h.html#a66cd410618e38ffa5c7863135de9c1e6", null ],
     [ "rigpull_word", "words_8h.html#a0e1f57c5d58719fe17ae8bc69d8e4564", null ],
     [ "rigread_word", "words_8h.html#abbff18a820bef38572d955de8500a07e", null ],

@@ -134,6 +134,7 @@ limit                         Displays the current limit.
 limit = &lt;value&gt;               Sets the limit to &lt;value&gt;.
 history                       Displays the current history size.
 history = &lt;value&gt;             Sets the history size to &lt;value&gt; entries.
+test                          Calls the test function.
 quit or exit                  Quits.
 classes                       Lists all classes recognized by the program.
 </pre><h3><a class="anchor" id="autotoc_md7"></a>
@@ -250,19 +251,79 @@ akernel(M)                    Displays the AMT-kernel of the morphism.
 gkernel(M)                    Displays the GR-kernel of the morphism.
 orbit(𝒞,M)                    Displays the 𝒞-orbits for the morphism (implemented for 𝒞 = DD, MOD⁺, AT).
 orbit(𝒞,M,e)                  Displays the 𝒞-orbit of the idempotent e for the morphism (implemented for 𝒞 = DD, MOD⁺, AT).
-orbit(OP,𝒞,M)                 Displays the OP(𝒞)-orbits for the morphism (implemented for OP = BPol, TL and 𝒞 = ST, DD, MOD, MOD⁺, GR, GR⁺).
-orbit(OP,𝒞,M,e)               Displays the OP(𝒞)-orbits of the idempotent e for the morphism (implemented for OP = BPol, TL and 𝒞 = ST, DD, MOD, MOD⁺, GR, GR⁺).
 image(M,"&lt;word&gt;")             Computes the image of an input word.
 </pre><h2><a class="anchor" id="autotoc_md22"></a>
 Membership tests</h2>
-<pre class="fragment">- membership(𝒞,&lt;object&gt;)                            
+<pre class="fragment">- membership(𝒞, &lt;object&gt;)                            
       Checks if the language recognized by the object belongs to 𝒞 (example: membership(Pol(GR),L)).
-- exall(𝒞,𝒟,&lt;n1&gt;,&lt;n2&gt;)                              
-      Computes and stores in variables all DFAs with at most &lt;n1&gt; states (plus a sink state) 
-      and &lt;n2&gt; letters which are outside 𝒞 and inside 𝒟.
-- exall(out(𝒞₁,..,𝒞ₙ),in(𝒟₁,..,𝒟ₘ),&lt;n1&gt;,&lt;n2&gt;)
-      Computes and stores in variables all DFAs with at most &lt;n1&gt; states (plus a sink state) 
-      and &lt;n2&gt; letters which are outside 𝒞₁,..,𝒞ₙ and inside 𝒟₁,..,𝒟ₘ.
+
+- exall(𝒞, 𝒟, &lt;n1&gt;, &lt;n2&gt;[, &lt;start&gt;, &lt;end&gt;])
+      Computes and stores in variables all (possibly incomplete) DFAs with at most &lt;n1&gt; states (plus possibly
+      a sink state) and &lt;n2&gt; letters which are outside 𝒞 and inside 𝒟, and having a unique final state.
+      Some DFAs that differ only by permutations of letters are only generated once. 
+      The command numbers these automata, as EXA0000, EXA0001, etc.
+      The optional &lt;start&gt; and &lt;end&gt; arguments restrict the search: the membership tests are performed only
+      for automata EXA000i, with i between start and end.
+      Example, to find all such automata with 6 states and 2 letteers, which are in BPol(MOD) but not in SF:
+          exall (SF, BPol(MOD), 6, 2)
+
+- exall(out(𝒞₁,..,𝒞ₙ), in(𝒟₁,..,𝒟ₘ), &lt;n1&gt;, &lt;n2&gt;[, &lt;start&gt;, &lt;end&gt;])
+      Same as the preceding command, but tests that the generated DFAs are outside 𝒞₁,..,𝒞ₙ and inside 𝒟₁,..,𝒟ₘ.
+
+- exinit(&lt;classes1&gt;, &lt;classes2&gt;, &lt;nb_states&gt;, &lt;nb_letters&gt;, "&lt;path&gt;")
+      Initializes a search for examples to be saved in a file.
+      &lt;classes1&gt; is either a single class or of the form out(&lt;cl1&gt;, &lt;cl2&gt;, ...) where the &lt;cli&gt; are classes.
+      &lt;classes2&gt; is either a single class or of the form in(&lt;cl1&gt;, &lt;cl2&gt;, ...) where the &lt;cli&gt; are classes.
+      &lt;nb_states&gt; is the number of states.
+      &lt;nb_letters&gt; is the size of the alphabet.
+      &lt;path&gt; is the path to the json file that will be created (or overwritten if it already exists).
+
+- excontinue("&lt;path&gt;")
+      Searches examples whose initialization is stored in file "&lt;path&gt;", and stores the results in that file.
+
+- exretrieve("&lt;path&gt;", "&lt;varname&gt;")
+      Reads examples in json file "&lt;path&gt;" and stores them in variables &lt;varname&gt;0000, &lt;varname&gt;0001, etc.
+      "&lt;varname&gt;" should be a string starting with an uppercase letter, such as "Example_" or "MYTEST".
+      Example:
+          exinit (SF(MOD), SF(GR), 4, 2, "toto.json")
+          excontinue ("toto.json")
+          sort(syntactic)
+          list(syntactic)
+
+- fpexall(&lt;class&gt;, &lt;level&gt;, &lt;nb_states&gt;, &lt;nb_letters&gt;[, &lt;start&gt;, &lt;end&gt;])
+      Same as exall, but generates languages of a specific level of the future-past temporal hierarchy.
+      &lt;class&gt; is the base class of the hierarchy.
+      &lt;level&gt; is the desired level in the hierarchy.
+      &lt;nb_states&gt; is the number of states.
+      &lt;nb_letters&gt; is the size of the alphabet.
+      &lt;start&gt; is the enumeration index of the first DFA to test (optional).
+      &lt;end&gt; is the enumeration index of the last DFA to test (optional).
+
+- exinitfp(&lt;class&gt;, &lt;level&gt;, &lt;nb_states&gt;, &lt;nb_letters&gt;, "&lt;path&gt;")
+      Same as exinit, but initializes a search for languages of a specific level of the future-past temporal hierarchy.
+      The file "&lt;path&gt;" can then be given to excontinue() and exretrieve().
+      &lt;class&gt; is the base class of the hierarchy.
+      &lt;level&gt; is the desired level in the hierarchy.
+      &lt;nb_states&gt; is the number of states.
+      &lt;nb_letters&gt; is the size of the alphabet.
+      &lt;path&gt; is the path to the json file that will be created (or overwritten if it already exists).
+
+- negexall(&lt;class&gt;, &lt;level&gt;, &lt;nb_states&gt;, &lt;nb_letters&gt;[, &lt;start&gt;, &lt;end&gt;])
+      Same as exall, but generates languages of a specific level of the negation temporal hierarchy.
+      &lt;class&gt; is the base class of the hierarchy.
+      &lt;level&gt; is the desired level in the hierarchy.
+      &lt;nb_states&gt; is the number of states.
+      &lt;nb_letters&gt; is the size of the alphabet.
+      &lt;start&gt; is the enumeration index of the first DFA to test (optional).
+      &lt;end&gt; is the enumeration index of the last DFA to test (optional).
+
+- exinitneg(&lt;class&gt;, &lt;level&gt;, &lt;nb_states&gt;, &lt;nb_letters&gt;, "&lt;path&gt;")
+      Same as exinit, but initializes a search for languages of a specific level of the negation temporal hierarchy.
+      &lt;class&gt; is the base class of the hierarchy.
+      &lt;level&gt; is the desired level in the hierarchy.
+      &lt;nb_states&gt; is the number of states.
+      &lt;nb_letters&gt; is the size of the alphabet.
+      &lt;path&gt; is the path to the json file that will be created (or overwritten if it already exists).
 </pre><h3><a class="anchor" id="autotoc_md23"></a>
 Available classes 𝒞</h3>
 <pre class="fragment">- ST      Trivial class.

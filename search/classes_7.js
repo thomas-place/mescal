@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['letter_0',['letter',['../structletter.html',1,'']]],
-  ['lgraph_1',['lgraph',['../structlgraph.html',1,'']]]
+  ['hash_5ftable_0',['hash_table',['../structhash__table.html',1,'']]],
+  ['hopcroft_5fpartition_1',['hopcroft_partition',['../structhopcroft__partition.html',1,'']]]
 ];

@@ -7,6 +7,7 @@ var structdfa__enum =
     [ "outlabs", "structdfa__enum.html#a3ae795c5b54e55d994013ba2059cb4fe", null ],
     [ "parsize", "structdfa__enum.html#aaece74b6396ebac6b5925b791e6e2861", null ],
     [ "parti", "structdfa__enum.html#a030d5036d018750812b29e59d57ff5ad", null ],
+    [ "run", "structdfa__enum.html#aac1fdb6639ad259811e8225ea02df89e", null ],
     [ "states", "structdfa__enum.html#a42c6cf6bc37ce4811cedec72c20d5904", null ],
     [ "used", "structdfa__enum.html#a72bf04cb1232fcd6dc71a88d27d35158", null ]
 ];

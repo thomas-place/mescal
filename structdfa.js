@@ -1,7 +1,6 @@
 var structdfa =
 [
     [ "alphabet", "structdfa.html#a7724e97869b7bdf458b43ab70a03f852", null ],
-    [ "ancestors", "structdfa.html#a10be9704c7c396e04ada21e9696d45cc", null ],
     [ "finals", "structdfa.html#a3e31a070568f0f05c588c128ed4f52d0", null ],
     [ "initial", "structdfa.html#a856e37ce7cf70667ba30220c1b30cbb2", null ],
     [ "nb_finals", "structdfa.html#ac4673b94618b273cf8e6de05767fbbbc", null ],

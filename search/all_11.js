@@ -58,5 +58,6 @@ var searchData=
   ['rigread_5fdequeue_5fgen_55',['rigread_dequeue_gen',['../type__dequeue__gen_8h.html#a79b9198415048e3feb9c3f57ace42d9d',1,'type_dequeue_gen.c']]],
   ['rigread_5fword_56',['rigread_word',['../words_8h.html#abbff18a820bef38572d955de8500a07e',1,'words.c']]],
   ['rindex_57',['rindex',['../structhopcroft__partition.html#a591080ba73a61c52b76317b1d8dd1848',1,'hopcroft_partition']]],
-  ['rsent_58',['rsent',['../structdlist.html#aabfcc54ef7eff42dbcc113592ae4779a',1,'dlist']]]
+  ['rsent_58',['rsent',['../structdlist.html#aabfcc54ef7eff42dbcc113592ae4779a',1,'dlist']]],
+  ['run_59',['run',['../structdfa__enum.html#aac1fdb6639ad259811e8225ea02df89e',1,'dfa_enum']]]
 ];

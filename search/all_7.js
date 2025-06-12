@@ -10,6 +10,7 @@ var searchData=
   ['help_7',['help',['../shell__help_8h.html#a0bed8474bd33a912769360766f6b10d4',1,'shell_help.c']]],
   ['hierarchies_8',['Available input classes 𝒞 for negation hierarchies and future/past hierarchies',['../index.html#autotoc_md25',1,'']]],
   ['hierarchies_20and_20future_20past_20hierarchies_9',['Available input classes 𝒞 for negation hierarchies and future/past hierarchies',['../index.html#autotoc_md25',1,'']]],
-  ['hint_10',['HINT',['../error_8h.html#a1296c786529f6fae6847c40248dcbbf2',1,'error.h']]],
-  ['hopcroft_5fpartition_11',['hopcroft_partition',['../structhopcroft__partition.html',1,'']]]
+  ['high_10',['high',['../structexall__profile.html#adbd4e7d336d1bafce7e78217cc8bbe4b',1,'exall_profile']]],
+  ['hint_11',['HINT',['../error_8h.html#a1296c786529f6fae6847c40248dcbbf2',1,'error.h']]],
+  ['hopcroft_5fpartition_12',['hopcroft_partition',['../structhopcroft__partition.html',1,'']]]
 ];

@@ -10,5 +10,6 @@ var searchData=
   ['rels_7',['rels',['../structmorphism.html#a1dd3e7cce88a026278a28eec623fd541',1,'morphism::rels'],['../structsubsemi.html#a21e3482c06b50d5846422ac34ee54242',1,'subsemi::rels']]],
   ['right_8',['right',['../structregexp.html#ac92e7ea338e4a75e4aa8b424fbd1344a',1,'regexp::right'],['../structavlnode.html#a3a5609a4723ebbb5f6a369fcd208443c',1,'avlnode::right'],['../structuint__avlnode.html#a9052c5ba45094b747b764c2bd9487a93',1,'uint_avlnode::right'],['../structdequeue.html#ad950f6a980260e79c8642e3f87c40ea9',1,'dequeue::right'],['../structdequeue__gen.html#a93fc1a16b653d42daf6e6730e01a292d',1,'dequeue_gen::right'],['../structword.html#a60e84403256e6978190e665dd1d43305',1,'word::right']]],
   ['rindex_9',['rindex',['../structhopcroft__partition.html#a591080ba73a61c52b76317b1d8dd1848',1,'hopcroft_partition']]],
-  ['rsent_10',['rsent',['../structdlist.html#aabfcc54ef7eff42dbcc113592ae4779a',1,'dlist']]]
+  ['rsent_10',['rsent',['../structdlist.html#aabfcc54ef7eff42dbcc113592ae4779a',1,'dlist']]],
+  ['run_11',['run',['../structdfa__enum.html#aac1fdb6639ad259811e8225ea02df89e',1,'dfa_enum']]]
 ];

@@ -119,41 +119,44 @@ $(function(){initNavTree('nfa__enum_8h_source.html',''); initResizable(true); })
 <div class="line"><a id="l00020" name="l00020"></a><span class="lineno"><a class="line" href="structdfa__enum.html#aaece74b6396ebac6b5925b791e6e2861">   20</a></span>    <span class="keywordtype">short</span>* <a class="code hl_variable" href="structdfa__enum.html#aaece74b6396ebac6b5925b791e6e2861">parsize</a>; </div>
 <div class="line"><a id="l00021" name="l00021"></a><span class="lineno"><a class="line" href="structdfa__enum.html#aab02747e94331ca9ad28b459aa3ce58f">   21</a></span>    <span class="keywordtype">short</span> <a class="code hl_variable" href="structdfa__enum.html#aab02747e94331ca9ad28b459aa3ce58f">inisep</a>;   </div>
 <div class="line"><a id="l00022" name="l00022"></a><span class="lineno"><a class="line" href="structdfa__enum.html#a858c8eebc4bf7f45a2640c14b2c7de98">   22</a></span>    <span class="keywordtype">short</span> <span class="keyword">final</span>;    </div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>} <a class="code hl_struct" href="structdfa__enum.html">dfa_enum</a>;</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno"><a class="line" href="structdfa__enum.html#aac1fdb6639ad259811e8225ea02df89e">   23</a></span>    <span class="keywordtype">bool</span> <a class="code hl_variable" href="structdfa__enum.html#aac1fdb6639ad259811e8225ea02df89e">run</a>;      </div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>} <a class="code hl_struct" href="structdfa__enum.html">dfa_enum</a>;</div>
 </div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span></div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span><a class="code hl_struct" href="structdfa__enum.html">dfa_enum</a>* <a class="code hl_function" href="nfa__enum_8h.html#ac9e8ffc541bd28671551a66e4137bce0">dfa_enum_init</a>(<span class="keywordtype">short</span>, </div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    <span class="keywordtype">short</span>                   </div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>);</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span></div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span><span class="keywordtype">void</span> <a class="code hl_function" href="nfa__enum_8h.html#a0ab2d618928d9fd6c41998bcdc151768">dfa_enum_free</a>(<a class="code hl_struct" href="structdfa__enum.html">dfa_enum</a>* </div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>);</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span></div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span><span class="keywordtype">bool</span> <a class="code hl_function" href="nfa__enum_8h.html#a1a7dbbb4c570cd0ae8f176a8d0ae0802">dfa_enum_next</a>(<a class="code hl_struct" href="structdfa__enum.html">dfa_enum</a>* </div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>);</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span> </div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span></div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><a class="code hl_struct" href="structdfa__enum.html">dfa_enum</a>* <a class="code hl_function" href="nfa__enum_8h.html#ac9e8ffc541bd28671551a66e4137bce0">dfa_enum_init</a>(<span class="keywordtype">short</span>, </div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keywordtype">short</span>                   </div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>);</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span></div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span><span class="keywordtype">void</span> <a class="code hl_function" href="nfa__enum_8h.html#a0ab2d618928d9fd6c41998bcdc151768">dfa_enum_free</a>(<a class="code hl_struct" href="structdfa__enum.html">dfa_enum</a>* </div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>);</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span></div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span><span class="keywordtype">bool</span> <a class="code hl_function" href="nfa__enum_8h.html#a1a7dbbb4c570cd0ae8f176a8d0ae0802">dfa_enum_next</a>(<a class="code hl_struct" href="structdfa__enum.html">dfa_enum</a>* </div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>);</div>
 <div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span> </div>
 <div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="keywordtype">short</span> <a class="code hl_function" href="nfa__enum_8h.html#a0a13663cefb234609281957beffbe438">iterate_integer_partition</a>(<span class="keywordtype">short</span>*, </div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    <span class="keywordtype">short</span>                             </div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>);</div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><a class="code hl_struct" href="structdfa.html">dfa</a>* <a class="code hl_function" href="nfa__enum_8h.html#a5bb34be5787b5adb068b3f302ce5cd81">dfa_enum_to_dfa</a>(<a class="code hl_struct" href="structdfa__enum.html">dfa_enum</a>* </div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span> </div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="keywordtype">short</span> <a class="code hl_function" href="nfa__enum_8h.html#a0a13663cefb234609281957beffbe438">iterate_integer_partition</a>(<span class="keywordtype">short</span>*, </div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <span class="keywordtype">short</span>                             </div>
 <div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>);</div>
 <div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span> </div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span><span class="keywordtype">void</span> dfa_enum_print(<a class="code hl_struct" href="structdfa__enum.html">dfa_enum</a>* E);</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><a class="code hl_struct" href="structdfa.html">dfa</a>* <a class="code hl_function" href="nfa__enum_8h.html#a5bb34be5787b5adb068b3f302ce5cd81">dfa_enum_to_dfa</a>(<a class="code hl_struct" href="structdfa__enum.html">dfa_enum</a>* </div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>);</div>
 <div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
 <div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span><span class="preprocessor">#endif </span><span class="comment">// NFA_ENUM_H</span></div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span><span class="keywordtype">void</span> dfa_enum_print(<a class="code hl_struct" href="structdfa__enum.html">dfa_enum</a>* E);</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="preprocessor">#endif </span><span class="comment">// NFA_ENUM_H</span></div>
 <div class="ttc" id="anfa_8h_html"><div class="ttname"><a href="nfa_8h.html">nfa.h</a></div><div class="ttdoc">Implementation of NFAs.</div></div>
-<div class="ttc" id="anfa__enum_8h_html_a0a13663cefb234609281957beffbe438"><div class="ttname"><a href="nfa__enum_8h.html#a0a13663cefb234609281957beffbe438">iterate_integer_partition</a></div><div class="ttdeci">short iterate_integer_partition(short *, short)</div><div class="ttdef"><b>Definition</b> nfa_enum.c:191</div></div>
-<div class="ttc" id="anfa__enum_8h_html_a0ab2d618928d9fd6c41998bcdc151768"><div class="ttname"><a href="nfa__enum_8h.html#a0ab2d618928d9fd6c41998bcdc151768">dfa_enum_free</a></div><div class="ttdeci">void dfa_enum_free(dfa_enum *)</div><div class="ttdoc">Frees the memory allocated for an enumeration of NFAs.</div><div class="ttdef"><b>Definition</b> nfa_enum.c:28</div></div>
-<div class="ttc" id="anfa__enum_8h_html_a1a7dbbb4c570cd0ae8f176a8d0ae0802"><div class="ttname"><a href="nfa__enum_8h.html#a1a7dbbb4c570cd0ae8f176a8d0ae0802">dfa_enum_next</a></div><div class="ttdeci">bool dfa_enum_next(dfa_enum *)</div><div class="ttdoc">Computes the next NFA in the enumeration.</div><div class="ttdef"><b>Definition</b> nfa_enum.c:41</div></div>
-<div class="ttc" id="anfa__enum_8h_html_a5bb34be5787b5adb068b3f302ce5cd81"><div class="ttname"><a href="nfa__enum_8h.html#a5bb34be5787b5adb068b3f302ce5cd81">dfa_enum_to_dfa</a></div><div class="ttdeci">dfa * dfa_enum_to_dfa(dfa_enum *)</div><div class="ttdef"><b>Definition</b> nfa_enum.c:228</div></div>
+<div class="ttc" id="anfa__enum_8h_html_a0a13663cefb234609281957beffbe438"><div class="ttname"><a href="nfa__enum_8h.html#a0a13663cefb234609281957beffbe438">iterate_integer_partition</a></div><div class="ttdeci">short iterate_integer_partition(short *, short)</div><div class="ttdef"><b>Definition</b> nfa_enum.c:194</div></div>
+<div class="ttc" id="anfa__enum_8h_html_a0ab2d618928d9fd6c41998bcdc151768"><div class="ttname"><a href="nfa__enum_8h.html#a0ab2d618928d9fd6c41998bcdc151768">dfa_enum_free</a></div><div class="ttdeci">void dfa_enum_free(dfa_enum *)</div><div class="ttdoc">Frees the memory allocated for an enumeration of NFAs.</div><div class="ttdef"><b>Definition</b> nfa_enum.c:29</div></div>
+<div class="ttc" id="anfa__enum_8h_html_a1a7dbbb4c570cd0ae8f176a8d0ae0802"><div class="ttname"><a href="nfa__enum_8h.html#a1a7dbbb4c570cd0ae8f176a8d0ae0802">dfa_enum_next</a></div><div class="ttdeci">bool dfa_enum_next(dfa_enum *)</div><div class="ttdoc">Computes the next NFA in the enumeration.</div><div class="ttdef"><b>Definition</b> nfa_enum.c:42</div></div>
+<div class="ttc" id="anfa__enum_8h_html_a5bb34be5787b5adb068b3f302ce5cd81"><div class="ttname"><a href="nfa__enum_8h.html#a5bb34be5787b5adb068b3f302ce5cd81">dfa_enum_to_dfa</a></div><div class="ttdeci">dfa * dfa_enum_to_dfa(dfa_enum *)</div><div class="ttdef"><b>Definition</b> nfa_enum.c:231</div></div>
 <div class="ttc" id="anfa__enum_8h_html_ac9e8ffc541bd28671551a66e4137bce0"><div class="ttname"><a href="nfa__enum_8h.html#ac9e8ffc541bd28671551a66e4137bce0">dfa_enum_init</a></div><div class="ttdeci">dfa_enum * dfa_enum_init(short, short)</div><div class="ttdoc">Initializes an enumeration of NFAs.</div><div class="ttdef"><b>Definition</b> nfa_enum.c:3</div></div>
 <div class="ttc" id="astructdfa__enum_html"><div class="ttname"><a href="structdfa__enum.html">dfa_enum</a></div><div class="ttdef"><b>Definition</b> nfa_enum.h:13</div></div>
 <div class="ttc" id="astructdfa__enum_html_a030d5036d018750812b29e59d57ff5ad"><div class="ttname"><a href="structdfa__enum.html#a030d5036d018750812b29e59d57ff5ad">dfa_enum::parti</a></div><div class="ttdeci">short ** parti</div><div class="ttdoc">Integer partition of the outgoing letters.</div><div class="ttdef"><b>Definition</b> nfa_enum.h:19</div></div>
@@ -162,9 +165,10 @@ $(function(){initNavTree('nfa__enum_8h_source.html',''); initResizable(true); })
 <div class="ttc" id="astructdfa__enum_html_a42c6cf6bc37ce4811cedec72c20d5904"><div class="ttname"><a href="structdfa__enum.html#a42c6cf6bc37ce4811cedec72c20d5904">dfa_enum::states</a></div><div class="ttdeci">short states</div><div class="ttdoc">Number of states.</div><div class="ttdef"><b>Definition</b> nfa_enum.h:14</div></div>
 <div class="ttc" id="astructdfa__enum_html_a72bf04cb1232fcd6dc71a88d27d35158"><div class="ttname"><a href="structdfa__enum.html#a72bf04cb1232fcd6dc71a88d27d35158">dfa_enum::used</a></div><div class="ttdeci">short * used</div><div class="ttdoc">Used states at each point.</div><div class="ttdef"><b>Definition</b> nfa_enum.h:17</div></div>
 <div class="ttc" id="astructdfa__enum_html_aab02747e94331ca9ad28b459aa3ce58f"><div class="ttname"><a href="structdfa__enum.html#aab02747e94331ca9ad28b459aa3ce58f">dfa_enum::inisep</a></div><div class="ttdeci">short inisep</div><div class="ttdoc">Number of letters looping on the initial state.</div><div class="ttdef"><b>Definition</b> nfa_enum.h:21</div></div>
+<div class="ttc" id="astructdfa__enum_html_aac1fdb6639ad259811e8225ea02df89e"><div class="ttname"><a href="structdfa__enum.html#aac1fdb6639ad259811e8225ea02df89e">dfa_enum::run</a></div><div class="ttdeci">bool run</div><div class="ttdoc">True if the enumeration is not finished.</div><div class="ttdef"><b>Definition</b> nfa_enum.h:23</div></div>
 <div class="ttc" id="astructdfa__enum_html_aaece74b6396ebac6b5925b791e6e2861"><div class="ttname"><a href="structdfa__enum.html#aaece74b6396ebac6b5925b791e6e2861">dfa_enum::parsize</a></div><div class="ttdeci">short * parsize</div><div class="ttdoc">Sizes of the partition.</div><div class="ttdef"><b>Definition</b> nfa_enum.h:20</div></div>
 <div class="ttc" id="astructdfa__enum_html_ac78b9e233f8ab2841cca8c32313cc473"><div class="ttname"><a href="structdfa__enum.html#ac78b9e233f8ab2841cca8c32313cc473">dfa_enum::alpha</a></div><div class="ttdeci">short alpha</div><div class="ttdoc">Number of letters in the alphabet.</div><div class="ttdef"><b>Definition</b> nfa_enum.h:15</div></div>
-<div class="ttc" id="astructdfa_html"><div class="ttname"><a href="structdfa.html">dfa</a></div><div class="ttdoc">Type used to represent a complete DFA.</div><div class="ttdef"><b>Definition</b> nfa.h:60</div></div>
+<div class="ttc" id="astructdfa_html"><div class="ttname"><a href="structdfa.html">dfa</a></div><div class="ttdoc">Type used to represent a complete DFA.</div><div class="ttdef"><b>Definition</b> nfa.h:59</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
