@@ -224,4 +224,12 @@ bool is_cycletbpgp_dfa(dfa* A, //!< The DFA.
     dfagp_mode mode, //!< The mode of the cycle triviality test.
     int* error //!< The error code.
 );
+
+
+bool is_nosimple_counter(dfa* A, //!< The DFA.
+    int* error //!< The error code.
+);
+
+
+
 #endif

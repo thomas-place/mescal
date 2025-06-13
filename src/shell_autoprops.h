@@ -111,5 +111,6 @@ bool shell_autoprop_cycletbpgp(int j, //!< Index of the automaton in the objects
     FILE* out //!< Output stream (NULL is no output is desired).
 );
 
+bool shell_autoprop_nosimplecounter(int j, char* name, int* error, FILE* out);
 
 

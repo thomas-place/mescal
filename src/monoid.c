@@ -732,7 +732,7 @@ static void mor_cons_order(morphism* M, bool** order) {
 }
 
 
-morphism* dfa_to_morphism(dfa* A, bool** order, int*) {
+morphism* dfa_to_morphism(dfa* A, bool** order, int*, uint** funs) {
 
 #ifdef DEBUG_MONO
     ulong thetime = time(NULL);
@@ -906,6 +906,11 @@ morphism* dfa_to_morphism(dfa* A, bool** order, int*) {
     }
 
     // We free the arrays used in the construction of the morphism.
+    if (funs) {
+        *funs = mor_cons_perms;
+        mor_cons_perms = NULL; // We do not free the mor_cons_perms array, as it is used in the morphism.
+    }
+
     mor_cons_delete();
 
     return M;

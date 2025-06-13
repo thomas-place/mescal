@@ -267,7 +267,8 @@ void mor_compute_min_regular_jcl(morphism* //!< The morphism.
  */
 morphism* dfa_to_morphism(dfa*, //!< The complete DFA.
     bool**, //!< Ordering on the elements of the DFA. (NULL if not used).  
-    int*  //!< Error code to be filled if not NULL.
+    int*,  //!< Error code to be filled if not NULL.
+    uint** //!< A pointer to return function table used to construct the monoid (NULL if not used).
 );
 
 

@@ -507,3 +507,30 @@ bool shell_autoprop_cycletbpgp(int j, dfagp_mode mode, char* name, int* error, F
 
 }
 
+
+
+bool shell_autoprop_nosimplecounter(int j, char* name, int* error, FILE* out) {
+    if (!object_make_dfa(j, error, out)) {
+        return false; // Error in making DFA
+    }
+    if (out) {
+        fprintf(out, "#### Checking if the %s has no simple counter.\n", name);
+    }
+    bool res = is_nosimple_counter(objects[j]->aut->obj_dfa, error);
+    if (*error < 0) {
+        return false;
+    }
+    if (res) {
+        if (out) {
+            fprintf(out, "#### The %s does not contain a simple counter.\n", name);
+        }
+        return true;
+    }
+    else {
+        if (out) {
+            fprintf(out, "#### The %s contains a simple counter.\n", name);
+        }
+        return false;
+    }
+
+}

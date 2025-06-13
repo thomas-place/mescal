@@ -542,7 +542,7 @@ int shell_compute_syntac(int i, bool order) {
 
 
     int error = 0;
-    morphism* synt = dfa_to_morphism(objects[j]->aut->obj_dfa, dfa_order, &error);
+    morphism* synt = dfa_to_morphism(objects[j]->aut->obj_dfa, dfa_order, &error, NULL);
     if (dfa_order) {
         for (uint h = 0; h < objects[j]->aut->obj_dfa->trans->size_graph;h++) {
             free(dfa_order[h]);

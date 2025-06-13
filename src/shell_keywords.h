@@ -80,6 +80,7 @@ typedef enum {
     KY_CYCLETRIV,
     KY_DETERMINIZE,
     KY_COMPLEMENT,
+    KY_NOSIMC,
 
     // Morphisms commands
     KY_SYNT,

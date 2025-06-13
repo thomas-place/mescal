@@ -93,6 +93,7 @@ void keywords_add_all_keys(void) {
     keywords_add_key(KY_RDFA, "dfarandom");
     keywords_add_key(KY_DETERMINIZE, "determinize");
     keywords_add_key(KY_COMPLEMENT, "complement");
+    keywords_add_key(KY_NOSIMC, "nosimplec");
 
     // Commandes morphismes
     keywords_add_key(KY_SYNT, "syntactic");

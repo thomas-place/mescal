@@ -101,6 +101,8 @@ static bool filter_idems(int i, int* vals) {
     return false;
 }
 
+
+
 static void info_idems(int i) {
     int j = shell_compute_syntac(i, false);
     char buffer[64];
@@ -108,6 +110,8 @@ static void info_idems(int i) {
     sprintf(buffer, "Idempotents in the syntactic monoid: %d", M->nb_idems);
     fprintf(stdout, "%-45s", buffer);
 }
+
+
 
 static bool params_idems(com_parameters* pars, int* vals) {
     if (com_nbparams(pars) == 0) {
@@ -131,6 +135,19 @@ static bool params_idems(com_parameters* pars, int* vals) {
         return false;
     }
     return true;
+}
+
+
+
+static bool filter_nosimple(int i, int*) {
+    if (!objects[i] || objects[i]->type != AUTOMATON) {
+        return false;
+    }
+    if (!objects[i]->aut->dfa) {
+        return false;
+    }
+
+    return is_nosimple_counter(objects[i]->aut->obj_dfa, NULL);
 }
 
 int shell_filter_objects(com_parameters* pars, ob_type type) {
@@ -171,6 +188,11 @@ int shell_filter_objects(com_parameters* pars, ob_type type) {
             if (!params_idems(com_getparam(pars, i)->params, vals[i])) {
                 return -1;
             }
+            break;
+        case KY_NOSIMC:
+            filters[i] = filter_nosimple;
+            infos[i] = NULL; // No info function for nosimple
+            vals[i][0] = 0; // No parameters needed
             break;
         default:
             shell_error_syntax();

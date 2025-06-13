@@ -141,13 +141,13 @@ bool is_permutation_dfa(dfa* A, int*, FILE* out) {
 
 // Retourne l'état atteint à partir de s en lisant le mot w dans le DFA A
 // (le déterminisme n'est pas vérifié)
-static uint dfa_function(dfa* A, uint s, dequeue* w) {
-    uint e = s;
-    for (uint i = 0; i < size_dequeue(w); i++) {
-        e = A->trans->edges[e][lefread_dequeue(w, i)];
-    }
-    return e;
-}
+// static uint dfa_function(dfa* A, uint s, dequeue* w) {
+//     uint e = s;
+//     for (uint i = 0; i < size_dequeue(w); i++) {
+//         e = A->trans->edges[e][lefread_dequeue(w, i)];
+//     }
+//     return e;
+// }
 
 // Génération d'un nfa à partir d'un lgraph et d'un unique état initial
 // Seuls les états accessibles sont conservés. Si l'automate n'est pas
@@ -157,7 +157,7 @@ static dfa* dfa_from_scc(dfa* A, parti* sccs, uint p) {
     CALLOC(D, 1);
     D->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha);
     D->trans = create_dgraph_noedges(sccs->cl_size[p] + 1, A->trans->size_alpha);
-    A->nb_finals = 0;
+    D->nb_finals = 0;
 
     for (uint i = 0; i < sccs->cl_size[p]; i++) {
         uint q = sccs->cl_elems[p][i];
@@ -196,11 +196,11 @@ bool is_counterfree_dfa(dfa* A, int* error, FILE* out) {
         // Compute the automaton obtained by only keeping this SCC
         dfa* D = dfa_from_scc(A, PSCCS, c);
 
-        // We compute the associated morphism.
-
+        // We compute the associated morphism and save the function table used to construct it.
         *error = 0;
 
-        morphism* M = dfa_to_morphism(D, NULL, error);
+        uint* funs;
+        morphism* M = dfa_to_morphism(D, NULL, error, &funs);
         if (*error < 0) {
             return false;
         }
@@ -208,69 +208,98 @@ bool is_counterfree_dfa(dfa* A, int* error, FILE* out) {
         // On calcule ses relations de Green
         green* GREL = M->rels;
 
-        // Si il existe une H-classe non-triviale, on sait que la SCC contient un compteur
+        // If there exists a non-trivial group in the automaton, then it contains a counter.
         if (GREL->HCL->size_set != GREL->HCL->size_par) {
-            // Si on doit afficher un exemple de compteur
+            // If a counterexample is requested, we will print it.
             if (out != NULL) {
-                // On cherche un groupe non-trivial dans le monoide
+
+                // We look for a non-trivial group in the automaton.
                 for (uint i = 0; i < M->nb_idems; i++) {
-                    uint cl = GREL->HCL->numcl[M->idem_list[i]];
+                    uint e = M->idem_list[i];
+                    uint cl = GREL->HCL->numcl[e];
                     if (GREL->HCL->cl_size[cl] > 1) {
-                        // On prend un élément de ce groupe qui n'est pas le neutre
+                        // We take an element of the class which is not an idempotent.
                         uint s = GREL->HCL->cl_elems[cl][0];
                         if (M->idem_array[s]) {
                             s = GREL->HCL->cl_elems[cl][1];
                         }
 
-                        // Cet élément satisfiait s^omega != s^omega+1. Donc son nom étiquette un compteur
+                        // This element satisfies  e = s^omega != s^omega+1 = s. Its name labels a counter.
 
                         fprintf(out, "#### Found a counter in this automaton.\n");
                         fprintf(out, "#### Word labeling the counter: ");
                         mor_fprint_name_utf8(M, s, out);
                         printf(".\n");
-                        // On va maintenant trouver le compteur. On prend d'abord le graph obtenu à partir du DFA en ne lisant que word
-                        fprintf(out, "#### The counter itself: ");
 
-                        dequeue* name = mor_name(M, s);
-
-                        graph* GW = create_graph_noedges(D->trans->size_graph);
-                        for (uint q = 0; q < GW->size; q++) {
-                            lefins_dequeue(dfa_function(D, q, name), GW->edges[q]);
-                        }
-                        delete_dequeue(name);
-                        // graph_printing_test(GW, stdout);
-
-                        // Le compteur recherché est une SCC non triviale dans ce graphe (qui sera un cycle)
-                        parti* CYCLES = tarjan(GW);
-                        for (uint j = 0; j < CYCLES->size_par; j++) {
-                            if (CYCLES->cl_size[j] > 1) {
-                                uint q = CYCLES->cl_elems[j][0];
-                                dfa_print_state(A, PSCCS->cl_elems[c][q], out);
-                                uint r = lefread_dequeue(GW->edges[q], 0);
-                                while (r != q) {
-                                    fprintf(out, " -> ");
-                                    dfa_print_state(A, PSCCS->cl_elems[c][r], out);
-                                    r = lefread_dequeue(GW->edges[r], 0);
-                                }
-                                fprintf(out, " -> ");
-                                dfa_print_state(A, PSCCS->cl_elems[c][q], out);
-                                fprintf(out, "\n");
+                        uint q = 0;
+                        // We now look for the counter itself.
+                        for (uint j = 0; j < D->trans->size_graph; j++) {
+                            if (funs[D->trans->size_graph * e + j] == j && funs[D->trans->size_graph * s + j] != j) {
+                                q = j;
                                 break;
                             }
                         }
-                        delete_parti(CYCLES);
-                        delete_graph(GW);
-                        dfa_delete(D);
 
-                        delete_morphism(M);
-                        return false;
+                        fprintf(out, "#### The counter itself: ");
+                        dfa_print_state(A, PSCCS->cl_elems[c][q], out);
+                        uint r = funs[D->trans->size_graph * s + q];
+                        while (r != q) {
+                            fprintf(out, " -> ");
+                            dfa_print_state(A, PSCCS->cl_elems[c][r], out);
+                            r = funs[D->trans->size_graph * s + r];
+                        }
+                        fprintf(out, " -> ");
+                        dfa_print_state(A, PSCCS->cl_elems[c][r], out);
+                        fprintf(out, "\n");
+                        break;
+                        // //On va maintenant trouver le compteur.On prend d'abord le graph obtenu à partir du DFA en ne lisant que word
+
+
+                        // dequeue* name = mor_name(M, s);
+
+                        // graph* GW = create_graph_noedges(D->trans->size_graph);
+                        // for (uint q = 0; q < GW->size; q++) {
+                        //     lefins_dequeue(dfa_function(D, q, name), GW->edges[q]);
+                        // }
+                        // delete_dequeue(name);
+                        // // graph_printing_test(GW, stdout);
+
+                        // // Le compteur recherché est une SCC non triviale dans ce graphe (qui sera un cycle)
+                        // parti* CYCLES = tarjan(GW);
+                        // for (uint j = 0; j < CYCLES->size_par; j++) {
+                        //     if (CYCLES->cl_size[j] > 1) {
+                        //         uint q = CYCLES->cl_elems[j][0];
+                        //         dfa_print_state(A, PSCCS->cl_elems[c][q], out);
+                        //         uint r = lefread_dequeue(GW->edges[q], 0);
+                        //         while (r != q) {
+                        //             fprintf(out, " -> ");
+                        //             dfa_print_state(A, PSCCS->cl_elems[c][r], out);
+                        //             r = lefread_dequeue(GW->edges[r], 0);
+                        //         }
+                        //         fprintf(out, " -> ");
+                        //         dfa_print_state(A, PSCCS->cl_elems[c][q], out);
+                        //         fprintf(out, "\n");
+                        //         break;
+                        //     }
+                        // }
+                        // delete_parti(CYCLES);
+                        // delete_graph(GW);
+                        // dfa_delete(D);
+                        // free(funs);
+                        // delete_morphism(M);
+                        // return false;
                     }
                 }
             }
             dfa_delete(D);
+            free(funs);
             delete_morphism(M);
             return false;
         }
+
+        dfa_delete(D);
+        free(funs);
+        delete_morphism(M);
     }
     return true;
 }
@@ -921,3 +950,26 @@ bool is_cycletbpgp_dfa(dfa* A, dfagp_mode mode, int*) {
     delete_parti(scca);
     return true;
 }
+
+
+bool is_nosimple_counter(dfa* A, int*) {
+    bool alpha[A->trans->size_alpha];
+    for (uint a = 0; a < A->trans->size_alpha; a++) {
+        alpha[a] = false;
+    }
+    for (uint a = 0; a < A->trans->size_alpha; a++) {
+        alpha[a] = true;
+        parti* sccs = dtarjan(A->trans, alpha, false);
+        if (sccs->size_par != sccs->size_set) {
+            // If the number of SCCs is not equal to the number of states, then there is a counter.
+            delete_parti(sccs);
+            return false;
+        }
+        delete_parti(sccs);
+        alpha[a] = false;
+    }
+
+    return true;
+}
+
+
