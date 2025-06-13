@@ -63,6 +63,7 @@ var shell__keywords_8h =
       [ "KY_CYCLETRIV", "shell__keywords_8h.html#a3c46b9a9ba1b08f7bffde99b45910d53ac86c431476cfb42966e62a7b57c3344e", null ],
       [ "KY_DETERMINIZE", "shell__keywords_8h.html#a3c46b9a9ba1b08f7bffde99b45910d53a3ed4501a71d28c312eee68a28a567bd6", null ],
       [ "KY_COMPLEMENT", "shell__keywords_8h.html#a3c46b9a9ba1b08f7bffde99b45910d53ae56e0478403e9814689c6c4f70ef01db", null ],
+      [ "KY_NOSIMC", "shell__keywords_8h.html#a3c46b9a9ba1b08f7bffde99b45910d53a387608d93f7a7be090cb88e8c04830b8", null ],
       [ "KY_SYNT", "shell__keywords_8h.html#a3c46b9a9ba1b08f7bffde99b45910d53ae33e4f477e89e2a3a4292b1f84f405b7", null ],
       [ "KY_RCAY", "shell__keywords_8h.html#a3c46b9a9ba1b08f7bffde99b45910d53a7f64764bd8520a06c2034bae61d170f1", null ],
       [ "KY_LCAY", "shell__keywords_8h.html#a3c46b9a9ba1b08f7bffde99b45910d53a550c28aeb2716ac27dfb2890ed80a5d2", null ],

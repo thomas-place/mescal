@@ -183,9 +183,9 @@ uint&#160;</td><td class="memItemRight" valign="bottom"><b>mor_regular_jclass</b
 <tr class="memitem:ad76d5a2d32a033920a97fef560e92512" id="r_ad76d5a2d32a033920a97fef560e92512"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad76d5a2d32a033920a97fef560e92512">mor_compute_min_regular_jcl</a> (<a class="el" href="structmorphism.html">morphism</a> *)</td></tr>
 <tr class="memdesc:ad76d5a2d32a033920a97fef560e92512"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computation of the number of strict J-classes.  <br /></td></tr>
 <tr class="separator:ad76d5a2d32a033920a97fef560e92512"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acdcd09fab627bc6916ef5984c6ffccce" id="r_acdcd09fab627bc6916ef5984c6ffccce"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structmorphism.html">morphism</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acdcd09fab627bc6916ef5984c6ffccce">dfa_to_morphism</a> (<a class="el" href="structdfa.html">dfa</a> *, bool **, int *)</td></tr>
-<tr class="memdesc:acdcd09fab627bc6916ef5984c6ffccce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computation of the transition morphism associated to a complete DFA.  <br /></td></tr>
-<tr class="separator:acdcd09fab627bc6916ef5984c6ffccce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2fc87f7827d2e90bfda3c98d12527da" id="r_ad2fc87f7827d2e90bfda3c98d12527da"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structmorphism.html">morphism</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad2fc87f7827d2e90bfda3c98d12527da">dfa_to_morphism</a> (<a class="el" href="structdfa.html">dfa</a> *, bool **, int *, uint **)</td></tr>
+<tr class="memdesc:ad2fc87f7827d2e90bfda3c98d12527da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computation of the transition morphism associated to a complete DFA.  <br /></td></tr>
+<tr class="separator:ad2fc87f7827d2e90bfda3c98d12527da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a434eaa46acba5bd102614880f63883f5" id="r_a434eaa46acba5bd102614880f63883f5"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a434eaa46acba5bd102614880f63883f5">dfa_to_morphism_size</a> (<a class="el" href="structdfa.html">dfa</a> *A)</td></tr>
 <tr class="memdesc:a434eaa46acba5bd102614880f63883f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the size of the morphism associated to a complete DFA without storing the actual morphism.  <br /></td></tr>
 <tr class="separator:a434eaa46acba5bd102614880f63883f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -337,8 +337,8 @@ uint&#160;</td><td class="memItemRight" valign="bottom"><b>mor_regular_jclass</b
 
 </div>
 </div>
-<a id="acdcd09fab627bc6916ef5984c6ffccce" name="acdcd09fab627bc6916ef5984c6ffccce"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acdcd09fab627bc6916ef5984c6ffccce">&#9670;&#160;</a></span>dfa_to_morphism()</h2>
+<a id="ad2fc87f7827d2e90bfda3c98d12527da" name="ad2fc87f7827d2e90bfda3c98d12527da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad2fc87f7827d2e90bfda3c98d12527da">&#9670;&#160;</a></span>dfa_to_morphism()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -356,7 +356,12 @@ uint&#160;</td><td class="memItemRight" valign="bottom"><b>mor_regular_jclass</b
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int *</td>          <td class="paramname"><span class="paramname"><em></em></span>&#160;)</td>
+          <td class="paramtype">int *</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint **</td>          <td class="paramname"><span class="paramname"><em>funs</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -367,7 +372,8 @@ uint&#160;</td><td class="memItemRight" valign="bottom"><b>mor_regular_jclass</b
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">A</td><td>The complete DFA.  </td></tr>
-    <tr><td class="paramname">order</td><td>Ordering on the elements of the DFA. (NULL if not used). </td></tr>
+    <tr><td class="paramname">order</td><td>Ordering on the elements of the DFA. (NULL if not used).  </td></tr>
+    <tr><td class="paramname">funs</td><td>A pointer to return function table used to construct the monoid (NULL if not used). </td></tr>
   </table>
   </dd>
 </dl>

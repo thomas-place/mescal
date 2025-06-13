@@ -5,7 +5,7 @@ var monoid_8h =
     [ "ONE", "monoid_8h.html#a206b6f5362e56b51ca957635350b70b6", null ],
     [ "delete_green", "monoid_8h.html#add9ea672052b921f90886575209eda7f", null ],
     [ "delete_morphism", "monoid_8h.html#a8ceee148f04c12a0bfbedc7fb5148201", null ],
-    [ "dfa_to_morphism", "monoid_8h.html#acdcd09fab627bc6916ef5984c6ffccce", null ],
+    [ "dfa_to_morphism", "monoid_8h.html#ad2fc87f7827d2e90bfda3c98d12527da", null ],
     [ "dfa_to_morphism_size", "monoid_8h.html#a434eaa46acba5bd102614880f63883f5", null ],
     [ "gr_green_compute", "monoid_8h.html#ae7841e3bd071fb4b9213208fe40c8887", null ],
     [ "green_sorted_jclass", "monoid_8h.html#a74a354e588a47859ea5057f52b727dbc", null ],

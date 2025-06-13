@@ -50,7 +50,7 @@ var searchData=
   ['dfa_5freset_5fstate_5fnames_47',['dfa_reset_state_names',['../nfa_8h.html#a85fe1a30798c5af8e74230893fecfca4',1,'nfa.c']]],
   ['dfa_5fstar_48',['dfa_star',['../nfa_8h.html#a11de7f8820befd2f1eb22b34f39a18ff',1,'nfa.c']]],
   ['dfa_5fto_5fmccluskey_49',['dfa_to_mccluskey',['../nfa__mccluskey_8h.html#a7eb6a0d130118775d3f4541e100c7f50',1,'nfa_mccluskey.c']]],
-  ['dfa_5fto_5fmorphism_50',['dfa_to_morphism',['../monoid_8h.html#acdcd09fab627bc6916ef5984c6ffccce',1,'monoid.c']]],
+  ['dfa_5fto_5fmorphism_50',['dfa_to_morphism',['../monoid_8h.html#ad2fc87f7827d2e90bfda3c98d12527da',1,'monoid.c']]],
   ['dfa_5fto_5fmorphism_5fsize_51',['dfa_to_morphism_size',['../monoid_8h.html#a434eaa46acba5bd102614880f63883f5',1,'monoid.c']]],
   ['dfa_5fto_5fnfa_52',['dfa_to_nfa',['../nfa_8h.html#abbf8171cffc00ce25c8e4d44d3628586',1,'nfa.c']]],
   ['dfa_5fto_5fnfa_5fexalpha_53',['dfa_to_nfa_exalpha',['../nfa_8h.html#aa2bd6a5957f3e640b7e19b1213bec24d',1,'nfa.c']]],
