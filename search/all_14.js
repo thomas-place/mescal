@@ -13,7 +13,7 @@ var searchData=
   ['usage_20of_20a_20recursive_20definition_20variable_20r_10',['Usage of a recursive definition variable R',['../index.html#autotoc_md17',1,'']]],
   ['used_11',['used',['../structdfa__enum.html#a72bf04cb1232fcd6dc71a88d27d35158',1,'dfa_enum']]],
   ['using_20morphisms_20variables_12',['Using morphisms variables',['../index.html#autotoc_md20',1,'']]],
-  ['using_20recurvive_20definitions_20variables_13',['Using recurvive definitions variables',['../index.html#autotoc_md14',1,'']]],
+  ['using_20recurvive_20definition_20variables_13',['Using recurvive definition variables',['../index.html#autotoc_md14',1,'']]],
   ['using_20regular_20expressions_20variables_14',['Using regular expressions variables',['../index.html#autotoc_md11',1,'']]],
   ['using_20variables_15',['Using variables',['../index.html#autotoc_md7',1,'']]],
   ['using_20variables_20representing_20automata_16',['Using variables representing automata',['../index.html#autotoc_md18',1,'']]]

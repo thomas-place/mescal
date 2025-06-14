@@ -11,7 +11,7 @@ var searchData=
   ['evalseq_8',['evalseq',['../structob__recursion.html#a8d798862b76c8ddd6e333107a72b3fdc',1,'ob_recursion']]],
   ['exall_5fprofile_9',['exall_profile',['../structexall__profile.html',1,'']]],
   ['exp_10',['exp',['../structobject.html#ae39393bd51ba4112d2d115ae4cb6d72a',1,'object']]],
-  ['expression_11',['Definition, of a regular expression',['../index.html#autotoc_md12',1,'']]],
+  ['expression_11',['Definition of a regular expression',['../index.html#autotoc_md12',1,'']]],
   ['expression_20stored_20in_20a_20variable_20l_12',['Manipulation of a regular expression stored in a variable L',['../index.html#autotoc_md13',1,'']]],
   ['expressions_20variables_13',['Using regular expressions variables',['../index.html#autotoc_md11',1,'']]],
   ['expsize_14',['EXPSIZE',['../files_8h.html#a38acc5b2a958ef6a1e7bbe8cfeba86c2',1,'files.h']]]

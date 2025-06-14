@@ -23,11 +23,11 @@ var searchData=
   ['finished_20',['finished',['../structexall__profile.html#ab288d92c9debea0e4ccd5611099848ec',1,'exall_profile']]],
   ['first_21',['first',['../structglushkov__info.html#ad1ff45509bc3add7895ec3bbfeaa54c6',1,'glushkov_info']]],
   ['follow_22',['follow',['../structglushkov__info.html#a53ef0e7e45579a51d2cab0c46f3d5e8c',1,'glushkov_info']]],
-  ['for_20negation_20hierarchies_20and_20future_20past_20hierarchies_23',['Available input classes 𝒞 for negation hierarchies and future/past hierarchies',['../index.html#autotoc_md25',1,'']]],
+  ['for_20negation_20hierarchies_20and_20future_20past_20hierarchies_23',['Available input classes 𝒞 for negation hierarchies and future/past hierarchies',['../index.html#autotoc_md26',1,'']]],
   ['found_24',['found',['../structexall__profile.html#a191477a8afcfab81cee4427a64a9f5f9',1,'exall_profile']]],
   ['fprint_5fletter_5fgviz_25',['fprint_letter_gviz',['../words_8h.html#acc35b232a0c3636bb8644397a7b3b59f',1,'words.c']]],
   ['fprint_5fletter_5flatex_26',['fprint_letter_latex',['../words_8h.html#abe45c50ad190aafb8cb431c24220bc6c',1,'words.c']]],
   ['fprint_5fletter_5futf8_27',['fprint_letter_utf8',['../words_8h.html#a385c2a53d1704920490e6328d5857b1a',1,'words.c']]],
   ['full_28',['full',['../structob__recursion.html#aabf0f5bebf29653d681d9bea92550bc2',1,'ob_recursion']]],
-  ['future_20past_20hierarchies_29',['Available input classes 𝒞 for negation hierarchies and future/past hierarchies',['../index.html#autotoc_md25',1,'']]]
+  ['future_20past_20hierarchies_29',['Available input classes 𝒞 for negation hierarchies and future/past hierarchies',['../index.html#autotoc_md26',1,'']]]
 ];

@@ -25,7 +25,7 @@
 var NAVTREE =
 [
   [ "Mescal", "index.html", [
-    [ "🌵 MeSCaL 🌵", "index.html", "index" ],
+    [ "🌵 <a href=\"https://github.com/thomas-place/mescal\" >MeSCaL</a> 🌵", "index.html", "index" ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],
@@ -52,10 +52,10 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "alloc_8c.html",
-"monoid_8h.html#a6fe51b3b3716e0069d0a2abbd3841059",
-"regexp_8h_source.html",
-"structcom__command.html#a3d687131b22277e11501a5b4ebf53ab0",
-"type__abr_8h.html#a99c654978a05b172367bf337522c07f5"
+"monoid_8h.html#a68a36c1f4de7bd2c49f5d3b058de696a",
+"regexp_8h.html#afc822beda3f58d0f381de94ef6478d8a",
+"structcom__command.html#a0f7ba2f6cc83402d606047eaf60e152b",
+"type__abr_8h.html#a8d26e9d08cbbe6567d252ba6d129675b"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

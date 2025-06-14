@@ -12,7 +12,7 @@ var searchData=
   ['nb_5fregular_5fjcl_9',['nb_regular_jcl',['../structmorphism.html#a09fa906fd5f06a273e791a97e674c128',1,'morphism']]],
   ['nbhigh_10',['nbhigh',['../structexall__profile.html#a82db25e0a32f9a43c28e80d4d8437b8a',1,'exall_profile']]],
   ['nblow_11',['nblow',['../structexall__profile.html#a228168cff23be38d86c58e6170d44a5a',1,'exall_profile']]],
-  ['negation_20hierarchies_20and_20future_20past_20hierarchies_12',['Available input classes 𝒞 for negation hierarchies and future/past hierarchies',['../index.html#autotoc_md25',1,'']]],
+  ['negation_20hierarchies_20and_20future_20past_20hierarchies_12',['Available input classes 𝒞 for negation hierarchies and future/past hierarchies',['../index.html#autotoc_md26',1,'']]],
   ['neut_13',['neut',['../structsubsemi.html#a01852dd02de5163fbd3d36c76012cdac',1,'subsemi']]],
   ['next_14',['next',['../structstring__chain.html#aeabc295aae83201bab5d06916f13486f',1,'string_chain::next'],['../structcom__parameters.html#a7062e4806182d7c58999cbf1098dd6e7',1,'com_parameters::next'],['../structdcell.html#a681c8936bccbbbe72634ceddbbcf3584',1,'dcell::next']]],
   ['nfa_15',['nfa',['../structnfa.html',1,'']]],

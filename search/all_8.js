@@ -30,7 +30,7 @@ var searchData=
   ['initialization_27',['Initialization',['../index.html#autotoc_md15',1,'']]],
   ['initialized_20recursive_20definition_20variable_20r_28',['Setup of an initialized recursive definition variable R',['../index.html#autotoc_md16',1,'']]],
   ['initials_29',['initials',['../structnfa.html#a91769b2fe71becb654821a8023965da1',1,'nfa']]],
-  ['input_20classes_20𝒞_20for_20negation_20hierarchies_20and_20future_20past_20hierarchies_30',['Available input classes 𝒞 for negation hierarchies and future/past hierarchies',['../index.html#autotoc_md25',1,'']]],
+  ['input_20classes_20𝒞_20for_20negation_20hierarchies_20and_20future_20past_20hierarchies_30',['Available input classes 𝒞 for negation hierarchies and future/past hierarchies',['../index.html#autotoc_md26',1,'']]],
   ['insert_5fdequeue_31',['insert_dequeue',['../type__dequeue_8h.html#a0ebc3059a657a98189ce4f59564788d5',1,'type_dequeue.c']]],
   ['insertnext_5fdlist_32',['insertnext_dlist',['../type__dlist_8h.html#a950fa8c19df7d4611ae1c1bac7036b8c',1,'type_dlist.c']]],
   ['insertprevious_5fdlist_33',['insertprevious_dlist',['../type__dlist_8h.html#a2ff9c1dffb81ec74d7895b334d464b6f',1,'type_dlist.c']]],
