@@ -1,5 +1,5 @@
 
-# 🌵 MeSCaL 🌵
+# 🌵 [MeSCaL](https://github.com/thomas-place/mescal) 🌵
 
 <b>Me</b>mbership and <b>S</b>eparation for <b>C</b>l<b>a</b>sses of <b>L</b>anguages 
 
@@ -33,63 +33,63 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
 
 ### General commands
 
-    help                          This help.
-    timeout                       Displays the current timeout.
-    timeout = <value>             Sets the timeout to <value> seconds (0 to cancel timeout).
-    limit                         Displays the current limit.
-    limit = <value>               Sets the limit to <value>.
-    history                       Displays the current history size.
-    history = <value>             Sets the history size to <value> entries.
-    test                          Calls the test function.
-    quit or exit                  Quits.
-    classes                       Lists all classes recognized by the program.
+    - help                         This help.
+    - timeout                      Displays the current timeout.
+    - timeout <value>              Sets the timeout to <value> seconds (0 to cancel timeout).
+    - limit                        Displays the current limit.
+    - limit <value>                Sets the limit to <value>.
+    - history                      Displays the current history size.
+    - history <value>              Sets the history size to <value> entries.
+    - test                         Calls the test function.
+    - exit                         Quits.
+    - classes                      Lists all classes recognized by the program.
 
 ### Using variables
 
-    <variable> = <command>        Stores a copy of the returned object in the variable.
-    delete(<variable>)            Deletes object.
+    - <variable> = <command>       Stores a copy of the returned object in the variable.
+    - delete(<variable>)           Deletes object.
 
         Variable types: regular expression, recursive definition of regular expressions, automaton and morphism.
-        Variable names: <upper><upper|digits>*
+        Variable names: <upper><alnum>*
 
 ### Filtering commands
 
-    list(<parameters>)            Lists all stored objects according to the parameters.
-    regexps(<parameters>)         Lists all stored regular expressions according to the parameters.
-    automata(<parameters>)        Lists all stored automata according to the parameters.
-    morphisms(<parameters>)       Lists all stored morphisms according to the parameters.
-    regexps(<parameters>)         Lists all stored recursive definitions according to the parameters.
+    - list(<parameters>)           Lists all stored objects according to the parameters.
+    - regexps(<parameters>)        Lists all stored regular expressions according to the parameters.
+    - automata(<parameters>)       Lists all stored automata according to the parameters.
+    - morphisms(<parameters>)      Lists all stored morphisms according to the parameters.
+    - regexps(<parameters>)        Lists all stored recursive definitions according to the parameters.
 
 **Available parameters:**
 
-    -syntactic                    displays the size of the syntactic monoid.
-    -syntactic(<n1>,<n2>)         only lists the objects with a syntactic monoid whose size is between n1 and n2.
-    -idempotents                  displays the number of idempotents in the syntactic monoid.
-    -idempotents(<n1>,<n2>)       only lists the objects with a syntactic monoid has between n1 and n2 idempotents.
-    -minimal                      displays the size of the minimal automaton.
-    -minimal(<n1>,<n2>)           only lists the objects with a minimal automaton whose size is between n1 and n2.
+    - syntactic                    Displays the size of the syntactic monoid.
+    - syntactic(<n1>,<n2>)         Only lists the objects with a syntactic monoid whose size is between n1 and n2.
+    - idempotents                  Displays the number of idempotents in the syntactic monoid.
+    - idempotents(<n1>,<n2>)       Only lists the objects with a syntactic monoid has between n1 and n2 idempotents.
+    - minimal                      Displays the size of the minimal automaton.
+    - minimal(<n1>,<n2>)           Only lists the objects with a minimal automaton whose size is between n1 and n2.
 
 
 ### Sorting commands
 
-    sort                          Sorts all objects, lexicographically by variable name.
-    sort(<parameter>)             Sorts all objects, according to the ordering given by the parameter.
+    - sort                         Sorts all objects, lexicographically by variable name.
+    - sort(<parameter>)            Sorts all objects, according to the ordering given by the parameter.
 
 **Available parameters:**
 
-    -syntactic                    Size of the syntactic monoid
-    -minimal                      Size of the minimal automaton
+    - syntactic                    Size of the syntactic monoid
+    - minimal                      Size of the minimal automaton
 
 ### Saving and loading
 
-    save(<command>,"<filename>")  Saves the object returned by a command in a file.
-    open("<filename>")            Opens and returns an object stored in a file.
-    savesession("<filename>")     Saves all current objects in a file.
-    loadsession("<filename>")     Loads all current objects from a file.
+    - save(<command>,"<filename>") Saves the object returned by a command in a file.
+    - open("<filename>")           Opens and returns an object stored in a file.
+    - savesession("<filename>")    Saves all current objects in a file.
+    - loadsession("<filename>")    Loads all current objects from a file.
 
 ## Using regular expressions variables
 
-### Definition, of a regular expression
+### Definition of a regular expression
 
     "<regexp>"
 
@@ -100,31 +100,30 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
 
 ### Manipulation of a regular expression stored in a variable L
 
-    L                             Displays the regular expression.
-    L.minimal                     The minimal automaton: works as an automaton variable.
-    L.syntactic                   The syntactic morphism: works as a morphism variable.
-    thomson(L)                    Uses the Thomson algorithm to compute a NFA.
-    glushkov(L)                   Uses the Glushkov algorithm to compute a NFA.
+    - L                            Displays the regular expression.
+    - L.minimal                    The minimal automaton: works as an automaton variable.
+    - L.syntactic                  The syntactic morphism: works as a morphism variable.
+    - thomson(L)                   Uses the Thomson algorithm to compute a NFA.
+    - glushkov(L)                  Uses the Glushkov algorithm to compute a NFA.
 
-## Using recurvive definitions variables
+## Using recurvive definition variables
 
 ### Initialization
 
-    initrecursion(<n>,<v1>,...)   Returns an initialized recursive definition variable.
-                                  <n> is the largest index that has to be specified by the user.
-                                  <v1>,... is a list of variable names denoting the relations used in the recursive definition.
-                                  Example: R = initrecursion(0,L)
-
+    - initrecursion(<n>,<v1>,...)  Returns an initialized recursive definition variable.
+                                   <n> is the largest index that has to be specified by the user.
+                                   <v1>,... is a list of variable names denoting the relations used in the recursive definition.
+                                   Example: R = initrecursion(0,L)
 
 ### Setup of an initialized recursive definition variable R
 
-    E.<v>[<n>] = <regexp>         Defines the initial case <n> of the relation <v>.
-                                  (<n> must be smaller than the maximum index specified in the initialization).
-                                  Example: R.L[0] = "\1"
+    - E.<v>[<n>] = <regexp>        Defines the initial case <n> of the relation <v>.
+                                   (<n> must be smaller than the maximum index specified in the initialization).
+                                   Example: R.L[0] = "\1"
 
-    E.<v>[i] = <symbolic regexp>  Defines the recursion of the relation <v>.
-                                  The regular expression can use symbolic variables and letters.
-                                  Example: R.L[i] = "(a{L}[i-1]b)*"
+    - E.<v>[i] = <symbolic regexp> Defines the recursion of the relation <v>.
+                                   The regular expression can use symbolic variables and letters.
+                                   Example: R.L[i] = "(a{L}[i-1]b)*"
 
 **Syntax of symbolic regexps:**
 
@@ -134,52 +133,52 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
 
 ### Usage of a recursive definition variable R
 
-    R                             Displays the recursive definition and checks if it is well-defined.
-    R.<v>[<n>]                    Returns the regular expression of index <n> for the relation <v>.
-                                  (can be copied into a regular expression variable).
+    - R                            Displays the recursive definition and checks if it is well-defined.
+    - R.<v>[<n>]                   Returns the regular expression of index <n> for the relation <v>.
+                                   (can be copied into a regular expression variable).
 
 ## Using variables representing automata
 
 ### Manipulation of an automaton stored in a variable A
 
-    A                             Displays the automaton.
-    A.minimal                     The minimal automaton: works as an automaton variable.
-    latex(A.minimal)              The minimal automaton, printed in LaTeX.
-    A.syntactic                   The syntactic morphism: works as a morphism variable.
-    latex(A.syntactic)            The right Cayley graph of the minimal automaton, printed in LaTeX.
-    elimepsilon(A)                Builds a new automaton by eliminating the epsilon transitions.
-    trim(A)                       Builds a new automaton by eliminating the tates that are not accessible or co-accessible.
-    union(A1,A2)                  Builds a new automaton by making a nondeterministic union.
-    intersection(A1,A2)           Builds a new automaton by making an intersection.
-    concatenation(A1,A2)          Builds a new automaton by making a concatenation.
-    kleene(A)                     Builds a new automaton by applying a Kleene star.
-    mccluskey(A)                  Uses the Brzozowski-McCluskey algorithm to compute a regular expression.
-    brzozowski(A)                 Uses the Brzozowski algorithm to compute a minimal NFA.
-    hopcroft(A)                   Uses the Hopcroft algorithm to compute a minimal NFA.
-    nfarandom(<n1>,<n2>,<n3>)     Builds a random NFA over an alphabet of size <n1> with at least <n2> states and at most <n3> states.
-    dfarandom(<n1>,<n2>,<n3>)     Builds a random complete DFA over an alphabet of size <n1> with at least <n2> states and at most <n3> states.
-    run(A,"<word>")               Computes the set of states reached with an input word.
-    iextension(A)                 Applies inverse extension to the automaton (does not return an object).
-    dyckextension(A)              Builds a new automaton via Dyck extension.
-    counterfree(A)                Tests if the automaton is a counterfree DFA.
-    permutation(A)                Tests if the automaton is a permutation DFA.
+    - A                            Displays the automaton.
+    - A.minimal                    The minimal automaton: works as an automaton variable.
+    - latex(A.minimal)             The minimal automaton, printed in LaTeX.
+    - A.syntactic                  The syntactic morphism: works as a morphism variable.
+    - latex(A.syntactic)           The right Cayley graph of the minimal automaton, printed in LaTeX.
+    - elimepsilon(A)               Builds a new automaton by eliminating the epsilon transitions.
+    - trim(A)                      Builds a new automaton by eliminating the tates that are not accessible or co-accessible.
+    - union(A1,A2)                 Builds a new automaton by making a nondeterministic union.
+    - intersection(A1,A2)          Builds a new automaton by making an intersection.
+    - concatenation(A1,A2)         Builds a new automaton by making a concatenation.
+    - kleene(A)                    Builds a new automaton by applying a Kleene star.
+    - mccluskey(A)                 Uses the Brzozowski-McCluskey algorithm to compute a regular expression.
+    - brzozowski(A)                Uses the Brzozowski algorithm to compute a minimal NFA.
+    - hopcroft(A)                  Uses the Hopcroft algorithm to compute a minimal NFA.
+    - nfarandom(<n1>,<n2>,<n3>)    Builds a random NFA over an alphabet of size <n1> with at least <n2> states and at most <n3> states.
+    - dfarandom(<n1>,<n2>,<n3>)    Builds a random complete DFA over an alphabet of size <n1> with at least <n2> states and at most <n3> states.
+    - run(A,"<word>")              Computes the set of states reached with an input word.
+    - iextension(A)                Applies inverse extension to the automaton (does not return an object).
+    - dyckextension(A)             Builds a new automaton via Dyck extension.
+    - counterfree(A)               Tests if the automaton is a counterfree DFA.
+    - permutation(A)               Tests if the automaton is a permutation DFA.
 
 ## Using morphisms variables
 
 ### Manipulation of a morphism stored in a variable M
 
-    M                             Displays the Green relations of the monoid.
-    rcayley(M)                    Displays the right Cayley graph of the morphism.
-    lcayley(M)                    Displays the left Cayley graph of the morphism.
-    multiplication(M)             Displays the multiplication table of the monoid.
-    order(M)                      Displays the ordering defined on the monoid.
-    idempotents(M)                Displays the idempotents of the monoid.
-    mkernel(M)                    Displays the MOD-kernel of the morphism.
-    akernel(M)                    Displays the AMT-kernel of the morphism.
-    gkernel(M)                    Displays the GR-kernel of the morphism.
-    orbit(𝒞,M)                    Displays the 𝒞-orbits for the morphism (implemented for 𝒞 = DD, MOD⁺, AT).
-    orbit(𝒞,M,e)                  Displays the 𝒞-orbit of the idempotent e for the morphism (implemented for 𝒞 = DD, MOD⁺, AT).
-    image(M,"<word>")             Computes the image of an input word.
+    - M                            Displays the Green relations of the monoid.
+    - rcayley(M)                   Displays the right Cayley graph of the morphism.
+    - lcayley(M)                   Displays the left Cayley graph of the morphism.
+    - multiplication(M)            Displays the multiplication table of the monoid.
+    - order(M)                     Displays the ordering defined on the monoid.
+    - idempotents(M)               Displays the idempotents of the monoid.
+    - mkernel(M)                   Displays the MOD-kernel of the morphism.
+    - akernel(M)                   Displays the AMT-kernel of the morphism.
+    - gkernel(M)                   Displays the GR-kernel of the morphism.
+    - orbit(𝒞,M)                   Displays the 𝒞-orbits for the morphism (implemented for 𝒞 = DD, MOD⁺, AT).
+    - orbit(𝒞,M,e)                 Displays the 𝒞-orbit of the idempotent e for the morphism (implemented for 𝒞 = DD, MOD⁺, AT).
+    - image(M,"<word>")            Computes the image of an input word.
 
 ## Membership tests
 
@@ -254,6 +253,11 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
           <nb_letters> is the size of the alphabet.
           <path> is the path to the json file that will be created (or overwritten if it already exists).
 
+## Membership summaries
+
+    - chierarchies(<object>)       Summary of membership tests for the language recognized by the object in concatenation hierarchies.
+    - nhierarchies(𝒞,<object>)     If the language recognized by the object belongs to TL(𝒞), determines its level in the negation hierarchy of TL(𝒞).
+    - fphierarchies(𝒞,<object>)    If the language recognized by the object belongs to TL(𝒞), determines its level in the future/past hierarchy of TL(𝒞).
 
 ### Available classes 𝒞
 
@@ -290,10 +294,6 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
     - TL2     Combined operator : 𝒞 ↦ TL(TL(𝒞)).
     - SF      Star-free closure : 𝒞 ↦ SF(𝒞).
 
-    chierarchies(<object>)        Summary of membership tests for the language recognized by the object in concatenation hierarchies.
-    nhierarchies(𝒞,<object>)      If the language recognized by the object belongs to TL(𝒞), determines its level in the negation hierarchy of TL(𝒞).
-    fphierarchies(𝒞,<object>)     If the language recognized by the object belongs to TL(𝒞), determines its level in the future/past hierarchy of TL(𝒞).
-
 ### Available input classes 𝒞 for negation hierarchies and future/past hierarchies
 
     - ST      Trivial class.
@@ -304,7 +304,7 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
 
 ## Separation tests
 
-    - separ(𝒞,<o1>,<o2>,(info))     Checks if <o1> is 𝒞-separable from <o2> ("info" is an optional parameter, it asks for more details).
+    - separ(𝒞,<o1>,<o2>[,info])  Checks if <o1> is 𝒞-separable from <o2> ("info" is an optional parameter, it asks for more details).
 
 ### Available classes 𝒞
 
