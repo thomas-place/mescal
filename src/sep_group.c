@@ -2,6 +2,451 @@
 #include "type_hash.h"
 
 
+/********************/
+/*+ AMT-separation +*/
+/********************/
+
+bool solve_system_amt(fmpz_mat_t MAT, int* target, uint nb_rows, uint nb_cols) {
+
+    // This Boolean will be set to false if we find that s is not in the kernel.
+    bool inside = true;
+
+    uint row = 0;
+    for (uint a = 0; a < nb_cols; a++) {
+        int val;
+        if (row >= nb_rows) {
+            val = 0;
+        }
+        else {
+            val = fmpz_get_si(fmpz_mat_entry(MAT, row, a));
+        }
+
+        if (val == 0 && target[a] != 0) {
+            inside = false;
+            break;
+        }
+        if (val == 0 && target[a] == 0) {
+            continue;
+        }
+        if (target[a] % val != 0) {
+            inside = false;
+            break;
+        }
+
+        int q = target[a] / val;
+        for (uint b = a + 1; b < nb_cols; b++) {
+            target[b] -= q * fmpz_get_si(fmpz_mat_entry(MAT, row, b));
+        }
+        row++;
+    }
+    return inside;
+}
+
+static void compute_span_forest_aux(dgraph* G, parti* sccs, uint q, uint num, num_span_forest* span, bool* visited) {
+
+    // Queue for the BFS.
+    dequeue* thequeue = create_dequeue();
+
+    // We first mark q as visited.
+    visited[q] = true;
+    span->numtree[q] = num; // We set the tree number of q to num.
+
+    // We first enqueue the edges starting at q, they will be in the spanning tree
+    for (uint a = 0; a < G->size_alpha; a++) {
+        // We only consider the edges internal to the R-class of e.
+        if (G->edges[q][a] != UINT_MAX && (!sccs || sccs->numcl[q] == sccs->numcl[G->edges[q][a]])) {
+            rigins_dequeue(q * G->size_alpha + a, thequeue);
+        }
+    }
+
+    // The BFS starts here.
+    while (!isempty_dequeue(thequeue)) {
+        // We take the first edge (r,b,s) in the queue.
+        uint p = lefpull_dequeue(thequeue);
+        uint r = p / G->size_alpha;
+        uint b = p % G->size_alpha;
+        uint s = G->edges[r][b];
+
+        // If s has already been treated, (r,b,s) is not in the spanning tree.
+        // We put it in the queue of dropped edges.
+        if (visited[s]) {
+            rigins_dequeue(p, span->dropped[num]);
+            continue;
+        }
+
+        // If s has not been treated, it is part of the spanning tree. We update the
+        // counts of the letters on the path from e to s and we insert each edge starting
+        // at s in the queue and that does not leave the class.
+        visited[s] = true;
+        span->numtree[s] = num; // We set the tree number of s to num.
+        for (uint a = 0; a < G->size_alpha; a++) {
+            span->span_forest[s][a] = span->span_forest[r][a];
+            if (G->edges[s][a] != UINT_MAX && (!sccs || sccs->numcl[s] == sccs->numcl[G->edges[s][a]])) {
+                rigins_dequeue(s * G->size_alpha + a, thequeue);
+            }
+        }
+        span->span_forest[s][b]++;
+    }
+    delete_dequeue(thequeue);
+
+}
+
+num_span_forest* compute_span_forest(dgraph* G, parti* sccs, bool* allowed) {
+    num_span_forest* ret;
+    MALLOC(ret, 1);
+
+
+    // Initialization of the trees.
+    MALLOC(ret->span_forest, G->size_graph);
+    MALLOC(ret->numtree, G->size_graph);
+    for (uint i = 0; i < G->size_graph; i++) {
+        ret->numtree[i] = UINT_MAX; // We initialize the tree number of each state to UINT_MAX.
+        CALLOC(ret->span_forest[i], G->size_alpha);
+    }
+    ret->size_graph = G->size_graph;
+    ret->size_alpha = G->size_alpha;
+
+    //Array memorizing the elements already treated.
+    bool* visited;
+    CALLOC(visited, G->size_graph);
+
+
+    if (sccs) {
+        // We initialize the number of trees in the spanning forest to the number of SCCs.
+        ret->nb_trees = sccs->size_par;
+        CALLOC(ret->root, ret->nb_trees);
+        CALLOC(ret->dropped, ret->nb_trees);
+        uint num = 0;
+        for (uint i = 0; i < G->size_graph; i++) {
+            if (visited[i] || (allowed && !allowed[i])) {
+                continue;
+            }
+            ret->root[num] = i;
+            ret->dropped[num] = create_dequeue(); // We create a queue for the dropped edges of the i-th element.
+            compute_span_forest_aux(G, sccs, i, num, ret, visited);
+            num++;
+        }
+        if (num < ret->nb_trees) {
+            ret->nb_trees = num;
+            REALLOC(ret->root, ret->nb_trees);
+            REALLOC(ret->dropped, ret->nb_trees);
+        }
+
+    }
+    else {
+        ret->nb_trees = 1;
+        CALLOC(ret->root, ret->nb_trees);
+        CALLOC(ret->dropped, ret->nb_trees);
+        ret->root[0] = 0; // We set the root of the only tree to 0.
+        ret->dropped[0] = create_dequeue(); // We create a queue for the dropped edges of the i-th element.
+        compute_span_forest_aux(G, NULL, 0, 0, ret, visited);
+    }
+
+    free(visited);
+
+    return ret;
+}
+
+
+void delete_span_forest(num_span_forest* S) {
+    if (!S) {
+        return;
+    }
+    for (uint i = 0; i < S->size_graph; i++) {
+        free(S->span_forest[i]);
+    }
+    free(S->span_forest);
+    free(S->numtree);
+    for (uint i = 0; i < S->nb_trees; i++) {
+        if (S->dropped[i]) {
+            delete_dequeue(S->dropped[i]);
+        }
+    }
+    free(S->dropped);
+    free(S->root);
+    free(S);
+}
+
+
+
+
+
+static void build_hnf_matrix(dgraph* g, num_span_forest* span, fmpz_mat_struct* MAT, uint i) {
+    uint size_base = size_dequeue(span->dropped[i]);
+    fmpz_mat_init(MAT, size_base, g->size_alpha);
+    for (uint j = 0; j < size_dequeue(span->dropped[i]); j++) {
+        uint p = lefread_dequeue(span->dropped[i], j);
+        uint r = p / g->size_alpha;
+        uint b = p % g->size_alpha;
+        uint s = g->edges[r][b];
+        for (uint a = 0; a < g->size_alpha; a++) {
+            if (a != b) {
+                fmpz_set_si(fmpz_mat_entry(MAT, j, a), span->span_forest[r][a] - span->span_forest[s][a]);
+            }
+            else {
+                fmpz_set_si(fmpz_mat_entry(MAT, j, a), span->span_forest[r][a] - span->span_forest[s][a] + 1);
+            }
+        }
+    }
+
+    // We put the matrix in HNF.
+    fmpz_mat_hnf(MAT, MAT);
+}
+
+parti* dgraph_amt_fold(dgraph* g, parti* sccs) {
+    num_span_forest* span = compute_span_forest(g, sccs, NULL);
+
+    ufind* uf = create_ufind(g->size_graph);
+
+    for (uint i = 0; i < span->nb_trees;i++) {
+        // We compute the matrix corresponding to the cycle base from the spanning tree and the list of dropped edges.
+        uint size_base = size_dequeue(span->dropped[i]);
+        fmpz_mat_t MAT;
+        build_hnf_matrix(g, span, MAT, i);
+        int vec[g->size_alpha];
+
+        if (sccs) {
+            uint rootcl = sccs->numcl[span->root[i]];
+            bool* treated;
+            CALLOC(treated, sccs->cl_size[rootcl]);
+            for (uint h = 0; h < sccs->cl_size[rootcl]; h++) {
+                if (treated[h]) {
+                    continue;
+                }
+                uint q = sccs->cl_elems[rootcl][h];
+
+                for (uint j = h + 1; j < sccs->cl_size[rootcl];j++) {
+                    uint r = sccs->cl_elems[rootcl][j];
+                    for (uint a = 0; a < g->size_alpha; a++) {
+                        vec[a] = span->span_forest[q][a] - span->span_forest[r][a];
+                    }
+                    if (solve_system_amt(MAT, vec, size_base, g->size_alpha)) {
+                        // If the system is solvable, we merge the two elements in the union find.
+                        union_ufind(q, r, uf);
+                        treated[j] = true;
+                    }
+
+                }
+                treated[h] = true;
+            }
+            free(treated);
+        }
+        else {
+            bool* treated;
+            CALLOC(treated, g->size_graph);
+            for (uint h = 0; h < g->size_graph; h++) {
+                if (treated[h]) {
+                    continue;
+                }
+
+                for (uint j = h + 1; j < g->size_graph;j++) {
+                    for (uint a = 0; a < g->size_alpha; a++) {
+                        vec[a] = span->span_forest[h][a] - span->span_forest[j][a];
+                    }
+                    if (solve_system_amt(MAT, vec, size_base, g->size_alpha)) {
+                        // If the system is solvable, we merge the two elements in the union find.
+                        union_ufind(h, j, uf);
+                        treated[j] = true;
+                    }
+
+                }
+                treated[h] = true;
+            }
+            free(treated);
+        }
+
+
+        fmpz_mat_clear(MAT);
+    }
+    parti* ret = ufind_to_parti(uf);
+    delete_ufind(uf);
+    // We delete the single spanning forest.
+    delete_span_forest(span);
+
+    return ret;
+}
+
+
+
+
+void compute_amt_kernel_regular(morphism* M, bool* mono_in_sub, uint* size) {
+    // Computation of the spanning forest of the right Cayley graph.
+    // Only idempotents are allowed to be root nodes.
+    num_span_forest* span = compute_span_forest(M->r_cayley, M->rels->RCL, M->idem_array);
+
+    for (uint i = 0; i < span->nb_trees; i++) {
+        // The idempotent root of the i-th tree.
+        uint e = span->root[i];
+
+        // Number of cycles in the base of the i-th tree.
+        uint size_base = size_dequeue(span->dropped[i]);
+
+        // We compute the hnf matrix corresponding to the cycle base from the spanning tree and the list of dropped edges.
+        fmpz_mat_t MAT;
+        build_hnf_matrix(M->r_cayley, span, MAT, i);
+
+        // It remains to solve the system of equations given by the HNF for each element of the R-class
+        // of the idempotent e. This checks whether the element is in the kernel or not.
+
+        for (uint k = 0; k < M->rels->RCL->cl_size[M->rels->RCL->numcl[e]]; k++) {
+
+            // We take the k-th element of the R-class of e.
+            uint s = M->rels->RCL->cl_elems[M->rels->RCL->numcl[e]][k];
+
+            // If s is an idempotent, we skip it: it is in the kernel.
+            // We do not need to check it.
+            if (M->idem_array[s]) {
+                mono_in_sub[s] = true;
+                (*size)++;
+                continue;
+            }
+
+            // We now know that s is not an idempotent.
+            // We check if it is in the kernel or not.
+            if (solve_system_amt(MAT, span->span_forest[s], size_base, M->r_cayley->size_alpha)) {
+                mono_in_sub[s] = true;
+                (*size)++;
+            }
+        }
+
+        // We do not need the matrix anymore, we can delete it.
+        fmpz_mat_clear(MAT);
+
+    }
+    delete_span_forest(span);
+}
+
+
+void build_hnf_matrix_two(dgraph* g1, dgraph* g2, num_span_forest* span1, num_span_forest* span2, uint q1, uint q2, fmpz_mat_t MAT) {
+    uint i1 = span1->numtree[q1];
+    uint i2 = span2->numtree[q2];
+    uint size_base1 = size_dequeue(span1->dropped[i1]);
+    uint size_base2 = size_dequeue(span2->dropped[i2]);
+    uint size_base = size_base1 + size_base2;
+    fmpz_mat_init(MAT, size_base, g1->size_alpha);
+
+    for (uint j = 0; j < size_base1; j++) {
+
+        // We take the dropped edge (r,b,s) from the queue.
+        uint p = lefread_dequeue(span1->dropped[i1], j);
+        uint r = p / span1->size_alpha;
+        uint b = p % span1->size_alpha;
+        uint s = g1->edges[r][b];
+
+        // We fill the matrix row corresponding to the cycle closed by this dropped edge.
+        for (uint a = 0; a < span1->size_alpha; a++) {
+            if (a != b) {
+                fmpz_set_si(fmpz_mat_entry(MAT, j, a), span1->span_forest[r][a] - span1->span_forest[s][a]);
+            }
+            else {
+                fmpz_set_si(fmpz_mat_entry(MAT, j, a), span1->span_forest[r][a] - span1->span_forest[s][a] + 1);
+            }
+        }
+    }
+    for (uint j = 0; j < size_base2; j++) {
+
+        // We take the dropped edge (r,b,s) from the queue.
+        uint p = lefread_dequeue(span2->dropped[i2], j);
+        uint r = p / span2->size_alpha;
+        uint b = p % span2->size_alpha;
+        uint s = g2->edges[r][b];
+
+        // We fill the matrix row corresponding to the cycle closed by this dropped edge.
+        for (uint a = 0; a < span2->size_alpha; a++) {
+            if (a != b) {
+                fmpz_set_si(fmpz_mat_entry(MAT, j + size_base1, a), span2->span_forest[r][a] - span2->span_forest[s][a]);
+            }
+            else {
+                fmpz_set_si(fmpz_mat_entry(MAT, j + size_base1, a), span2->span_forest[r][a] - span2->span_forest[s][a] + 1);
+            }
+        }
+    }
+
+    // We put the matrix in HNF.
+    fmpz_mat_hnf(MAT, MAT);
+}
+
+
+
+
+void compute_amt_pairs_regular(morphism* M, num_span_forest* rspan, num_span_forest* lspan, uint e, uint f, dequeue* p1, dequeue* p2) {
+
+    // We compute the matrix corresponding to the cycle base (R-class of e + L-class of f).
+    uint size_ebase = size_dequeue(rspan->dropped[rspan->numtree[e]]);
+    uint size_fbase = size_dequeue(lspan->dropped[lspan->numtree[f]]);
+    fmpz_mat_t MAT;
+    fmpz_mat_init(MAT, size_ebase + size_fbase, rspan->size_alpha);
+
+    for (uint j = 0; j < size_ebase; j++) {
+
+        // We take the dropped edge (r,b,s) from the queue.
+        uint p = lefread_dequeue(rspan->dropped[rspan->numtree[e]], j);
+        uint r = p / rspan->size_alpha;
+        uint b = p % rspan->size_alpha;
+        uint s = M->r_cayley->edges[r][b];
+
+        // We fill the matrix row corresponding to the cycle closed by this dropped edge.
+        for (uint a = 0; a < rspan->size_alpha; a++) {
+            if (a != b) {
+                fmpz_set_si(fmpz_mat_entry(MAT, j, a), rspan->span_forest[r][a] - rspan->span_forest[s][a]);
+            }
+            else {
+                fmpz_set_si(fmpz_mat_entry(MAT, j, a), rspan->span_forest[r][a] - rspan->span_forest[s][a] + 1);
+            }
+        }
+    }
+    for (uint j = 0; j < size_fbase; j++) {
+
+        // We take the dropped edge (r,b,s) from the queue.
+        uint p = lefread_dequeue(lspan->dropped[lspan->numtree[f]], j);
+        uint r = p / lspan->size_alpha;
+        uint b = p % lspan->size_alpha;
+        uint s = M->l_cayley->edges[r][b];
+
+        // We fill the matrix row corresponding to the cycle closed by this dropped edge.
+        for (uint a = 0; a < lspan->size_alpha; a++) {
+            if (a != b) {
+                fmpz_set_si(fmpz_mat_entry(MAT, j + size_ebase, a), lspan->span_forest[r][a] - lspan->span_forest[s][a]);
+            }
+            else {
+                fmpz_set_si(fmpz_mat_entry(MAT, j + size_ebase, a), lspan->span_forest[r][a] - lspan->span_forest[s][a] + 1);
+            }
+        }
+    }
+
+    // We put the matrix in HNF.
+    fmpz_mat_hnf(MAT, MAT);
+
+
+
+    for (uint i = 0; i < M->rels->RCL->cl_size[M->rels->RCL->numcl[e]]; i++) {
+        for (uint j = 0; j < M->rels->LCL->cl_size[M->rels->LCL->numcl[f]]; j++) {
+            uint q = M->rels->RCL->cl_elems[M->rels->RCL->numcl[e]][i];
+            uint t = M->rels->LCL->cl_elems[M->rels->LCL->numcl[f]][j];
+
+            int target[rspan->size_alpha];
+            for (uint a = 0; a < rspan->size_alpha; a++) {
+                target[a] = rspan->span_forest[q][a] + lspan->span_forest[t][a];
+            }
+
+            if (solve_system_amt(MAT, target, MAT->r, MAT->c)) {
+                rigins_dequeue(q, p1);
+                rigins_dequeue(t, p2);
+            }
+        }
+    }
+
+    fmpz_mat_clear(MAT);
+}
+
+
+
+/****************************/
+/*+ Dealing with morphisms +*/
+/****************************/
+
+
+
 typedef struct {
     uint left;
     uint right;
@@ -29,13 +474,27 @@ static void concat_stal_lists(uint* map, stal_sent** trans, uint asize, uint r, 
 }
 
 
-/****************************/
-/*+ Dealing with morphisms +*/
-/****************************/
-
-
-parti* dgraph_stal_fold(dgraph* g, bool grp) {
-
+parti* dgraph_stal_fold(dgraph* g, parti* sccs, basis ba) {
+    bool grp = false;
+    switch (ba)
+    {
+    case BA_ST:
+        return dtarjan(g, NULL, false);
+        break;
+    case BA_MOD:
+        grp = false;
+        break;
+    case BA_AMT:
+        return dgraph_amt_fold(g, sccs);
+        break;
+    case BA_GR:
+        grp = true;
+        break;
+    default:
+        fprintf(stderr, "Error: Invalid basis in dgraph_stal_fold.\n");
+        exit(EXIT_FAILURE);
+        break;
+    }
 
     uint alpha_size;
 
@@ -80,7 +539,7 @@ parti* dgraph_stal_fold(dgraph* g, bool grp) {
     for (uint q = 0; q < g->size_graph; q++) {
         for (uint a = 0; a < g->size_alpha; a++) {
             uint r = g->edges[q][a];
-            if (r == UINT_MAX) {
+            if (r == UINT_MAX || (sccs && sccs->numcl[r] != sccs->numcl[q])) {
                 continue; // Skip transitions not in the same SCC
             }
             uint b;
@@ -195,8 +654,6 @@ parti* dgraph_stal_fold(dgraph* g, bool grp) {
             a++;
         }
     }
-
-
 
     // Cleanup
     free(map);
@@ -213,198 +670,6 @@ parti* dgraph_stal_fold(dgraph* g, bool grp) {
 
 }
 
-parti* mor_stal_fold(morphism* M, bool grp, bool rcl) {
-
-
-    parti* sccs;
-    dgraph* g;
-
-    if (rcl) {
-        g = M->r_cayley;
-        sccs = M->rels->RCL;
-    }
-    else {
-        g = M->l_cayley;
-        sccs = M->rels->LCL;
-    }
-
-    uint alpha_size;
-
-    if (grp) {
-        alpha_size = g->size_alpha;
-    }
-    else {
-        alpha_size = 1;
-    }
-
-
-
-    // Allocation of the transition lists
-    uint* map;
-    uint* states;
-    MALLOC(map, g->size_graph * g->size_alpha * 2);
-    MALLOC(states, g->size_graph * g->size_alpha * 2);
-    stal_sent** ltrans;
-    MALLOC(ltrans, g->size_graph);
-    stal_sent** litrans;
-    MALLOC(litrans, g->size_graph);
-    stal_sent* storage;
-    CALLOC(storage, g->size_graph * alpha_size);
-    stal_sent* istorage;
-    CALLOC(istorage, g->size_graph * alpha_size);
-
-
-    for (uint q = 0; q < g->size_graph; q++) {
-        ltrans[q] = storage + q * alpha_size;
-        litrans[q] = istorage + q * alpha_size;
-        for (uint a = 0; a < alpha_size; a++) {
-            ltrans[q][a].left = UINT_MAX;
-            ltrans[q][a].right = UINT_MAX;
-            ltrans[q][a].size = 0;
-            litrans[q][a].left = UINT_MAX;
-            litrans[q][a].right = UINT_MAX;
-            litrans[q][a].size = 0;
-        }
-    }
-
-
-    // Fill lists with original transitions (only transitions internal to sccs are kept).
-    uint index = 0;
-    for (uint q = 0; q < g->size_graph; q++) {
-        for (uint a = 0; a < g->size_alpha; a++) {
-            uint r = g->edges[q][a];
-            if (sccs->numcl[r] != sccs->numcl[q]) {
-                continue; // Skip transitions not in the same SCC
-            }
-            uint b;
-            if (grp) {
-                b = a;
-            }
-            else {
-                b = 0;
-            }
-
-            states[index] = r;
-            map[index] = ltrans[q][b].left;
-            ltrans[q][b].left = index;
-            if (ltrans[q][b].right == UINT_MAX) {
-                ltrans[q][b].right = index;
-            }
-            ltrans[q][b].size++;
-
-            index++;
-
-            states[index] = q;
-            map[index] = litrans[r][b].left;
-            litrans[r][b].left = index;
-            if (litrans[r][b].right == UINT_MAX) {
-                litrans[r][b].right = index;
-            }
-            litrans[r][b].size++;
-
-            index++;
-        }
-    }
-
-    // Union-find for the partition
-    ufind* merge = create_ufind(g->size_graph);
-
-    // Une file qui contient une liste de de sommets à traiter
-    // Elle contient initialement tous les sommets
-    dequeue* tofold = create_dequeue();
-    for (uint q = 0; q < g->size_graph; q++) {
-        rigins_dequeue(q, tofold);
-    }
-
-
-    // Tant qu'il reste un sommet à traiter
-    while (!isempty_dequeue(tofold)) {
-        // On prend le représentant d'un sommet non-traité
-        uint q = find_ufind(lefpull_dequeue(tofold), merge);
-
-        bool folded = false;
-        uint a = 0;
-        while (!folded && a < alpha_size) {
-
-            if (ltrans[q][a].size > 1) // Si il y a 2 arêtes sortantes étiquetées par a
-            {
-                // On prend les représentant des destinations des deux premières
-                // arêtes qu'on va fusionner (si ça n'a pas été fait avant)
-                uint r = find_ufind(states[ltrans[q][a].left], merge);
-                uint s = find_ufind(states[map[ltrans[q][a].left]], merge);
-
-                ltrans[q][a].size--; // On supprime la première des deux edges
-                if (ltrans[q][a].size == 0) {
-                    ltrans[q][a].left = UINT_MAX;
-                    ltrans[q][a].right = UINT_MAX;
-                }
-                else {
-                    ltrans[q][a].left = map[ltrans[q][a].left];
-                }
-                if (r != s)                                                // Si les deux sommets adjacents n'avaient pas encore étés fusionnés
-                {
-                    union_ufind(r, s, merge);                       // On effectue la fusion
-                    concat_stal_lists(map, ltrans, alpha_size, r, s); // On concatène leur listes de sommets adjacents
-                    concat_stal_lists(map, litrans, alpha_size, r, s);
-                    rigins_dequeue(find_ufind(r, merge), tofold); // On va devoir éventuelement traiter la nouvelle classe
-                    if (find_ufind(r, merge) != find_ufind(q, merge)) {
-                        rigins_dequeue(find_ufind(q, merge), tofold);
-                    }
-                    folded = true;
-                }
-                else {
-                    rigins_dequeue(find_ufind(q, merge), tofold);
-                }
-            }
-            else if (litrans[q][a].size > 1) // Si il y a 2 arêtes sortantes étiquetées par a-1
-            {
-                // On prend les représentant des destinations des deux premières
-                // arêtes qu'on va fusionner (si ça n'a pas été fait avant)
-                uint r = find_ufind(states[litrans[q][a].left], merge);
-                uint s = find_ufind(states[map[litrans[q][a].left]], merge);
-                litrans[q][a].size--; // On supprime la première des deux edges
-                if (litrans[q][a].size == 0) {
-                    litrans[q][a].left = UINT_MAX;
-                    litrans[q][a].right = UINT_MAX;
-                }
-                else {
-                    litrans[q][a].left = map[litrans[q][a].left];
-                }
-                if (r != s)                                                  // Si les deux sommets adjacents n'avaient pas encore étés fusionnés
-                {
-                    union_ufind(r, s, merge); // On effectue la fusion
-                    concat_stal_lists(map, ltrans, alpha_size, r, s); // On concatène leur listes de sommets adjacents
-                    concat_stal_lists(map, litrans, alpha_size, r, s);
-                    rigins_dequeue(find_ufind(r, merge), tofold); // On va devoir éventuellement traiter la nouvelle classe
-                    if (find_ufind(r, merge) != find_ufind(q, merge)) {
-                        rigins_dequeue(find_ufind(q, merge), tofold);
-                    }
-                    folded = true;
-                }
-                else {
-                    rigins_dequeue(find_ufind(q, merge), tofold);
-                }
-            }
-            a++;
-        }
-    }
-
-
-
-    // Cleanup
-    free(map);
-    free(states);
-    free(ltrans);
-    free(litrans);
-    free(storage);
-    free(istorage);
-    delete_dequeue(tofold);
-    parti* result = ufind_to_parti_refined(merge, sccs);
-    delete_ufind(merge);
-
-    return result;
-}
-
 
 dgraph* shrink_mod(dgraph* g, parti* fold, parti* sccs) {
     dgraph* new = create_dgraph_noedges(fold->size_par, 2);
@@ -417,7 +682,7 @@ dgraph* shrink_mod(dgraph* g, parti* fold, parti* sccs) {
         uint c = fold->numcl[q];
         for (uint a = 0; a < g->size_alpha; a++) {
             uint r = g->edges[q][a];
-            if (sccs->numcl[r] == sccs->numcl[q]) {
+            if (r != UINT_MAX && sccs->numcl[r] == sccs->numcl[q]) {
                 new->edges[c][0] = fold->numcl[r];
                 new->edges[fold->numcl[r]][1] = c;
             }
@@ -437,7 +702,7 @@ dgraph* shrink_mod_mirror(dgraph* g, parti* fold, parti* sccs) {
         uint c = fold->numcl[q];
         for (uint a = 0; a < g->size_alpha; a++) {
             uint r = g->edges[q][a];
-            if (sccs->numcl[r] == sccs->numcl[q]) {
+            if (r != UINT_MAX && sccs->numcl[r] == sccs->numcl[q]) {
                 new->edges[c][1] = fold->numcl[r];
                 new->edges[fold->numcl[r]][0] = c;
             }
@@ -457,7 +722,7 @@ dgraph* shrink_grp(dgraph* g, parti* fold, parti* sccs) {
         uint c = fold->numcl[q];
         for (uint a = 0; a < g->size_alpha; a++) {
             uint r = g->edges[q][a];
-            if (sccs->numcl[r] == sccs->numcl[q]) {
+            if (r != UINT_MAX && (!sccs || sccs->numcl[r] == sccs->numcl[q])) {
                 new->edges[c][a] = fold->numcl[r];
                 new->edges[fold->numcl[r]][g->size_alpha + a] = c;
             }
@@ -477,7 +742,7 @@ dgraph* shrink_grp_mirror(dgraph* g, parti* fold, parti* sccs) {
         uint c = fold->numcl[q];
         for (uint a = 0; a < g->size_alpha; a++) {
             uint r = g->edges[q][a];
-            if (sccs->numcl[r] == sccs->numcl[q]) {
+            if (r != UINT_MAX && sccs->numcl[r] == sccs->numcl[q]) {
                 new->edges[c][g->size_alpha + a] = fold->numcl[r];
                 new->edges[fold->numcl[r]][a] = c;
             }
@@ -485,6 +750,115 @@ dgraph* shrink_grp_mirror(dgraph* g, parti* fold, parti* sccs) {
     }
     return new;
 }
+
+
+
+
+
+dgraph* dgraph_implement_fold(dgraph* g, parti* sccs, parti* fold) {
+
+    dgraph* g_fold = create_dgraph_noedges(fold->size_par, g->size_alpha);
+
+    // Initialize the edges of the folded graph to UINT_MAX
+    for (uint i = 0; i < fold->size_par; i++) {
+        for (uint a = 0; a < g->size_alpha; a++) {
+            g_fold->edges[i][a] = UINT_MAX;
+        }
+    }
+
+    // For each state in the original graph, copy the edges to the folded graph
+    for (uint i = 0; i < g->size_graph;i++) {
+        for (uint a = 0; a < g->size_alpha; a++) {
+            if (g->edges[i][a] != UINT_MAX && (!sccs || sccs->numcl[g->edges[i][a]] == sccs->numcl[i])) {
+                g_fold->edges[fold->numcl[i]][a] = fold->numcl[g->edges[i][a]];
+            }
+        }
+    }
+    return g_fold;
+
+}
+
+
+dfa* dfa_compute_folding(dfa* A, basis ba) {
+    // If the basis is not a group basis, we compute the partition of the states.
+    parti* sccs = dtarjan(A->trans, NULL, false);
+    parti* fold = dgraph_stal_fold(A->trans, sccs, ba);
+
+    dfa* ret;
+    MALLOC(ret, 1);
+    ret->trans = dgraph_implement_fold(A->trans, sccs, fold);
+    ret->initial = fold->numcl[A->initial];
+
+    bool* final;
+    CALLOC(final, fold->size_par);
+
+
+    for (uint i = 0; i < A->nb_finals; i++) {
+        uint n = fold->numcl[A->finals[i]];
+        final[n] = true; // We mark the state as final in the folded DFA.
+    }
+
+    ret->nb_finals = 0;
+
+    for (uint i = 0; i < fold->size_par; i++) {
+        if (final[i]) {
+            ret->nb_finals++;
+        }
+    }
+
+    MALLOC(ret->finals, ret->nb_finals);
+
+    ret->nb_finals = 0;
+    for (uint i = 0; i < fold->size_par; i++) {
+        if (final[i]) {
+            ret->finals[ret->nb_finals] = i; // We add the final state to the folded DFA.
+            ret->nb_finals++;
+        }
+    }
+
+    ret->order = NULL;
+    ret->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha);
+    MALLOC(ret->state_names, fold->size_par);
+    for (uint q = 0; q < fold->size_par; q++) {
+        uint stringsize = 0;
+        for (uint i = 0; i < fold->cl_size[q]; i++) {
+            uint r = fold->cl_elems[q][i];
+            if (A->state_names) {
+                stringsize += strlen(A->state_names[r]) + 1;
+            }
+            else {
+                stringsize += get_uint_length(r) + 1;
+            }
+        }
+        MALLOC(ret->state_names[q], stringsize);
+        bool first = true;
+        char aux[64];
+        for (uint i = 0; i < fold->cl_size[q]; i++) {
+            if (first) {
+                first = false;
+            }
+            else {
+                strcat(ret->state_names[q], ",");
+            }
+
+            if (A->state_names) {
+                strcat(ret->state_names[q], A->state_names[fold->cl_elems[q][i]]);
+            }
+            else {
+                sprintf(aux, "%d", fold->cl_elems[q][i]);
+                strcat(ret->state_names[q], aux);
+            }
+        }
+    }
+
+    delete_parti(sccs);
+    delete_parti(fold);
+    return ret;
+
+}
+
+
+
 
 /***********************/
 /*+ Inverse extension +*/

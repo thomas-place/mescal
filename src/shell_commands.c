@@ -37,13 +37,13 @@ void com_setrec_command(char* varname, char* subname, char* par, com_command* th
         shell_error_unknownvar(varname);
         return;
     }
-    if (objects[i]->type != RECDEF) {
+    if (objects[i].type != RECDEF) {
         shell_error_notrecvar(varname);
         return;
     }
 
-    uchar h = shell_rec_getnum(objects[i]->rec, subname);
-    if (h >= objects[i]->rec->num) {
+    uchar h = shell_rec_getnum(objects[i].rec, subname);
+    if (h >= objects[i].rec->num) {
         shell_error_unknownrel(varname, subname);
         return;
     }
@@ -52,8 +52,8 @@ void com_setrec_command(char* varname, char* subname, char* par, com_command* th
             shell_error_notrecdef(thecom);
             return;
         }
-        symbolic_count = objects[i]->rec->num;
-        symbolic_names = objects[i]->rec->names;
+        symbolic_count = objects[i].rec->num;
+        symbolic_names = objects[i].rec->names;
         regexp* myexp = parse_string_regexp(thecom->main->string);
         symbolic_count = 0;
         symbolic_names = NULL;
@@ -71,21 +71,21 @@ void com_setrec_command(char* varname, char* subname, char* par, com_command* th
         shell_error_syntax();
         return;
     }
-    if (nb >= objects[i]->rec->init) {
+    if (nb >= objects[i].rec->init) {
         shell_error_wrongrecindex(nb, varname);
         return;
     }
 
     bool save;
     int j = com_apply_command(thecom, NULL, MODE_DEFAULT, &save);
-    if (j == -1 || objects[j]->type != REGEXP) {
+    if (j == -1 || objects[j].type != REGEXP) {
         shell_error_notregexp(thecom);
         if (save && j != -1) {
             object_free(j);
         }
         return;
     }
-    shell_rec_iniadd(i, h, nb, reg_copy(objects[j]->exp));
+    shell_rec_iniadd(i, h, nb, reg_copy(objects[j].exp));
 
     if (save) {
         object_free(j);
@@ -169,7 +169,7 @@ int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* s
         // There are two subcases, depending on the type of variable.
 
         // Subcase 1: regular expression, automaton or morphism.
-        if (objects[i]->type != RECDEF) {
+        if (objects[i].type != RECDEF) {
             int j = com_get_object(i, thecom->main->next);
             if (j < 0) {
                 shell_error_dispatch(j);
@@ -183,7 +183,7 @@ int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* s
                 return j;
                 break;
             case MODE_PRINT:
-                shell_view_object(objects[j], true);
+                shell_view_object(objects + j, true);
                 return -1;
                 break;
             case MODE_COPY:
@@ -199,7 +199,7 @@ int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* s
             // If the command consists of a single link, display the summary of the recdef.
             if (com_single(thecom)) {
                 if (mode == MODE_PRINT) {
-                    shell_view_object(objects[i], true);
+                    shell_view_object(objects + i, true);
                     return -1;
                 }
                 else {
@@ -213,14 +213,14 @@ int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* s
                 return -1;
             }
 
-            uchar h = shell_rec_getnum(objects[i]->rec, thecom->main->next->string);
+            uchar h = shell_rec_getnum(objects[i].rec, thecom->main->next->string);
 
-            if (h >= objects[i]->rec->num) {
+            if (h >= objects[i].rec->num) {
                 shell_error_unknownrel(thecom->main->string, thecom->main->next->string);
                 return -1;
             }
 
-            if (!objects[i]->rec->full) {
+            if (!objects[i].rec->full) {
                 shell_error_recnotok(thecom->main->string);
                 return -1;
             }
@@ -237,7 +237,7 @@ int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* s
                 return j;
                 break;
             case MODE_PRINT:
-                shell_view_object(objects[j], true);
+                shell_view_object(objects + j, true);
                 object_free(j);
                 return -1;
                 break;
@@ -335,6 +335,9 @@ int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* s
         case KY_CHIERA:
             return shell_print_chiera(thecom->params, thecom->main->string);
             break;
+        case KY_NAVHIERA:
+            return shell_print_navhiera(thecom->params, thecom->main->string);
+            break;
         case KY_NHIERA:
             return shell_print_neghiera(thecom->params, thecom->main->string);
             break;
@@ -351,7 +354,7 @@ int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* s
             return shell_autoda(thecom->params, thecom->main->string);
             break;
         case KY_CYCLETRIV:
-            return shell_cycletrivial(thecom->params, thecom->main->string);
+            return shell_rtrivialrivial(thecom->params, thecom->main->string);
             break;
         case KY_PERMUT:
             return shell_permutation(thecom->params, thecom->main->string);
@@ -359,9 +362,6 @@ int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* s
         case KY_LETTERIND:
             return shell_letteruniform(thecom->params, thecom->main->string);
             break;
-            // case KY_EXSEARCH:
-            //     return shell_exsearch(thecom->params);
-            //     break;
         case KY_EXINIT:
             return shell_initfile_exall(thecom->params, thecom->main->string);
             break;
@@ -380,6 +380,12 @@ int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* s
         case KY_EXALL:
             return shell_browse_dfas(thecom->params, thecom->main->string);
             break;
+        case KY_BUGSEARCH:
+            return shell_browse_dfas_bug(thecom->params, thecom->main->string);
+            break;
+        case KY_TIMESTATS:
+            return shell_browse_dfas_time(thecom->params, thecom->main->string);
+            break;
         case KY_NEXALL:
             return shell_browse_dfas_neg(thecom->params, thecom->main->string);
             break;
@@ -392,14 +398,20 @@ int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* s
         case KY_LIST:
             return shell_filter_objects(thecom->params, DUMMY);
             break;
+        case KY_FILTER:
+            return shell_filter_delete(thecom->params, DUMMY);
+            break;
         case KY_CLEAR:
             return shell_delete_all(thecom->params, thecom->main->string);
             break;
         case KY_TOGGLE:
             return shell_toggle_optimization(thecom->params, thecom->main->string);
             break;
+        case KY_TOGGLEMEMB:
+            return shell_toggle_membership(thecom->params, thecom->main->string);
+            break;
         case KY_AUTOMATA:
-            return shell_filter_objects(thecom->params, AUTOMATON);
+            return shell_filter_objects(thecom->params, NAUTOMATON);
             break;
         case KY_MORPHISMS:
             return shell_filter_objects(thecom->params, MORPHISM);
@@ -430,6 +442,9 @@ int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* s
     case KY_DYCKTRANS:
         k = shell_dycktrans_nfa(varname, thecom->params, thecom->main->string);
         break;
+    case KY_FOLDING:
+        k = shell_folding_dfa(varname, thecom->params, thecom->main->string);
+        break;
     case KY_GLUSHKOV:
         k = shell_glushkov_nfa(varname, thecom->params, thecom->main->string);
         break;
@@ -453,6 +468,9 @@ int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* s
         break;
     case KY_UNION:
         k = shell_union_nfa(varname, thecom->params, thecom->main->string);
+        break;
+    case KY_DIRECTPRODUCT:
+        k = shell_directproduct_dfa(varname, thecom->params, thecom->main->string);
         break;
     case KY_DETERMINIZE:
         k = shell_determinize_nfa(varname, thecom->params, thecom->main->string);
@@ -507,7 +525,7 @@ int com_apply_command(com_command* thecom, char* varname, com_mode mode, bool* s
     }
 
     if (k >= 0 && mode == MODE_PRINT) {
-        shell_view_object(objects[k], true);
+        shell_view_object(objects + k, true);
         object_free(k);
         return -1;
     }
@@ -580,67 +598,67 @@ bool param_checkobjtype(int i, par_type type, int p, const char* str) {
 
     switch (type) {
     case PAR_AUTOMATONV:
-        if (i < 0 || objects[i]->type != AUTOMATON) {
+        if (i < 0 || (objects[i].type != NAUTOMATON && objects[i].type != DAUTOMATON)) {
             fprintf(stderr, "#### Error  : parameter %d in the command \"%s\" is not an automaton variable.\n", p + 1, str);
             return false;
         }
         break;
     case PAR_AUTOMATON:
-        if (i < 0 || objects[i]->type != AUTOMATON) {
+        if (i < 0 || (objects[i].type != NAUTOMATON && objects[i].type != DAUTOMATON)) {
             fprintf(stderr, "#### Error  : parameter %d in the command \"%s\" is not an automaton.\n", p + 1, str);
             return false;
         }
         break;
     case PAR_REGEXP:
-        if (i < 0 || objects[i]->type != REGEXP) {
+        if (i < 0 || objects[i].type != REGEXP) {
             fprintf(stderr, "#### Error  : parameter %d in the command \"%s\" is not a regular expression.\n", p + 1, str);
             return false;
         }
         break;
     case PAR_MORPHISM:
-        if (i < 0 || objects[i]->type != MORPHISM) {
+        if (i < 0 || objects[i].type != MORPHISM) {
             fprintf(stderr, "#### Error  : parameter %d in the command \"%s\" is not a morphism.\n", p + 1, str);
             return false;
         }
         break;
     case PAR_RECDEF:
-        if (i < 0 || objects[i]->type != RECDEF) {
+        if (i < 0 || objects[i].type != RECDEF) {
             fprintf(stderr, "#### Error  : parameter %d in the command \"%s\" is not a recursive definition.\n", p + 1, str);
             return false;
         }
         break;
     case PAR_AUTOMOR:
-        if (i < 0 || (objects[i]->type != AUTOMATON && objects[i]->type != MORPHISM)) {
+        if (i < 0 || (objects[i].type != NAUTOMATON && objects[i].type != DAUTOMATON && objects[i].type != MORPHISM)) {
             fprintf(stderr, "#### Error  : parameter %d in the command \"%s\" is not an automaton or a morphism.\n", p + 1, str);
             return false;
         }
         break;
     case PAR_AUTOREG:
-        if (i < 0 || (objects[i]->type != AUTOMATON && objects[i]->type != REGEXP)) {
+        if (i < 0 || (objects[i].type != NAUTOMATON && objects[i].type != DAUTOMATON && objects[i].type != REGEXP)) {
             fprintf(stderr, "#### Error  : parameter %d in the command \"%s\" is not an automaton or a regular expression.\n", p + 1, str);
             return false;
         }
         break;
     case PAR_REGMOR:
-        if (i < 0 || (objects[i]->type != REGEXP && objects[i]->type != MORPHISM)) {
+        if (i < 0 || (objects[i].type != REGEXP && objects[i].type != MORPHISM)) {
             fprintf(stderr, "#### Error  : parameter %d in the command \"%s\" is not a regular expression or a morphism.\n", p + 1, str);
             return false;
         }
         break;
     case PAR_OBJECTV:
-        if (i < 0 || (objects[i]->type != AUTOMATON && objects[i]->type != REGEXP && objects[i]->type != MORPHISM && objects[i]->type != RECDEF)) {
+        if (i < 0 || (objects[i].type != NAUTOMATON && objects[i].type != DAUTOMATON && objects[i].type != REGEXP && objects[i].type != MORPHISM && objects[i].type != RECDEF)) {
             fprintf(stderr, "#### Error  : parameter %d in the command \"%s\" is not an object variable.\n", p + 1, str);
             return false;
         }
         break;
     case PAR_OBJECT:
-        if (i < 0 || (objects[i]->type != AUTOMATON && objects[i]->type != REGEXP && objects[i]->type != MORPHISM && objects[i]->type != RECDEF)) {
+        if (i < 0 || (objects[i].type != NAUTOMATON && objects[i].type != DAUTOMATON && objects[i].type != REGEXP && objects[i].type != MORPHISM && objects[i].type != RECDEF)) {
             fprintf(stderr, "#### Error  : parameter %d in the command \"%s\" is not an object.\n", p + 1, str);
             return false;
         }
         break;
     case PAR_REGAUTOMOR:
-        if (i < 0 || (objects[i]->type != REGEXP && objects[i]->type != AUTOMATON && objects[i]->type != MORPHISM)) {
+        if (i < 0 || (objects[i].type != REGEXP && objects[i].type != NAUTOMATON && objects[i].type != DAUTOMATON && objects[i].type != MORPHISM)) {
             fprintf(stderr, "#### Error  : parameter %d in the command \"%s\" is not a regular expression or an automaton or a morphism.\n", p + 1, str);
             return false;
         }
@@ -861,13 +879,13 @@ int shell_mccluskey_reg(char* varname, com_parameters* pars, const char* str) {
         return -2;
     }
     regexp* exp;
-    if (objects[i]->aut->dfa) {
+    if (objects[i].type == DAUTOMATON) {
         // Computes the regular expression from the DFA.
-        exp = dfa_mccluskey(objects[i]->aut->obj_dfa);
+        exp = dfa_mccluskey(objects[i].obj_dfa);
     }
     else {
         // Computes the regular expression from the NFA.
-        exp = nfa_mccluskey(objects[i]->aut->obj_nfa);
+        exp = nfa_mccluskey(objects[i].obj_nfa);
     }
 
     if (saved) {
@@ -887,7 +905,7 @@ int shell_thompson_nfa(char* varname, com_parameters* pars, const char* str) {
     }
 
     // Computes the automaton from the regular expression.
-    nfa* automaton = reg_thompson(objects[i]->exp);
+    nfa* automaton = reg_thompson(objects[i].exp);
     if (saved) {
         object_free(i);
     }
@@ -905,7 +923,7 @@ int shell_glushkov_nfa(char* varname, com_parameters* pars, const char* str) {
     }
 
     // Computes the automaton from the regular expression.
-    nfa* automaton = reg_glushkov(objects[i]->exp);
+    nfa* automaton = reg_glushkov(objects[i].exp);
     if (saved) {
         object_free(i);
     }
@@ -923,11 +941,11 @@ int shell_mirror_nfa(char* varname, com_parameters* pars, const char* str) {
     }
 
     nfa* automaton;
-    if (objects[i]->aut->dfa) {
-        automaton = dfa_mirror(objects[i]->aut->obj_dfa);
+    if (objects[i].type == DAUTOMATON) {
+        automaton = dfa_mirror(objects[i].obj_dfa);
     }
     else {
-        automaton = nfa_mirror(objects[i]->aut->obj_nfa);
+        automaton = nfa_mirror(objects[i].obj_nfa);
     }
     if (saved) {
         object_free(i);
@@ -945,9 +963,9 @@ int shell_union_nfa(char* varname, com_parameters* pars, const char* str) {
         return -2;
     }
 
-    void* obj1 = objects[inds[0]]->aut->dfa ? (void*)objects[inds[0]]->aut->obj_dfa : (void*)objects[inds[0]]->aut->obj_nfa;
-    void* obj2 = objects[inds[1]]->aut->dfa ? (void*)objects[inds[1]]->aut->obj_dfa : (void*)objects[inds[1]]->aut->obj_nfa;
-    nfa* automaton = nfa_union(obj1, objects[inds[0]]->aut->dfa, obj2, objects[inds[1]]->aut->dfa);
+    void* obj1 = (objects[inds[0]].type == DAUTOMATON) ? (void*)objects[inds[0]].obj_dfa : (void*)objects[inds[0]].obj_nfa;
+    void* obj2 = (objects[inds[1]].type == DAUTOMATON) ? (void*)objects[inds[1]].obj_dfa : (void*)objects[inds[1]].obj_nfa;
+    nfa* automaton = nfa_union(obj1, (objects[inds[0]].type == DAUTOMATON), obj2, (objects[inds[1]].type == DAUTOMATON));
     if (saved[0]) {
         object_free(inds[0]);
     }
@@ -966,8 +984,8 @@ int shell_intersect_nfa(char* varname, com_parameters* pars, const char* str) {
         usage_generic(types, 2, PAR_AUTOMATON, str);
         return -2;
     }
-    if (objects[inds[0]]->aut->dfa && objects[inds[1]]->aut->dfa) {
-        dfa* automaton = dfa_intersect(objects[inds[0]]->aut->obj_dfa, objects[inds[1]]->aut->obj_dfa, true);
+    if ((objects[inds[0]].type == DAUTOMATON) && (objects[inds[1]].type == DAUTOMATON)) {
+        dfa* automaton = dfa_intersect(objects[inds[0]].obj_dfa, objects[inds[1]].obj_dfa, true);
         if (saved[0]) {
             object_free(inds[0]);
         }
@@ -978,10 +996,10 @@ int shell_intersect_nfa(char* varname, com_parameters* pars, const char* str) {
     }
 
 
-    void* obj1 = objects[inds[0]]->aut->dfa ? (void*)objects[inds[0]]->aut->obj_dfa : (void*)objects[inds[0]]->aut->obj_nfa;
-    void* obj2 = objects[inds[1]]->aut->dfa ? (void*)objects[inds[1]]->aut->obj_dfa : (void*)objects[inds[1]]->aut->obj_nfa;
+    void* obj1 = (objects[inds[0]].type == DAUTOMATON) ? (void*)objects[inds[0]].obj_dfa : (void*)objects[inds[0]].obj_nfa;
+    void* obj2 = (objects[inds[1]].type == DAUTOMATON) ? (void*)objects[inds[1]].obj_dfa : (void*)objects[inds[1]].obj_nfa;
 
-    void* automaton = nfa_intersect_mixed(obj1, objects[inds[0]]->aut->dfa, obj2, objects[inds[1]]->aut->dfa, true);
+    void* automaton = nfa_intersect_mixed(obj1, (objects[inds[0]].type == DAUTOMATON), obj2, (objects[inds[1]].type == DAUTOMATON), true);
     if (saved[0]) {
         object_free(inds[0]);
     }
@@ -989,7 +1007,7 @@ int shell_intersect_nfa(char* varname, com_parameters* pars, const char* str) {
         object_free(inds[1]);
     }
 
-    if (objects[inds[0]]->aut->dfa && objects[inds[1]]->aut->dfa) {
+    if ((objects[inds[0]].type == DAUTOMATON) && (objects[inds[1]].type == DAUTOMATON)) {
         return object_add_automaton_dfa(varname, (dfa*)automaton);
     }
     else {
@@ -999,6 +1017,150 @@ int shell_intersect_nfa(char* varname, com_parameters* pars, const char* str) {
 
 
 }
+
+int shell_directproduct_dfa(char* varname, com_parameters* pars, const char* str) {
+    int n = com_nbparams(pars);
+    if (n < 2) {
+        // Not enough parameters
+        return -2;
+    }
+    bool saved;
+    int i = com_apply_command(com_getparam(pars, 0), NULL, MODE_DEFAULT, &saved);
+    if (i == -2) {
+        // Error, first parameter not valid
+        return -2;
+    }
+
+    int num;
+    if (!param_getinteger(pars, 1, str, &num)) {
+        // Error, second parameter not valid
+        if (saved) {
+            object_free(i);
+        }
+        return -2;
+    }
+
+    if (num != n - 2 && 2 * num != n - 2) {
+        if (saved) {
+            object_free(i);
+        }
+        return -2;
+    }
+
+
+    int initial_states[num];
+    for (int j = 0; j < num; j++) {
+        if (!param_getinteger(pars, 2 + j, str, initial_states + j)) {
+            // Error, second parameter not valid
+            if (saved) {
+                object_free(i);
+            }
+            return -2;
+        }
+    }
+
+    int final_states[num];
+    int* final_states_ptr = NULL;
+    if (2 * num == n - 2) {
+        final_states_ptr = final_states;
+        for (int j = 0; j < num; j++) {
+            if (!param_getinteger(pars, 2 + num + j, str, final_states + j)) {
+                // Error, second parameter not valid
+                if (saved) {
+                    object_free(i);
+                }
+                return -2;
+            }
+        }
+    }
+
+
+
+    if (objects[i].type == NAUTOMATON) {
+        dfa* automaton = detnfa_to_dfa(objects[i].obj_nfa);
+        if (!automaton) {
+            fprintf(stderr, "#### Error  : the input automaton is not deterministic.\n");
+            if (saved) {
+                object_free(i);
+            }
+            return -2;
+        }
+        dfa* new = dfa_power_prod(automaton, num, initial_states, final_states_ptr);
+        if (saved) {
+            object_free(i);
+        }
+        return object_add_automaton_dfa(varname, new);
+    }
+    else if (objects[i].type == DAUTOMATON) {
+        dfa* new = dfa_power_prod(objects[i].obj_dfa, num, initial_states, final_states_ptr);
+        if (saved) {
+            object_free(i);
+        }
+        return object_add_automaton_dfa(varname, new);
+    }
+    else {
+        fprintf(stderr, "#### Error  : the input object is not an automaton.\n");
+        if (saved) {
+            object_free(i);
+        }
+        return -2;
+    }
+
+
+}
+
+// int shell_directproduct_dfa(char* varname, com_parameters* pars, const char* str) {
+//     // Retrieval of the parameters (errors are handled in the function).
+//     int inds[2];
+//     bool saved[] = { false, false };
+//     par_type types[] = { PAR_AUTOMATON, PAR_AUTOMATON };
+//     if (param_retrieve(pars, 2, 0, types, NULL, NULL, NULL, inds, saved, str) == -2) {
+//         usage_generic(types, 2, PAR_AUTOMATON, str);
+//         return -2;
+//     }
+//     if (objects[inds[0]].type == NAUTOMATON) {
+//         dfa* new = detnfa_to_dfa(objects[inds[0]].obj_nfa);
+//         if (!new) {
+//             fprintf(stderr, "#### Error  : the first automaton is not deterministic.\n");
+//             if (saved[0]) {
+//                 object_free(inds[0]);
+//             }
+//             if (saved[1]) {
+//                 object_free(inds[1]);
+//             }
+//             return -2;
+//         }
+//         objects[inds[0]].obj_dfa = new;
+//         objects[inds[0]].type = DAUTOMATON;
+//     }
+
+//     if (objects[inds[1]].type == NAUTOMATON) {
+//         dfa* new = detnfa_to_dfa(objects[inds[1]].obj_nfa);
+//         if (!new) {
+//             fprintf(stderr, "#### Error  : the second automaton is not deterministic.\n");
+//             if (saved[0]) {
+//                 object_free(inds[0]);
+//             }
+//             if (saved[1]) {
+//                 object_free(inds[1]);
+//             }
+//             return -2;
+//         }
+//         objects[inds[1]].obj_dfa = new;
+//         objects[inds[1]].type = DAUTOMATON;
+//     }
+
+//     dfa* theprod = dfa_direct_product(objects[inds[0]].obj_dfa, objects[inds[1]].obj_dfa);
+//     if (saved[0]) {
+//         object_free(inds[0]);
+//     }
+//     if (saved[1]) {
+//         object_free(inds[1]);
+//     }
+//     return object_add_automaton_dfa(varname, theprod);
+
+
+// }
 
 int shell_concat_nfa(char* varname, com_parameters* pars, const char* str) {
     // Retrieval of the parameters (errors are handled in the function).
@@ -1010,9 +1172,9 @@ int shell_concat_nfa(char* varname, com_parameters* pars, const char* str) {
         return -2;
     }
 
-    void* obj1 = objects[inds[0]]->aut->dfa ? (void*)objects[inds[0]]->aut->obj_dfa : (void*)objects[inds[0]]->aut->obj_nfa;
-    void* obj2 = objects[inds[1]]->aut->dfa ? (void*)objects[inds[1]]->aut->obj_dfa : (void*)objects[inds[1]]->aut->obj_nfa;
-    nfa* automaton = nfa_concat(obj1, objects[inds[0]]->aut->dfa, obj2, objects[inds[1]]->aut->dfa);
+    void* obj1 = (objects[inds[0]].type == DAUTOMATON) ? (void*)objects[inds[0]].obj_dfa : (void*)objects[inds[0]].obj_nfa;
+    void* obj2 = (objects[inds[1]].type == DAUTOMATON) ? (void*)objects[inds[1]].obj_dfa : (void*)objects[inds[1]].obj_nfa;
+    nfa* automaton = nfa_concat(obj1, (objects[inds[0]].type == DAUTOMATON), obj2, (objects[inds[1]].type == DAUTOMATON));
     if (saved[0]) {
         object_free(inds[0]);
     }
@@ -1033,11 +1195,11 @@ int shell_kleene_nfa(char* varname, com_parameters* pars, const char* str) {
     }
 
     nfa* automaton;
-    if (objects[i]->aut->dfa) {
-        automaton = dfa_star(objects[i]->aut->obj_dfa);
+    if (objects[i].type == DAUTOMATON) {
+        automaton = dfa_star(objects[i].obj_dfa);
     }
     else {
-        automaton = nfa_star(objects[i]->aut->obj_nfa);
+        automaton = nfa_star(objects[i].obj_nfa);
     }
 
     if (saved) {
@@ -1056,15 +1218,15 @@ int shell_elimeps_nfa(char* varname, com_parameters* pars, const char* str) {
         return -2;
     }
 
-    if (objects[i]->aut->dfa) {
-        dfa* automaton = dfa_copy(objects[i]->aut->obj_dfa);
+    if (objects[i].type == DAUTOMATON) {
+        dfa* automaton = dfa_copy(objects[i].obj_dfa);
         if (saved) {
             object_free(i);
         }
         return object_add_automaton_dfa(varname, automaton);
     }
     else {
-        nfa* automaton = nfa_elimeps(objects[i]->aut->obj_nfa);
+        nfa* automaton = nfa_elimeps(objects[i].obj_nfa);
         if (saved) {
             object_free(i);
         }
@@ -1085,15 +1247,15 @@ int shell_trim_nfa(char* varname, com_parameters* pars, const char* str) {
     }
 
 
-    if (objects[i]->aut->dfa) {
-        dfa* automaton = dfa_trim(objects[i]->aut->obj_dfa);
+    if (objects[i].type == DAUTOMATON) {
+        dfa* automaton = dfa_trim(objects[i].obj_dfa);
         if (saved) {
             object_free(i);
         }
         return object_add_automaton_dfa(varname, automaton);
     }
     else {
-        nfa* automaton = nfa_trim(objects[i]->aut->obj_nfa);
+        nfa* automaton = nfa_trim(objects[i].obj_nfa);
         if (saved) {
             object_free(i);
         }
@@ -1111,7 +1273,7 @@ int shell_determinize_nfa(char* varname, com_parameters* pars, const char* str) 
         return -2;
     }
 
-    if (objects[i]->aut->dfa) {
+    if (objects[i].type == DAUTOMATON) {
         uint j = shell_copy_generic(i, varname);
         if (saved) {
             object_free(i);
@@ -1120,12 +1282,12 @@ int shell_determinize_nfa(char* varname, com_parameters* pars, const char* str) 
     }
 
     dfa* automaton;
-    if (objects[i]->aut->dfa) {
-        automaton = dfa_copy(objects[i]->aut->obj_dfa);
+    if (objects[i].type == DAUTOMATON) {
+        automaton = dfa_copy(objects[i].obj_dfa);
     }
     else {
         // We need to determinize the NFA.
-        automaton = nfa_determinize(objects[i]->aut->obj_nfa, true);
+        automaton = nfa_determinize(objects[i].obj_nfa, true);
     }
     if (saved) {
         object_free(i);
@@ -1145,12 +1307,12 @@ int shell_complement_nfa(char* varname, com_parameters* pars, const char* str) {
 
     dfa* automaton;
 
-    if (objects[i]->aut->dfa) {
-        automaton = dfa_complement(objects[i]->aut->obj_dfa);
+    if (objects[i].type == DAUTOMATON) {
+        automaton = dfa_complement(objects[i].obj_dfa);
 
     }
     else {
-        dfa* determinized = nfa_determinize(objects[i]->aut->obj_nfa, true);
+        dfa* determinized = nfa_determinize(objects[i].obj_nfa, true);
         automaton = dfa_complement(determinized);
         dfa_delete(determinized);
     }
@@ -1172,11 +1334,11 @@ int shell_hopcroft_nfa(char* varname, com_parameters* pars, const char* str) {
     }
 
     dfa* automaton;
-    if (objects[i]->aut->dfa) {
-        automaton = dfa_hopcroft(objects[i]->aut->obj_dfa);
+    if (objects[i].type == DAUTOMATON) {
+        automaton = dfa_hopcroft(objects[i].obj_dfa);
     }
     else {
-        dfa* determinized = nfa_determinize(objects[i]->aut->obj_nfa, true);
+        dfa* determinized = nfa_determinize(objects[i].obj_nfa, true);
         automaton = dfa_hopcroft(determinized);
         dfa_delete(determinized);
     }
@@ -1196,11 +1358,11 @@ int shell_brzozowski_nfa(char* varname, com_parameters* pars, const char* str) {
         return -2;
     }
     dfa* automaton;
-    if (objects[i]->aut->dfa) {
-        automaton = dfa_brzozowski(objects[i]->aut->obj_dfa);
+    if (objects[i].type == DAUTOMATON) {
+        automaton = dfa_brzozowski(objects[i].obj_dfa);
     }
     else {
-        automaton = nfa_brzozowski(objects[i]->aut->obj_nfa);
+        automaton = nfa_brzozowski(objects[i].obj_nfa);
     }
     if (saved) {
         object_free(i);
@@ -1219,11 +1381,11 @@ int shell_invtrans(char* varname, com_parameters* pars, const char* str) {
     }
 
     nfa* automaton;
-    if (objects[i]->aut->dfa) {
-        automaton = dfa_to_nfa(objects[i]->aut->obj_dfa);
+    if (objects[i].type == DAUTOMATON) {
+        automaton = dfa_to_nfa(objects[i].obj_dfa);
     }
     else {
-        automaton = nfa_copy(objects[i]->aut->obj_nfa);
+        automaton = nfa_copy(objects[i].obj_nfa);
     }
     parti* par = nfa_inv_ext(automaton);
     delete_parti(par);
@@ -1232,6 +1394,69 @@ int shell_invtrans(char* varname, com_parameters* pars, const char* str) {
     }
     return object_add_automaton_nfa(varname, automaton);
 }
+
+int shell_folding_dfa(char* varname, com_parameters* pars, const char* str) {
+    // Retrieval of the parameters (errors are handled in the function).
+    int i;
+    classes theclass;
+    bool saved = false;
+    par_type types[] = { PAR_AUTOMATON, PAR_CLASS };
+    if (param_retrieve(pars, 2, 0, types, &theclass, NULL, NULL, &i, &saved, str) == -2) {
+        usage_generic(types, 2, PAR_AUTOMATON, str);
+        return -2;
+    }
+
+    basis ba;
+    switch (theclass)
+    {
+    case CL_ST:
+        ba = BA_ST;
+        break;
+    case CL_MOD:
+        ba = BA_MOD;
+        break;
+    case CL_AMT:
+        ba = BA_AMT;
+        break;
+    case CL_GR:
+        ba = BA_GR;
+        break;
+    default:
+        fprintf(stdout, "#### Error : invalid group basis.\n");
+        if (saved) {
+            object_free(i);
+        }
+        return -2;
+        break;
+    }
+
+    dfa* automaton;
+    dfa* newauto;
+    if (objects[i].type == DAUTOMATON) {
+        newauto = dfa_compute_folding(objects[i].obj_dfa, ba);
+        if (saved) {
+            object_free(i);
+        }
+        return object_add_automaton_dfa(varname, newauto);
+    }
+    else {
+        automaton = detnfa_to_dfa(objects[i].obj_nfa);
+        if (!automaton) {
+            fprintf(stdout, "#### Error  : the automaton is not deterministic.\n");
+            if (saved) {
+                object_free(i);
+            }
+            return -2;
+        }
+        newauto = dfa_compute_folding(automaton, ba);
+        dfa_delete(automaton);
+        if (saved) {
+            object_free(i);
+        }
+        return object_add_automaton_dfa(varname, newauto);
+    }
+}
+
 
 int shell_dycktrans_nfa(char* varname, com_parameters* pars, const char* str) {
     // Retrieval of the parameters (errors are handled in the function).
@@ -1244,11 +1469,11 @@ int shell_dycktrans_nfa(char* varname, com_parameters* pars, const char* str) {
     }
 
     nfa* automaton;
-    if (objects[i]->aut->dfa) {
-        automaton = dfa_to_nfa(objects[i]->aut->obj_dfa);
+    if (objects[i].type == DAUTOMATON) {
+        automaton = dfa_to_nfa(objects[i].obj_dfa);
     }
     else {
-        automaton = nfa_copy(objects[i]->aut->obj_nfa);
+        automaton = nfa_copy(objects[i].obj_nfa);
     }
 
     parti* SCCS = nfa_inv_ext(automaton);
@@ -1334,7 +1559,7 @@ int shell_save_to_file(com_parameters* pars, const char* str) {
         return -2;
     }
     fprintf(stdout, "#### saving in the file: \"%s\".\n", filename);
-    files_save_object(objects[i], filename);
+    files_save_object(objects + i, filename);
     if (saved) {
         object_free(i);
     }
@@ -1388,16 +1613,14 @@ int shell_latex_gen(com_parameters* pars, const char* str) {
         return -2;
     }
 
-    if (objects[i]->type == AUTOMATON) {
-        if (objects[i]->aut->dfa) {
-            latex_print_dfa(objects[i]->aut->obj_dfa, stdout);
-        }
-        else {
-            latex_print_nfa(objects[i]->aut->obj_nfa, stdout);
-        }
+    if (objects[i].type == DAUTOMATON) {
+        latex_print_dfa(objects[i].obj_dfa, stdout);
     }
-    else if (objects[i]->type == MORPHISM) {
-        latex_print_cayley(objects[i]->mor->obj, stdout);
+    else if (objects[i].type == NAUTOMATON) {
+        latex_print_nfa(objects[i].obj_nfa, stdout);
+    }
+    else if (objects[i].type == MORPHISM) {
+        latex_print_cayley(objects[i].mor->obj, stdout);
     }
 
     if (saved) {
@@ -1416,7 +1639,7 @@ int shell_view_rcayley(com_parameters* pars, const char* str) {
         return -2;
     }
     print_title_box(100, true, stdout, 1, "Right Cayley graph of the morphism");
-    view_cayley(objects[i]->mor->obj);
+    view_cayley(objects[i].mor->obj);
     if (saved) {
         object_free(i);
     }
@@ -1433,7 +1656,7 @@ int shell_view_lcayley(com_parameters* pars, const char* str) {
         return -2;
     }
     print_title_box(100, true, stdout, 1, "Left Cayley graph of the morphism");
-    view_left_cayley(objects[i]->mor->obj);
+    view_left_cayley(objects[i].mor->obj);
     if (saved) {
         object_free(i);
     }
@@ -1449,9 +1672,9 @@ int shell_view_mormult(com_parameters* pars, const char* str) {
         usage_generic(types, 1, PAR_NONE, str);
         return -2;
     }
-    mor_compute_mult(objects[i]->mor->obj);
+    mor_compute_mult(objects[i].mor->obj);
     print_title_box(100, true, stdout, 1, "Multiplication table of the morphism");
-    mor_mult_print(objects[i]->mor->obj, stdout);
+    mor_mult_print(objects[i].mor->obj, stdout);
     if (saved) {
         object_free(i);
     }
@@ -1467,9 +1690,9 @@ int shell_view_morder(com_parameters* pars, const char* str) {
         usage_generic(types, 1, PAR_NONE, str);
         return -2;
     }
-    mor_compute_order(objects[i]->mor->obj);
+    mor_compute_order(objects[i].mor->obj);
     print_title_box(100, true, stdout, 1, "Ordering of the morphism.");
-    mor_print_order(objects[i]->mor->obj, stdout);
+    mor_print_order(objects[i].mor->obj, stdout);
     if (saved) {
         object_free(i);
     }
@@ -1485,7 +1708,7 @@ int shell_view_idems(com_parameters* pars, const char* str) {
         usage_generic(types, 1, PAR_NONE, str);
         return -2;
     }
-    mor_print_idems(objects[i]->mor->obj, stdout);
+    mor_print_idems(objects[i].mor->obj, stdout);
     if (saved) {
         object_free(i);
     }
@@ -1508,6 +1731,29 @@ int shell_toggle_optimization(com_parameters* pars, const char* str) {
     return -1;
 }
 
+int shell_toggle_membership(com_parameters* pars, const char* str) {
+    if (param_retrieve(pars, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, str) == -2) {
+        usage_generic(NULL, 0, PAR_NONE, str);
+        return -2;
+    }
+    memb_mode = (memb_mode + 1) % MEMB_SIZE;
+    switch (memb_mode)
+    {
+    case MEMB_MINIMAL:
+        fprintf(stdout, "#### Membership mode set to \"minimal automaton\".\n");
+        break;
+    case MEMB_SYNTAC:
+        fprintf(stdout, "#### Membership mode set to \"syntactic morphism\".\n");
+        break;
+    case MEMB_OPTIMAL:
+        fprintf(stdout, "#### Membership mode set to \"optimal\".\n");
+        break;
+    default:
+        break;
+    }
+    return -1;
+}
+
 int shell_view_mkernel(com_parameters* pars, const char* str) {
     // Retrieval of the parameters (errors are handled in the function).
     int i;
@@ -1517,7 +1763,7 @@ int shell_view_mkernel(com_parameters* pars, const char* str) {
         usage_generic(types, 1, PAR_NONE, str);
         return -2;
     }
-    shell_view_object(objects[i], true);
+    shell_view_object(objects + i, true);
     print_title_box(100, true, stdout, 1, "MOD-kernel of the morphism.");
     print_full_subsemi(shell_compute_ker(i, KER_MOD, optimization_level), stdout);
     if (saved) {
@@ -1535,7 +1781,7 @@ int shell_view_akernel(com_parameters* pars, const char* str) {
         usage_generic(types, 1, PAR_NONE, str);
         return -2;
     }
-    shell_view_object(objects[i], true);
+    shell_view_object(objects + i, true);
     print_title_box(100, true, stdout, 1, "AMT-kernel of the morphism.");
     print_full_subsemi(shell_compute_ker(i, KER_AMT, optimization_level), stdout);
     if (saved) {
@@ -1553,7 +1799,7 @@ int shell_view_gkernel(com_parameters* pars, const char* str) {
         usage_generic(types, 1, PAR_NONE, str);
         return -2;
     }
-    shell_view_object(objects[i], true);
+    shell_view_object(objects + i, true);
     print_title_box(100, true, stdout, 1, "GR-kernel of the morphism.");
     print_full_subsemi(shell_compute_ker(i, KER_GR, optimization_level), stdout);
     if (saved) {
@@ -1565,7 +1811,7 @@ int shell_view_gkernel(com_parameters* pars, const char* str) {
 static subsemi* shell_compute_orbit_aux(int i, uint e, orbits_type thetype) {
     switch (thetype) {
     case ORB_DD:
-        return compute_one_ddorb(objects[i]->mor->obj, e);
+        return compute_one_ddorb(objects[i].mor->obj, e);
         break;
     case ORB_MODP:
         return compute_one_gplusorb(shell_compute_ker(i, KER_MOD, optimization_level), e);
@@ -1577,28 +1823,28 @@ static subsemi* shell_compute_orbit_aux(int i, uint e, orbits_type thetype) {
         return compute_one_gplusorb(shell_compute_ker(i, KER_GR, optimization_level), e);
         break;
     case ORB_PT:
-        return compute_one_ptorb(objects[i]->mor->obj, e, optimization_level);
+        return compute_one_ptorb(objects[i].mor->obj, e, optimization_level);
         break;
     case ORB_BPMOD:
-        return compute_one_bpgorb(objects[i]->mor->obj, e, optimization_level, BPG_MOD);
+        return compute_one_bpgorb(objects[i].mor->obj, e, optimization_level, BA_MOD);
         break;
     case ORB_BPAMT:
-        return compute_one_bpgorb(objects[i]->mor->obj, e, optimization_level, BPG_AMT);
+        return compute_one_bpgorb(objects[i].mor->obj, e, optimization_level, BA_AMT);
         break;
     case ORB_BPGR:
-        return compute_one_bpgorb(objects[i]->mor->obj, e, optimization_level, BPG_GR);
+        return compute_one_bpgorb(objects[i].mor->obj, e, optimization_level, BA_GR);
         break;
     case ORB_BPDD:
-        return compute_one_bpgplusorb(objects[i]->mor->obj, e, optimization_level, BPG_ST);
+        return compute_one_bpgplusorb(objects[i].mor->obj, e, optimization_level, BA_ST);
         break;
     case ORB_BPMODP:
-        return compute_one_bpgplusorb(objects[i]->mor->obj, e, optimization_level, BPG_MOD);
+        return compute_one_bpgplusorb(objects[i].mor->obj, e, optimization_level, BA_MOD);
         break;
     case ORB_BPAMTP:
-        return compute_one_bpgplusorb(objects[i]->mor->obj, e, optimization_level, BPG_AMT);
+        return compute_one_bpgplusorb(objects[i].mor->obj, e, optimization_level, BA_AMT);
         break;
     case ORB_BPGRP:
-        return compute_one_bpgplusorb(objects[i]->mor->obj, e, optimization_level, BPG_GR);
+        return compute_one_bpgplusorb(objects[i].mor->obj, e, optimization_level, BA_GR);
         break;
     default:
         break;
@@ -1810,9 +2056,9 @@ int shell_view_orbits(com_parameters* pars, const char* str) {
             return -2;
         }
 
-        uint e = mor_compute_image(objects[i]->mor->obj, myexp->word);
+        uint e = mor_compute_image(objects[i].mor->obj, myexp->word);
         reg_free(myexp);
-        if (e >= objects[i]->mor->obj->r_cayley->size_graph || !objects[i]->mor->obj->idem_array[e]) {
+        if (e >= objects[i].mor->obj->r_cayley->size_graph || !objects[i].mor->obj->idem_array[e]) {
             fprintf(stderr, "Error: Parameter 3 of the command \"%s\" has to be an idempotent element.\n", str);
             if (saved) {
                 object_free(i);
@@ -1822,7 +2068,7 @@ int shell_view_orbits(com_parameters* pars, const char* str) {
         subsemi* theorbit = shell_compute_orbit_aux(i, e, thetype);
 
         fprintf(stdout, "#### %s-orbit of the idempotent ", cl_name);
-        mor_fprint_name_utf8(objects[i]->mor->obj, e, stdout);
+        mor_fprint_name_utf8(objects[i].mor->obj, e, stdout);
         printf(".\n");
         print_full_subsemi(theorbit, stdout);
 
@@ -1859,11 +2105,11 @@ int shell_view_nfa_run(com_parameters* pars, const char* str) {
         return -2;
     }
 
-    shell_view_object(objects[k], true);
+    shell_view_object(objects + k, true);
     fprintf(stdout, "Running the word %s in this automaton.\n", pars->next->param->main->string);
 
-    if (objects[k]->aut->dfa) {
-        dfa* A = objects[k]->aut->obj_dfa;
+    if (objects[k].type == DAUTOMATON) {
+        dfa* A = objects[k].obj_dfa;
         uint s = dfa_compute_run(A, myexp->word);
         if (s >= A->trans->size_graph) {
             fprintf(stderr, "This word contains letters outside the alphabet of this automaton.\n");
@@ -1881,7 +2127,7 @@ int shell_view_nfa_run(com_parameters* pars, const char* str) {
         }
     }
     else {
-        nfa* A = objects[k]->aut->obj_nfa;
+        nfa* A = objects[k].obj_nfa;
         dequeue* states = nfa_compute_runs(A, myexp->word);
         if (states == NULL) {
             fprintf(stderr, "This word contains letters outside the alphabet of this automaton.\n");
@@ -1954,8 +2200,8 @@ int shell_view_mor_image(com_parameters* pars, const char* str) {
         return -2;
     }
 
-    shell_view_object(objects[k], true);
-    morphism* M = objects[k]->mor->obj;
+    shell_view_object(objects + k, true);
+    morphism* M = objects[k].mor->obj;
 
     fprintf(stdout, "Computing the image of the word %s by this morphism.\n", pars->next->param->main->string);
 
@@ -2003,7 +2249,7 @@ int shell_counterfree(com_parameters* pars, const char* str) {
     }
 
     int error = 0;
-    shell_autoprop_cfree(i, "DFA", &error, stdout);
+    shell_autoprop_cfreegp(i, BA_ST, "DFA", &error, stdout);
     if (error < 0) {
         fprintf(stdout, "#### Error received while testing counter-freeness\n");
     }
@@ -2025,7 +2271,7 @@ int shell_autoda(com_parameters* pars, const char* str) {
 
     int error = 0;
 
-    shell_autoprop_dapat(i, "DFA", &error, stdout);
+    shell_autoprop_dagp(i, BA_ST, "DFA", &error, stdout);
     if (error < 0) {
         fprintf(stdout, "#### Error received while testing the DA pattern equation.\n");
     }
@@ -2056,7 +2302,7 @@ int shell_permutation(com_parameters* pars, const char* str) {
     return -1;
 }
 
-int shell_cycletrivial(com_parameters* pars, const char* str) {
+int shell_rtrivialrivial(com_parameters* pars, const char* str) {
     // Retrieval of the parameters (errors are handled in the function).
     int i;
     bool saved = false;
@@ -2067,7 +2313,7 @@ int shell_cycletrivial(com_parameters* pars, const char* str) {
     }
 
     int error = 0;
-    shell_autoprop_cyclet(i, "DFA", &error, stdout);
+    shell_autoprop_rtrivialgp(i, BA_ST, "DFA", &error, stdout);
     if (error < 0) {
         fprintf(stdout, "#### Error received while testing if a DFA is cycle trivial.\n");
     }
@@ -2087,8 +2333,9 @@ int shell_commutative(com_parameters* pars, const char* str) {
     }
 
     int error = 0;
-    switch (objects[i]->type) {
-    case AUTOMATON:
+    switch (objects[i].type) {
+    case NAUTOMATON:
+    case DAUTOMATON:
         shell_autoprop_commut(i, "DFA", &error, stdout);
         break;
     case MORPHISM:
@@ -2116,8 +2363,9 @@ int shell_letteruniform(com_parameters* pars, const char* str) {
     }
 
     int error = 0;
-    switch (objects[i]->type) {
-    case AUTOMATON:
+    switch (objects[i].type) {
+    case NAUTOMATON:
+    case DAUTOMATON:
         shell_autoprop_letterind(i, "DFA", &error, stdout);
         break;
     case MORPHISM:
@@ -2165,15 +2413,32 @@ int shell_membership(com_parameters* pars, const char* str) {
 
     print_info_input(i, stdout);
 
-    // Computes the syntactic morphism.
-    int j = shell_compute_syntac(i, shell_membership_needs_order(cl));
-    if (j == -1) {
-        return -2;
+    int j;
+    switch (memb_mode)
+    {
+    case MEMB_MINIMAL:
+        j = shell_compute_minimal(i);
+        if (j == -1) {
+            return -2;
+        }
+        print_title_box(10, true, stdout, 1, "The minimal automaton.");
+        shell_view_object(objects + j, false);
+        break;
+    case MEMB_SYNTAC:
+        j = shell_compute_syntac(i, shell_membership_needs_order(cl));
+        if (j == -1) {
+            return -2;
+        }
+        print_title_box(10, true, stdout, 1, "The syntactic morphism.");
+        shell_view_object(objects + j, false);
+        break;
+    case MEMB_OPTIMAL:
+        j = i;
+    default:
+        j = i;
+        break;
     }
-
-    print_title_box(10, true, stdout, 1, "The syntactic morphism.");
-    shell_view_object(objects[j], false);
-    print_conclusion_comp(stdout, class_membership[cl](j, stdout), class_names[cl]);
+    print_conclusion_comp(stdout, class_membership[cl](j, memb_mode, stdout), class_names[cl]);
     if (saved) {
         object_free(i);
     }
@@ -2222,25 +2487,23 @@ int shell_separation(com_parameters* pars, const char* str) {
     // We first compute NFAs recognizing the two inputs.
     nfa* A[2];
     for (uchar i = 0; i < 2; i++) {
-        switch (objects[inds[i]]->type)
+        switch (objects[inds[i]].type)
         {
-        case AUTOMATON:
-            if (objects[inds[0]]->aut->dfa) {
-                A[i] = dfa_to_nfa(objects[inds[i]]->aut->obj_dfa);
-            }
-            else {
-                A[i] = nfa_elimeps(objects[inds[i]]->aut->obj_nfa);
-                nfa_reset_state_names(A[i]);
-            }
+        case NAUTOMATON:
+            A[i] = nfa_elimeps(objects[inds[i]].obj_nfa);
+            nfa_reset_state_names(A[i]);
+            break;
+        case DAUTOMATON:
+            A[i] = dfa_to_nfa(objects[inds[i]].obj_dfa);
             break;
         case REGEXP:
-            A[i] = reg_thompson(objects[inds[i]]->exp);
+            A[i] = reg_thompson(objects[inds[i]].exp);
             nfa_elimeps_mod(A[i]);
             nfa_trim_mod(A[i]);
             nfa_reset_state_names(A[i]);
             break;
         case MORPHISM:
-            A[i] = dfa_to_nfa(objects[shell_compute_minimal(inds[i])]->aut->obj_dfa);
+            A[i] = dfa_to_nfa(objects[shell_compute_minimal(inds[i])].obj_dfa);
             break;
         default:
             if (saved[0]) {
@@ -2277,6 +2540,21 @@ int shell_print_chiera(com_parameters* pars, const char* str) {
         return -2;
     }
     shell_chiera_summary(i, stdout);
+    if (saved) {
+        object_free(i);
+    }
+    return -1;
+}
+
+int shell_print_navhiera(com_parameters* pars, const char* str) {
+    int i;
+    bool saved = false;
+    par_type types[] = { PAR_REGAUTOMOR };
+    if (param_retrieve(pars, 1, 0, types, NULL, NULL, NULL, &i, &saved, str) == -2) {
+        usage_generic(types, 1, PAR_NONE, str);
+        return -2;
+    }
+    shell_navhiera_summary(i, stdout);
     if (saved) {
         object_free(i);
     }
@@ -2562,18 +2840,17 @@ int shell_retrievefile(com_parameters* pars, const char* str) {
 
 
 static void usage_browse_dfas(const char* str) {
-    fprintf(stderr, "#### Usage  : %s(<classes1>, <classes2>, <nb_states>, <nb_letters>[, <start>, <end>])\n", str);
+    fprintf(stderr, "#### Usage  : %s(<classes1>, <classes2>, <nb_states>, <nb_letters>[, \"<prefix>\"])\n", str);
     fprintf(stderr, "####          <classes1> is either a single class or of the form out(<cl1>, <cl2>, ...) where the <cli> are classes.\n");
     fprintf(stderr, "####          <classes2> is either a single class or of the form in(<cl1>, <cl2>, ...) where the <cli> are classes.\n");
     fprintf(stderr, "####          <nb_states> is the number of states.\n");
     fprintf(stderr, "####          <nb_letters> is the size of the alphabet.\n");
-    fprintf(stderr, "####          <start> is the enumeration index of the first DFA to test (optional).\n");
-    fprintf(stderr, "####          <end> is the enumeration index of the last DFA to test (optional).\n");
+    fprintf(stderr, "####          <prefix> is a prefix string used for the variable names of found examples (optional, must start with a capital letter).\n");
     fprintf(stderr, "#### Return : nothing (directly stores multiple DFAs in memory).\n");
 }
 int shell_browse_dfas(com_parameters* pars, const char* str) {
     int n = com_nbparams(pars);
-    if (n < 4 || n > 6) {
+    if (n < 4 || n > 5) {
         fprintf(stderr, "#### Error  : wrong number of parameters in the command \"%s\".\n", str);
         usage_browse_dfas(str);
         return -2;
@@ -2675,99 +2952,116 @@ int shell_browse_dfas(com_parameters* pars, const char* str) {
         return -2;
     }
 
-    long start = 0;
-    long end = LONG_MAX;
-
+    char* prefix;
     if (n > 4) {
-        if (!param_getlong(pars, 4, str, &start)) {
+        if (!param_getrawtext(pars, 4, str, &prefix) || !check_varname(prefix)) {
+            fprintf(stderr, "#### Error  : prefix string is not well-formed.\n");
             usage_browse_dfas(str);
             return -2;
         }
     }
-
-    if (n == 6) {
-        if (!param_getlong(pars, 5, str, &end)) {
-            usage_browse_dfas(str);
-            return -2;
-        }
+    else {
+        prefix = "EXA";
     }
-
-
-    shell_exall(low, nblow, high, nbhigh, states, start, end, alpha);
+    shell_exall(low, nblow, high, nbhigh, states, alpha, prefix);
 
     return -1;
 }
 
 static void usage_browse_dfas_negfp(const char* str) {
-    fprintf(stderr, "#### Usage  : %s(<class>, <level>, <nb_states>, <nb_letters>[, <start>, <end>])\n", str);
+    fprintf(stderr, "#### Usage  : %s(<class>, <level>, <nb_states>, <nb_letters>[, \"<prefix>\"])\n", str);
     fprintf(stderr, "####          <class> is the base class of the hierarchy.\n");
     fprintf(stderr, "####          <level> is the desired level in the hierarchy.\n");
     fprintf(stderr, "####          <nb_states> is the number of states.\n");
     fprintf(stderr, "####          <nb_letters> is the size of the alphabet.\n");
-    fprintf(stderr, "####          <start> is the enumeration index of the first DFA to test (optional).\n");
-    fprintf(stderr, "####          <end> is the enumeration index of the last DFA to test (optional).\n");
+    fprintf(stderr, "####          <prefix> is a prefix string used for the variable names of found examples (optional, must start with a capital letter).\n");
     fprintf(stderr, "#### Return : nothing (directly stores multiple DFAs in memory).\n");
 }
 int shell_browse_dfas_neg(com_parameters* pars, const char* str) {
     classes cl;
-    int nb[5];
-    par_type types[] = { PAR_CLASS, PAR_INTEGER, PAR_INTEGER, PAR_INTEGER,PAR_INTEGER, PAR_INTEGER };
-    if (param_retrieve(pars, 6, 2, types, &cl, NULL, nb, NULL, NULL, str) == -2) {
+    int nb[3];
+    char* prefix = NULL;
+    par_type types[] = { PAR_CLASS, PAR_INTEGER, PAR_INTEGER, PAR_INTEGER,PAR_RAWTEXT };
+    if (param_retrieve(pars, 5, 1, types, &cl, &prefix, nb, NULL, NULL, str) == -2) {
         usage_browse_dfas_negfp(str);
         return -2;
     }
 
-    int n = com_nbparams(pars);
-    long start = 0;
-    long end = LONG_MAX;
-    if (n > 4) {
-        if (!param_getlong(pars, 4, str, &start)) {
-            usage_browse_dfas_negfp(str);
-            return -2;
-        }
+    if (prefix == NULL || !check_varname(prefix)) {
+        prefix = "EXA";
     }
 
-    if (n == 6) {
-        if (!param_getlong(pars, 5, str, &end)) {
-            usage_browse_dfas_negfp(str);
-            return -2;
-        }
-    }
-
-    shell_exall_dethiera(cl, nb[0], nb[1], nb[2], start, end, true);
+    shell_exall_dethiera(cl, nb[0], nb[1], nb[2], prefix, true);
 
     return -1;
 }
 
 int shell_browse_dfas_fp(com_parameters* pars, const char* str) {
     classes cl;
-    int nb[5];
-    par_type types[] = { PAR_CLASS, PAR_INTEGER, PAR_INTEGER, PAR_INTEGER,PAR_INTEGER, PAR_INTEGER };
-    if (param_retrieve(pars, 6, 2, types, &cl, NULL, nb, NULL, NULL, str) == -2) {
+    int nb[3];
+    char* prefix = NULL;
+    par_type types[] = { PAR_CLASS, PAR_INTEGER, PAR_INTEGER, PAR_INTEGER,PAR_RAWTEXT };
+    if (param_retrieve(pars, 5, 1, types, &cl, &prefix, nb, NULL, NULL, str) == -2) {
         usage_browse_dfas_negfp(str);
         return -2;
     }
 
-    int n = com_nbparams(pars);
-    long start = 0;
-    long end = LONG_MAX;
-    if (n > 4) {
-        if (!param_getlong(pars, 4, str, &start)) {
-            usage_browse_dfas_negfp(str);
-            return -2;
-        }
+    if (prefix == NULL || !check_varname(prefix)) {
+        prefix = "EXA";
     }
 
-    if (n == 6) {
-        if (!param_getlong(pars, 5, str, &end)) {
-            usage_browse_dfas_negfp(str);
-            return -2;
-        }
-    }
-
-    shell_exall_dethiera(cl, nb[0], nb[1], nb[2], start, end, false);
+    shell_exall_dethiera(cl, nb[0], nb[1], nb[2], prefix, false);
 
     return -1;
+}
+
+
+static void usage_browse_dfas_bug(const char* str) {
+    fprintf(stderr, "#### Usage  : %s(<class>, <nb_states>, <nb_letters>[, \"<prefix>\"])\n", str);
+    fprintf(stderr, "####          <class> is the class.\n");
+    fprintf(stderr, "####          <nb_states> is the number of states.\n");
+    fprintf(stderr, "####          <nb_letters> is the size of the alphabet.\n");
+    fprintf(stderr, "####          <prefix> is a prefix string used for the variable names of found examples (optional, must start with a capital letter).\n");
+    fprintf(stderr, "#### Return : nothing (directly stores multiple DFAs in memory).\n");
+}
+int shell_browse_dfas_bug(com_parameters* pars, const char* str) {
+    classes cl;
+    int nb[2];
+    char* prefix = NULL;
+    par_type types[] = { PAR_CLASS, PAR_INTEGER, PAR_INTEGER, PAR_RAWTEXT };
+    if (param_retrieve(pars, 4, 1, types, &cl, &prefix, nb, NULL, NULL, str) == -2) {
+        usage_browse_dfas_bug(str);
+        return -2;
+    }
+
+    if (prefix == NULL || !check_varname(prefix)) {
+        prefix = "BUG";
+    }
+
+    shell_bugsearch(cl, nb[0], nb[1], prefix);
+
+    return -1;
+}
+
+
+static void usage_browse_dfas_time(const char* str) {
+    fprintf(stderr, "#### Usage  : %s(<class>, <nb_states>, <nb_letters>)\n", str);
+    fprintf(stderr, "####          <class> is the class.\n");
+    fprintf(stderr, "####          <nb_states> is the number of states.\n");
+    fprintf(stderr, "####          <nb_letters> is the size of the alphabet.\n");
+    fprintf(stderr, "#### Return : nothing.\n");
+}
+int shell_browse_dfas_time(com_parameters* pars, const char* str) {
+    classes cl;
+    int nb[2];
+    par_type types[] = { PAR_CLASS, PAR_INTEGER, PAR_INTEGER };
+    if (param_retrieve(pars, 3, 0, types, &cl, NULL, nb, NULL, NULL, str) == -2) {
+        usage_browse_dfas_time(str);
+        return -2;
+    }
+
+
+    shell_make_timestats(cl, nb[0], nb[1]);
 
     return -1;
 }

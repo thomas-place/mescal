@@ -138,29 +138,6 @@ orbits* compute_gplusorbits(subsemi* //!< The G-kernel.
 /* PT-orbits (which are also the AT-orbits) */
 /********************************************/
 
-/**
- * @brief
- * Given an element of a monoid, computes the set of letters which label a transition in the
- * strongly connected component of this element in the right Cayley graph.
- *
- * @return
- * An array of Boolean indexed by the letters marking those in the set.
- */
-bool* compute_maxalph_scc(morphism*, //!< The morphism.
-    uint //!< The element.
-);
-
-/**
- * @brief
- * Computes the maximal shared alphabet between two idempotents.
- *
- * @return
- * An array of Boolean indexed by the letters marking those in the set (NULL is not sharded alphabet exists).
- */
-bool* compute_maxalph_com_scc(morphism*,//!< The morphism.
-    uint, //!< The first idempotent.
-    uint //!< The second idempotent.
-);
 
 /**
  * @brief
@@ -241,12 +218,7 @@ bool** compute_polgpairs(subsemi*, //!< The G-kernel.
 );
 
 
-typedef enum {
-    BPG_ST,
-    BPG_MOD,
-    BPG_GR,
-    BPG_AMT
-} bpg_type;
+
 
 
 /**
@@ -264,7 +236,7 @@ typedef enum {
 subsemi* compute_one_bpgorb(morphism* M, //!< The morphism.
     uint, //!< The idempotent.
     sub_level, //!< Desired computation level.
-    bpg_type //!< Type of the BPol(G)-orbit to compute (MOD, AMT or GR).
+    basis //!< Type of the BPol(G)-orbit to compute (MOD, AMT or GR).
 );
 
 /**
@@ -283,7 +255,7 @@ subsemi* compute_one_bpgorb(morphism* M, //!< The morphism.
  */
 orbits* compute_bpgorbits(morphism* M, //!< The G-kernel.
     sub_level, //!< Desired computation level.
-    bpg_type //!< Type of the BPol(G)-orbit to compute (MOD, AMT or GR).
+    basis //!< Type of the BPol(G)-orbit to compute (MOD, AMT or GR).
 );
 
 
@@ -363,7 +335,7 @@ subsemi* compute_one_bpddorb(morphism* M, //!< The morphism.
 subsemi* compute_one_bpgplusorb(morphism*, //!< The morphism.
     uint, //!< The idempotent.
     sub_level, //!< Desired computation level.
-    bpg_type //!< Type of the BPol(G⁺)-orbit to compute (ST, MOD, AMT or GR).
+    basis //!< Type of the BPol(G⁺)-orbit to compute (ST, MOD, AMT or GR).
 );
 
 /**
@@ -382,7 +354,7 @@ subsemi* compute_one_bpgplusorb(morphism*, //!< The morphism.
  */
 orbits* compute_bpgplusorbits(morphism*, //!< The morphism.
     sub_level, //!< Desired computation level.
-    bpg_type //!< Type of the BPol(G⁺)-orbit to compute (ST, MOD, AMT or GR).
+    basis //!< Type of the BPol(G⁺)-orbit to compute (ST, MOD, AMT or GR).
 );
 
 

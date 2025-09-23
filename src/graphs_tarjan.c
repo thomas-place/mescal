@@ -3,6 +3,7 @@
 #include "graphs_tarjan.h"
 #include <limits.h>
 #include <time.h>
+#include "printing.h"
 
 parti* tarjan(graph* g)
 {
@@ -237,6 +238,11 @@ parti* ltarjan(lgraph* g, bool* alph)
                 // We update the lowlink of the vertex
                 for (uint a = 0; a < g->size_alpha; a++)
                 {
+                    if (alph && !alph[a])
+                    {
+                        continue;
+                    }
+
                     for (uint i = 0; i < size_dequeue(g->edges[v][a]); i++)
                     {
                         uint w = lefread_dequeue(g->edges[v][a], i);
@@ -370,11 +376,13 @@ parti* dtarjan(dgraph* g, bool* alph, bool ismor)
                 }
             }
 
+
+
             // If there are still edges to process for the vertex, we process the next one
             if (aout[v] < g->size_alpha)
             {
                 uint w = g->edges[v][aout[v]];
-                if (index[w] == 0)
+                if (w != UINT_MAX && index[w] == 0)
                 {
                     index[w] = id++;
                     lowlink[w] = index[w];
@@ -392,7 +400,12 @@ parti* dtarjan(dgraph* g, bool* alph, bool ismor)
                 // We update the lowlink of the vertex
                 for (uint a = 0; a < g->size_alpha; a++)
                 {
-                    if (onStack[g->edges[v][a]])
+                    if (alph && !alph[a])
+                    {
+                        continue;
+                    }
+
+                    if (g->edges[v][a] != UINT_MAX && onStack[g->edges[v][a]])
                     {
                         lowlink[v] = min(lowlink[v], lowlink[g->edges[v][a]]);
                     }
@@ -605,6 +618,173 @@ parti* dualdtarjan(dgraph* g1, dgraph* g2, bool* alph, bool ismor)
         numcl[i] = size_par - 1 - numcl[i];
     }
     return create_parti(g1->size_graph, size_par, numcl);
+}
+
+
+/**************************/
+/*+ Computations on SCCS +*/
+/**************************/
+
+
+dgraph* dgraph_extract(dgraph* G, parti* P, uint* inv, uint j) {
+    // Creation of the graph
+    dgraph* res = create_dgraph_noedges(P->cl_size[j], G->size_alpha);
+    // Pour chaque élément du morphisme
+    for (uint i = 0; i < P->cl_size[j]; i++) {
+        uint q = P->cl_elems[j][i];
+        for (uint a = 0; a < G->size_alpha; a++) {
+            uint r = G->edges[q][a];
+            if (r != UINT_MAX && P->numcl[r] == j) {
+                res->edges[i][a] = inv[r];
+            }
+            else {
+                res->edges[i][a] = UINT_MAX;
+            }
+        }
+    }
+    return res;
+}
+
+
+
+void dgraph_compute_alph_scc(dgraph* g, parti* sccs, uint scc, bool* alph) {
+    // Initialize the alphabet to false
+    for (uint a = 0; a < g->size_alpha; a++) {
+        alph[a] = false;
+    }
+
+    // For each label
+    for (uint a = 0; a < g->size_alpha; a++) {
+        // For each vertex in the SCC
+        for (uint i = 0; i < sccs->cl_size[scc]; i++) {
+            uint v = sccs->cl_elems[scc][i];
+
+
+            // If there is an edge labeled by a from v, set alph[a] to true
+            if (g->edges[v][a] != UINT_MAX && sccs->numcl[g->edges[v][a]] == scc) {
+                alph[a] = true;
+            }
+        }
+    }
+}
+
+
+// Merges two alphabets into a new one and tests simultanoeously if these alphabets were equal
+static bool merge_subalph(bool* m, bool* s1, bool* s2, uint sizea, int* count) {
+    *count = 0;
+    bool res = true;
+    for (uint a = 0; a < sizea; a++) {
+        if (s1[a] != s2[a]) {
+            res = false;
+        }
+        else {
+            (*count)++;
+        }
+        m[a] = s1[a] && s2[a];
+    }
+    return res;
+}
+
+static void restricted_loop_alph(dgraph* g, uint q, bool* allowed, bool* alph) {
+
+    // We compute the strongly connected components of the graph restricted to the allowed letters
+    parti* sccs = dtarjan(g, allowed, false);
+
+    // Initialize the alphabet to false
+    for (uint a = 0; a < g->size_alpha; a++) {
+        alph[a] = false;
+    }
+
+    // For each label
+    for (uint a = 0; a < g->size_alpha; a++) {
+        if (!allowed[a]) {
+            continue;
+        }
+        for (uint i = 0; i < sccs->cl_size[sccs->numcl[q]]; i++) {
+            uint v = sccs->cl_elems[sccs->numcl[q]][i];
+            // If there is an edge labeled by a from q, set alph[a] to true
+            if (g->edges[v][a] != UINT_MAX && sccs->numcl[g->edges[v][a]] == sccs->numcl[q]) {
+                alph[a] = true;
+            }
+        }
+    }
+    delete_parti(sccs);
+}
+
+bool dgraph_common_alph_loop(dgraph* g, parti* sccs, uint* inv_sccs, uint q1, uint q2, bool* alph) {
+
+
+    // Compute the maximum loop alphabet for each state
+    bool alph1[g->size_alpha];
+    bool alph2[g->size_alpha];
+    dgraph_compute_alph_scc(g, sccs, sccs->numcl[q1], alph1);
+    dgraph_compute_alph_scc(g, sccs, sccs->numcl[q2], alph2);
+
+    // We extract the sccs of the two states (useful for quickly recopmputing the sccs for restricted alphabets).
+    dgraph* ge1 = dgraph_extract(g, sccs, inv_sccs, sccs->numcl[q1]);
+    dgraph* ge2 = dgraph_extract(g, sccs, inv_sccs, sccs->numcl[q2]);
+    uint r1 = inv_sccs[q1];
+    uint r2 = inv_sccs[q2];
+
+    int count;
+    // While the two alphabets are not equal, we make the intersection of the two.
+    while (!merge_subalph(alph, alph1, alph2, g->size_alpha, &count)) {
+        // We compute the maximum loop alphabet for each state over the restricted alphabet.
+        restricted_loop_alph(ge1, r1, alph, alph1);
+        restricted_loop_alph(ge2, r2, alph, alph2);
+
+    }
+    delete_dgraph(ge1);
+    delete_dgraph(ge2);
+    return (count > 0); // Return true if the alphabet is not empty, false otherwise.
+}
+
+
+void dgraph_discard_nonscc_edges(dgraph* g, parti* sccs) {
+    for (uint q = 0; q < g->size_graph; q++) {
+        for (uint a = 0; a < g->size_alpha; a++) {
+            uint r = g->edges[q][a];
+            if (r != UINT_MAX && sccs->numcl[r] != sccs->numcl[q]) {
+                g->edges[q][a] = UINT_MAX;
+            }
+        }
+    }
+}
+
+
+
+
+
+dgraph* dgraph_copy_discard_nonscc_edges(dgraph* g, parti* sccs) {
+    dgraph* res = create_dgraph_noedges(g->size_graph, g->size_alpha);
+
+
+    for (uint i = 0; i < g->size_graph; i++) {
+        for (uint a = 0; a < g->size_alpha; a++) {
+            if (g->edges[i][a] != UINT_MAX && sccs->numcl[g->edges[i][a]] == sccs->numcl[i]) {
+                // If the edge goes to the same SCC, copy it
+                res->edges[i][a] = g->edges[i][a];
+            }
+            else {
+                // Otherwise, no transition
+                res->edges[i][a] = UINT_MAX;
+            }
+        }
+    }
+    return res;
+}
+
+
+bool dgraph_ntrivial_loop(dgraph* g, parti* sccs, uint q) {
+    if (sccs->cl_size[sccs->numcl[q]] > 1) {
+        return true;
+    }
+    for (uint a = 0; a < g->size_alpha; a++) {
+        if (g->edges[q][a] == q) {
+            return true;
+        }
+    }
+    return false;
 }
 
 

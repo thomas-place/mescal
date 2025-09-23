@@ -684,7 +684,7 @@ static void mor_cons_order(morphism* M, bool** order) {
 
     for (uint i = 0; i < M->nb_regular_jcl; i++) {
         order_temp[i] = create_dequeue();
-        ulong e = M->regular_idems[i];
+        uint e = M->regular_idems[i];
         dequeue* eM = compute_r_ideal(M, e, NULL);
         dequeue* Me = compute_l_ideal(M, e, NULL);
         dequeue* eMe = make_inter_sorted_dequeue(eM, Me);
@@ -693,16 +693,17 @@ static void mor_cons_order(morphism* M, bool** order) {
 
 
         for (uint j = 0; j < size_dequeue(eMe); j++) {
-            uint q = lefread_dequeue(eMe, j) * (ulong)mor_cons_states;
+            ulong q = lefread_dequeue(eMe, j) * (ulong)mor_cons_states;
+            ulong eq = e * (ulong)mor_cons_states;
             bool found = true;
             for (uint k = 0; k < mor_cons_states; k++) {
-                if (!order[mor_cons_perms[e + k]][mor_cons_perms[q + k]]) {
+                if (!order[mor_cons_perms[eq + k]][mor_cons_perms[q + k]]) {
                     found = false;
                     break;
                 }
             }
             if (found) {
-                rigins_dequeue(q, order_temp[i]);
+                rigins_dequeue(lefread_dequeue(eMe, j), order_temp[i]);
             }
         }
         delete_dequeue(eMe);
@@ -732,7 +733,7 @@ static void mor_cons_order(morphism* M, bool** order) {
 }
 
 
-morphism* dfa_to_morphism(dfa* A, bool** order, int*, uint** funs) {
+morphism* dfa_to_morphism(dfa* A, bool order, int*, uint** funs) {
 
 #ifdef DEBUG_MONO
     ulong thetime = time(NULL);
@@ -899,7 +900,8 @@ morphism* dfa_to_morphism(dfa* A, bool** order, int*, uint** funs) {
 
     // If we need to compute the ordering, we do it now.
     if (order) {
-        mor_cons_order(M, order);
+        dfa_mini_canonical_ordering(A);
+        mor_cons_order(M, A->order);
 #ifdef DEBUG_MONO
         printf("Ordering done. Time: %f\n", difftime(time(NULL), thetime));
 #endif

@@ -89,6 +89,8 @@ void init_class_info(void) {
     class_infos[CL_JORBGRP] = info_jorb_grp;
     class_infos[CL_JORBAT] = info_jorb_at;
 
+    class_infos[CL_KNASTAMTP] = info_knastamtp;
+    class_infos[CL_KNASTGRP] = info_knastgrp;
     class_infos[CL_KNASTAT] = info_knastat;
 
     class_names[CL_PT] = "PT";
@@ -116,7 +118,9 @@ void init_class_info(void) {
     class_names[CL_JORBGRP] = "JOrb(GR⁺)";
     class_names[CL_JORBAT] = "JOrb(AT)";
 
-    class_names[CL_KNASTAT] = "KNASTAT";
+    class_names[CL_KNASTAMTP] = "KNAST(AMT⁺)";
+    class_names[CL_KNASTGRP] = "KNAST(GR⁺)";
+    class_names[CL_KNASTAT] = "KNAST(AT)";
 
     // Unambiguous Polynomial closure
     class_infos[CL_UPOLDD] = info_upol_dd;
@@ -266,6 +270,7 @@ void init_class_info(void) {
     class_infos[CL_GR] = info_gr;
     class_infos[CL_GRP] = info_grp;
     class_infos[CL_REG] = info_reg;
+    class_infos[CL_EMPTY] = info_empty;
 
     class_names[CL_AT] = "AT";
     class_names[CL_ATT] = "ATT";
@@ -280,6 +285,7 @@ void init_class_info(void) {
     class_names[CL_GR] = "GR";
     class_names[CL_GRP] = "GR⁺";
     class_names[CL_REG] = "REG";
+    class_names[CL_EMPTY] = "EMPTY";
 
 }
 
@@ -318,7 +324,7 @@ static keylist* make_keylist_class(com_command* thecom) {
         case KY_GR:
         case KY_GRP:
         case KY_REG:
-        case KY_KNASTAT:
+        case KY_EMPTY:
             MALLOC(ret, 1);
             ret->key = key;
             ret->next = NULL;
@@ -344,6 +350,7 @@ static keylist* make_keylist_class(com_command* thecom) {
         case KY_TLC:
         case KY_FLC:
         case KY_PLC:
+        case KY_KNAST:
             MALLOC(ret, 1);
             ret->key = key;
             ret->next = sub;
@@ -395,9 +402,9 @@ static keylist* make_keylist_class(com_command* thecom) {
             return ret;
         case KY_PLC2:
             MALLOC(ret, 1);
-            ret->key = KY_FLC;
+            ret->key = KY_PLC;
             MALLOC(ret->next, 1);
-            ret->next->key = KY_FLC;
+            ret->next->key = KY_PLC;
             ret->next->next = sub;
             return ret;
         default:
@@ -486,8 +493,8 @@ static classes command_to_class_aux(keylist* list) {
         case KY_REG:
             return CL_REG;
             break;
-        case KY_KNASTAT:
-            return CL_KNASTAT;
+        case KY_EMPTY:
+            return CL_EMPTY;
             break;
         default:
             return CL_END;
@@ -507,6 +514,10 @@ static classes command_to_class_aux(keylist* list) {
 
     if (subcl == CL_REG) {
         return CL_REG;
+    }
+
+    if (subcl == CL_EMPTY) {
+        return CL_EMPTY;
     }
 
     if (list->key == KY_SF) {
@@ -779,6 +790,7 @@ static classes command_to_class_aux(keylist* list) {
             break;
         case CL_LT:
         case CL_LTT:
+        case CL_BPOLDD:
         case CL_POL2DD:
         case CL_TLDD:
         case CL_FLDD:
@@ -1057,6 +1069,67 @@ static classes command_to_class_aux(keylist* list) {
             break;
         }
 
+    }
+
+    if (list->key == KY_KNAST) {
+        switch (subcl)
+        {
+        case CL_ST:
+        case CL_PPT:
+            return CL_PT;
+            break;
+        case CL_DD:
+        case CL_UPOLDD:
+        case CL_POLDD:
+            return CL_BPOLDD;
+            break;
+        case CL_AT:
+        case CL_ATT:
+        case CL_PT:
+            return CL_KNASTAT;
+            break;
+        case CL_SF:
+            return CL_SF;
+            break;
+        case CL_MOD:
+        case CL_POLMOD:
+            return CL_JORBMOD;
+            break;
+        case CL_MODP:
+        case CL_UPOLMODP:
+        case CL_POLMODP:
+            return CL_BPOLMODP;
+            break;
+        case CL_SFMOD:
+            return CL_SFMOD;
+            break;
+        case CL_AMT:
+        case CL_POLAMT:
+            return CL_JORBAMT;
+            break;
+        case CL_AMTP:
+        case CL_UPOLAMTP:
+        case CL_POLAMTP:
+            return CL_KNASTAMTP;
+            break;
+        case CL_SFAMT:
+            return CL_SFAMT;
+            break;
+        case CL_GR:
+        case CL_POLGR:
+            return CL_BPOLGR;
+            break;
+        case CL_GRP:
+        case CL_UPOLGRP:
+        case CL_POLGRP:
+            return CL_KNASTGRP;
+            break;
+        case CL_SFGR:
+            return CL_SFGR;
+            break;
+        default: return CL_END;
+            break;
+        }
     }
 
 
@@ -1973,6 +2046,14 @@ void info_jorb_at(FILE* out) {
     print_dtitle_box(10, false, out, 1, "Languages with a syntactic morphism whose AT-orbits are J-trivial : JORB(AT).");
 }
 
+void info_knastamtp(FILE* out) {
+    print_dtitle_box(10, false, out, 1, "Languages with a syntactic morphism satisfying that AMT⁺-variant of Knast's equation : KNAST(AMT⁺).");
+}
+
+void info_knastgrp(FILE* out) {
+    print_dtitle_box(10, false, out, 1, "Languages with a syntactic morphism satisfying that GR⁺-variant of Knast's equation : KNAST(GR⁺).");
+}
+
 void info_knastat(FILE* out) {
     print_dtitle_box(10, false, out, 1, "Languages with a syntactic morphism satisfying that AT-variant of Knast's equation : KNASTAT.");
 }
@@ -2661,7 +2742,10 @@ void info_reg(FILE* out) {
 
 
 
-
+void info_empty(FILE* out) {
+    print_dtitle_box(10, false, out, 1, "Empty class : EMPTY.");
+    print_dline_box(0, out, " Definition : Contains no language.");
+}
 
 
 
@@ -2673,14 +2757,14 @@ void info_reg(FILE* out) {
 
 void print_info_input(int i, FILE* out)
 {
-    switch (objects[i]->type)
+    switch (objects[i].type)
     {
     case REGEXP:
         print_title_box(10, true, out, 1, "Input: a regular expression.");
         fprintf(out, "#### Regular expression  : ");
-        reg_print(objects[i]->exp);
+        reg_print(objects[i].exp);
 
-        /* morphism* morp = objects[lang->syntmor]->mor;
+        /* morphism* morp = objects[lang->syntmor].mor;
     fprintf(out, "#### Syntactic monoid    :\n");
     print_full_green(morp->morphism, morp->green, false, out);
     fprintf(out, "#### Syntactic morphism  :\n");
@@ -2690,19 +2774,19 @@ void print_info_input(int i, FILE* out)
     case MORPHISM:
         print_title_box(10, true, out, 1, "Input: a morphism into a finite monoid.");
         fprintf(out, "#### The monoid          :\n");
-        print_full_green(objects[i]->mor->obj, false, out);
+        print_full_green(objects[i].mor->obj, false, out);
         fprintf(out, "#### The morphism        :\n");
-        mor_print_mapping(objects[i]->mor->obj, out);
+        mor_print_mapping(objects[i].mor->obj, out);
         break;
-    case AUTOMATON:
+    case NAUTOMATON:
         print_title_box(10, true, out, 1, "Input: an automaton.");
         fprintf(out, "#### The automaton  :\n");
-        if (objects[i]->aut->dfa) {
-            view_dfa(objects[i]->aut->obj_dfa);
-        }
-        else {
-            view_nfa(objects[i]->aut->obj_nfa);
-        }
+        view_nfa(objects[i].obj_nfa);
+        break;
+    case DAUTOMATON:
+        print_title_box(10, true, out, 1, "Input: an automaton.");
+        fprintf(out, "#### The automaton  :\n");
+        view_dfa(objects[i].obj_dfa);
         break;
     default:
         break;

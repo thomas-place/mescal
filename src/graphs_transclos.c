@@ -142,6 +142,7 @@ graph* compute_tclos_dag(graph* G, dequeue* topo_sort)
 /* Fonctions sur les graphes quelconques */
 /*****************************************/
 
+
 // Prend un graphe quelconque en entrée et l'étend en faisant sa clôture transitive
 // void make_tclos_graph(graph* G)
 // {

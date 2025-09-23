@@ -89,19 +89,19 @@ bool is_group_mono(morphism* M, uint* c) {
 bool is_group_semigroup(morphism* M, uint* c) {
     green* G = M->rels;
     // If there is only one J-class in the semigroup, then it is a group.
-    if (G->JCL->size_par == 1 || (G->JCL->size_par == 2 && G->JCL->cl_size[G->JCL->numcl[ONE]] == 1)) {
+    if (G->JCL->size_par == 1 || (G->HCL->size_par == 2 && !mor_nonempty_neutral(M))) {
         return true;
     }
 
-    // Otherwise, two elements that are not J-equivalent are a counterexample.
+    // Otherwise, two elements that are not H-equivalent are a counterexample.
     if (c) {
-        if (G->JCL->cl_size[G->JCL->numcl[ONE]] != 1) {
+        if (mor_nonempty_neutral(M)) {
             c[0] = ONE;
-            c[1] = G->JCL->cl_elems[1][0];// lefread_dequeue(G->JCL->cl[1], 0);
+            c[1] = G->HCL->cl_elems[1][0];// lefread_dequeue(G->HCL->cl[1], 0);
         }
         else {
-            c[0] = G->JCL->cl_elems[1][0];//lefread_dequeue(G->JCL->cl[1], 0);
-            c[1] = G->JCL->cl_elems[2][0];//lefread_dequeue(G->JCL->cl[2], 0);
+            c[0] = G->HCL->cl_elems[1][0];//lefread_dequeue(G->HCL->cl[1], 0);
+            c[1] = G->HCL->cl_elems[2][0];//lefread_dequeue(G->JCL->cl[2], 0);
         }
 
     }
@@ -224,7 +224,7 @@ bool is_comm_ltt_mono(orbits* L, uint* c) {
             uint q = c[0];
             uint s = c[1];
             c[0] = q;
-            c[1] = ONE;
+            c[1] = e;
             c[2] = s;
             c[3] = e;
             c[4] = e;
@@ -236,6 +236,9 @@ bool is_comm_ltt_mono(orbits* L, uint* c) {
     // We now check the equation for the cases when (e ≠ f).
     for (uint i = 0; i < M->nb_min_regular_jcl; i++) {
         uint e = M->regular_idems[i];
+        if (e == ONE) {
+            continue; // The neutral element is not considered.
+        }
         dequeue* eM = compute_r_ideal(M, e, NULL);
         dequeue* Me = compute_l_ideal(M, e, NULL);
 
@@ -246,6 +249,9 @@ bool is_comm_ltt_mono(orbits* L, uint* c) {
             }
 
             uint f = M->regular_idems[j];
+            if (f == ONE) {
+                continue; // The neutral element is not considered.
+            }
 
             dequeue* fM = compute_r_ideal(M, f, NULL);
             dequeue* Mf = compute_l_ideal(M, f, NULL);
@@ -343,7 +349,7 @@ bool is_idem_orbmono(orbits* L, uint* c) {
 
 
 
-static parti* grel_to_parti(green* G, green_relation P) {
+parti* grel_to_parti(green* G, green_relation P) {
     switch (P) {
     case H_GREEN:
         return G->HCL;
@@ -587,7 +593,6 @@ bool is_jsat_subsemi(subsemi* S, uint ind, uint* c) {
     }
     //morphism* M = S->original;
     //mor_compute_order(M);
-
     uint i = 0;
     uint j = 0;
     while (i < S->size) {
@@ -685,56 +690,48 @@ bool is_blockg_mono(morphism* M, uint* c) {
 }
 
 
-static void make_cexample_from_jtriv(morphism* M, uint* cexa) {
-    if (!cexa) {
-        return;
-    }
-    uint e = cexa[0];
-    uint s = cexa[1];
+// static void make_cexample_from_jtriv(morphism* M, uint* cexa, bool* alpha) {
+//     if (!cexa) {
+//         return;
+//     }
+//     uint e = cexa[0];
+//     uint s = cexa[1];
 
 
 
-    if (M->rels->RCL->numcl[e] == M->rels->RCL->numcl[s]) {
-        cexa[0] = s;
-        cexa[1] = get_rlink(M, M->rels->RCL, e, s);
-        cexa[2] = ONE;
-        cexa[3] = ONE;
-        return;
-    }
-    else {
-        cexa[0] = ONE;
-        cexa[1] = ONE;
-        cexa[2] = get_llink(M, M->rels->LCL, e, s);
-        cexa[3] = s;
+//     if (M->rels->RCL->numcl[e] == M->rels->RCL->numcl[s]) {
+//         cexa[0] = s;
+//         cexa[1] = get_rlink(M, M->rels->RCL, e, s, alpha);
+//         cexa[2] = ONE;
+//         cexa[3] = ONE;
+//         cexa[4] = e;
+//         cexa[5] = ONE;
+//         return;
+//     }
+//     else {
+//         cexa[0] = ONE;
+//         cexa[1] = ONE;
+//         cexa[2] = get_llink(M, M->rels->LCL, e, s, alpha);
+//         cexa[3] = s;
+//         cexa[4] = ONE;
+//         cexa[5] = e;
+//         return;
 
-        return;
-
-    }
-}
-
-
-
-
-
+//     }
+// }
 
 
 
-bool is_bpolmod_mono(subsemi* S, uint* cexa) {
-
-    // We first check whether the MOD-kernel is J-trivial.
-    if (!is_gtrivial_subsemi(S, J_GREEN, cexa)) {
-        if (cexa) {
-            make_cexample_from_jtriv(S->original, cexa);
-        }
-        return false;
-    }
 
 
 
-    morphism* M = S->original;
 
-    parti* FOLDR = mor_stal_fold(M, false, true);
-    parti* FOLDL = mor_stal_fold(M, false, false);
+
+bool is_bpolmod_mono(morphism* M, uint* cexa) {
+
+
+    parti* FOLDR = dgraph_stal_fold(M->r_cayley, M->rels->RCL, BA_MOD);
+    parti* FOLDL = dgraph_stal_fold(M->l_cayley, M->rels->LCL, BA_MOD);
 
     dgraph* gr = shrink_mod(M->r_cayley, FOLDR, M->rels->RCL);
     dgraph* glinv = shrink_mod_mirror(M->l_cayley, FOLDL, M->rels->LCL);
@@ -770,9 +767,11 @@ bool is_bpolmod_mono(subsemi* S, uint* cexa) {
                         if (ef != mor_mult(M, q, t)) {
                             if (cexa) {
                                 cexa[0] = q;
-                                cexa[1] = get_rlink(M, M->rels->RCL, e, q);
-                                cexa[2] = get_llink(M, M->rels->LCL, f, t);
+                                cexa[1] = get_rlink(M, M->rels->RCL, e, q, NULL);
+                                cexa[2] = get_llink(M, M->rels->LCL, f, t, NULL);
                                 cexa[3] = t;
+                                cexa[4] = e;
+                                cexa[5] = f;
                             }
                             free(pairs);
                             delete_dgraph(gr);
@@ -796,22 +795,16 @@ bool is_bpolmod_mono(subsemi* S, uint* cexa) {
 }
 
 
-bool is_bpolamt_mono(subsemi* S, uint* cexa) {
+bool is_bpolamt_mono(morphism* M, uint* cexa) {
 
-    // We first check whether the AMT-kernel is J-trivial.
-    if (!is_gtrivial_subsemi(S, J_GREEN, cexa)) {
-        if (cexa) {
-            make_cexample_from_jtriv(S->original, cexa);
-        }
-        return false;
-    }
 
-    morphism* M = S->original;
 
 
     // Computation of the spanning trees for all (regular) R-classes and L-classes
-    num_span_trees* rspans = compute_num_span_trees(M, true);
-    num_span_trees* lspans = compute_num_span_trees(M, false);
+    num_span_forest* rspan = compute_span_forest(M->r_cayley, M->rels->RCL, M->idem_array);
+    num_span_forest* lspan = compute_span_forest(M->l_cayley, M->rels->LCL, M->idem_array);
+    // num_span_trees* rspans = compute_num_span_trees(M, true);
+    // num_span_trees* lspans = compute_num_span_trees(M, false);
 
     // Loop over all idempotents e = qr
     for (uint i = 0; i < M->nb_idems; i++) {
@@ -828,8 +821,7 @@ bool is_bpolamt_mono(subsemi* S, uint* cexa) {
             dequeue* p1 = create_dequeue();
             dequeue* p2 = create_dequeue();
 
-
-            compute_amt_pairs_regular(rspans, lspans, e, f, p1, p2);
+            compute_amt_pairs_regular(M, rspan, lspan, e, f, p1, p2);
 
 
             for (uint p = 0; p < size_dequeue(p1); p++) {
@@ -839,14 +831,16 @@ bool is_bpolamt_mono(subsemi* S, uint* cexa) {
                 if (ef != mor_mult(M, q, t)) {
                     if (cexa) {
                         cexa[0] = q;
-                        cexa[1] = get_rlink(M, M->rels->RCL, e, q);
-                        cexa[2] = get_llink(M, M->rels->LCL, f, t);
+                        cexa[1] = get_rlink(M, M->rels->RCL, e, q, NULL);
+                        cexa[2] = get_llink(M, M->rels->LCL, f, t, NULL);
                         cexa[3] = t;
+                        cexa[4] = e;
+                        cexa[5] = f;
                     }
                     delete_dequeue(p1);
                     delete_dequeue(p2);
-                    delete_num_span_trees(rspans);
-                    delete_num_span_trees(lspans);
+                    delete_span_forest(rspan);
+                    delete_span_forest(lspan);
                     return false;
 
 
@@ -856,25 +850,13 @@ bool is_bpolamt_mono(subsemi* S, uint* cexa) {
             delete_dequeue(p2);
         }
     }
-    delete_num_span_trees(rspans);
-    delete_num_span_trees(lspans);
+    delete_span_forest(rspan);
+    delete_span_forest(lspan);
     return true;
 }
 
 // Knast
 bool is_knast_mono(orbits* L, uint* cexa) {
-
-
-    // We first check whether the DD-orbits are J-trivial.
-    if (!is_gtrivial_orbmono(L, J_GREEN, cexa)) {
-        if (cexa) {
-            uint e = cexa[2];
-            make_cexample_from_jtriv(L->original, cexa);
-            cexa[4] = e;
-            cexa[5] = e;
-        }
-        return false;
-    }
 
 
 
@@ -887,9 +869,8 @@ bool is_knast_mono(orbits* L, uint* cexa) {
         uint e = M->regular_idems[i];
 
         // Loop over all minimal idempotents f
-        // The case e = f is already handled: we checked if the DD-orbits are J-trivial.
         // The case f < e is treated when e and f are inverted.
-        for (uint j = i + 1; j < M->nb_min_regular_jcl; j++) {
+        for (uint j = i; j < M->nb_min_regular_jcl; j++) {
             uint f = M->regular_idems[j];
 
             // Intersection of MfM and eMe
@@ -927,11 +908,13 @@ bool is_knast_mono(orbits* L, uint* cexa) {
                                 if (cexa) {
                                     // Generation of a counterexample if necessary.
                                     cexa[0] = q;
-                                    cexa[1] = get_rlink(M, M->rels->RCL, g, q);
-                                    cexa[2] = get_llink(M, M->rels->LCL, h, t);
+                                    cexa[1] = get_rlink(M, M->rels->RCL, g, q, NULL);
+                                    cexa[2] = get_llink(M, M->rels->LCL, h, t, NULL);
                                     cexa[3] = t;
                                     cexa[4] = e;
                                     cexa[5] = f;
+                                    cexa[6] = g;
+                                    cexa[7] = h;
                                 }
 
                                 delete_dequeue(rset);
@@ -958,16 +941,6 @@ bool is_knast_mono(orbits* L, uint* cexa) {
 // Knast on the a strict kernel
 bool is_knast_ker(orbits* L, subsemi* ker, uint* cexa) {
 
-    // We first check whether the G⁺-orbits are J-trivial.
-    if (!is_gtrivial_orbmono(L, J_GREEN, cexa)) {
-        if (cexa) {
-            uint e = cexa[2];
-            make_cexample_from_jtriv(L->original, cexa);
-            cexa[4] = e;
-            cexa[5] = e;
-        }
-        return false;
-    }
 
 
     morphism* M = ker->original;
@@ -980,9 +953,8 @@ bool is_knast_ker(orbits* L, subsemi* ker, uint* cexa) {
         uint e = M->regular_idems[i];
 
         // Loop over all idempotents f
-        // The case e = f is already handled: we checked if the G⁺-orbits are J-trivial.
         // The case f < e is treated when e and f are inverted.
-        for (uint j = i + 1; j < M->nb_min_regular_jcl; j++) {
+        for (uint j = i; j < M->nb_min_regular_jcl; j++) {
             uint f = M->regular_idems[j];
 
             // Intersection of MfM and eMe
@@ -1020,11 +992,13 @@ bool is_knast_ker(orbits* L, subsemi* ker, uint* cexa) {
                             if (gh != mor_mult(M, q, t)) {
                                 if (cexa) {
                                     cexa[0] = q;
-                                    cexa[1] = get_rlink(M, M->rels->RCL, g, q);
-                                    cexa[2] = get_llink(M, M->rels->LCL, h, t);
+                                    cexa[1] = get_rlink(M, M->rels->RCL, g, q, NULL);
+                                    cexa[2] = get_llink(M, M->rels->LCL, h, t, NULL);
                                     cexa[3] = t;
                                     cexa[4] = e;
                                     cexa[5] = f;
+                                    cexa[6] = g;
+                                    cexa[7] = h;
                                 }
                                 delete_dequeue(rset);
                                 delete_dequeue(lset);
@@ -1050,21 +1024,14 @@ bool is_knast_ker(orbits* L, subsemi* ker, uint* cexa) {
 bool is_bpolamtp_mono(orbits* L, uint* cexa) {
     morphism* M = L->original;
 
-    // We first check if the AMT⁺-orbits are J-trivial.
-    if (!is_gtrivial_orbmono(L, J_GREEN, cexa)) {
-        if (cexa) {
-            uint e = cexa[2];
-            make_cexample_from_jtriv(L->original, cexa);
-            cexa[4] = e;
-            cexa[5] = e;
-        }
-        return false;
-    }
+
 
 
     // Computation of the spanning trees for all (regular) R-classes and L-classes
-    num_span_trees* rspans = compute_num_span_trees(M, true);
-    num_span_trees* lspans = compute_num_span_trees(M, false);
+    num_span_forest* rspan = compute_span_forest(M->r_cayley, M->rels->RCL, M->idem_array);
+    num_span_forest* lspan = compute_span_forest(M->l_cayley, M->rels->LCL, M->idem_array);
+    // num_span_trees* rspans = compute_num_span_trees(M, true);
+    // num_span_trees* lspans = compute_num_span_trees(M, false);
 
 
     // Loop over all idempotents e.
@@ -1088,7 +1055,7 @@ bool is_bpolamtp_mono(orbits* L, uint* cexa) {
                     // We compute the anti AMT-pairs (q,t) where q is in the R-class of g and t is in the L-class of h
                     dequeue* p1 = create_dequeue();
                     dequeue* p2 = create_dequeue();
-                    compute_amt_pairs_regular(rspans, lspans, g, h, p1, p2);
+                    compute_amt_pairs_regular(M, rspan, lspan, g, h, p1, p2);
 
                     for (uint p = 0; p < size_dequeue(p1); p++) {
                         uint q = lefread_dequeue(p1, p);
@@ -1101,17 +1068,19 @@ bool is_bpolamtp_mono(orbits* L, uint* cexa) {
                         if (gh != mor_mult(M, q, t)) {
                             if (cexa) {
                                 cexa[0] = q;
-                                cexa[1] = get_rlink(M, M->rels->RCL, g, q);
-                                cexa[2] = get_llink(M, M->rels->LCL, h, t);
+                                cexa[1] = get_rlink(M, M->rels->RCL, g, q, NULL);
+                                cexa[2] = get_llink(M, M->rels->LCL, h, t, NULL);
                                 cexa[3] = t;
                                 cexa[4] = e;
                                 cexa[5] = f;
+                                cexa[6] = g;
+                                cexa[7] = h;
                             }
                             delete_dequeue(p1);
                             delete_dequeue(p2);
                             delete_dequeue(candidates);
-                            delete_num_span_trees(rspans);
-                            delete_num_span_trees(lspans);
+                            delete_span_forest(rspan);
+                            delete_span_forest(lspan);
                             return false;
                         }
                     }
@@ -1122,8 +1091,8 @@ bool is_bpolamtp_mono(orbits* L, uint* cexa) {
             delete_dequeue(candidates);
         }
     }
-    delete_num_span_trees(rspans);
-    delete_num_span_trees(lspans);
+    delete_span_forest(rspan);
+    delete_span_forest(lspan);
     return true;
 }
 
@@ -1134,21 +1103,11 @@ bool is_bpolamtp_mono(orbits* L, uint* cexa) {
 
 bool is_bpolgrp_mono(orbits* L, uint* cexa) {
 
-    // We first check if the GR⁺-orbits are J-trivial.
-    if (!is_gtrivial_orbmono(L, J_GREEN, cexa)) {
-        if (cexa) {
-            uint e = cexa[2];
-            make_cexample_from_jtriv(L->original, cexa);
-            cexa[4] = e;
-            cexa[5] = e;
-        }
-        return false;
-    }
-
     morphism* M = L->original;
 
-    parti* FOLDR = mor_stal_fold(M, true, true);
-    parti* FOLDL = mor_stal_fold(M, true, false);
+    parti* FOLDR = dgraph_stal_fold(M->r_cayley, M->rels->RCL, BA_GR);
+    parti* FOLDL = dgraph_stal_fold(M->l_cayley, M->rels->LCL, BA_GR);
+
 
     dgraph* gr = shrink_grp(M->r_cayley, FOLDR, M->rels->RCL);
     dgraph* glinv = shrink_grp_mirror(M->l_cayley, FOLDL, M->rels->LCL);
@@ -1195,11 +1154,13 @@ bool is_bpolgrp_mono(orbits* L, uint* cexa) {
                                 if (gh != mor_mult(M, q, t)) {
                                     if (cexa) {
                                         cexa[0] = q;
-                                        cexa[1] = get_rlink(M, M->rels->RCL, g, q);
-                                        cexa[2] = get_llink(M, M->rels->LCL, h, t);
+                                        cexa[1] = get_rlink(M, M->rels->RCL, g, q, NULL);
+                                        cexa[2] = get_llink(M, M->rels->LCL, h, t, NULL);
                                         cexa[3] = t;
                                         cexa[4] = e;
                                         cexa[5] = f;
+                                        cexa[6] = g;
+                                        cexa[7] = h;
                                     }
                                     free(pairs);
                                     delete_dgraph(gr);
@@ -1228,24 +1189,12 @@ bool is_bpolgrp_mono(orbits* L, uint* cexa) {
 
 
 // Knast for at-sets
-bool is_knast_at_mono(orbits* L, uint* cexa) {
+bool is_knast_at_mono(morphism* M, uint* cexa) {
 
 
-    // We first check if the AT-orbits are J-trivial.
-    if (!is_gtrivial_orbmono(L, J_GREEN, cexa)) {
-        if (cexa) {
-            uint e = cexa[2];
-            make_cexample_from_jtriv(L->original, cexa);
-            cexa[4] = e;
-            cexa[5] = e;
-        }
-        return false;
-    }
+    green* G = M->rels;
 
-    morphism* M = L->original;
-    green* G = L->original->rels;
-
-
+    uint* inv_rcl = parti_compute_inv(G->RCL);
 
     // Loop over all idempotents e.
     for (uint i = 0; i < M->nb_idems; i++) {
@@ -1253,16 +1202,14 @@ bool is_knast_at_mono(orbits* L, uint* cexa) {
 
         // Loop over all idempotents f > e.
         // The case f < e is treated when e and f are inverted.
-        // The case e = f is already handled: we checked if the AT-orbits are J-trivial.
-        for (uint j = i + 1; j < M->nb_idems; j++) {
+        for (uint j = i; j < M->nb_idems; j++) {
             uint f = M->idem_list[j];
 
             // We compute the maximal alphabet such that there exists two words
             // with this alphabet that maps to e and f respectively.
-            bool* efalph = compute_maxalph_com_scc(M, e, f);
-
-            // If there is no such alphabet, we skip the current pair.
-            if (!efalph) {
+            // If this alphabet is empty, we skip the pair (e,f).
+            bool efalph[M->r_cayley->size_alpha];
+            if (!dgraph_common_alph_loop(M->r_cayley, G->RCL, inv_rcl, e, f, efalph)) {
                 continue;
             }
 
@@ -1315,11 +1262,13 @@ bool is_knast_at_mono(orbits* L, uint* cexa) {
                             if (gh != mor_mult(M, q, t)) {
                                 if (cexa) {
                                     cexa[0] = q;
-                                    cexa[1] = get_rlink(M, rSCCS, g, q);
-                                    cexa[2] = get_llink(M, lSCCS, h, t);
+                                    cexa[1] = get_rlink(M, rSCCS, g, q, efalph);
+                                    cexa[2] = get_llink(M, lSCCS, h, t, efalph);
                                     cexa[3] = t;
                                     cexa[4] = e;
                                     cexa[5] = f;
+                                    cexa[6] = g;
+                                    cexa[7] = h;
                                 }
                                 delete_dequeue(rset);
                                 delete_dequeue(lset);
@@ -1328,6 +1277,7 @@ bool is_knast_at_mono(orbits* L, uint* cexa) {
                                 delete_dequeue(Mf);
                                 delete_parti(rSCCS);
                                 delete_parti(lSCCS);
+                                //free(inv_rcl);
                                 return false;
                             }
                         }
@@ -1341,11 +1291,12 @@ bool is_knast_at_mono(orbits* L, uint* cexa) {
             delete_dequeue(Mf);
             delete_parti(rSCCS);
             delete_parti(lSCCS);
-            free(efalph);
+            //free(efalph);
 
 
         }
     }
+    free(inv_rcl);
     return true;
 }
 
@@ -1363,7 +1314,7 @@ bool is_upbp_mono(orbits* L, uint* cexa) {
         for (uint k = 0; k < L->orbits[i]->size; k++) {
             uint ese = L->orbits[i]->sub_to_mono[k];
             if (ese == e) {
-                // If ese = e, the equation is trivially satsfied for all t
+                // If ese = e, the equation is trivially satisfied for all t
                 continue;
             }
 
@@ -1385,12 +1336,13 @@ bool is_upbp_mono(orbits* L, uint* cexa) {
                 visited[t] = true;
 
                 // If p is idempotent, we check the equation for this t
-                if (M->idem_array[p]) {
+                if (M->idem_array[p] && mor_mult(M, p, e) == p) {
                     if (mor_mult_gen(M, 3, p, t, p) != p) {
                         if (cexa) {
                             cexa[0] = ese;
                             cexa[1] = t;
                             cexa[2] = e;
+                            cexa[3] = p;
                         }
                         free(visited);
                         delete_dequeue(elem);

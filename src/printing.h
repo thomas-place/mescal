@@ -10,6 +10,7 @@
 #include "nfa.h"
 #include "alloc.h"
 #include "type_basic.h"
+#include "nfa_patterns.h"
 
 
 
@@ -65,9 +66,13 @@ void named_dfaedges_print(dequeue_gen* theedges, dfa* A, FILE* out);
 
 void named_dedges_print(dequeue_gen* theedges, morphism* M, FILE* out);
 
+void dgraphedges_print(dequeue_gen* theedges, FILE* out);
+
 void nfa_print(nfa* A, FILE* out);
 
 void dfa_print(dfa* A, FILE* out);
+
+void dgraph_print(dgraph* g, FILE* out);
 
 void cayley_print(morphism* mor, FILE* out);
 
@@ -82,10 +87,13 @@ void view_nfa(nfa* nfa);
 
 void view_dfa(dfa* dfa);
 
+void view_dgraph(dgraph* g);
+
 void view_cayley(morphism* mor);
 
 void view_left_cayley(morphism* mor);
 
+void view_image(const char* filename);
 
 /********************/
 /* Latex generation */
@@ -100,5 +108,7 @@ void latex_print_dfa(dfa* A, FILE* out);
 void latex_print_cayley(morphism* M, FILE* out);
 
 void latex_print_lcayley(morphism* M, FILE* out);
+
+
 
 #endif

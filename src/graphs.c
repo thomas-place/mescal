@@ -182,6 +182,36 @@ int lgraph_nb_edges(lgraph* G) {
 
 int dgraph_nb_edges(dgraph* G) { return G->size_graph * G->size_alpha; }
 
+/**************/
+/*+ Products +*/
+/**************/
+
+
+dgraph* dgraph_direct_product(dgraph* g1, dgraph* g2) {
+    if (g1->size_alpha != g2->size_alpha) {
+        fprintf(stderr, "dgraph_direct_product: The two graphs must have the same alphabet size.\n");
+        exit(EXIT_FAILURE);
+    }
+    dgraph* inter = create_dgraph_noedges(g1->size_graph * g2->size_graph, g1->size_alpha);
+    for (uint q = 0; q < g1->size_graph; q++) {
+        for (uint r = 0; r < g2->size_graph; r++) {
+            for (uint a = 0; a < g1->size_alpha; a++) {
+                uint qa = g1->edges[q][a];
+                uint ra = g2->edges[r][a];
+                if (qa == UINT_MAX || ra == UINT_MAX) {
+                    inter->edges[q * g2->size_graph + r][a] = UINT_MAX; // No transition
+                }
+                else {
+                    inter->edges[q * g2->size_graph + r][a] = qa * g2->size_graph + ra;
+                }
+            }
+        }
+    }
+    return inter;
+}
+
+
+
 /***********/
 /* Mirrors */
 /***********/
@@ -462,7 +492,34 @@ dequeue* twin_dgraph_search(graph_stype T, dgraph* G1, dgraph* G2, dequeue* ini,
     return res;
 }
 
+dgraph* dgraph_paths(dgraph* G, uint start) {
+    bool* visited;
+    CALLOC(visited, G->size_graph);
+    dgraph* res = create_dgraph_noedges(G->size_graph, G->size_alpha);
+    for (uint q = 0; q < G->size_graph; q++) {
+        for (uint a = 0; a < G->size_alpha; a++) {
+            res->edges[q][a] = UINT_MAX;
+        }
+    }
 
+    dequeue* thequeue = create_dequeue();
+    rigins_dequeue(start, thequeue);
+    visited[start] = true;
+    while (!isempty_dequeue(thequeue)) {
+        uint q = lefpull_dequeue(thequeue);
+        for (uint a = 0; a < G->size_alpha; a++) {
+            uint r = G->edges[q][a];
+            if (r != UINT_MAX && !visited[r]) {
+                rigins_dequeue(r, thequeue);
+                visited[r] = true;
+                res->edges[r][a] = q; // On enregistre le chemin
+            }
+        }
+    }
+    delete_dequeue(thequeue);
+    free(visited);
+    return res;
+}
 
 /********************************/
 /*+ Disjoint merging of graphs +*/

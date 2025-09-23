@@ -7,12 +7,11 @@
 #include "shell_errors.h"
 #include "printing.h"
 
-
-object** objects; //[nb_objects-1] = { NULL };
+object* objects = NULL;
 int nb_objects = 0;
 int nb_objemax = 0;
 
-char* object_types_names[DUMMY] = { "regexp", "automaton", "morphism", "recdef" };
+char* object_types_names[DUMMY] = { "empty object", "regexp", "automaton", "automaton", "morphism", "recdef" };
 
 void init_objects_array(void) {
     CALLOC(objects, 1024);
@@ -31,25 +30,73 @@ void grow_objects_array(void) {
 /* Création/Suppression */
 /************************/
 
-object* object_init(const char* name) {
-    object* theobject;
-    MALLOC(theobject, 1);
-    if (name) {
-        theobject->name = strdup(name);
+ob_prefixname* create_prefixname_full(const char* name) {
+    if (!name || strlen(name) == 0) {
+        fprintf(stderr, "Error: tried to create a prefix with an empty name.\n");
+        return NULL;
     }
-    else {
-        theobject->name = NULL;
-    }
-    theobject->type = DUMMY;
-    theobject->parent = -1;
-    for (uint i = 0; i < OD_SIZE; i++) {
-        theobject->depend[i] = -1;
-    }
-    return theobject;
+    ob_prefixname* prefix;
+    MALLOC(prefix, 1);
+    prefix->name = strdup(name);
+    prefix->count = 1;
+    prefix->digits = 0; // Full name has no suffix
+    return prefix;
 }
 
+ob_prefixname* create_prefixname(const char* name, uint count) {
+    if (!name || strlen(name) == 0) {
+        fprintf(stderr, "Error: tried to create a prefix with an empty name.\n");
+        return NULL;
+    }
+    if (count == 0) {
+        fprintf(stderr, "Error: tried to create a prefix with count 0.\n");
+        return NULL;
+    }
+    ob_prefixname* prefix;
+    MALLOC(prefix, 1);
+    prefix->name = strdup(name);
+    prefix->count = count;
+    prefix->digits = (uchar)get_uint_length(count);
+    return prefix;
+}
+
+void remove_instance_prefixname(ob_prefixname* prefixname) {
+    if (!prefixname) {
+        return;
+    }
+    if (prefixname->count > 0) {
+        prefixname->count--;
+    }
+
+    if (prefixname->count == 0 || prefixname->digits == 0) {
+        free(prefixname->name);
+        free(prefixname);
+    }
+}
+
+int object_init(const char* name) {
+    grow_objects_array();
+    int i = nb_objects++;
+    if (name) {
+        objects[i].prefix = create_prefixname_full(name);
+        objects[i].number = UINT_MAX;
+    }
+    else {
+        objects[i].prefix = NULL;
+        objects[i].number = UINT_MAX;
+    }
+    objects[i].type = EMPTYOBJ;
+    objects[i].parent = -1;
+    for (uint j = 0; j < OD_SIZE; j++) {
+        objects[i].depend[j] = -1;
+    }
+    return i;
+}
+
+
+
 void object_swap(int i, int j) {
-    if (i < 0 || i >= nb_objects || !objects[i] || j < 0 || j >= nb_objects || !objects[j]) {
+    if (i < 0 || i >= nb_objects || j < 0 || j >= nb_objects) {
         fprintf(stderr, "Error: tried to swap an invalid object.\n");
         return;
     }
@@ -62,16 +109,16 @@ void object_swap(int i, int j) {
     int tab[2 * (OD_SIZE)+2];
 
     // The parents of the two objects.
-    tab[0] = objects[i]->parent;
+    tab[0] = objects[i].parent;
     int s = 1;
-    if (tab[0] != objects[j]->parent) {
-        tab[s++] = objects[j]->parent;
+    if (tab[0] != objects[j].parent) {
+        tab[s++] = objects[j].parent;
     }
 
     // The dependencies of the two objects.
     for (uchar h = 0; h < OD_SIZE; h++) {
-        tab[s++] = objects[i]->depend[h];
-        tab[s++] = objects[j]->depend[h];
+        tab[s++] = objects[i].depend[h];
+        tab[s++] = objects[j].depend[h];
     }
 
     for (uchar g = 0; g < s; g++) {
@@ -79,67 +126,58 @@ void object_swap(int i, int j) {
         if (k == -1) {
             continue;
         }
-        if (objects[k]->parent == i) {
-            objects[k]->parent = j;
+        if (objects[k].parent == i) {
+            objects[k].parent = j;
         }
-        else if (objects[k]->parent == j) {
-            objects[k]->parent = i;
+        else if (objects[k].parent == j) {
+            objects[k].parent = i;
         }
         for (uchar h = 0; h < OD_SIZE; h++) {
-            if (objects[k]->depend[h] == i) {
-                objects[k]->depend[h] = j;
+            if (objects[k].depend[h] == i) {
+                objects[k].depend[h] = j;
             }
-            else if (objects[k]->depend[h] == j) {
-                objects[k]->depend[h] = i;
+            else if (objects[k].depend[h] == j) {
+                objects[k].depend[h] = i;
             }
         }
     }
-    object* temp = objects[i];
+    object temp = objects[i];
     objects[i] = objects[j];
     objects[j] = temp;
 }
 
-static void object_free_aux(object* theob) {
+void object_free_aux(object* theob) {
     if (!theob) {
         return;
     }
-    free(theob->name);
 
+    remove_instance_prefixname(theob->prefix);
+    //free(theob->name);
 
-
-
-    if (theob->type == REGEXP) {
+    switch (theob->type)
+    {
+    case REGEXP:
         reg_free(theob->exp);
-    }
-    else if (theob->type == AUTOMATON) {
-        if (theob->aut) {
-            if (theob->aut->dfa) {
-                dfa_delete(theob->aut->obj_dfa);
-            }
-            else {
-                // If the automaton is not deterministic, it is an NFA.
-                // We delete the NFA.
-                nfa_delete(theob->aut->obj_nfa);
-            }
-        }
-        free(theob->aut);
-    }
-    else if (theob->type == MORPHISM) {
+        break;
+    case NAUTOMATON:
+        nfa_delete(theob->obj_nfa);
+        break;
+    case DAUTOMATON:
+        dfa_delete(theob->obj_dfa);
+        break;
+    case MORPHISM:
         if (theob->mor) {
             delete_morphism(theob->mor->obj);
-
-
             for (int i = 0; i < KER_SIZE; i++) {
                 delete_subsemi(theob->mor->kers[i]);
             }
             for (int i = 0; i < ORB_SIZE; i++) {
                 delete_orbits(theob->mor->orbs[i]);
             }
-
         }
         free(theob->mor);
-    }
-    else if (theob->type == RECDEF) {
+        break;
+    case RECDEF:
         if (theob->rec) {
             for (uint h = 0; h < theob->rec->num; h++) {
                 for (uint g = 0; g < theob->rec->init; g++) {
@@ -150,12 +188,14 @@ static void object_free_aux(object* theob) {
             }
         }
         free(theob->rec);
+    default:
+        break;
     }
-    free(theob);
+    theob->type = EMPTYOBJ; // Clear the pointer to the deleted object
 }
 
 void object_free(int i) {
-    if (i < 0 || i >= nb_objects || !objects[i]) {
+    if (i < 0 || i >= nb_objects) {
         //fprintf(stderr, "%d Error: tried to delete an invalid object.\n", i);
         return;
     }
@@ -166,15 +206,15 @@ void object_free(int i) {
     i = nb_objects - 1;
     uchar count = 1;
     for (uint h = 0; h < OD_SIZE; h++) {
-        if (objects[i]->depend[h] != -1) {
-            object_swap(objects[i]->depend[h], i - count);
+        if (objects[i].depend[h] != -1) {
+            object_swap(objects[i].depend[h], i - count);
             count++;
         }
     }
 
     for (uint h = 0; h < count; h++) {
-        object_free_aux(objects[i - h]);
-        objects[i - h] = NULL;
+        object_free_aux(&objects[i - h]);
+        objects[i - h].type = EMPTYOBJ;
         nb_objects--;
     }
 
@@ -183,22 +223,94 @@ void object_free(int i) {
 
 void object_free_all(void) {
     for (int i = 0; i < nb_objects; i++) {
-        object_free_aux(objects[i]);
-        objects[i] = NULL;
+        object_free_aux(&objects[i]);
+        objects[i].type = EMPTYOBJ;
     }
     nb_objects = 0;
 }
 
+void object_delete_prefix(const char* prefix) {
+    if (!prefix || strlen(prefix) == 0) {
+        return;
+    }
+
+    for (int i = 0; i < nb_objects; i++) {
+        if (objects[i].parent == -1 && strncmp(objects[i].prefix->name, prefix, strlen(prefix)) == 0) {
+            for (uint h = 0; h < OD_SIZE; h++) {
+                if (objects[i].depend[h] != -1) {
+                    object_free_aux(&objects[objects[i].depend[h]]);
+                }
+            }
+            object_free_aux(&objects[i]);
+        }
+    }
+
+    int nu = 0;
+
+    for (int i = 0; i < nb_objects; i++) {
+        if (objects[i].type == EMPTYOBJ) {
+            continue; // Skip deleted objects
+        }
+
+        if (i == nu) {
+            nu++;
+            continue; // No need to move the object
+        }
+
+        int k = objects[i].parent;
+        if (k != -1) {
+            for (uchar h = 0; h < OD_SIZE; h++) {
+                if (objects[k].depend[h] == i) {
+                    objects[k].depend[h] = nu;
+                }
+            }
+        }
+        for (uchar h = 0; h < OD_SIZE; h++) {
+            int j = objects[i].depend[h];
+            if (j == -1) {
+                continue; // Skip if no dependency
+            }
+            objects[j].parent = nu; // Update the parent of the dependent object
+        }
+        objects[nu] = objects[i]; // Move the object to the new position
+        objects[i].type = EMPTYOBJ;
+        nu++;
+
+    }
+
+    nb_objects = nu; // Update the number of objects
+}
+
+
 /************************/
 /* Get/insert an object */
 /************************/
+
+char full_name_buffer[256];
+
+const char* object_get_full_name(int i) {
+    if (i < 0 || i >= nb_objects) {
+        return NULL; // Invalid index
+    }
+    if (objects[i].prefix == NULL) {
+        return NULL; // No prefix name
+    }
+    if (objects[i].number == UINT_MAX || objects[i].prefix->digits == 0) {
+        return objects[i].prefix->name; // Full name without suffix
+    }
+    sprintf(full_name_buffer, "%s%0*u", objects[i].prefix->name, objects[i].prefix->digits, objects[i].number);
+    return full_name_buffer;
+}
+
+
+
 
 int object_get_from_name(const char* name) {
     if (!name) {
         return -1;
     }
     for (int i = 0; i < nb_objects; i++) {
-        if (objects[i] && objects[i]->name && strcmp(objects[i]->name, name) == 0) {
+        if (objects[i].parent == -1 && objects[i].prefix && strcmp(object_get_full_name(i), name) == 0) {
             return i;
         }
     }
@@ -207,12 +319,14 @@ int object_get_from_name(const char* name) {
 
 int object_delete_from_name(const char* name) {
     int i = object_get_from_name(name);
-    if (i == -1 || !objects[i]) {
+    if (i == -1 || objects[i].parent != -1) {
         return -1;
     }
     object_free(i);
     return i;
 }
+
+
 
 int object_add_regexp(const char* name, regexp* theregexp) {
     if (theregexp == NULL) {
@@ -228,17 +342,9 @@ int object_add_regexp(const char* name, regexp* theregexp) {
     }
 
     grow_objects_array();
-
-    /*
-    if (nb_objects >= nb_objects-1) {
-        shell_error_full();
-        return -1;
-    }
- */
-    int i = nb_objects++;
-    objects[i] = object_init(name);
-    objects[i]->type = REGEXP;
-    objects[i]->exp = theregexp;
+    int i = object_init(name);
+    objects[i].type = REGEXP;
+    objects[i].exp = theregexp;
     return i;
 }
 
@@ -256,19 +362,10 @@ int object_add_automaton_nfa(const char* name, nfa* A) {
     }
 
     grow_objects_array();
-    /*
-        if (nb_objects >= nb_objects-1) {
-            shell_error_full();
-            return -1;
-        }
-     */
 
-    int i = nb_objects++;
-    objects[i] = object_init(name);
-    objects[i]->type = AUTOMATON;
-    MALLOC(objects[i]->aut, 1);
-    objects[i]->aut->obj_nfa = A;
-    objects[i]->aut->dfa = false;
+    int i = object_init(name);
+    objects[i].type = NAUTOMATON;
+    objects[i].obj_nfa = A;
     return i;
 }
 
@@ -286,20 +383,37 @@ int object_add_automaton_dfa(const char* name, dfa* A) {
     }
 
     grow_objects_array();
-    /*
-        if (nb_objects >= nb_objects-1) {
-            shell_error_full();
-            return -1;
-        }
-     */
-
-    int i = nb_objects++;
-    objects[i] = object_init(name);
-    objects[i]->type = AUTOMATON;
-    MALLOC(objects[i]->aut, 1);
-    objects[i]->aut->obj_dfa = A;
-    objects[i]->aut->dfa = true;
+    int i = object_init(name);
+    objects[i].type = DAUTOMATON;
+    objects[i].obj_dfa = A;
     return i;
+}
+
+
+void object_add_automaton_dfa_family(const char* pname, dfa** array, uint count) {
+    if (count == 0) {
+        return;
+    }
+    if (!array || !pname) {
+        shell_error_null();
+        return;
+    }
+    // Deletes all objects with the given prefix.
+    object_delete_prefix(pname);
+    ob_prefixname* prefixname = create_prefixname(pname, count);
+
+    for (uint k = 0; k < count; k++) {
+        grow_objects_array();
+        int i = nb_objects++;
+        objects[i].prefix = prefixname;
+        objects[i].number = k;
+        objects[i].type = DAUTOMATON;
+        objects[i].parent = -1;
+        for (uint j = 0; j < OD_SIZE; j++) {
+            objects[i].depend[j] = -1;
+        }
+        objects[i].obj_dfa = array[k];
+    }
 }
 
 int object_add_morphism(char* name, morphism* M) {
@@ -316,23 +430,16 @@ int object_add_morphism(char* name, morphism* M) {
     }
 
     grow_objects_array();
-    /*
-        if (nb_objects >= nb_objects-1) {
-            shell_error_full();
-            return -1;
-        }
-     */
-    int i = nb_objects++;
-    objects[i] = object_init(name);
-    objects[i]->type = MORPHISM;
-    MALLOC(objects[i]->mor, 1);
-    objects[i]->mor->obj = M;
+    int i = object_init(name);
+    objects[i].type = MORPHISM;
+    MALLOC(objects[i].mor, 1);
+    objects[i].mor->obj = M;
 
     for (int j = 0; j < KER_SIZE; j++) {
-        objects[i]->mor->kers[j] = NULL;
+        objects[i].mor->kers[j] = NULL;
     }
     for (int j = 0; j < ORB_SIZE; j++) {
-        objects[i]->mor->orbs[j] = NULL;
+        objects[i].mor->orbs[j] = NULL;
     }
 
     return i;
@@ -342,113 +449,18 @@ int shell_copy_generic(int i, char* newname) {
     if (i == -1) {
         return -1;
     }
-    switch (objects[i]->type) {
-    case AUTOMATON:
-        if (objects[i]->aut->dfa) {
-            return object_add_automaton_dfa(newname, dfa_copy(objects[i]->aut->obj_dfa));
-        }
-        else {
-            return object_add_automaton_nfa(newname, nfa_copy(objects[i]->aut->obj_nfa));
-        }
+    switch (objects[i].type) {
+    case DAUTOMATON:
+        return object_add_automaton_dfa(newname, dfa_copy(objects[i].obj_dfa));
+        break;
+    case NAUTOMATON:
+        return object_add_automaton_nfa(newname, nfa_copy(objects[i].obj_nfa));
         break;
     case REGEXP:
-        return object_add_regexp(newname, reg_copy(objects[i]->exp));
+        return object_add_regexp(newname, reg_copy(objects[i].exp));
     default:
         return -1;
         break;
-    }
-}
-
-int object_compare(int i1, int i2) {
-    if (i1 == -1 || i2 == -1) {
-        return 0;
-    }
-    if (!objects[i1]->name) {
-        if (!objects[i2]->name) {
-            return 0;
-        }
-        return 1;
-    }
-
-    if (!objects[i2]->name) {
-        return -1;
-    }
-
-    return strcmp(objects[i1]->name, objects[i2]->name);
-}
-
-int object_compare_synt(int i1, int i2) {
-    if (i1 == -1 || i2 == -1) {
-        return 0;
-    }
-    if (objects[i1]->type == RECDEF && objects[i2]->type == RECDEF) {
-        return 0;
-    }
-
-    if (objects[i1]->type == RECDEF) {
-        return -1;
-    }
-
-    if (objects[i2]->type == RECDEF) {
-        return 1;
-    }
-    int j1 = shell_compute_syntac(i1, false);
-    int j2 = shell_compute_syntac(i2, false);
-    return objects[j1]->mor->obj->r_cayley->size_graph - objects[j2]->mor->obj->r_cayley->size_graph;
-}
-
-int object_compare_mini(int i1, int i2) {
-    if (i1 == -1 || i2 == -1) {
-        return 0;
-    }
-    if (objects[i1]->type == RECDEF && objects[i2]->type == RECDEF) {
-        return 0;
-    }
-
-    if (objects[i1]->type == RECDEF) {
-        return -1;
-    }
-
-    if (objects[i2]->type == RECDEF) {
-        return 1;
-    }
-    int j1 = shell_compute_minimal(i1);
-    int j2 = shell_compute_minimal(i2);
-    return objects[j1]->aut->obj_dfa->trans->size_graph - objects[j2]->aut->obj_dfa->trans->size_graph;
-}
-
-static void max_heapify(int i, int max, int (*comp)(int, int)) {
-    if (i < 0 || i > max) {
-        return;
-    }
-    int l = 2 * i + 1;
-    int r = 2 * i + 2;
-    while ((l <= max && comp(l, i) > 0) || (r <= max && comp(r, i) > 0)) {
-        if (r <= max && comp(l, r) < 0) {
-            object_swap(i, r);
-            i = r;
-
-        }
-        else {
-            object_swap(i, l);
-            i = l;
-        }
-        l = 2 * i + 1;
-        r = 2 * i + 2;
-    }
-}
-
-void object_sort_array(int (*comp)(int, int)) {
-    int end = nb_objects - 1;
-    // Heapify
-    for (int i = end; i >= 0; i--) {
-        max_heapify(i, end, comp);
-    }
-    // Sort
-
-    for (int max = end; max > 0; max--) {
-        object_swap(0, max);
-        max_heapify(0, max - 1, comp);
     }
 }
 
@@ -457,74 +469,85 @@ void object_sort_array(int (*comp)(int, int)) {
 /***********************************************/
 
 int shell_compute_minimal(int i) {
-    if (i < 0 || i > nb_objects - 1 || !objects[i] || objects[i]->type > MORPHISM) {
+    if (i < 0 || i > nb_objects - 1 || objects[i].type > MORPHISM || objects[i].type < REGEXP) {
         fprintf(stderr, "Error: invalid object.\n");
         return -1;
     }
 
-    if (objects[i]->parent != -1) {
-        return shell_compute_minimal(objects[i]->parent);
+    if (objects[i].parent != -1) {
+        return shell_compute_minimal(objects[i].parent);
     }
 
-    if (objects[i]->depend[OD_MINI] != -1) {
-        return objects[i]->depend[OD_MINI];
+    if (objects[i].depend[OD_MINI] != -1) {
+        return objects[i].depend[OD_MINI];
     }
 
-    dfa* mini;
-    if (objects[i]->type == REGEXP) {
-        nfa* A = reg_thompson(objects[i]->exp);
+    dfa* mini = NULL;
+    switch (objects[i].type)
+    {
+    case REGEXP:
+    {
+        nfa* A = reg_thompson(objects[i].exp);
         mini = nfa_brzozowski(A);
         nfa_delete(A);
     }
-
-    if (objects[i]->type == AUTOMATON) {
-        if (objects[i]->aut->dfa) {
-            mini = dfa_hopcroft(objects[i]->aut->obj_dfa);
-        }
-        else {
-            mini = nfa_brzozowski(objects[i]->aut->obj_nfa);
-        }
-    }
-
-    if (objects[i]->type == MORPHISM) {
+    break;
+    case NAUTOMATON:
+        mini = nfa_brzozowski(objects[i].obj_nfa);
+        break;
+    case DAUTOMATON:
+        //mini = dfa_brzozowski(objects[i].obj_dfa);
+        mini = dfa_hopcroft(objects[i].obj_dfa);
+        break;
+    case MORPHISM:
+    {
         dfa A;
-        A.alphabet = objects[i]->mor->obj->alphabet;
-        A.finals = objects[i]->mor->obj->accept_list;
+        A.alphabet = objects[i].mor->obj->alphabet;
+        A.finals = objects[i].mor->obj->accept_list;
         A.initial = ONE;
-        A.nb_finals = objects[i]->mor->obj->nb_accept;
+        A.nb_finals = objects[i].mor->obj->nb_accept;
         A.state_names = NULL;
-        A.trans = objects[i]->mor->obj->r_cayley;
+        A.trans = objects[i].mor->obj->r_cayley;
         mini = dfa_hopcroft(&A);
     }
+    break;
+    default:
+        break;
+    }
+
 
     int j = object_add_automaton_dfa(NULL, mini);
     if (j == -1) {
         dfa_delete(mini);
         return j;
     }
-    objects[i]->depend[OD_MINI] = j;
-    objects[j]->parent = i;
+    objects[i].depend[OD_MINI] = j;
+    objects[j].parent = i;
+
     return j;
 }
 
 int shell_compute_syntac(int i, bool order) {
-    if (i < 0 || i > nb_objects - 1 || !objects[i]) {
+    if (i < 0 || i > nb_objects - 1 || objects[i].type > MORPHISM || objects[i].type < REGEXP) {
         fprintf(stderr, "Error: invalid object.\n");
         return INVALID_OBJECT;
     }
 
-    if (objects[i]->parent != -1) {
-        return shell_compute_syntac(objects[i]->parent, order);
+    if (objects[i].parent != -1) {
+        //printf("Parent: %d\n", objects[i].parent);
+        return shell_compute_syntac(objects[i].parent, order);
     }
 
-    if (objects[i]->depend[OD_SYNT] != -1) {
-        int j = objects[i]->depend[OD_SYNT];
-        if (order && !objects[j]->mor->obj->order) {
+
+
+    if (objects[i].depend[OD_SYNT] != -1) {
+        int j = objects[i].depend[OD_SYNT];
+        if (order && !objects[j].mor->obj->order) {
             object_free(j);
-            objects[i]->depend[OD_SYNT] = -1;
+            objects[i].depend[OD_SYNT] = -1;
         }
         else {
-            return objects[i]->depend[OD_SYNT];
+            return objects[i].depend[OD_SYNT];
         }
     }
 
@@ -534,21 +557,8 @@ int shell_compute_syntac(int i, bool order) {
         return j;
     }
 
-    bool** dfa_order = NULL;
-    if (order) {
-        dfa_order = dfa_mini_canonical_ordering(objects[j]->aut->obj_dfa);
-    }
-
-
-
     int error = 0;
-    morphism* synt = dfa_to_morphism(objects[j]->aut->obj_dfa, dfa_order, &error, NULL);
-    if (dfa_order) {
-        for (uint h = 0; h < objects[j]->aut->obj_dfa->trans->size_graph;h++) {
-            free(dfa_order[h]);
-        }
-        free(dfa_order);
-    }
+    morphism* synt = dfa_to_morphism(objects[j].obj_dfa, order, &error, NULL);
 
     // if (interrupt_flag) {
     //     interrupt_flag = false;
@@ -565,117 +575,117 @@ int shell_compute_syntac(int i, bool order) {
         delete_morphism(synt);
         return k;
     }
-    objects[i]->depend[OD_SYNT] = k;
-    objects[k]->parent = i;
+    objects[i].depend[OD_SYNT] = k;
+    objects[k].parent = i;
     return k;
 }
 
 void shell_compute_mult(int i) {
-    if (i < 0 || i > nb_objects - 1 || !objects[i] || objects[i]->type != MORPHISM) {
+    if (i < 0 || i > nb_objects - 1 || objects[i].type != MORPHISM) {
         fprintf(stderr, "Error: invalid object.\n");
         return;
     }
-    mor_compute_mult(objects[i]->mor->obj);
+    mor_compute_mult(objects[i].mor->obj);
 }
 
 void shell_compute_order(int i) {
-    if (i < 0 || i > nb_objects - 1 || !objects[i] || objects[i]->type != MORPHISM) {
+    if (i < 0 || i > nb_objects - 1 || objects[i].type != MORPHISM) {
         fprintf(stderr, "Error: invalid object.\n");
         return;
     }
-    mor_compute_order(objects[i]->mor->obj);
+    mor_compute_order(objects[i].mor->obj);
 }
 
 
 subsemi* shell_compute_ker(int i, kernel_type type, sub_level level) {
-    if (i < 0 || i > nb_objects - 1 || !objects[i] || objects[i]->type != MORPHISM) {
+    if (i < 0 || i > nb_objects - 1 || objects[i].type != MORPHISM) {
         fprintf(stderr, "Error: invalid object.\n");
         return NULL;
     }
 
 
     // If part of the kernel has already been computed and we now want more, we delete the old kernel.
-    if (objects[i]->mor->kers[type] && objects[i]->mor->kers[type]->level < level) {
-        delete_subsemi(objects[i]->mor->kers[type]);
-        objects[i]->mor->kers[type] = NULL;
+    if (objects[i].mor->kers[type] && objects[i].mor->kers[type]->level < level) {
+        delete_subsemi(objects[i].mor->kers[type]);
+        objects[i].mor->kers[type] = NULL;
     }
 
-    if (!objects[i]->mor->kers[type]) {
+    if (!objects[i].mor->kers[type]) {
         switch (type)
         {
         case KER_MOD:
-            objects[i]->mor->kers[type] = get_mod_kernel(objects[i]->mor->obj, level);
+            objects[i].mor->kers[type] = get_kernel(objects[i].mor->obj, level, BA_MOD);
             break;
         case KER_AMT:
-            objects[i]->mor->kers[type] = get_amt_kernel(objects[i]->mor->obj, level);
+            objects[i].mor->kers[type] = get_kernel(objects[i].mor->obj, level, BA_AMT);
             break;
         case KER_GR:
-            objects[i]->mor->kers[type] = get_grp_kernel(objects[i]->mor->obj, level);
+            objects[i].mor->kers[type] = get_kernel(objects[i].mor->obj, level, BA_GR);
             break;
         default:
             break;
         }
     }
-    return objects[i]->mor->kers[type];
+    return objects[i].mor->kers[type];
 }
 
 orbits* shell_compute_orbits(int i, orbits_type type, sub_level level) {
-    if (i < 0 || i > nb_objects - 1 || !objects[i] || objects[i]->type != MORPHISM) {
+    if (i < 0 || i > nb_objects - 1 || objects[i].type != MORPHISM) {
         fprintf(stderr, "Error: invalid object.\n");
         return NULL;
     }
 
     // If part of the orbits have already been computed and we now want more, we delete the old orbits.
-    if (objects[i]->mor->orbs[type] && objects[i]->mor->orbs[type]->level < level) {
-        delete_orbits(objects[i]->mor->orbs[type]);
-        objects[i]->mor->orbs[type] = NULL;
+    if (objects[i].mor->orbs[type] && objects[i].mor->orbs[type]->level < level) {
+        delete_orbits(objects[i].mor->orbs[type]);
+        objects[i].mor->orbs[type] = NULL;
     }
 
-    if (!objects[i]->mor->orbs[type]) {
+    if (!objects[i].mor->orbs[type]) {
         switch (type)
         {
         case ORB_DD:
-            objects[i]->mor->orbs[type] = compute_ddorbits(objects[i]->mor->obj);
+            objects[i].mor->orbs[type] = compute_ddorbits(objects[i].mor->obj);
             break;
         case ORB_MODP:
-            objects[i]->mor->orbs[type] = compute_gplusorbits(shell_compute_ker(i, KER_MOD, level));
+            objects[i].mor->orbs[type] = compute_gplusorbits(shell_compute_ker(i, KER_MOD, level));
             break;
         case ORB_AMTP:
-            objects[i]->mor->orbs[type] = compute_gplusorbits(shell_compute_ker(i, KER_AMT, level));
+            objects[i].mor->orbs[type] = compute_gplusorbits(shell_compute_ker(i, KER_AMT, level));
             break;
         case ORB_GRP:
-            objects[i]->mor->orbs[type] = compute_gplusorbits(shell_compute_ker(i, KER_GR, level));
+            objects[i].mor->orbs[type] = compute_gplusorbits(shell_compute_ker(i, KER_GR, level));
             break;
         case ORB_PT:
-            objects[i]->mor->orbs[type] = compute_ptorbits(objects[i]->mor->obj, level);
+            objects[i].mor->orbs[type] = compute_ptorbits(objects[i].mor->obj, level);
             break;
         case ORB_BPMOD:
-            objects[i]->mor->orbs[type] = compute_bpgorbits(objects[i]->mor->obj, level, BPG_MOD);
+            objects[i].mor->orbs[type] = compute_bpgorbits(objects[i].mor->obj, level, BA_MOD);
             break;
         case ORB_BPAMT:
-            objects[i]->mor->orbs[type] = compute_bpgorbits(objects[i]->mor->obj, level, BPG_AMT);
+            objects[i].mor->orbs[type] = compute_bpgorbits(objects[i].mor->obj, level, BA_AMT);
             break;
         case ORB_BPGR:
-            objects[i]->mor->orbs[type] = compute_bpgorbits(objects[i]->mor->obj, level, BPG_GR);
+            objects[i].mor->orbs[type] = compute_bpgorbits(objects[i].mor->obj, level, BA_GR);
             break;
         case ORB_BPDD:
-            objects[i]->mor->orbs[type] = compute_bpgplusorbits(objects[i]->mor->obj, level, BPG_ST);
+            objects[i].mor->orbs[type] = compute_bpgplusorbits(objects[i].mor->obj, level, BA_ST);
             break;
         case ORB_BPMODP:
-            objects[i]->mor->orbs[type] = compute_bpgplusorbits(objects[i]->mor->obj, level, BPG_MOD);
+            objects[i].mor->orbs[type] = compute_bpgplusorbits(objects[i].mor->obj, level, BA_MOD);
             break;
         case ORB_BPAMTP:
-            objects[i]->mor->orbs[type] = compute_bpgplusorbits(objects[i]->mor->obj, level, BPG_AMT);
+            objects[i].mor->orbs[type] = compute_bpgplusorbits(objects[i].mor->obj, level, BA_AMT);
             break;
         case ORB_BPGRP:
-            objects[i]->mor->orbs[type] = compute_bpgplusorbits(objects[i]->mor->obj, level, BPG_GR);
+            objects[i].mor->orbs[type] = compute_bpgplusorbits(objects[i].mor->obj, level, BA_GR);
             break;
         default:
             break;
         }
     }
 
-    return objects[i]->mor->orbs[type];
+    return objects[i].mor->orbs[type];
 }
 
 
@@ -706,13 +716,13 @@ static bool shell_check_defined(ob_recursion* obj) {
 }
 
 bool shell_check_recursion(int i) {
-    if (!objects[i] || objects[i]->type != RECDEF) {
+    if (objects[i].type != RECDEF) {
         return false;
     }
-    if (!shell_check_defined(objects[i]->rec)) {
+    if (!shell_check_defined(objects[i].rec)) {
         return false;
     }
-    ob_recursion* obj = objects[i]->rec;
+    ob_recursion* obj = objects[i].rec;
 
     // Checking that there are no loops in the recursion scheme.
     bool trans[obj->num][obj->num];
@@ -753,36 +763,36 @@ bool shell_check_recursion(int i) {
 }
 
 int shell_rec_defadd(int i, uchar j, regexp* exp) {
-    if (!objects[i] || objects[i]->type != RECDEF) {
+    if (objects[i].type != RECDEF) {
         return -1;
     }
-    if (j >= objects[i]->rec->num) {
+    if (j >= objects[i].rec->num) {
         return -1;
     }
     // Release of the previous recursion
-    reg_free(objects[i]->rec->def[j]);
-    objects[i]->rec->def[j] = exp;
-    objects[i]->rec->full = shell_check_recursion(i);
+    reg_free(objects[i].rec->def[j]);
+    objects[i].rec->def[j] = exp;
+    objects[i].rec->full = shell_check_recursion(i);
     return i;
 }
 
 int shell_rec_iniadd(int i, uchar j, ushort ind, regexp* exp) {
-    if (!objects[i] || objects[i]->type != RECDEF) {
+    if (objects[i].type != RECDEF) {
         return -1;
     }
-    if (ind >= objects[i]->rec->init) {
-        return -1;
-    }
-
-    if (j >= objects[i]->rec->num) {
+    if (ind >= objects[i].rec->init) {
         return -1;
     }
 
-    if (!objects[i]->rec->regexps[j][ind]) {
-        reg_free(objects[i]->rec->regexps[j][ind]);
+    if (j >= objects[i].rec->num) {
+        return -1;
     }
-    objects[i]->rec->regexps[j][ind] = exp;
-    objects[i]->rec->full = shell_check_recursion(i);
+
+    if (!objects[i].rec->regexps[j][ind]) {
+        reg_free(objects[i].rec->regexps[j][ind]);
+    }
+    objects[i].rec->regexps[j][ind] = exp;
+    objects[i].rec->full = shell_check_recursion(i);
     return i;
 }
 
@@ -880,25 +890,25 @@ regexp** shell_rec_compute(ob_recursion* obj, ushort ind) {
 }
 
 regexp* shell_rec_getexp(int i, char* name, ushort ind) {
-    if (!objects[i] || objects[i]->type != RECDEF) {
+    if (objects[i].type != RECDEF) {
         return NULL;
     }
 
-    if (!objects[i]->rec->full) {
+    if (!objects[i].rec->full) {
         return NULL;
     }
 
-    uchar j = shell_rec_getnum(objects[i]->rec, name);
+    uchar j = shell_rec_getnum(objects[i].rec, name);
 
-    if (j >= objects[i]->rec->num) {
+    if (j >= objects[i].rec->num) {
         return NULL;
     }
-    regexp** array = shell_rec_compute(objects[i]->rec, ind);
+    regexp** array = shell_rec_compute(objects[i].rec, ind);
     if (!array) {
         return NULL;
     }
     regexp* ret = array[j];
-    for (uchar h = 0; h < objects[i]->rec->num; h++) {
+    for (uchar h = 0; h < objects[i].rec->num; h++) {
         if (h != j) {
             reg_free(array[h]);
         }
@@ -913,7 +923,7 @@ regexp* shell_rec_getexp(int i, char* name, ushort ind) {
 
 
 
-    return objects[i]->rec->regexps[j][ind];
+    return objects[i].rec->regexps[j][ind];
  */
 }
 
@@ -970,17 +980,18 @@ void shell_view_object(object* ob, bool title) {
         reg_print(ob->exp);
         return;
         break;
-    case AUTOMATON:
+    case NAUTOMATON:
         if (title) {
             print_title_box(100, true, stdout, 1, "Automaton");
         }
-        if (ob->aut->dfa) {
-            view_dfa(ob->aut->obj_dfa);
-
+        view_nfa(ob->obj_nfa);
+        return;
+        break;
+    case DAUTOMATON:
+        if (title) {
+            print_title_box(100, true, stdout, 1, "Automaton");
         }
-        else {
-            view_nfa(ob->aut->obj_nfa);
-        }
+        view_dfa(ob->obj_dfa);
         return;
         break;
     case MORPHISM:

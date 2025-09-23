@@ -207,6 +207,32 @@ int lgraph_nb_edges(lgraph* //<! The graph.
 int dgraph_nb_edges(dgraph* //<! The graph.
 );
 
+/**************/
+/*+ Products +*/
+/**************/
+
+/**
+ * @brief
+ * Computes the direct product of two deterministic directed labeled graphs.
+ *
+ * @remark
+ * The vertex (q1,q2) is is encoded as the integer q1 * g2->size_graph + q2 in the resulting graph.
+ *
+ * @remark
+ * The graphs need not be complete. A undefined edge is represented by the destination value UINT_MAX
+ * in both the input graphs and the resulting graph.
+ *
+ * @attention
+ * The two graphs must have the same alphabet size.
+ *
+ * @return
+ * The resulting graph.
+ */
+dgraph* dgraph_direct_product(dgraph* g1, //!< The first graph.
+    dgraph* g2 //!< The second graph.
+);
+
+
 /***********/
 /* Mirrors */
 /***********/
@@ -430,6 +456,26 @@ dequeue* twin_dgraph_search(graph_stype, //!< The type of search that has to be 
     bool*       //!< An array indexed by the vertices. Used to restrict the list of reachable vertices.
 );
 
+
+/**
+ * @brief
+ * Computes a path from a given strating vertex to all other reachable vertices in a directed unlabeled graph.
+ *
+ * @remark
+ * The paths are computed using a breadth-first search.
+ *
+ * @remark
+ * It is allowed for the input graph to have non-defined edges (in these cases the value `UINT_MAX` is used to represent the non-defined edges).
+ *
+ * @return
+ * A graph containing the back edges of the paths.
+ */
+dgraph* dgraph_paths(dgraph* G, //!< The graph.
+    uint start //!< The starting vertex.
+);
+
+
+
 /********************************/
 /*+ Disjoint merging of graphs +*/
 /********************************/
@@ -584,7 +630,7 @@ graph* dgraph_to_graph_alpha(dgraph*, //!< The labeled graph.
 
 /**
  * @brief
- * Given a labeled graph, a list of vertices in this graph and a label, computed the
+ * Given a labeled graph, a list of vertices in this graph and a label, computes the
  * list of all vertices connected to a vertex in the input list by an edge labeled by
  * the input label.
  *
@@ -595,6 +641,7 @@ dequeue* lgraph_reachable(lgraph*,  //!< The graph.
     dequeue*, //!< The input list of vertices.
     uint       //!< The label.
 );
+
 
 
 

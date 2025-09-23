@@ -61,22 +61,16 @@ dfa* nfa_brzozowski(nfa* A) {
     nfa* B = nfa_mirror(A);
     dfa* C = nfa_determinize(B, false);
     nfa_delete(B);
-    B = dfa_mirror(C);
+    dfa* D = dfa_determinize_mirror(C, false);
     dfa_delete(C);
-    C = nfa_determinize(B, false);
-    nfa_delete(B);
-    return C;
+    return D;
 }
 
 dfa* dfa_brzozowski(dfa* A) {
-    nfa* B = dfa_mirror(A);
-    dfa* C = nfa_determinize(B, false);
-    nfa_delete(B);
-    B = dfa_mirror(C);
+    dfa* C = dfa_determinize_mirror(A, false);
+    dfa* D = dfa_determinize_mirror(C, false);
     dfa_delete(C);
-    C = nfa_determinize(B, false);
-    nfa_delete(B);
-    return C;
+    return D;
 }
 
 
@@ -146,6 +140,9 @@ dfa* dfa_hopcroft_genauto(dfa* D, hopcroft_partition* p) {
         return NULL;
     }
 
+
+
+
     //Computation of the final states
     bool* finals;
     uint nb_finals = 0;
@@ -207,7 +204,10 @@ void dfa_hopcroft_free(hopcroft_partition* p) {
 } */
 
 
+
+
 dfa* dfa_hopcroft(dfa* A) {
+
     if (!A) {
         return NULL;
     }
@@ -239,8 +239,13 @@ dfa* dfa_hopcroft(dfa* A) {
     // On sait maintenant que l'ensemble des états finaux est non-trivial.
     // Calcul de la partition initiale
     hopcroft_partition* p = dfa_hopcroft_initial(A->trans->size_graph, A->finals, A->nb_finals);
+
     // Calcul du miroir de l'automate (utile pour l'algorithme)
-    nfa* MA = dfa_mirror(A);
+    dfa_mirror_info mirror;
+    dfa_get_mirror_info(A, &mirror);
+
+
+    //nfa* MA = dfa_mirror(A);
 
     // Création de la pile des classes à traiter (on empile la plus petite des deux)
     dequeue_gen* thestack = create_dequeue_gen();
@@ -250,7 +255,6 @@ dfa* dfa_hopcroft(dfa* A) {
     else {
         rigins_dequeue_gen(dfa_create_hopcroft_candidate(p->parray, p->lindex[1], p->rindex[1]), thestack);
     }
-
     // Création d'une table temporaire des indices droits
     uint* rtemp;
     MALLOC(rtemp, p->size_set);
@@ -270,11 +274,11 @@ dfa* dfa_hopcroft(dfa* A) {
             dequeue* visited = create_dequeue();
             // Pour chaque antécédent r de la classe c par la lettre a (c'est ici que set le miroir)
             for (uint i = 0; i < size_dequeue(cand);i++) {
-                for (uint j = 0; j < size_dequeue(MA->trans->edges[lefread_dequeue(cand, i)][a]);j++) {
-
+                uint k = lefread_dequeue(cand, i) * A->trans->size_alpha + a;
+                for (uint j = mirror.st_edges[k]; j < mirror.ed_edges[k];j++) {
 
                     // L'antécédent
-                    uint r = lefread_dequeue(MA->trans->edges[lefread_dequeue(cand, i)][a], j);
+                    uint r = mirror.edges[j];
 
 
                     // La classe de r
@@ -298,6 +302,36 @@ dfa* dfa_hopcroft(dfa* A) {
                     // On décrémente le marqueur de fin de la classe
                     rtemp[cr]--;
                 }
+
+
+                // for (uint j = 0; j < size_dequeue(MA->trans->edges[lefread_dequeue(cand, i)][a]);j++) {
+
+
+                //     // L'antécédent
+                //     uint r = lefread_dequeue(MA->trans->edges[lefread_dequeue(cand, i)][a], j);
+
+
+                //     // La classe de r
+                //     uint cr = p->classes[r];
+
+
+                //     // Si on n'a pas encore traité la classe cr, on la marque comme visitée 
+                //     if (rtemp[cr] == p->rindex[cr]) {
+                //         rigins_dequeue(cr, visited);
+                //     }
+
+                //     // On swap r avec l'élément à la fin du tableau des éléments
+                //     uint q = p->parray[rtemp[cr] - 1];
+
+                //     p->parray[p->parray_i[r]] = q;
+                //     p->parray_i[q] = p->parray_i[r];
+
+                //     p->parray[rtemp[cr] - 1] = r;
+                //     p->parray_i[r] = rtemp[cr] - 1;
+
+                //     // On décrémente le marqueur de fin de la classe
+                //     rtemp[cr]--;
+                // }
             }
 
 
@@ -345,10 +379,21 @@ dfa* dfa_hopcroft(dfa* A) {
     free(rtemp);
     delete_dequeue_gen(thestack);
 
-    dfa* MINI = dfa_hopcroft_genauto(A, p);
+    dfa* MINI;
+    if (p->size_par == A->trans->size_graph) {
+        MINI = A;
+    }
+    else {
+        MINI = dfa_hopcroft_genauto(A, p);
+        dfa_delete(A);
+    }
 
-    dfa_delete(A);
-    nfa_delete(MA);
+
+
+    free(mirror.ed_edges);
+    free(mirror.edges);
+    free(mirror.st_edges);
+    //nfa_delete(MA);
     dfa_hopcroft_free(p);
     return MINI;
 }
@@ -358,19 +403,16 @@ dfa* dfa_hopcroft(dfa* A) {
 /** Canonical ordering **/
 /************************/
 
-bool** dfa_mini_canonical_ordering(dfa* A) {
-    if (!A) {
-        return NULL;
+void dfa_mini_canonical_ordering(dfa* A) {
+    if (!A || A->order) {
+        return;
     }
 
-
     uint thesize = A->trans->size_graph;
-
     // Array that marks the visited pairs.
-    bool** visited;
-    MALLOC(visited, thesize);
+    MALLOC(A->order, thesize);
     for (uint i = 0; i < thesize; i++) {
-        CALLOC(visited[i], thesize);
+        CALLOC(A->order[i], thesize);
     }
 
     // Stacks for the DFS which computes all pairs incomparable of states
@@ -407,12 +449,12 @@ bool** dfa_mini_canonical_ordering(dfa* A) {
         uint r = rigpull_dequeue(stack_two);
 
         // We skip the pair if it has already been visited.
-        if (visited[q][r]) {
+        if (A->order[q][r]) {
             continue;
         }
 
         // We mark the pair as visited.
-        visited[q][r] = true;
+        A->order[q][r] = true;
 
 
         // We push all pairs from which we can reach (q, r) in either the left or right Cayley graph
@@ -430,7 +472,7 @@ bool** dfa_mini_canonical_ordering(dfa* A) {
     // We may now inverse the visted array to get the canonical order.
     for (uint q = 0; q < thesize; q++) {
         for (uint r = 0; r < thesize; r++) {
-            visited[q][r] = !visited[q][r];
+            A->order[q][r] = !A->order[q][r];
         }
     }
 
@@ -438,5 +480,6 @@ bool** dfa_mini_canonical_ordering(dfa* A) {
     delete_dequeue(stack_one);
     delete_dequeue(stack_two);
     delete_lgraph(mirror);
-    return visited;
 }
+
+

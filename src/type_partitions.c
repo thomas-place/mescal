@@ -194,6 +194,18 @@ parti* restrict_parti_subset(parti* P, uint size, bool* insub, uint* tosub, uint
     return create_parti(size, num, newnumcl);
 }
 
+uint* parti_compute_inv(parti* P)
+{
+    uint* inv;
+    MALLOC(inv, P->size_set);
+    for (uint c = 0; c < P->size_par; c++) {
+        for (uint j = 0; j < P->cl_size[c]; j++) {
+            inv[P->cl_elems[c][j]] = j; // The index of the element in its class
+        }
+    }
+    return inv;
+}
+
 
 /**************/
 /* Union-Find */

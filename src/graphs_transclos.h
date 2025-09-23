@@ -86,11 +86,14 @@ graph* compute_tclos_dag(graph*, //!< A directed acyclic graph.
 /* Functions for arbitrary graphs */
 /**********************************/
 
-/**
- * @brief
- * Makes the transitive closure of the input graph.
- */
-void make_tclos_graph(graph* //!< An arbitrary graph.
-);
+
+
+
+// /**
+//  * @brief
+//  * Makes the transitive closure of the input graph.
+//  */
+// void make_tclos_graph(graph* //!< An arbitrary graph.
+// );
 
 #endif

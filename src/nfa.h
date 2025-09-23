@@ -26,6 +26,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
+
 /**
  * @brief
  * Type used to represent a NFA.
@@ -66,6 +68,7 @@ typedef struct {
 
     /* Optional */
     char** state_names; //!< Array of state names (only utilized when displaying the DFA). Each state is mapped to its name (NULL if unused).
+    bool** order; //!< The canonical order of the states (NULL if not used). The order is defined by the indices of the states in the DFA.
 } dfa;
 
 /*****************/
@@ -395,6 +398,11 @@ dfa* dfa_trim(dfa* A //!< The DFA.
  * initial state and co-reachable from a final state. Overwrites the input NFA.
  */
 void nfa_trim_mod(nfa* //!< The NFA.
+);
+
+
+dfa* dfa_direct_product(dfa* A, //!< The first DFA.
+    dfa* B //!< The second DFA.
 );
 
 /***********************************/

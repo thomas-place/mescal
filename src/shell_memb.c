@@ -5,7 +5,10 @@
 #include "shell_morprops.h"
 #include "type_hash.h"
 
-bool (*class_membership[CL_END])(int, FILE*) = { NULL };
+membership_mode memb_mode = MEMB_MINIMAL;
+
+
+bool (*class_membership[CL_END])(int, membership_mode, FILE*) = { NULL };
 
 void init_membership(void) {
     class_membership[CL_HTGEN] = shell_membership_htgen;
@@ -60,6 +63,8 @@ void init_membership(void) {
     class_membership[CL_JORBDD] = shell_membership_jorbdd;
     class_membership[CL_JORBAT] = shell_membership_jorbat;
 
+    class_membership[CL_KNASTAMTP] = shell_membership_knastamtp;
+    class_membership[CL_KNASTGRP] = shell_membership_knastgrp;
     class_membership[CL_KNASTAT] = shell_membership_knastat;
 
     // Unambiguous Polynomial closure
@@ -145,6 +150,7 @@ void init_membership(void) {
     class_membership[CL_GR] = shell_membership_gr;
     class_membership[CL_GRP] = shell_membership_grp;
     class_membership[CL_REG] = shell_membership_reg;
+    class_membership[CL_EMPTY] = shell_membership_empty;
 }
 
 bool shell_membership_needs_order(classes cl) {
@@ -187,577 +193,2247 @@ bool shell_membership_needs_order(classes cl) {
 /* General functions */
 /*********************/
 
-bool shell_membership_reg(int, FILE*) { return true; }
+bool shell_membership_reg(int, membership_mode, FILE*) { return true; }
 
-bool shell_membership_htgen(int j, FILE* out) { return shell_morprop_htgentriv(j, "syntactic monoid", out); }
+bool shell_membership_empty(int, membership_mode, FILE*) { return false; }
+
+
+bool shell_membership_htgen(int j, membership_mode, FILE* out) { return shell_morprop_htgentriv(j, "syntactic monoid", out); }
 
 /*****************/
 /* Group classes */
 /*****************/
 
-bool shell_membership_st(int j, FILE* out) {
-    if (objects[j]->type == MORPHISM) {
-        return shell_morprop_monotriv(shell_compute_syntac(j, false), "syntactic monoid", out);
-    }
-    else {
-        int error = 0;
-        return shell_autoprop_trivial(shell_compute_minimal(j), "minimal automaton", &error, out);
-    }
-}
-
-bool shell_membership_dd(int j, FILE* out) { return shell_morprop_semitriv(shell_compute_syntac(j, false), "syntactic semigroup", out); }
-
-bool shell_membership_mod(int j, FILE* out) {
-    return shell_morprop_letterind(shell_compute_syntac(j, false), "syntactic morphism", out) && shell_morprop_monogroup(shell_compute_syntac(j, false), "syntactic monoid", out);
-}
-
-bool shell_membership_modp(int j, FILE* out) {
-    return shell_morprop_letterind(shell_compute_syntac(j, false), "syntactic morphism", out) && shell_morprop_semigroup(shell_compute_syntac(j, false), "syntactic semigroup", out);
-}
-
-bool shell_membership_amt(int j, FILE* out) {
-    return shell_morprop_monocom(shell_compute_syntac(j, false), "syntactic monoid", out) && shell_morprop_monogroup(shell_compute_syntac(j, false), "syntactic monoid", out);
-}
-
-bool shell_membership_amtp(int j, FILE* out) {
-    return shell_morprop_monocom(shell_compute_syntac(j, false), "syntactic semigroup", out) && shell_morprop_semigroup(shell_compute_syntac(j, false), "syntactic semigroup", out);
-}
-
-bool shell_membership_gr(int j, FILE* out) {
+bool shell_membership_st(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM) {
-        return shell_autoprop_permut(shell_compute_minimal(j), "minimal automaton", &error, out);
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        out = NULL;
+        // fall through
+    case MEMB_OPTIMAL:
+        return shell_autoprop_trivial(shell_compute_minimal(j), "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_monotriv(shell_compute_syntac(j, false), "syntactic monoid", out);
+        break;
+    default:
+        return false;
+        break;
     }
-    return shell_morprop_monogroup(shell_compute_syntac(j, false), "syntactic monoid", out);
 }
 
-bool shell_membership_grp(int j, FILE* out) {
-    return shell_morprop_semigroup(shell_compute_syntac(j, false), "syntactic semigroup", out);
-    return true;
+bool shell_membership_dd(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        out = NULL;
+        // fall through
+    case MEMB_OPTIMAL:
+        return shell_autoprop_ddtrivial(shell_compute_minimal(j), "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_semitriv(shell_compute_syntac(j, false), "syntactic semigroup", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+}
+
+bool shell_membership_mod(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        out = NULL;
+        // fall through
+    case MEMB_OPTIMAL:
+        return shell_autoprop_letterind(shell_compute_minimal(j), "minimal automaton", &error, out) && shell_autoprop_permut(shell_compute_minimal(j), "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_letterind(shell_compute_syntac(j, false), "syntactic morphism", out) && shell_morprop_monogroup(shell_compute_syntac(j, false), "syntactic monoid", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+}
+
+bool shell_membership_modp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        out = NULL;
+        // fall through
+    case MEMB_OPTIMAL:
+        return shell_autoprop_letterind(shell_compute_minimal(j), "minimal automaton", &error, out) && shell_autoprop_permutplus(shell_compute_minimal(j), "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_letterind(shell_compute_syntac(j, false), "syntactic morphism", out) && shell_morprop_semigroup(shell_compute_syntac(j, false), "syntactic semigroup", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+
+}
+
+bool shell_membership_amt(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        out = NULL;
+        // fall through
+    case MEMB_OPTIMAL:
+        return shell_autoprop_commut(shell_compute_minimal(j), "minimal automaton", &error, out) && shell_autoprop_permut(shell_compute_minimal(j), "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_monocom(shell_compute_syntac(j, false), "syntactic morphism", out) && shell_morprop_monogroup(shell_compute_syntac(j, false), "syntactic monoid", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+}
+
+bool shell_membership_amtp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        out = NULL;
+        // fall through
+    case MEMB_OPTIMAL:
+        return shell_autoprop_commut(shell_compute_minimal(j), "minimal automaton", &error, out) && shell_autoprop_permutplus(shell_compute_minimal(j), "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_monocom(shell_compute_syntac(j, false), "syntactic morphism", out) && shell_morprop_semigroup(shell_compute_syntac(j, false), "syntactic semigroup", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+}
+
+bool shell_membership_gr(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        out = NULL;
+        // fall through
+    case MEMB_OPTIMAL:
+        return shell_autoprop_permut(shell_compute_minimal(j), "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_monogroup(shell_compute_syntac(j, false), "syntactic monoid", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+}
+
+bool shell_membership_grp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through
+    case MEMB_MINIMAL:
+        return shell_autoprop_permutplus(shell_compute_minimal(j), "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_semigroup(shell_compute_syntac(j, false), "syntactic semigroup", out);
+        break;
+    default:
+        return false;
+        break;
+    }
 }
 
 /*****************/
 /* AT-ATT-LT-LTT */
 /*****************/
 
-bool shell_membership_at(int j, FILE* out) {
-    return shell_morprop_monocom(shell_compute_syntac(j, false), "syntactic monoid", out) && shell_morprop_monoidem(shell_compute_syntac(j, false), "syntactic monoid", out);
+bool shell_membership_at(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        out = NULL;
+        // fall through
+    case MEMB_OPTIMAL:
+        return shell_autoprop_commut(shell_compute_minimal(j), "minimal automaton", &error, out) && shell_autoprop_alphaidem(shell_compute_minimal(j), "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_monocom(shell_compute_syntac(j, false), "syntactic monoid", out) && shell_morprop_monoidem(shell_compute_syntac(j, false), "syntactic monoid", out);
+        break;
+    default:
+        return false;
+        break;
+    }
 }
 
-bool shell_membership_att(int j, FILE* out) {
-    return shell_morprop_monocom(shell_compute_syntac(j, false), "syntactic monoid", out) && shell_morprop_monogreen(shell_compute_syntac(j, false), H_GREEN, "syntactic monoid", out);
+bool shell_membership_att(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        out = NULL;
+        // fall through
+    case MEMB_OPTIMAL:
+        return shell_autoprop_commut(shell_compute_minimal(j), "minimal automaton", &error, out) && shell_autoprop_rtrivialgp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_monocom(shell_compute_syntac(j, false), "syntactic monoid", out) && shell_morprop_monogreen(shell_compute_syntac(j, false), H_GREEN, "syntactic monoid", out);
+        break;
+    default:
+        return false;
+        break;
+    }
 }
 
-bool shell_membership_lt(int j, FILE* out) {
-    return shell_morprop_orbcom(shell_compute_syntac(j, false), ORB_DD, "DD", "syntactic morphism", out) &&
-        shell_morprop_orbidem(shell_compute_syntac(j, false), ORB_DD, "DD", "syntactic morphism", out);
+bool shell_membership_lt(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        return shell_autoprop_rtrivialgpplus(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out) && shell_autoprop_ddidem(shell_compute_minimal(j), "minimal automaton", &error, out) && shell_morprop_orbcom(shell_compute_syntac(j, false), ORB_DD, "DD", "syntactic morphism", out);
+        break;
+    case MEMB_MINIMAL:
+        return shell_autoprop_ddidem(shell_compute_minimal(j), "minimal automaton", &error, out) && shell_autoprop_ddcomm(shell_compute_minimal(j), "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbcom(shell_compute_syntac(j, false), ORB_DD, "DD", "syntactic morphism", out) && shell_morprop_orbidem(shell_compute_syntac(j, false), ORB_DD, "DD", "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
 }
 
-bool shell_membership_ltt(int j, FILE* out) {
-    return shell_morprop_monogreen(shell_compute_syntac(j, false), H_GREEN, "syntactic semigroup", out) && shell_morprop_semigencom(shell_compute_syntac(j, false), "syntactic semigroup", out);
+bool shell_membership_ltt(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        return shell_autoprop_rtrivialgpplus(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out) && shell_morprop_semigencom(shell_compute_syntac(j, false), "syntactic semigroup", out);
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialgpplus(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out) && shell_autoprop_lttcomm(shell_compute_minimal(j), "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_monogreen(shell_compute_syntac(j, false), H_GREEN, "syntactic semigroup", out) && shell_morprop_semigencom(shell_compute_syntac(j, false), "syntactic semigroup", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+
 }
 
 /*********************/
 /* Star-free closure */
 /*********************/
 
-bool shell_membership_sf(int j, FILE* out) {
+bool shell_membership_sf(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM && !shell_autoprop_nosimplecounter(shell_compute_minimal(j), "minimal automaton", &error, out)) {
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        return shell_autoprop_nosimplecounter(shell_compute_minimal(j), "minimal automaton", &error, out) && shell_morprop_monogreen(shell_compute_syntac(j, false), H_GREEN, "syntactic monoid", out);
+        break;
+    case MEMB_MINIMAL:
+        return shell_autoprop_cfreegp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_monogreen(shell_compute_syntac(j, false), H_GREEN, "syntactic monoid", out);
+        break;
+    default:
         return false;
+        break;
     }
-    return shell_morprop_monogreen(shell_compute_syntac(j, false), H_GREEN, "syntactic monoid", out);
 }
 
-bool shell_membership_sfmod(int j, FILE* out) { return shell_morprop_kergreen(shell_compute_syntac(j, false), H_GREEN, KER_MOD, "MOD", "syntactic monoid", out); }
+bool shell_membership_sfmod(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        return shell_autoprop_cfreegp(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through  
+    case MEMB_SYNTAC:
+        return shell_morprop_kergreen(shell_compute_syntac(j, false), H_GREEN, KER_MOD, "MOD", "syntactic monoid", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+}
 
-bool shell_membership_sfamt(int j, FILE* out) { return shell_morprop_kergreen(shell_compute_syntac(j, false), H_GREEN, KER_AMT, "AMT", "syntactic monoid", out); }
+bool shell_membership_sfamt(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        return shell_autoprop_cfreegp(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out);
+        break;
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through 
+    case MEMB_SYNTAC:
+        return shell_morprop_kergreen(shell_compute_syntac(j, false), H_GREEN, KER_AMT, "AMT", "syntactic monoid", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+}
 
-bool shell_membership_sfgr(int j, FILE* out) { return shell_morprop_kergreen(shell_compute_syntac(j, false), H_GREEN, KER_GR, "GR", "syntactic monoid", out); }
+bool shell_membership_sfgr(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        return shell_autoprop_cfreegp(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_SYNTAC:
+        return shell_morprop_kergreen(shell_compute_syntac(j, false), H_GREEN, KER_GR, "GR", "syntactic monoid", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+}
 
 /**********************/
 /* Polynomial closure */
 /**********************/
 
-bool shell_membership_ppt(int j, FILE* out) { return shell_morprop_monojsat(shell_compute_syntac(j, true), "syntactic monoid", out); }
+bool shell_membership_ppt(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_MINIMAL:
+        return shell_autoprop_polgp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_monojsat(shell_compute_syntac(j, true), "syntactic monoid", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+}
 
-bool shell_membership_polmod(int j, FILE* out) { return shell_morprop_kerjsat(shell_compute_syntac(j, true), KER_MOD, "MOD", "syntactic morphism", out); }
+bool shell_membership_polmod(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        return shell_autoprop_polgp(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_SYNTAC:
+        return shell_morprop_kerjsat(shell_compute_syntac(j, true), KER_MOD, "MOD", "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+}
 
-bool shell_membership_polgr(int j, FILE* out) { return shell_morprop_monoejsat(shell_compute_syntac(j, true), "syntactic monoid", out); }
+bool shell_membership_polgr(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through    
+    case MEMB_MINIMAL:
+        return shell_autoprop_polgp(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_monoejsat(shell_compute_syntac(j, true), "syntactic monoid", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+}
 
-bool shell_membership_poldd(int j, FILE* out) { return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_DD, "DD", "syntactic morphism", out); }
+bool shell_membership_poldd(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through    
+    case MEMB_MINIMAL:
+        return shell_autoprop_polgpplus(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_DD, "DD", "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+}
 
-bool shell_membership_polmodp(int j, FILE* out) { return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_MODP, "MOD⁺", "syntactic morphism", out); }
+bool shell_membership_polmodp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        return shell_autoprop_polgpplus(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through    
+    case MEMB_SYNTAC:
+        return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_MODP, "MOD⁺", "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+}
 
-bool shell_membership_polgrp(int j, FILE* out) { return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_GRP, "GR⁺", "syntactic morphism", out); }
+bool shell_membership_polgrp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        return shell_autoprop_polgpplus(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through    
+    case MEMB_SYNTAC:
+        return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_GRP, "GR⁺", "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+}
 
-bool shell_membership_pol2st(int j, FILE* out) { return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_PT, "PT", "syntactic morphism", out); }
+bool shell_membership_pol2st(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through    
+    case MEMB_MINIMAL:
+        return shell_autoprop_pol2gp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_PT, "PT", "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+}
 
-bool shell_membership_pol2mod(int j, FILE* out) { return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_BPMOD, "BPol(MOD)", "syntactic morphism", out); }
+bool shell_membership_pol2mod(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_MINIMAL:
+        return shell_autoprop_pol2gp(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_BPMOD, "BPol(MOD)", "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+}
 
-bool shell_membership_pol2amt(int j, FILE* out) { return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_BPAMT, "BPol(AMT)", "syntactic morphism", out); }
+bool shell_membership_pol2amt(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_MINIMAL:
+        return shell_autoprop_pol2gp(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_BPAMT, "BPol(AMT)", "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+}
 
-bool shell_membership_pol2gr(int j, FILE* out) { return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_BPGR, "BPol(GR)", "syntactic morphism", out); }
+bool shell_membership_pol2gr(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_MINIMAL:
+        return shell_autoprop_pol2gp(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_BPGR, "BPol(GR)", "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+}
 
-bool shell_membership_pol2dd(int j, FILE* out) { return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_BPDD, "BPol(DD)", "syntactic morphism", out); }
+bool shell_membership_pol2dd(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through  
+    case MEMB_MINIMAL:
+        return shell_autoprop_pol2gpplus(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_BPDD, "BPol(DD)", "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+}
 
-bool shell_membership_pol2modp(int j, FILE* out) { return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_BPMODP, "BPol(MOD⁺)", "syntactic morphism", out); }
+bool shell_membership_pol2modp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through  
+    case MEMB_MINIMAL:
+        return shell_autoprop_pol2gpplus(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_BPMODP, "BPol(MOD⁺)", "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+}
 
-bool shell_membership_pol2amtp(int j, FILE* out) { return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_BPAMTP, "BPol(AMT⁺)", "syntactic morphism", out); }
+bool shell_membership_pol2amtp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through    
+    case MEMB_MINIMAL:
+        return shell_autoprop_pol2gpplus(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_BPAMTP, "BPol(AMT⁺)", "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+}
 
-bool shell_membership_pol2grp(int j, FILE* out) { return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_BPGRP, "BPol(GR⁺)", "syntactic morphism", out); }
+bool shell_membership_pol2grp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        return shell_autoprop_pol2gpplus(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through    
+    case MEMB_SYNTAC:
+        return shell_morprop_orbjsat(shell_compute_syntac(j, true), ORB_BPGRP, "BPol(GR⁺)", "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+}
 
 /******************************/
 /* Boolean polynomial closure */
 /******************************/
 
-bool shell_membership_pt(int j, FILE* out) {
+bool shell_membership_pt(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM && !shell_autoprop_cyclet(shell_compute_minimal(j), "minimal automaton", &error, out)) {
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        if (objects[j].type == DAUTOMATON) {
+            return shell_autoprop_ltrivialgp_opti(j, BA_ST, &error) &&
+                shell_autoprop_rtrivialgp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, NULL);
+        }
+        else {
+            return shell_autoprop_ltrivialgp_opti(shell_compute_minimal(j), BA_ST, &error) &&
+                shell_autoprop_rtrivialgp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, NULL);
+        }
+        //return shell_autoprop_piecewise(shell_compute_minimal(j), &error);
+        break;
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialgp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out) &&
+            shell_autoprop_ltrivialgp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_monogreen(shell_compute_syntac(j, false), J_GREEN, "syntactic monoid", out);
+        break;
+    default:
         return false;
+        break;
     }
-    return shell_morprop_monogreen(shell_compute_syntac(j, false), J_GREEN, "syntactic monoid", out);
+    return false;
 }
 
-bool shell_membership_bpolmod(int j, FILE* out) {
+bool shell_membership_bpolmod(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM && !shell_autoprop_cycletgp(shell_compute_minimal(j), DFAGP_MOD, "minimal automaton", &error, out)) {
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        return shell_autoprop_rtrivialgp(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, NULL) &&
+            shell_autoprop_bpolmod(shell_compute_minimal(j), "minimal automaton", &error, NULL);
+        break;
+    case MEMB_MINIMAL:
+        return shell_autoprop_bpolmod(shell_compute_minimal(j), "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_bpgroupeq(shell_compute_syntac(j, false), KER_MOD, "MOD", "syntactic morphism", out);
+        break;
+    default:
         return false;
+        break;
     }
-    return shell_morprop_bpgroupeq(shell_compute_syntac(j, false), KER_MOD, "MOD", "syntactic morphism", out);
+    return false;
 }
 
-bool shell_membership_bpolamt(int j, FILE* out) {
+bool shell_membership_bpolamt(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM && !shell_autoprop_cycletgp(shell_compute_minimal(j), DFAGP_AMT, "minimal automaton", &error, out)) {
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        return shell_autoprop_rtrivialgp(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, NULL) &&
+            shell_autoprop_bpolamt(shell_compute_minimal(j), "minimal automaton", &error, NULL);
+        break;
+    case MEMB_MINIMAL:
+        return shell_autoprop_bpolamt(shell_compute_minimal(j), "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_bpgroupeq(shell_compute_syntac(j, false), KER_AMT, "AMT", "syntactic morphism", out);
+        break;
+    default:
         return false;
+        break;
     }
-    return shell_morprop_bpgroupeq(shell_compute_syntac(j, false), KER_AMT, "AMT", "syntactic morphism", out);
+    return false;
 }
 
-bool shell_membership_bpolgr(int j, FILE* out) {
+bool shell_membership_bpolgr(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM && !shell_autoprop_cycletgp(shell_compute_minimal(j), DFAGP_GR, "minimal automaton", &error, out)) {
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        return shell_autoprop_rtrivialgp(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, NULL) &&
+            shell_autoprop_ltrivialgp_opti(shell_compute_minimal(j), BA_GR, &error);
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialgp(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out) &&
+            shell_autoprop_ltrivialgp(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_blockg(shell_compute_syntac(j, false), "syntactic monoid", out);
+        break;
+    default:
         return false;
+        break;
     }
-    return shell_morprop_blockg(shell_compute_syntac(j, false), "syntactic monoid", out);
+    return false;
 }
 
-bool shell_membership_bpoldd(int j, FILE* out) {
+bool shell_membership_bpoldd(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM && !shell_autoprop_cycletplus(shell_compute_minimal(j), "minimal automaton", &error, out)) {
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        return shell_autoprop_rtrivialgpplus(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, NULL) &&
+            shell_autoprop_knastgpplus(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, NULL);
+        break;
+    case MEMB_MINIMAL:
+        return shell_autoprop_knastgpplus(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_mprop_semiknast(shell_compute_syntac(j, false), "syntactic semigroup", out);
+        break;
+    default:
         return false;
+        break;
     }
-    return shell_mprop_semiknast(shell_compute_syntac(j, false), "syntactic semigroup", out);
+    return false;
 }
 
-bool shell_membership_bpolmodp(int j, FILE* out) {
+bool shell_membership_bpolmodp(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM && !shell_autoprop_cycletplusgp(shell_compute_minimal(j), DFAGP_MOD, "minimal automaton", &error, out)) {
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        return shell_autoprop_rtrivialgpplus(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, NULL) &&
+            shell_autoprop_knastgpplus(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, NULL);
+        break;
+    case MEMB_MINIMAL:
+        return shell_autoprop_knastgpplus(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_kerknast(shell_compute_syntac(j, false), KER_MOD, "MOD", "syntactic morphism", out);
+        break;
+    default:
         return false;
+        break;
     }
-    return shell_morprop_kerknast(shell_compute_syntac(j, false), KER_MOD, "MOD", "syntactic morphism", out);
+    return false;
 }
 
-bool shell_membership_bpolamtp(int j, FILE* out) {
+bool shell_membership_bpolamtp(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM && !shell_autoprop_cycletplusgp(shell_compute_minimal(j), DFAGP_AMT, "minimal automaton", &error, out)) {
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        return shell_autoprop_rtrivialgpplus(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, NULL) &&
+            shell_autoprop_bpolamtplus(shell_compute_minimal(j), "minimal automaton", &error, NULL);
+        break;
+    case MEMB_MINIMAL:
+        return shell_autoprop_bpolamtplus(shell_compute_minimal(j), "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_bpgroupeqplus(shell_compute_syntac(j, false), ORB_AMTP, "AMT", "syntactic morphism", out);
+        break;
+    default:
         return false;
+        break;
     }
-    return shell_morprop_bpgroupeqplus(shell_compute_syntac(j, false), ORB_AMTP, "AMT", "syntactic morphism", out);
+    return false;
 }
 
-bool shell_membership_bpolgrp(int j, FILE* out) {
+bool shell_membership_bpolgrp(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM && !shell_autoprop_cycletplusgp(shell_compute_minimal(j), DFAGP_GR, "minimal automaton", &error, out)) {
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        return shell_autoprop_rtrivialgpplus(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, NULL) &&
+            shell_autoprop_bpolgrplus(shell_compute_minimal(j), "minimal automaton", &error, NULL);
+        break;
+    case MEMB_MINIMAL:
+        return shell_autoprop_bpolgrplus(shell_compute_minimal(j), "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_bpgroupeqplus(shell_compute_syntac(j, false), ORB_GRP, "GR", "syntactic morphism", out);
+        break;
+    default:
         return false;
+        break;
     }
-    return shell_morprop_bpgroupeqplus(shell_compute_syntac(j, false), ORB_GRP, "GR", "syntactic morphism", out);
+    return false;
 }
 
-bool shell_membership_bpol2st(int j, FILE* out) {
+bool shell_membership_bpol2st(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM && !shell_autoprop_cycletbp(shell_compute_minimal(j), "minimal automaton", &error, out)) {
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        return shell_autoprop_rtrivialbpgp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, NULL) &&
+            shell_autoprop_upolbp2gp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, NULL) &&
+            shell_autoprop_knastat(shell_compute_minimal(j), "minimal automaton", &error, out);
+        break;
+    case MEMB_MINIMAL:
+        return shell_autoprop_upolbp2gp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out) &&
+            shell_autoprop_knastat(shell_compute_minimal(j), "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_PT, "PT", "syntactic morphism", out) &&
+            shell_morprop_knastat(shell_compute_syntac(j, false), "syntactic morphism", out);
+        break;
+    default:
         return false;
+        break;
     }
-    return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_PT, "PT", "syntactic morphism", out) && shell_morprop_knastat(shell_compute_syntac(j, false), "syntactic morphism", out);
+    return false;
 }
 
-bool shell_membership_jorbmod(int j, FILE* out) {
+bool shell_membership_jorbmod(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM && !shell_autoprop_cycletgp(shell_compute_minimal(j), DFAGP_MOD, "minimal automaton", &error, out)) {
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        return shell_autoprop_rtrivialgp(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, NULL) &&
+            shell_autoprop_ltrivialgp_opti(shell_compute_minimal(j), BA_MOD, &error);
+        break;
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialgp(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out) &&
+            shell_autoprop_ltrivialgp(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_kergreen(shell_compute_syntac(j, false), J_GREEN, KER_MOD, "MOD", "syntactic monoid", out);
+        break;
+    default:
         return false;
+        break;
     }
-    return shell_morprop_kergreen(shell_compute_syntac(j, false), J_GREEN, KER_MOD, "MOD", "syntactic monoid", out);
+    return false;
 }
 
-bool shell_membership_jorbamt(int j, FILE* out) {
+bool shell_membership_jorbamt(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM && !shell_autoprop_cycletgp(shell_compute_minimal(j), DFAGP_AMT, "minimal automaton", &error, out)) {
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        return shell_autoprop_rtrivialgp(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, NULL) &&
+            shell_autoprop_ltrivialgp_opti(shell_compute_minimal(j), BA_AMT, &error);
+        break;
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialgp(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out) &&
+            shell_autoprop_ltrivialgp(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_kergreen(shell_compute_syntac(j, false), J_GREEN, KER_AMT, "AMT", "syntactic monoid", out);
+        break;
+    default:
         return false;
+        break;
     }
-    return shell_morprop_kergreen(shell_compute_syntac(j, false), J_GREEN, KER_AMT, "AMT", "syntactic monoid", out);
 }
 
-bool shell_membership_jorbmodp(int j, FILE* out) {
+bool shell_membership_jorbmodp(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM && !shell_autoprop_cycletplusgp(shell_compute_minimal(j), DFAGP_MOD, "minimal automaton", &error, out)) {
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        return shell_autoprop_rtrivialgpplus(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, NULL) &&
+            shell_autoprop_ltrivialgpplus_opti(shell_compute_minimal(j), BA_MOD, &error);
+        break;
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialgpplus(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out) &&
+            shell_autoprop_ltrivialgpplus(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbgreen(shell_compute_syntac(j, false), J_GREEN, ORB_MODP, "MOD⁺", "syntactic morphism", out);
+        break;
+    default:
         return false;
+        break;
     }
-    return shell_morprop_orbgreen(shell_compute_syntac(j, false), J_GREEN, ORB_MODP, "MOD⁺", "syntactic morphism", out);
+    return false;
 }
 
-bool shell_membership_jorbamtp(int j, FILE* out) {
+bool shell_membership_jorbamtp(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM && !shell_autoprop_cycletplusgp(shell_compute_minimal(j), DFAGP_AMT, "minimal automaton", &error, out)) {
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        return shell_autoprop_rtrivialgpplus(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, NULL) &&
+            shell_autoprop_ltrivialgpplus_opti(shell_compute_minimal(j), BA_AMT, &error);
+        break;
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialgpplus(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out) &&
+            shell_autoprop_ltrivialgpplus(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbgreen(shell_compute_syntac(j, false), J_GREEN, ORB_AMTP, "AMT⁺", "syntactic morphism", out);
+        break;
+    default:
         return false;
+        break;
     }
-    return shell_morprop_orbgreen(shell_compute_syntac(j, false), J_GREEN, ORB_AMTP, "AMT⁺", "syntactic morphism", out);
+    return false;
 }
 
-bool shell_membership_jorbgrp(int j, FILE* out) {
+bool shell_membership_jorbgrp(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM && !shell_autoprop_cycletplusgp(shell_compute_minimal(j), DFAGP_GR, "minimal automaton", &error, out)) {
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        return shell_autoprop_rtrivialgpplus(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, NULL) &&
+            shell_autoprop_ltrivialgpplus_opti(shell_compute_minimal(j), BA_GR, &error);
+        break;
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialgpplus(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out) &&
+            shell_autoprop_ltrivialgpplus(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbgreen(shell_compute_syntac(j, false), J_GREEN, ORB_GRP, "GR⁺", "syntactic morphism", out);
+        break;
+    default:
         return false;
+        break;
     }
-    return shell_morprop_orbgreen(shell_compute_syntac(j, false), J_GREEN, ORB_GRP, "GR⁺", "syntactic morphism", out);
+    return false;
 }
 
-bool shell_membership_jorbdd(int j, FILE* out) {
+bool shell_membership_jorbdd(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM && !shell_autoprop_cycletplus(shell_compute_minimal(j), "minimal automaton", &error, out)) {
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        return shell_autoprop_rtrivialgpplus(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, NULL) &&
+            shell_autoprop_ltrivialgpplus_opti(shell_compute_minimal(j), BA_ST, &error);
+        break;
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialgpplus(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out) &&
+            shell_autoprop_ltrivialgpplus(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbgreen(shell_compute_syntac(j, false), J_GREEN, ORB_DD, "DD", "syntactic morphism", out);
+        break;
+    default:
         return false;
+        break;
     }
-    return shell_morprop_orbgreen(shell_compute_syntac(j, false), J_GREEN, ORB_DD, "DD", "syntactic morphism", out);
+    return false;
 }
 
-bool shell_membership_jorbat(int j, FILE* out) {
+bool shell_membership_jorbat(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM && !shell_autoprop_cycletbp(shell_compute_minimal(j), "minimal automaton", &error, out)) {
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        return shell_autoprop_rtrivialbpgp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, NULL) &&
+            shell_autoprop_ltrivialbpgp_opti(shell_compute_minimal(j), BA_ST, &error);
+        break;
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialbpgp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out) &&
+            shell_autoprop_ltrivialbpgp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbgreen(shell_compute_syntac(j, false), J_GREEN, ORB_PT, "PT", "syntactic morphism", out);
+        break;
+    default:
         return false;
+        break;
     }
-    return shell_morprop_orbgreen(shell_compute_syntac(j, false), J_GREEN, ORB_PT, "PT", "syntactic morphism", out);
+    return false;
 }
 
-bool shell_membership_knastat(int j, FILE* out) {
+
+bool shell_membership_knastamtp(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM && !shell_autoprop_cycletbp(shell_compute_minimal(j), "minimal automaton", &error, out)) {
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        return shell_autoprop_rtrivialgpplus(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, NULL) &&
+            shell_autoprop_knastgpplus(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, NULL);
+        break;
+    case MEMB_MINIMAL:
+        return shell_autoprop_knastgpplus(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_kerknast(shell_compute_syntac(j, false), KER_AMT, "AMT", "syntactic morphism", out);
+        break;
+    default:
         return false;
+        break;
     }
-    return shell_morprop_knastat(shell_compute_syntac(j, false), "syntactic morphism", out);
+    return false;
+}
+
+
+
+bool shell_membership_knastgrp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        return shell_autoprop_rtrivialgpplus(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, NULL) &&
+            shell_autoprop_knastgpplus(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, NULL);
+        break;
+    case MEMB_MINIMAL:
+        return shell_autoprop_knastgpplus(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_kerknast(shell_compute_syntac(j, false), KER_GR, "GR", "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+    return false;
+}
+
+bool shell_membership_knastat(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        return shell_autoprop_rtrivialbpgp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, NULL) &&
+            shell_autoprop_knastat(shell_compute_minimal(j), "minimal automaton", &error, out);
+        break;
+    case MEMB_MINIMAL:
+        return shell_autoprop_knastat(shell_compute_minimal(j), "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_knastat(shell_compute_syntac(j, false), "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+    return false;
 }
 
 /**********************************/
 /* Unambiguous polynomial closure */
 /**********************************/
 
-bool shell_membership_upoldd(int j, FILE* out) { return shell_morprop_orbtriv(shell_compute_syntac(j, false), ORB_DD, "DD", "syntactic morphism", out); }
-
-bool shell_membership_upolmodp(int j, FILE* out) { return shell_morprop_orbtriv(shell_compute_syntac(j, false), ORB_MODP, "MOD⁺", "syntactic morphism", out); }
-
-bool shell_membership_upolamtp(int j, FILE* out) { return shell_morprop_orbtriv(shell_compute_syntac(j, false), ORB_AMTP, "AMT⁺", "syntactic morphism", out); }
-
-bool shell_membership_upolgrp(int j, FILE* out) { return shell_morprop_orbtriv(shell_compute_syntac(j, false), ORB_GRP, "GR⁺", "syntactic morphism", out); }
-
-bool shell_membership_ubpol2st(int j, FILE* out) {
+bool shell_membership_upoldd(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM && !shell_autoprop_cycletbp(shell_compute_minimal(j), "minimal automaton", &error, out)) {
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through
+    case MEMB_MINIMAL:
+        return shell_autoprop_upolgpplus(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbtriv(shell_compute_syntac(j, false), ORB_DD, "DD", "syntactic morphism", out);
+        break;
+    default:
         return false;
+        break;
     }
-    return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_PT, "PT", "syntactic morphism", out);
+    return false;
 }
 
-bool shell_membership_ubpol2mod(int j, FILE* out) {
+bool shell_membership_upolmodp(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM && !shell_autoprop_cycletbpgp(shell_compute_minimal(j), DFAGP_MOD, "minimal automaton", &error, out)) {
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through
+    case MEMB_MINIMAL:
+        return shell_autoprop_upolgpplus(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbtriv(shell_compute_syntac(j, false), ORB_MODP, "MOD⁺", "syntactic morphism", out);
+        break;
+    default:
         return false;
+        break;
     }
-    return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_BPMOD, "BPol(MOD)-orbit", "syntactic morphism", out);
+    return false;
 }
 
-bool shell_membership_ubpol2amt(int j, FILE* out) {
+bool shell_membership_upolamtp(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM && !shell_autoprop_cycletbpgp(shell_compute_minimal(j), DFAGP_AMT, "minimal automaton", &error, out)) {
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through
+    case MEMB_MINIMAL:
+        return shell_autoprop_upolgpplus(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbtriv(shell_compute_syntac(j, false), ORB_AMTP, "AMT⁺", "syntactic morphism", out);
+        break;
+    default:
         return false;
+        break;
     }
-    return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_BPAMT, "BPol(AMT)-orbit", "syntactic morphism", out);
+    return false;
 }
 
-bool shell_membership_ubpol2gr(int j, FILE* out) {
+bool shell_membership_upolgrp(int j, membership_mode mode, FILE* out) {
     int error = 0;
-    if (objects[j]->type != MORPHISM && !shell_autoprop_cycletbpgp(shell_compute_minimal(j), DFAGP_GR, "minimal automaton", &error, out)) {
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through
+    case MEMB_MINIMAL:
+        return shell_autoprop_upolgpplus(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbtriv(shell_compute_syntac(j, false), ORB_GRP, "GR⁺", "syntactic morphism", out);
+        break;
+    default:
         return false;
+        break;
     }
-    return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_BPGR, "BPol(GR)-orbit", "syntactic morphism", out);
+    return false;
 }
 
-bool shell_membership_ubpol2dd(int j, FILE* out) { return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_BPDD, "BPol(DD)-orbit", "syntactic morphism", out); }
+bool shell_membership_ubpol2st(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through
+    case MEMB_MINIMAL:
+        return shell_autoprop_upolbp2gp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_PT, "PT", "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+    return false;
+}
 
-bool shell_membership_ubpol2modp(int j, FILE* out) { return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_BPMODP, "BPol(MOD⁺)-orbit", "syntactic morphism", out); }
+bool shell_membership_ubpol2mod(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through
+    case MEMB_MINIMAL:
+        return shell_autoprop_upolbp2gp(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_BPMOD, "BPol(MOD)-orbit", "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+    return false;
+}
 
-bool shell_membership_ubpol2amtp(int j, FILE* out) { return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_BPAMTP, "BPol(AMT⁺)-orbit", "syntactic morphism", out); }
+bool shell_membership_ubpol2amt(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through
+    case MEMB_MINIMAL:
+        return shell_autoprop_upolbp2gp(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_BPAMT, "BPol(AMT)-orbit", "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+    return false;
+}
 
-bool shell_membership_ubpol2grp(int j, FILE* out) { return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_BPGRP, "BPol(GR⁺)-orbit", "syntactic morphism", out); }
+bool shell_membership_ubpol2gr(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through
+    case MEMB_MINIMAL:
+        return shell_autoprop_upolbp2gp(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_BPGR, "BPol(GR)-orbit", "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+    return false;
+}
+
+bool shell_membership_ubpol2dd(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through
+    case MEMB_MINIMAL:
+        return shell_autoprop_upolbp2gpplus(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_BPDD, "BPol(DD)-orbit", "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+    return false;
+}
+
+bool shell_membership_ubpol2modp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through
+    case MEMB_MINIMAL:
+        return shell_autoprop_upolbp2gpplus(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_BPMODP, "BPol(MOD⁺)-orbit", "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+    return false;
+}
+
+bool shell_membership_ubpol2amtp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through
+    case MEMB_MINIMAL:
+        return shell_autoprop_upolbp2gpplus(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_BPAMTP, "BPol(AMT⁺)-orbit", "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+    return false;
+}
+
+bool shell_membership_ubpol2grp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through
+    case MEMB_MINIMAL:
+        return shell_autoprop_upolbp2gpplus(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_ubp2eq(shell_compute_syntac(j, false), ORB_BPGRP, "BPol(GR⁺)-orbit", "syntactic morphism", out);
+        break;
+    default:
+        return false;
+        break;
+    }
+    return false;
+}
 
 /******************/
 /* Temporal logic */
 /******************/
 
-bool shell_membership_ul(int j, FILE* out) {
-    if (objects[j]->type == MORPHISM) {
+bool shell_membership_ul(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through    
+    case MEMB_MINIMAL:
+        return shell_autoprop_dagp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
         return shell_morprop_monoda(shell_compute_syntac(j, false), "syntactic monoid", out);
+        break;
+
+    default:
+        break;
     }
-    else {
-        int error = 0;
-        return shell_autoprop_dapat(shell_compute_minimal(j), "minimal automaton", &error, out);
-    }
+    return false;
 }
 
-bool shell_membership_tlmod(int j, FILE* out) {
-    if (objects[j]->type == MORPHISM) {
+bool shell_membership_tlmod(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through    
+    case MEMB_MINIMAL:
+        return shell_autoprop_dagp(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
         return shell_morprop_kerda(shell_compute_syntac(j, false), KER_MOD, "MOD", "syntactic morphism", out);
+        break;
+
+    default:
+        break;
     }
-    else {
-        int error = 0;
-        return shell_autoprop_dagppat(shell_compute_minimal(j), DFAGP_MOD, "minimal automaton", &error, out);
-    }
+    return false;
 }
 
-bool shell_membership_tlamt(int j, FILE* out) {
-    if (objects[j]->type == MORPHISM) {
+bool shell_membership_tlamt(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through    
+    case MEMB_MINIMAL:
+        return shell_autoprop_dagp(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
         return shell_morprop_kerda(shell_compute_syntac(j, false), KER_AMT, "AMT", "syntactic morphism", out);
+        break;
+
+    default:
+        break;
     }
-    else {
-        int error = 0;
-        return shell_autoprop_dagppat(shell_compute_minimal(j), DFAGP_AMT, "minimal automaton", &error, out);
-    }
+    return false;
 }
 
-bool shell_membership_tlgr(int j, FILE* out) {
-    if (objects[j]->type == MORPHISM) {
+bool shell_membership_tlgr(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through  
+    case MEMB_MINIMAL:
+        return shell_autoprop_dagp(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
         return shell_morprop_kerda(shell_compute_syntac(j, false), KER_GR, "GR", "syntactic morphism", out);
+        break;
+
+    default:
+        break;
     }
-    else {
-        int error = 0;
-        return shell_autoprop_dagppat(shell_compute_minimal(j), DFAGP_GR, "minimal automaton", &error, out);
-    }
+    return false;
 }
 
-bool shell_membership_tldd(int j, FILE* out) {
-    if (objects[j]->type == MORPHISM) {
+bool shell_membership_tldd(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_MINIMAL:
+        return shell_autoprop_dagpplus(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
         return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_DD, "DD", "syntactic morphism", out);
+        break;
+
+    default:
+        break;
     }
-    else {
-        int error = 0;
-        return shell_autoprop_dapluspat(shell_compute_minimal(j), "minimal automaton", &error, out);
-    }
+    return false;
 }
 
-bool shell_membership_tlmodp(int j, FILE* out) {
-    if (objects[j]->type == MORPHISM) {
+bool shell_membership_tlmodp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_MINIMAL:
+        return shell_autoprop_dagpplus(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
         return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_MODP, "MOD⁺", "syntactic morphism", out);
+        break;
+
+    default:
+        break;
     }
-    else {
-        int error = 0;
-        return shell_autoprop_daplusgppat(shell_compute_minimal(j), DFAGP_MOD, "minimal automaton", &error, out);
-    }
+    return false;
 }
 
-bool shell_membership_tlamtp(int j, FILE* out) {
-    if (objects[j]->type == MORPHISM) {
+bool shell_membership_tlamtp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_MINIMAL:
+        return shell_autoprop_dagpplus(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
         return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_AMTP, "AMT⁺", "syntactic morphism", out);
+        break;
+
+    default:
+        break;
     }
-    else {
-        int error = 0;
-        return shell_autoprop_daplusgppat(shell_compute_minimal(j), DFAGP_AMT, "minimal automaton", &error, out);
-    }
+    return false;
 }
 
-bool shell_membership_tlgrp(int j, FILE* out) {
-    if (objects[j]->type == MORPHISM) {
+bool shell_membership_tlgrp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_MINIMAL:
+        return shell_autoprop_dagpplus(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
         return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_GRP, "GR⁺", "syntactic morphism", out);
+        break;
+
+    default:
+        break;
     }
-    else {
-        int error = 0;
-        return shell_autoprop_daplusgppat(shell_compute_minimal(j), DFAGP_GR, "minimal automaton", &error, out);
-    }
+    return false;
 }
 
-bool shell_membership_tl2st(int j, FILE* out) { return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_PT, "TL(ST)", "syntactic morphism", out); }
+bool shell_membership_tl2st(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through    
+    case MEMB_MINIMAL:
+        return shell_autoprop_dabpgp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_PT, "TL(ST)", "syntactic morphism", out);
+        break;
 
-bool shell_membership_tl2mod(int j, FILE* out) { return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_BPMOD, "TL(MOD)", "syntactic morphism", out); }
+    default:
+        break;
+    }
+    return false;
+}
 
-bool shell_membership_tl2amt(int j, FILE* out) { return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_BPAMT, "TL(AMT)", "syntactic morphism", out); }
+bool shell_membership_tl2mod(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_MINIMAL:
+        return shell_autoprop_dabpgp(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_BPMOD, "TL(MOD)", "syntactic morphism", out);
+        break;
 
-bool shell_membership_tl2gr(int j, FILE* out) { return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_BPGR, "TL(GR)", "syntactic morphism", out); }
+    default:
+        break;
+    }
+    return false;
+}
 
-bool shell_membership_tl2dd(int j, FILE* out) { return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_BPDD, "TL(DD)", "syntactic morphism", out); }
+bool shell_membership_tl2amt(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_MINIMAL:
+        return shell_autoprop_dabpgp(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_BPAMT, "TL(AMT)", "syntactic morphism", out);
+        break;
 
-bool shell_membership_tl2modp(int j, FILE* out) { return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_BPMODP, "TL(MOD⁺)", "syntactic morphism", out); }
+    default:
+        break;
+    }
+    return false;
+}
 
-bool shell_membership_tl2amtp(int j, FILE* out) { return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_BPAMTP, "TL(AMT⁺)", "syntactic morphism", out); }
+bool shell_membership_tl2gr(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_MINIMAL:
+        return shell_autoprop_dabpgp(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_BPGR, "TL(GR)", "syntactic morphism", out);
+        break;
 
-bool shell_membership_tl2grp(int j, FILE* out) { return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_BPGRP, "TL(GR⁺)", "syntactic morphism", out); }
+    default:
+        break;
+    }
+    return false;
+}
 
-bool shell_membership_fl(int j, FILE* out) { return shell_morprop_monogreen(shell_compute_syntac(j, false), L_GREEN, "syntactic monoid", out); }
+bool shell_membership_tl2dd(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_MINIMAL:
+        return shell_autoprop_dabpgpplus(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_BPDD, "TL(DD)", "syntactic morphism", out);
+        break;
 
-bool shell_membership_flmod(int j, FILE* out) { return shell_morprop_kergreen(shell_compute_syntac(j, false), L_GREEN, KER_MOD, "MOD", "syntactic morphism", out); }
+    default:
+        break;
+    }
+    return false;
+}
 
-bool shell_membership_flamt(int j, FILE* out) { return shell_morprop_kergreen(shell_compute_syntac(j, false), L_GREEN, KER_AMT, "AMT", "syntactic morphism", out); }
+bool shell_membership_tl2modp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_MINIMAL:
+        return shell_autoprop_dabpgpplus(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_BPMODP, "TL(MOD⁺)", "syntactic morphism", out);
+        break;
 
-bool shell_membership_flgr(int j, FILE* out) { return shell_morprop_kergreen(shell_compute_syntac(j, false), L_GREEN, KER_GR, "GR", "syntactic morphism", out); }
+    default:
+        break;
+    }
+    return false;
+}
 
-bool shell_membership_fldd(int j, FILE* out) { return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_DD, "DD", "syntactic morphism", out); }
+bool shell_membership_tl2amtp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_MINIMAL:
+        return shell_autoprop_dabpgpplus(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_BPAMTP, "TL(AMT⁺)", "syntactic morphism", out);
+        break;
 
-bool shell_membership_flmodp(int j, FILE* out) { return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_MODP, "MOD⁺", "syntactic morphism", out); }
+    default:
+        break;
+    }
+    return false;
+}
 
-bool shell_membership_flamtp(int j, FILE* out) { return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_AMTP, "AMT⁺", "syntactic morphism", out); }
+bool shell_membership_tl2grp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_MINIMAL:
+        return shell_autoprop_dabpgpplus(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbda(shell_compute_syntac(j, false), ORB_BPGRP, "TL(GR⁺)", "syntactic morphism", out);
+        break;
 
-bool shell_membership_flgrp(int j, FILE* out) { return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_GRP, "GR⁺", "syntactic morphism", out); }
+    default:
+        break;
+    }
+    return false;
+}
 
-bool shell_membership_fl2st(int j, FILE* out) { return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_PT, "FL(ST)", "syntactic morphism", out); }
+bool shell_membership_fl(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        if (objects[j].type == DAUTOMATON) {
+            return shell_autoprop_ltrivialgp_opti(j, BA_ST, &error);
+        }
+        else {
+            return shell_autoprop_ltrivialgp_opti(shell_compute_minimal(j), BA_ST, &error);
+        }
+    case MEMB_MINIMAL:
+        return shell_autoprop_ltrivialgp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_monogreen(shell_compute_syntac(j, false), L_GREEN, "syntactic monoid", out);
+        break;
 
-bool shell_membership_fl2mod(int j, FILE* out) { return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_BPMOD, "FL(MOD)", "syntactic morphism", out); }
+    default:
+        break;
+    }
+    return false;
+}
 
-bool shell_membership_fl2amt(int j, FILE* out) { return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_BPAMT, "FL(AMT)", "syntactic morphism", out); }
+bool shell_membership_flmod(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        if (objects[j].type == DAUTOMATON) {
+            return shell_autoprop_ltrivialgp_opti(j, BA_MOD, &error);
+        }
+        else {
+            return shell_autoprop_ltrivialgp_opti(shell_compute_minimal(j), BA_MOD, &error);
+        }
+    case MEMB_MINIMAL:
+        return shell_autoprop_ltrivialgp(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_kergreen(shell_compute_syntac(j, false), L_GREEN, KER_MOD, "MOD", "syntactic morphism", out);
+        break;
 
-bool shell_membership_fl2gr(int j, FILE* out) { return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_BPGR, "FL(GR)", "syntactic morphism", out); }
+    default:
+        break;
+    }
+    return false;
+}
 
-bool shell_membership_fl2dd(int j, FILE* out) { return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_BPDD, "FL(DD)", "syntactic morphism", out); }
+bool shell_membership_flamt(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        if (objects[j].type == DAUTOMATON) {
+            return shell_autoprop_ltrivialgp_opti(j, BA_AMT, &error);
+        }
+        else {
+            return shell_autoprop_ltrivialgp_opti(shell_compute_minimal(j), BA_AMT, &error);
+        }
+    case MEMB_MINIMAL:
+        return shell_autoprop_ltrivialgp(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_kergreen(shell_compute_syntac(j, false), L_GREEN, KER_AMT, "AMT", "syntactic morphism", out);
+        break;
 
-bool shell_membership_fl2modp(int j, FILE* out) { return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_BPMODP, "FL(MOD⁺)", "syntactic morphism", out); }
+    default:
+        break;
+    }
+    return false;
+}
 
-bool shell_membership_fl2amtp(int j, FILE* out) { return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_BPAMTP, "FL(AMT⁺)", "syntactic morphism", out); }
+bool shell_membership_flgr(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        if (objects[j].type == DAUTOMATON) {
+            return shell_autoprop_ltrivialgp_opti(j, BA_GR, &error);
+        }
+        else {
+            return shell_autoprop_ltrivialgp_opti(shell_compute_minimal(j), BA_GR, &error);
+        }
+    case MEMB_MINIMAL:
+        return shell_autoprop_ltrivialgp(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_kergreen(shell_compute_syntac(j, false), L_GREEN, KER_GR, "GR", "syntactic morphism", out);
+        break;
 
-bool shell_membership_fl2grp(int j, FILE* out) { return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_BPGRP, "FL(GR⁺)", "syntactic morphism", out); }
+    default:
+        break;
+    }
+    return false;
+}
 
-bool shell_membership_pl(int j, FILE* out) {
-    if (objects[j]->type == MORPHISM) {
+bool shell_membership_fldd(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        if (objects[j].type == DAUTOMATON) {
+            return shell_autoprop_ltrivialgpplus_opti(j, BA_ST, &error);
+        }
+        else {
+            return shell_autoprop_ltrivialgpplus_opti(shell_compute_minimal(j), BA_ST, &error);
+        }
+    case MEMB_MINIMAL:
+        return shell_autoprop_ltrivialgpplus(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_DD, "DD", "syntactic morphism", out);
+        break;
+
+    default:
+        break;
+    }
+    return false;
+}
+
+bool shell_membership_flmodp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        if (objects[j].type == DAUTOMATON) {
+            return shell_autoprop_ltrivialgpplus_opti(j, BA_MOD, &error);
+        }
+        else {
+            return shell_autoprop_ltrivialgpplus_opti(shell_compute_minimal(j), BA_MOD, &error);
+        }
+    case MEMB_MINIMAL:
+        return shell_autoprop_ltrivialgpplus(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_MODP, "MOD⁺", "syntactic morphism", out);
+        break;
+
+    default:
+        break;
+    }
+    return false;
+}
+
+bool shell_membership_flamtp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        if (objects[j].type == DAUTOMATON) {
+            return shell_autoprop_ltrivialgpplus_opti(j, BA_AMT, &error);
+        }
+        else {
+            return shell_autoprop_ltrivialgpplus_opti(shell_compute_minimal(j), BA_AMT, &error);
+        }
+    case MEMB_MINIMAL:
+        return shell_autoprop_ltrivialgpplus(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_AMTP, "AMT⁺", "syntactic morphism", out);
+        break;
+
+    default:
+        break;
+    }
+    return false;
+}
+
+bool shell_membership_flgrp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        if (objects[j].type == DAUTOMATON) {
+            return shell_autoprop_ltrivialgpplus_opti(j, BA_GR, &error);
+        }
+        else {
+            return shell_autoprop_ltrivialgpplus_opti(shell_compute_minimal(j), BA_GR, &error);
+        }
+    case MEMB_MINIMAL:
+        return shell_autoprop_ltrivialgpplus(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_GRP, "GR⁺", "syntactic morphism", out);
+        break;
+
+    default:
+        break;
+    }
+    return false;
+}
+
+bool shell_membership_fl2st(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        if (objects[j].type == DAUTOMATON) {
+            return shell_autoprop_ltrivialbpgp_opti(j, BA_ST, &error);
+        }
+        else {
+            return shell_autoprop_ltrivialbpgp_opti(shell_compute_minimal(j), BA_ST, &error);
+        }
+    case MEMB_MINIMAL:
+        return shell_autoprop_ltrivialbpgp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_PT, "FL(ST)", "syntactic morphism", out);
+        break;
+
+    default:
+        break;
+    }
+    return false;
+}
+
+bool shell_membership_fl2mod(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        if (objects[j].type == DAUTOMATON) {
+            return shell_autoprop_ltrivialbpgp_opti(j, BA_MOD, &error);
+        }
+        else {
+            return shell_autoprop_ltrivialbpgp_opti(shell_compute_minimal(j), BA_MOD, &error);
+        }
+    case MEMB_MINIMAL:
+        return shell_autoprop_ltrivialbpgp(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_BPMOD, "FL(MOD)", "syntactic morphism", out);
+        break;
+
+    default:
+        break;
+    }
+    return false;
+}
+
+bool shell_membership_fl2amt(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        if (objects[j].type == DAUTOMATON) {
+            return shell_autoprop_ltrivialbpgp_opti(j, BA_AMT, &error);
+        }
+        else {
+            return shell_autoprop_ltrivialbpgp_opti(shell_compute_minimal(j), BA_AMT, &error);
+        }
+    case MEMB_MINIMAL:
+        return shell_autoprop_ltrivialbpgp(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_BPAMT, "FL(AMT)", "syntactic morphism", out);
+        break;
+
+    default:
+        break;
+    }
+    return false;
+}
+
+bool shell_membership_fl2gr(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        if (objects[j].type == DAUTOMATON) {
+            return shell_autoprop_ltrivialbpgp_opti(j, BA_GR, &error);
+        }
+        else {
+            return shell_autoprop_ltrivialbpgp_opti(shell_compute_minimal(j), BA_GR, &error);
+        }
+        break;
+    case MEMB_MINIMAL:
+        return shell_autoprop_ltrivialbpgp(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
+        return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_BPGR, "FL(GR)", "syntactic morphism", out);
+        break;
+
+    default:
+        break;
+    }
+    return false;
+}
+
+bool shell_membership_fl2dd(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        return shell_autoprop_ltrivialbpgpplus(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through    
+    case MEMB_SYNTAC:
+        return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_BPDD, "FL(DD)", "syntactic morphism", out);
+        break;
+
+    default:
+        break;
+    }
+    return false;
+}
+
+bool shell_membership_fl2modp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        return shell_autoprop_ltrivialbpgpplus(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_SYNTAC:
+        return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_BPMODP, "FL(MOD⁺)", "syntactic morphism", out);
+        break;
+
+    default:
+        break;
+    }
+    return false;
+}
+
+bool shell_membership_fl2amtp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        return shell_autoprop_ltrivialbpgpplus(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out);
+        break;
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_SYNTAC:
+        return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_BPAMTP, "FL(AMT⁺)", "syntactic morphism", out);
+        break;
+
+    default:
+        break;
+    }
+    return false;
+}
+
+bool shell_membership_fl2grp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        return shell_autoprop_ltrivialbpgpplus(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_SYNTAC:
+        return shell_morprop_orbgreen(shell_compute_syntac(j, false), L_GREEN, ORB_BPGRP, "FL(GR⁺)", "syntactic morphism", out);
+        break;
+
+    default:
+        break;
+    }
+    return false;
+}
+
+bool shell_membership_pl(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        return shell_autoprop_rtrivialgp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, NULL);
+        break;
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialgp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
         return shell_morprop_monogreen(shell_compute_syntac(j, false), R_GREEN, "syntactic monoid", out);
+    default:
+        break;
     }
-    else {
-        int error = 0;
-        return shell_autoprop_cyclet(shell_compute_minimal(j), "minimal automaton", &error, out);
-    }
+    return false;
 }
 
-bool shell_membership_plmod(int j, FILE* out) {
-    if (objects[j]->type == MORPHISM) {
+bool shell_membership_plmod(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialgp(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
         return shell_morprop_kergreen(shell_compute_syntac(j, false), R_GREEN, KER_MOD, "MOD", "syntactic morphism", out);
+    default:
+        break;
     }
-    else {
-        int error = 0;
-        return shell_autoprop_cycletgp(shell_compute_minimal(j), DFAGP_MOD, "minimal automaton", &error, out);
-    }
+    return false;
 }
 
-bool shell_membership_plamt(int j, FILE* out) {
-    if (objects[j]->type == MORPHISM) {
+bool shell_membership_plamt(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through    
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialgp(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
         return shell_morprop_kergreen(shell_compute_syntac(j, false), R_GREEN, KER_AMT, "AMT", "syntactic morphism", out);
+    default:
+        break;
     }
-    else {
-        int error = 0;
-        return shell_autoprop_cycletgp(shell_compute_minimal(j), DFAGP_AMT, "minimal automaton", &error, out);
-    }
+    return false;
 }
 
-bool shell_membership_plgr(int j, FILE* out) {
-    if (objects[j]->type == MORPHISM) {
+bool shell_membership_plgr(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through    
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialgp(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
         return shell_morprop_kergreen(shell_compute_syntac(j, false), R_GREEN, KER_GR, "GR", "syntactic morphism", out);
+    default:
+        break;
     }
-    else {
-        int error = 0;
-        return shell_autoprop_cycletgp(shell_compute_minimal(j), DFAGP_GR, "minimal automaton", &error, out);
-    }
+    return false;
 }
 
-bool shell_membership_pldd(int j, FILE* out) {
-    if (objects[j]->type == MORPHISM) {
+bool shell_membership_pldd(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialgpplus(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
         return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_DD, "DD", "syntactic morphism", out);
+    default:
+        break;
     }
-    else {
-        int error = 0;
-        return shell_autoprop_cycletplus(shell_compute_minimal(j), "minimal automaton", &error, out);
-    }
+    return false;
 }
 
-bool shell_membership_plmodp(int j, FILE* out) {
-    if (objects[j]->type == MORPHISM) {
+bool shell_membership_plmodp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through    
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialgpplus(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
         return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_MODP, "MOD⁺", "syntactic morphism", out);
+    default:
+        break;
     }
-    else {
-        int error = 0;
-        return shell_autoprop_cycletplusgp(shell_compute_minimal(j), DFAGP_MOD, "minimal automaton", &error, out);
-    }
+    return false;
 }
 
-bool shell_membership_plamtp(int j, FILE* out) {
-    if (objects[j]->type == MORPHISM) {
+bool shell_membership_plamtp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through    
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialgpplus(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
         return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_AMTP, "AMT⁺", "syntactic morphism", out);
+    default:
+        break;
     }
-    else {
-        int error = 0;
-        return shell_autoprop_cycletplusgp(shell_compute_minimal(j), DFAGP_AMT, "minimal automaton", &error, out);
-    }
+    return false;
 }
 
-bool shell_membership_plgrp(int j, FILE* out) {
-    if (objects[j]->type == MORPHISM) {
+bool shell_membership_plgrp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialgpplus(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
         return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_GRP, "GR⁺", "syntactic morphism", out);
+    default:
+        break;
     }
-    else {
-        int error = 0;
-        return shell_autoprop_cycletplusgp(shell_compute_minimal(j), DFAGP_GR, "minimal automaton", &error, out);
-    }
+    return false;
 }
 
-bool shell_membership_pl2st(int j, FILE* out) {
-    if (objects[j]->type == MORPHISM) {
+bool shell_membership_pl2st(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialbpgp(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
         return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_PT, "PL(ST)", "syntactic morphism", out);
+    default:
+        break;
     }
-    else {
-        int error = 0;
-        return shell_autoprop_cycletbp(shell_compute_minimal(j), "minimal automaton", &error, out);
-    }
+    return false;
 }
 
-bool shell_membership_pl2mod(int j, FILE* out) {
-    if (objects[j]->type == MORPHISM) {
+bool shell_membership_pl2mod(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through    
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialbpgp(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
         return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_BPMOD, "PL(MOD)", "syntactic morphism", out);
+    default:
+        break;
     }
-    else {
-        int error = 0;
-        return shell_autoprop_cycletbpgp(shell_compute_minimal(j), DFAGP_MOD, "minimal automaton", &error, out);
-    }
+    return false;
 }
 
-bool shell_membership_pl2amt(int j, FILE* out) {
-    if (objects[j]->type == MORPHISM) {
+bool shell_membership_pl2amt(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through    
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialbpgp(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
         return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_BPAMT, "PL(AMT)", "syntactic morphism", out);
+    default:
+        break;
     }
-    else {
-        int error = 0;
-        return shell_autoprop_cycletbpgp(shell_compute_minimal(j), DFAGP_AMT, "minimal automaton", &error, out);
-    }
+    return false;
 }
 
-bool shell_membership_pl2gr(int j, FILE* out) {
-    if (objects[j]->type == MORPHISM) {
+bool shell_membership_pl2gr(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through    
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialbpgp(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_SYNTAC:
         return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_BPGR, "PL(GR)", "syntactic morphism", out);
+    default:
+        break;
     }
-    else {
-        int error = 0;
-        return shell_autoprop_cycletbpgp(shell_compute_minimal(j), DFAGP_GR, "minimal automaton", &error, out);
-    }
+    return false;
 }
 
-bool shell_membership_pl2dd(int j, FILE* out) { return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_BPDD, "PL(DD)", "syntactic morphism", out); }
+bool shell_membership_pl2dd(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialbpgpplus(shell_compute_minimal(j), BA_ST, "minimal automaton", &error, out);
+        break;
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_SYNTAC:
+        return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_BPDD, "PL(DD)", "syntactic morphism", out);
+    default:
+        break;
+    }
+    return false;
+}
 
-bool shell_membership_pl2modp(int j, FILE* out) { return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_BPMODP, "PL(MOD⁺)", "syntactic morphism", out); }
+bool shell_membership_pl2modp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialbpgpplus(shell_compute_minimal(j), BA_MOD, "minimal automaton", &error, out);
+        break;
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_SYNTAC:
+        return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_BPMODP, "PL(MOD⁺)", "syntactic morphism", out);
+    default:
+        break;
+    }
+    return false;
+}
 
-bool shell_membership_pl2amtp(int j, FILE* out) { return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_BPAMTP, "PL(AMT⁺)", "syntactic morphism", out); }
+bool shell_membership_pl2amtp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialbpgpplus(shell_compute_minimal(j), BA_AMT, "minimal automaton", &error, out);
+        break;
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_SYNTAC:
+        return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_BPAMTP, "PL(AMT⁺)", "syntactic morphism", out);
+    default:
+        break;
+    }
+    return false;
+}
 
-bool shell_membership_pl2grp(int j, FILE* out) { return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_BPGRP, "PL(GR⁺)", "syntactic morphism", out); }
+bool shell_membership_pl2grp(int j, membership_mode mode, FILE* out) {
+    int error = 0;
+    switch (mode)
+    {
+    case MEMB_MINIMAL:
+        return shell_autoprop_rtrivialbpgpplus(shell_compute_minimal(j), BA_GR, "minimal automaton", &error, out);
+        break;
+    case MEMB_OPTIMAL:
+        out = NULL;
+        // fall through   
+    case MEMB_SYNTAC:
+        return shell_morprop_orbgreen(shell_compute_syntac(j, false), R_GREEN, ORB_BPGRP, "PL(GR⁺)", "syntactic morphism", out);
+    default:
+        break;
+    }
+    return false;
+}
 
 /********************************/
 /* Summary for all main classes */
@@ -769,11 +2445,11 @@ enum { CLT_BASIS = 0, CLT_POL, CLT_BPOL, CLT_TL, CLT_POL2, CLT_BPOL2, CLT_UBPOL2
 
 enum { BSI_ST = 0, BSI_DD, BSI_MOD, BSI_MODP, BSI_AMT, BSI_AMTP, BSI_GR, BSI_GRP, BSI_SIZE };
 
-static void populate_table_star(int j, int op, int bs, bool (*fun)(int, FILE*), ans_type res[CLT_SIZE][BSI_SIZE]) {
+static void populate_table_star(int j, int op, int bs, bool (*fun)(int, membership_mode, FILE*), ans_type res[CLT_SIZE][BSI_SIZE]) {
     if (res[op][bs] != ANS_UNKNOWN) {
         return;
     }
-    bool val = fun(j, NULL);
+    bool val = fun(j, MEMB_OPTIMAL, NULL);
     if (val) {
         for (int g = op; g < CLT_SIZE; g++) {
             for (int h = bs; h < BSI_SIZE; h++) {
@@ -791,11 +2467,11 @@ static void populate_table_star(int j, int op, int bs, bool (*fun)(int, FILE*), 
     }
 }
 
-static void populate_table_plus(int j, int op, int bs, bool (*fun)(int, FILE*), ans_type res[CLT_SIZE][BSI_SIZE]) {
+static void populate_table_plus(int j, int op, int bs, bool (*fun)(int, membership_mode, FILE*), ans_type res[CLT_SIZE][BSI_SIZE]) {
     if (res[op][bs] != ANS_UNKNOWN) {
         return;
     }
-    bool val = fun(j, NULL);
+    bool val = fun(j, MEMB_OPTIMAL, NULL);
     if (val) {
         for (int g = op; g < CLT_SIZE; g++) {
             for (int h = bs; h < BSI_SIZE; h += 2) {
@@ -1040,62 +2716,293 @@ void shell_chiera_summary(int i, FILE* out) {
     return;
 }
 
+
+static void summary_print_answer_nav(bool res, FILE* out) {
+    if (res) {
+        fprintf(out, "║" ANSI_COLOR_GREEN "     YES      " ANSI_COLOR_RESET);
+        return;
+    }
+    else {
+        fprintf(out, "║" ANSI_COLOR_RED "     NO       " ANSI_COLOR_RESET);
+        return;
+    }
+}
+
+
+void shell_navhiera_summary(int j, FILE* out) {
+
+    if (j < 0) {
+        return;
+    }
+
+    bool res[8][BSI_SIZE];
+
+
+
+    /************/
+    /* Basis ST */
+    /************/
+
+    res[0][BSI_ST] = shell_membership_st(j, MEMB_OPTIMAL, NULL);
+    res[1][BSI_ST] = res[0][BSI_ST] || shell_membership_fl(j, MEMB_OPTIMAL, NULL);
+    res[2][BSI_ST] = res[0][BSI_ST] || shell_membership_pl(j, MEMB_OPTIMAL, NULL);
+    res[3][BSI_ST] = res[1][BSI_ST] || res[2][BSI_ST] || shell_membership_ul(j, MEMB_OPTIMAL, NULL);
+    res[4][BSI_ST] = res[3][BSI_ST] || shell_membership_fl2st(j, MEMB_OPTIMAL, NULL);
+    res[5][BSI_ST] = res[3][BSI_ST] || shell_membership_pl2st(j, MEMB_OPTIMAL, NULL);
+    res[6][BSI_ST] = res[4][BSI_ST] || res[5][BSI_ST] || shell_membership_tl2st(j, MEMB_OPTIMAL, NULL);
+    res[7][BSI_ST] = res[6][BSI_ST] || shell_membership_sf(j, MEMB_OPTIMAL, NULL);
+
+
+
+    fprintf(out, "╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗\n");
+    fprintf(out, "║                                    Navigational hierarchies: membership tests summary                                 ║\n");
+    fprintf(out, "╠══════════════╦══════════════╦══════════════╦══════════════╦══════════════╦══════════════╦══════════════╦══════════════╣\n");
+    fprintf(out, "║  Basis: ST   ║    FL(ST)    ║    PL(ST)    ║    TL(ST)    ║    FL₂(ST)   ║    PL₂(ST)   ║    TL₂(ST)   ║    SF(ST)    ║\n");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    // fprintf(out, "║             ");
+    for (uint h = 0; h < 8; h++) {
+        summary_print_answer_nav(res[h][BSI_ST], out);
+    }
+    fprintf(out, "║\n");
+
+    /************/
+    /* Basis DD */
+    /************/
+
+    res[0][BSI_DD] = res[7][BSI_ST] && (res[0][BSI_ST] || shell_membership_dd(j, MEMB_OPTIMAL, NULL));
+    res[1][BSI_DD] = res[7][BSI_ST] && (res[1][BSI_ST] || res[0][BSI_DD] || shell_membership_fldd(j, MEMB_OPTIMAL, NULL));
+    res[2][BSI_DD] = res[7][BSI_ST] && (res[2][BSI_ST] || res[0][BSI_DD] || shell_membership_pldd(j, MEMB_OPTIMAL, NULL));
+    res[3][BSI_DD] = res[7][BSI_ST] && (res[3][BSI_ST] || res[1][BSI_DD] || res[2][BSI_DD] || shell_membership_tldd(j, MEMB_OPTIMAL, NULL));
+    res[4][BSI_DD] = res[7][BSI_ST] && (res[4][BSI_ST] || res[3][BSI_DD] || shell_membership_fl2dd(j, MEMB_OPTIMAL, NULL));
+    res[5][BSI_DD] = res[7][BSI_ST] && (res[5][BSI_ST] || res[3][BSI_DD] || shell_membership_pl2dd(j, MEMB_OPTIMAL, NULL));
+    res[6][BSI_DD] = res[7][BSI_ST] && (res[6][BSI_ST] || res[4][BSI_DD] || res[5][BSI_DD] || shell_membership_tl2dd(j, MEMB_OPTIMAL, NULL));
+    res[7][BSI_DD] = res[7][BSI_ST];
+
+
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    fprintf(out, "║  Basis: DD   ║    FL(DD)    ║    PL(DD)    ║    TL(DD)    ║    FL₂(DD)   ║    PL₂(DD)   ║    TL₂(DD)   ║    SF(DD)    ║\n");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+
+    for (uint h = 0; h < 8; h++) {
+        summary_print_answer_nav(res[h][BSI_DD], out);
+    }
+    fprintf(out, "║\n");
+
+    /*************/
+    /* Basis MOD */
+    /*************/
+
+    res[0][BSI_MOD] = res[0][BSI_ST] || shell_membership_mod(j, MEMB_OPTIMAL, NULL);
+    res[1][BSI_MOD] = res[1][BSI_ST] || res[0][BSI_MOD] || shell_membership_flmod(j, MEMB_OPTIMAL, NULL);
+    res[2][BSI_MOD] = res[2][BSI_ST] || res[0][BSI_MOD] || shell_membership_plmod(j, MEMB_OPTIMAL, NULL);
+    res[3][BSI_MOD] = res[3][BSI_ST] || res[1][BSI_MOD] || res[2][BSI_MOD] || shell_membership_tlmod(j, MEMB_OPTIMAL, NULL);
+    res[4][BSI_MOD] = res[4][BSI_ST] || res[3][BSI_MOD] || shell_membership_fl2mod(j, MEMB_OPTIMAL, NULL);
+    res[5][BSI_MOD] = res[5][BSI_ST] || res[3][BSI_MOD] || shell_membership_pl2mod(j, MEMB_OPTIMAL, NULL);
+    res[6][BSI_MOD] = res[6][BSI_ST] || res[4][BSI_MOD] || res[5][BSI_MOD] || shell_membership_tl2mod(j, MEMB_OPTIMAL, NULL);
+    res[7][BSI_MOD] = res[7][BSI_ST] || res[6][BSI_MOD] || shell_membership_sfmod(j, MEMB_OPTIMAL, NULL);
+
+
+
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    fprintf(out, "║  Basis: MOD  ║    FL(MOD)   ║    PL(MOD)   ║    TL(MOD)   ║    FL₂(MOD)  ║    PL₂(MOD)  ║    TL₂(MOD)  ║    SF(MOD)   ║\n");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+
+    for (uint h = 0; h < 8; h++) {
+        summary_print_answer_nav(res[h][BSI_MOD], out);
+    }
+    fprintf(out, "║\n");
+
+
+    /*************/
+    /* Basis MOD⁺ */
+    /*************/
+
+    res[0][BSI_MODP] = res[7][BSI_MOD] && (res[0][BSI_DD] || res[0][BSI_MOD] || shell_membership_modp(j, MEMB_OPTIMAL, NULL));
+    res[1][BSI_MODP] = res[7][BSI_MOD] && (res[1][BSI_DD] || res[1][BSI_MOD] || res[0][BSI_MODP] || shell_membership_flmodp(j, MEMB_OPTIMAL, NULL));
+    res[2][BSI_MODP] = res[7][BSI_MOD] && (res[2][BSI_DD] || res[2][BSI_MOD] || res[0][BSI_MODP] || shell_membership_plmodp(j, MEMB_OPTIMAL, NULL));
+    res[3][BSI_MODP] = res[7][BSI_MOD] && (res[3][BSI_DD] || res[3][BSI_MOD] || res[1][BSI_MODP] || res[2][BSI_MODP] || shell_membership_tlmodp(j, MEMB_OPTIMAL, NULL));
+    res[4][BSI_MODP] = res[7][BSI_MOD] && (res[4][BSI_DD] || res[4][BSI_MOD] || res[3][BSI_MODP] || shell_membership_fl2modp(j, MEMB_OPTIMAL, NULL));
+    res[5][BSI_MODP] = res[7][BSI_MOD] && (res[5][BSI_DD] || res[5][BSI_MOD] || res[3][BSI_MODP] || shell_membership_pl2modp(j, MEMB_OPTIMAL, NULL));
+    res[6][BSI_MODP] = res[7][BSI_MOD] && (res[6][BSI_DD] || res[6][BSI_MOD] || res[4][BSI_MODP] || res[5][BSI_MODP] || shell_membership_tl2modp(j, MEMB_OPTIMAL, NULL));
+    res[7][BSI_MODP] = res[7][BSI_MOD];
+
+
+
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    fprintf(out, "║ Basis: MOD⁺  ║   FL(MOD⁺)   ║   PL(MOD⁺)   ║   TL(MOD⁺)   ║   FL₂(MOD⁺)  ║   PL₂(MOD⁺)  ║   TL₂(MOD⁺)  ║   SF(MOD⁺)   ║\n");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+
+    for (uint h = 0; h < 8; h++) {
+        summary_print_answer_nav(res[h][BSI_MODP], out);
+    }
+    fprintf(out, "║\n");
+
+
+
+    /*************/
+   /* Basis AMT */
+   /*************/
+
+    res[0][BSI_AMT] = res[0][BSI_MOD] || shell_membership_amt(j, MEMB_OPTIMAL, NULL);
+    res[1][BSI_AMT] = res[1][BSI_MOD] || res[0][BSI_AMT] || shell_membership_flamt(j, MEMB_OPTIMAL, NULL);
+    res[2][BSI_AMT] = res[2][BSI_MOD] || res[0][BSI_AMT] || shell_membership_plamt(j, MEMB_OPTIMAL, NULL);
+    res[3][BSI_AMT] = res[3][BSI_MOD] || res[1][BSI_AMT] || res[2][BSI_AMT] || shell_membership_tlamt(j, MEMB_OPTIMAL, NULL);
+    res[4][BSI_AMT] = res[4][BSI_MOD] || res[3][BSI_AMT] || shell_membership_fl2amt(j, MEMB_OPTIMAL, NULL);
+    res[5][BSI_AMT] = res[5][BSI_MOD] || res[3][BSI_AMT] || shell_membership_pl2amt(j, MEMB_OPTIMAL, NULL);
+    res[6][BSI_AMT] = res[6][BSI_MOD] || res[4][BSI_AMT] || res[5][BSI_AMT] || shell_membership_tl2amt(j, MEMB_OPTIMAL, NULL);
+    res[7][BSI_AMT] = res[7][BSI_MOD] || res[6][BSI_AMT] || shell_membership_sfamt(j, MEMB_OPTIMAL, NULL);
+
+
+
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    fprintf(out, "║  Basis: AMT  ║    FL(AMT)   ║    PL(AMT)   ║    TL(AMT)   ║    FL₂(AMT)  ║    PL₂(AMT)  ║    TL₂(AMT)  ║    SF(AMT)   ║\n");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+
+    for (uint h = 0; h < 8; h++) {
+        summary_print_answer_nav(res[h][BSI_AMT], out);
+    }
+    fprintf(out, "║\n");
+
+
+    /*************/
+    /* Basis AMT⁺ */
+    /*************/
+
+    res[0][BSI_AMTP] = res[7][BSI_AMT] && (res[0][BSI_MODP] || res[0][BSI_AMT] || shell_membership_amtp(j, MEMB_OPTIMAL, NULL));
+    res[1][BSI_AMTP] = res[7][BSI_AMT] && (res[1][BSI_MODP] || res[1][BSI_AMT] || res[0][BSI_AMTP] || shell_membership_flamtp(j, MEMB_OPTIMAL, NULL));
+    res[2][BSI_AMTP] = res[7][BSI_AMT] && (res[2][BSI_MODP] || res[2][BSI_AMT] || res[0][BSI_AMTP] || shell_membership_plamtp(j, MEMB_OPTIMAL, NULL));
+    res[3][BSI_AMTP] = res[7][BSI_AMT] && (res[3][BSI_MODP] || res[3][BSI_AMT] || res[1][BSI_AMTP] || res[2][BSI_AMTP] || shell_membership_tlamtp(j, MEMB_OPTIMAL, NULL));
+    res[4][BSI_AMTP] = res[7][BSI_AMT] && (res[4][BSI_MODP] || res[4][BSI_AMT] || res[3][BSI_AMTP] || shell_membership_fl2amtp(j, MEMB_OPTIMAL, NULL));
+    res[5][BSI_AMTP] = res[7][BSI_AMT] && (res[5][BSI_MODP] || res[5][BSI_AMT] || res[3][BSI_AMTP] || shell_membership_pl2amtp(j, MEMB_OPTIMAL, NULL));
+    res[6][BSI_AMTP] = res[7][BSI_AMT] && (res[6][BSI_MODP] || res[6][BSI_AMT] || res[4][BSI_AMTP] || res[5][BSI_AMTP] || shell_membership_tl2amtp(j, MEMB_OPTIMAL, NULL));
+    res[7][BSI_AMTP] = res[7][BSI_AMT];
+
+
+
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    fprintf(out, "║ Basis: AMT⁺  ║   FL(AMT⁺)   ║   PL(AMT⁺)   ║   TL(AMT⁺)   ║   FL₂(AMT⁺)  ║   PL₂(AMT⁺)  ║   TL₂(AMT⁺)  ║   SF(AMT⁺)   ║\n");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+
+    for (uint h = 0; h < 8; h++) {
+        summary_print_answer_nav(res[h][BSI_AMTP], out);
+    }
+    fprintf(out, "║\n");
+
+    /*************/
+   /* Basis GR */
+   /*************/
+
+    res[0][BSI_GR] = res[0][BSI_AMT] || shell_membership_gr(j, MEMB_OPTIMAL, NULL);
+    res[1][BSI_GR] = res[1][BSI_AMT] || res[0][BSI_GR] || shell_membership_flgr(j, MEMB_OPTIMAL, NULL);
+    res[2][BSI_GR] = res[2][BSI_AMT] || res[0][BSI_GR] || shell_membership_plgr(j, MEMB_OPTIMAL, NULL);
+    res[3][BSI_GR] = res[3][BSI_AMT] || res[1][BSI_GR] || res[2][BSI_GR] || shell_membership_tlgr(j, MEMB_OPTIMAL, NULL);
+    res[4][BSI_GR] = res[4][BSI_AMT] || res[3][BSI_GR] || shell_membership_fl2gr(j, MEMB_OPTIMAL, NULL);
+    res[5][BSI_GR] = res[5][BSI_AMT] || res[3][BSI_GR] || shell_membership_pl2gr(j, MEMB_OPTIMAL, NULL);
+    res[6][BSI_GR] = res[6][BSI_AMT] || res[4][BSI_GR] || res[5][BSI_GR] || shell_membership_tl2gr(j, MEMB_OPTIMAL, NULL);
+    res[7][BSI_GR] = res[7][BSI_AMT] || res[6][BSI_GR] || shell_membership_sfgr(j, MEMB_OPTIMAL, NULL);
+
+
+
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    fprintf(out, "║   Basis: GR  ║    FL(GR)    ║    PL(GR)    ║    TL(GR)    ║    FL₂(GR)   ║    PL₂(GR)   ║    TL₂(GR)   ║    SF(GR)    ║\n");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+
+    for (uint h = 0; h < 8; h++) {
+        summary_print_answer_nav(res[h][BSI_GR], out);
+    }
+    fprintf(out, "║\n");
+
+
+    /*************/
+    /* Basis GR⁺ */
+    /*************/
+
+    res[0][BSI_GRP] = res[7][BSI_GR] && (res[0][BSI_AMTP] || res[0][BSI_GR] || shell_membership_grp(j, MEMB_OPTIMAL, NULL));
+    res[1][BSI_GRP] = res[7][BSI_GR] && (res[1][BSI_AMTP] || res[1][BSI_GR] || res[0][BSI_GRP] || shell_membership_flgrp(j, MEMB_OPTIMAL, NULL));
+    res[2][BSI_GRP] = res[7][BSI_GR] && (res[2][BSI_AMTP] || res[2][BSI_GR] || res[0][BSI_GRP] || shell_membership_plgrp(j, MEMB_OPTIMAL, NULL));
+    res[3][BSI_GRP] = res[7][BSI_GR] && (res[3][BSI_AMTP] || res[3][BSI_GR] || res[1][BSI_GRP] || res[2][BSI_GRP] || shell_membership_tlgrp(j, MEMB_OPTIMAL, NULL));
+    res[4][BSI_GRP] = res[7][BSI_GR] && (res[4][BSI_AMTP] || res[4][BSI_GR] || res[3][BSI_GRP] || shell_membership_fl2grp(j, MEMB_OPTIMAL, NULL));
+    res[5][BSI_GRP] = res[7][BSI_GR] && (res[5][BSI_AMTP] || res[5][BSI_GR] || res[3][BSI_GRP] || shell_membership_pl2grp(j, MEMB_OPTIMAL, NULL));
+    res[6][BSI_GRP] = res[7][BSI_GR] && (res[6][BSI_AMTP] || res[6][BSI_GR] || res[4][BSI_GRP] || res[5][BSI_GRP] || shell_membership_tl2grp(j, MEMB_OPTIMAL, NULL));
+    res[7][BSI_GRP] = res[7][BSI_GR];
+
+
+
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+    fprintf(out, "║  Basis: GR⁺  ║    FL(GR⁺)   ║    PL(GR⁺)   ║    TL(GR⁺)   ║   FL₂(GR⁺)   ║   PL₂(GR⁺)   ║   TL₂(GR⁺)   ║   SF(GR⁺)    ║\n");
+    fprintf(out, "╠══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╬══════════════╣\n");
+
+    for (uint h = 0; h < 8; h++) {
+        summary_print_answer_nav(res[h][BSI_GRP], out);
+    }
+    fprintf(out, "║\n");
+
+
+
+    fprintf(out, "╚══════════════╩══════════════╩══════════════╩══════════════╩══════════════╩══════════════╩══════════════╩══════════════╝\n");
+
+    return;
+}
+
+
+
+
 static short shell_neghiera_aux(int i, classes cl) {
     ufind* theuf = NULL;
 
     int j = 0;
     switch (cl) {
     case CL_ST:
-        if (!shell_membership_ul(i, NULL)) {
+        if (!shell_membership_ul(i, MEMB_OPTIMAL, NULL)) {
             return -1;
         }
         j = shell_compute_syntac(i, false);
-        theuf = iden_green_mono(objects[j]->mor->obj, J_GREEN);
+        theuf = iden_green_mono(objects[j].mor->obj, J_GREEN);
         break;
     case CL_MOD:
-        if (!shell_membership_tlmod(i, NULL)) {
+        if (!shell_membership_tlmod(i, MEMB_OPTIMAL, NULL)) {
             return -1;
         }
         j = shell_compute_syntac(i, false);
-        theuf = iden_bpolmod_mono(objects[j]->mor->obj);
+        theuf = iden_bpolmod_mono(objects[j].mor->obj);
         break;
     case CL_AMT:
-        if (!shell_membership_tlamt(i, NULL)) {
+        if (!shell_membership_tlamt(i, MEMB_OPTIMAL, NULL)) {
             return -1;
         }
         j = shell_compute_syntac(i, false);
-        theuf = iden_bpolamt_mono(objects[j]->mor->obj);
+        theuf = iden_bpolamt_mono(objects[j].mor->obj);
         break;
     case CL_GR:
-        if (!shell_membership_tlgr(i, NULL)) {
+        if (!shell_membership_tlgr(i, MEMB_OPTIMAL, NULL)) {
             return -1;
         }
         j = shell_compute_syntac(i, false);
-        theuf = iden_blockg_mono(objects[j]->mor->obj);
+        theuf = iden_blockg_mono(objects[j].mor->obj);
         break;
     case CL_DD:
-        if (!shell_membership_tldd(i, NULL)) {
+        if (!shell_membership_tldd(i, MEMB_OPTIMAL, NULL)) {
             return -1;
         }
         j = shell_compute_syntac(i, false);
         theuf = iden_knast_mono(shell_compute_orbits(j, ORB_DD, LV_REG));
         break;
     case CL_MODP:
-        if (!shell_membership_tlmodp(i, NULL)) {
+        if (!shell_membership_tlmodp(i, MEMB_OPTIMAL, NULL)) {
             return -1;
         }
         j = shell_compute_syntac(i, false);
         theuf = iden_qknast_mono(shell_compute_orbits(j, ORB_MODP, LV_REG), shell_compute_ker(j, KER_MOD, LV_REG));
         break;
     case CL_AMTP:
-        if (!shell_membership_tlamtp(i, NULL)) {
+        if (!shell_membership_tlamtp(i, MEMB_OPTIMAL, NULL)) {
             return -1;
         }
         j = shell_compute_syntac(i, false);
         theuf = iden_bpolamtp_mono(shell_compute_orbits(j, ORB_AMTP, LV_REG));
         break;
     case CL_GRP:
-        if (!shell_membership_tlgrp(i, NULL)) {
+        if (!shell_membership_tlgrp(i, MEMB_OPTIMAL, NULL)) {
             return -1;
         }
         j = shell_compute_syntac(i, false);
@@ -1115,7 +3022,7 @@ static short shell_neghiera_aux(int i, classes cl) {
         level++;
         thepr = ufind_to_parti(theuf);
         delete_ufind(theuf);
-        theuf = iden_mpolc_mono(objects[j]->mor->obj, thepr);
+        theuf = iden_mpolc_mono(objects[j].mor->obj, thepr);
         delete_parti(thepr);
     }
     delete_ufind(theuf);
@@ -1166,16 +3073,16 @@ static void shell_fphiera_aux(int i, classes cl, short* fllv, short* pllv) {
     int j;
     switch (cl) {
     case CL_ST:
-        if (!shell_membership_ul(i, NULL)) {
+        if (!shell_membership_ul(i, MEMB_OPTIMAL, NULL)) {
             return;
         }
 
         j = shell_compute_syntac(i, false);
-        fluf = iden_green_mono(objects[j]->mor->obj, L_GREEN);
-        pluf = iden_green_mono(objects[j]->mor->obj, R_GREEN);
+        fluf = iden_green_mono(objects[j].mor->obj, L_GREEN);
+        pluf = iden_green_mono(objects[j].mor->obj, R_GREEN);
         break;
     case CL_MOD:
-        if (!shell_membership_tlmod(i, NULL)) {
+        if (!shell_membership_tlmod(i, MEMB_OPTIMAL, NULL)) {
             return;
         }
         j = shell_compute_syntac(i, false);
@@ -1183,7 +3090,7 @@ static void shell_fphiera_aux(int i, classes cl, short* fllv, short* pllv) {
         pluf = iden_green_subsemi(shell_compute_ker(j, KER_MOD, LV_REG), R_GREEN);
         break;
     case CL_AMT:
-        if (!shell_membership_tlamt(i, NULL)) {
+        if (!shell_membership_tlamt(i, MEMB_OPTIMAL, NULL)) {
             return;
         }
         j = shell_compute_syntac(i, false);
@@ -1191,7 +3098,7 @@ static void shell_fphiera_aux(int i, classes cl, short* fllv, short* pllv) {
         pluf = iden_green_subsemi(shell_compute_ker(j, KER_AMT, LV_REG), R_GREEN);
         break;
     case CL_GR:
-        if (!shell_membership_tlgr(i, NULL)) {
+        if (!shell_membership_tlgr(i, MEMB_OPTIMAL, NULL)) {
             return;
         }
         j = shell_compute_syntac(i, false);
@@ -1199,7 +3106,7 @@ static void shell_fphiera_aux(int i, classes cl, short* fllv, short* pllv) {
         pluf = iden_green_subsemi(shell_compute_ker(j, KER_GR, LV_REG), R_GREEN);
         break;
     case CL_DD:
-        if (!shell_membership_tldd(i, NULL)) {
+        if (!shell_membership_tldd(i, MEMB_OPTIMAL, NULL)) {
             return;
         }
         j = shell_compute_syntac(i, false);
@@ -1207,7 +3114,7 @@ static void shell_fphiera_aux(int i, classes cl, short* fllv, short* pllv) {
         pluf = iden_green_orbmono(shell_compute_orbits(j, ORB_DD, LV_REG), R_GREEN);
         break;
     case CL_MODP:
-        if (!shell_membership_tlmodp(i, NULL)) {
+        if (!shell_membership_tlmodp(i, MEMB_OPTIMAL, NULL)) {
             return;
         }
         j = shell_compute_syntac(i, false);
@@ -1215,7 +3122,7 @@ static void shell_fphiera_aux(int i, classes cl, short* fllv, short* pllv) {
         pluf = iden_green_orbmono(shell_compute_orbits(j, ORB_MODP, LV_REG), R_GREEN);
         break;
     case CL_AMTP:
-        if (!shell_membership_tlamtp(i, NULL)) {
+        if (!shell_membership_tlamtp(i, MEMB_OPTIMAL, NULL)) {
             return;
         }
         j = shell_compute_syntac(i, false);
@@ -1223,7 +3130,7 @@ static void shell_fphiera_aux(int i, classes cl, short* fllv, short* pllv) {
         pluf = iden_green_orbmono(shell_compute_orbits(j, ORB_AMTP, LV_REG), R_GREEN);
         break;
     case CL_GRP:
-        if (!shell_membership_tlgrp(i, NULL)) {
+        if (!shell_membership_tlgrp(i, MEMB_OPTIMAL, NULL)) {
             return;
         }
         j = shell_compute_syntac(i, false);
@@ -1256,12 +3163,12 @@ static void shell_fphiera_aux(int i, classes cl, short* fllv, short* pllv) {
         delete_ufind(fluf);
         delete_ufind(pluf);
         if (*fllv % 2 == 0) {
-            fluf = iden_lpolc_mono(objects[j]->mor->obj, flpr);
-            pluf = iden_rpolc_mono(objects[j]->mor->obj, plpr);
+            fluf = iden_lpolc_mono(objects[j].mor->obj, flpr);
+            pluf = iden_rpolc_mono(objects[j].mor->obj, plpr);
         }
         else {
-            fluf = iden_rpolc_mono(objects[j]->mor->obj, flpr);
-            pluf = iden_lpolc_mono(objects[j]->mor->obj, plpr);
+            fluf = iden_rpolc_mono(objects[j].mor->obj, flpr);
+            pluf = iden_lpolc_mono(objects[j].mor->obj, plpr);
         }
         delete_parti(flpr);
         delete_parti(plpr);
@@ -1477,7 +3384,7 @@ static void shell_memb_file_exall(exall_profile* theprofile) {
 
         bool res = true;
         for (uint h = 0; h < theprofile->nbhigh; h++) {
-            res = res && class_membership[theprofile->high[h]](j, NULL);
+            res = res && class_membership[theprofile->high[h]](j, MEMB_OPTIMAL, NULL);
             if (!res) {
                 break; // If the automaton does not belong to a required class, we stop checking.
             }
@@ -1485,7 +3392,7 @@ static void shell_memb_file_exall(exall_profile* theprofile) {
 
         if (res) {
             for (uint h = 0; h < theprofile->nblow; h++) {
-                res = res && !class_membership[theprofile->low[h]](j, NULL);
+                res = res && !class_membership[theprofile->low[h]](j, MEMB_OPTIMAL, NULL);
                 if (!res) {
                     break; // If the automaton belongs to a forbidden class, we stop checking.
                 }
@@ -1493,7 +3400,7 @@ static void shell_memb_file_exall(exall_profile* theprofile) {
         }
 
         if (j != -1 && res) {
-            exa_array[exa_elem] = dfa_mini_canonical_copy(objects[shell_compute_minimal(j)]->aut->obj_dfa);
+            exa_array[exa_elem] = dfa_mini_canonical_copy(objects[shell_compute_minimal(j)].obj_dfa);
             uint x = hash_table_insert(thehash, exa_elem);
             if (x == exa_elem) {
                 // If this was a new automaton, we add it to the set.
@@ -1634,10 +3541,10 @@ static void shell_memb_file_fpdet(exall_profile* theprofile) {
             levelj = shell_neghiera_aux(i, theprofile->low[0]);
         }
 
-        // view_nfa(objects[j]->aut->obj_nfa);
+        // view_nfa(objects[j].aut->obj_nfa);
 
         if (i != -1 && levelj >= (short)theprofile->nblow) {
-            exa_array[exa_elem] = dfa_mini_canonical_copy(objects[shell_compute_minimal(i)]->aut->obj_dfa);
+            exa_array[exa_elem] = dfa_mini_canonical_copy(objects[shell_compute_minimal(i)].obj_dfa);
             uint x = hash_table_insert(thehash, exa_elem);
             if (x == exa_elem) {
                 // If this was a new automaton, we add it to the set.
@@ -1734,8 +3641,14 @@ void shell_file_retrieve(const char* filename, const char* pref) {
     uint64_t count = 0;
     uint64_t posit = 0;
 
+    theprofile.nb_found = 0;
+
+    dfa** temp;
+    uint64_t sizetab = 1024;
+    MALLOC(temp, sizetab);
+
     listen_interrupt(); // Start listening for user interruptions.
-    char buffer[128];
+
     // Tests
     while (count < theprofile.done) {
         if (interrupt_flag) {
@@ -1743,26 +3656,26 @@ void shell_file_retrieve(const char* filename, const char* pref) {
             break;
         }
         if (count == theprofile.found[posit]) {
-
-            sprintf(buffer, "%s%04llu", pref, (unsigned long long)posit);
-            dfa* A = dfa_enum_to_dfa(E);
-            object_add_automaton_dfa(buffer, A);
-            posit++;
+            if (posit >= sizetab) {
+                sizetab <<= 1;
+                REALLOC(temp, sizetab);
+            }
+            temp[posit++] = dfa_enum_to_dfa(E);
+            //object_add_automaton_dfa_nocheck(buffer, A);
         }
         count++;
         dfa_enum_next(E);
     }
-
     ignore_interrupt(); // Stop listening for interrupts.
+    object_add_automaton_dfa_family(pref, temp, posit);
+    free(temp);
 
     dfa_enum_free(E);
 
     free(theprofile.found);
 }
 
-void shell_exall(classes* low, int nblow, classes* high, int nbhigh, int states, long start, long end, int alpha) {
-    start = max(start, 0);
-    end = min(end, LONG_MAX);
+void shell_exall(classes* low, int nblow, classes* high, int nbhigh, int states, int alpha, const char* prefix) {
 
     states = max(states, 1);
     alpha = max(alpha, 1);
@@ -1789,27 +3702,21 @@ void shell_exall(classes* low, int nblow, classes* high, int nbhigh, int states,
     exa_init(128);
     hash_table* thehash = create_hash_table(8, &exa_hash, &exa_equal);
 
-    long tests = 0;
-    while (tests < start && dfa_enum_next(E)) {
-        tests++;
-    }
 
     // listening_mode(timeout_value);
     listen_interrupt();
 
-    while (tests <= end && dfa_enum_next(E)) {
+    while (dfa_enum_next(E)) {
 
         if (interrupt_flag) {
             fprintf(stdout, "#### User interruption detected. Stopping the example generation.\n");
             break;
         }
 
-        tests++;
 
         //       dfa_enum_print(E);
         dfa* A = dfa_enum_to_dfa(E);
-
-        // view_dfa(A);
+        // // view_dfa(A);
 
         int j = object_add_automaton_dfa(NULL, A);
 
@@ -1836,15 +3743,16 @@ void shell_exall(classes* low, int nblow, classes* high, int nbhigh, int states,
         bool res = true;
 
         for (int h = 0; h < nbhigh; h++) {
-            if (!class_membership[high[h]](j, NULL)) {
+            if (!class_membership[high[h]](j, MEMB_OPTIMAL, NULL)) {
                 res = false;
+
                 break; // If the automaton does not belong to a required class, we stop checking.
             }
         }
 
         if (res) {
             for (int h = 0; h < nblow; h++) {
-                if (class_membership[low[h]](j, NULL)) {
+                if (class_membership[low[h]](j, MEMB_OPTIMAL, NULL)) {
                     res = false;
                     break; // If the automaton belongs to a forbidden class, we stop checking.
                 }
@@ -1854,7 +3762,7 @@ void shell_exall(classes* low, int nblow, classes* high, int nbhigh, int states,
         count++;
 
         if (j != -1 && res) {
-            exa_array[exa_elem] = dfa_mini_canonical_copy(objects[shell_compute_minimal(j)]->aut->obj_dfa);
+            exa_array[exa_elem] = dfa_mini_canonical_copy(objects[shell_compute_minimal(j)].obj_dfa);
             uint x = hash_table_insert(thehash, exa_elem);
             if (x == exa_elem) {
                 // If this was a new automaton, we add it to the set.
@@ -1882,20 +3790,15 @@ void shell_exall(classes* low, int nblow, classes* high, int nbhigh, int states,
 
     fprintf(stdout, "#### %d tests in total. Found %lu example languages.\n", count, exa_elem);
 
-    char buffer[64];
-    for (uint i = 0; i < exa_elem; i++) {
-        sprintf(buffer, "EXA%04d", i);
-        object_add_automaton_dfa(buffer, exa_array[i]);
-    }
+
+    object_add_automaton_dfa_family(prefix, exa_array, exa_elem);
 
     exa_delete(); // Free the example array.
 
     return;
 }
 
-void shell_exall_dethiera(classes cl, int level, int states, int alpha, long start, long end, bool neg) {
-    start = max(start, 0);
-    end = min(end, LONG_MAX);
+void shell_exall_dethiera(classes cl, int level, int states, int alpha, const char* prefix, bool neg) {
     if (!class_is_basis(cl)) {
         fprintf(stdout, "#### The class %s is not a valid basis.\n", class_names[cl]);
         return;
@@ -1907,13 +3810,7 @@ void shell_exall_dethiera(classes cl, int level, int states, int alpha, long sta
     exa_init(128);
     hash_table* thehash = create_hash_table(8, &exa_hash, &exa_equal);
 
-    long tests = 0;
-    while (tests < start && dfa_enum_next(E)) {
-        tests++;
-    }
-
-    while (tests <= end && dfa_enum_next(E)) {
-        tests++;
+    while (dfa_enum_next(E)) {
 
         //       dfa_enum_print(E);
         dfa* A = dfa_enum_to_dfa(E);
@@ -1948,10 +3845,10 @@ void shell_exall_dethiera(classes cl, int level, int states, int alpha, long sta
         }
 
         count++;
-        // view_nfa(objects[j]->aut->obj_nfa);
+        // view_nfa(objects[j].aut->obj_nfa);
 
         if (i != -1 && levelj >= level) {
-            exa_array[exa_elem] = dfa_mini_canonical_copy(objects[shell_compute_minimal(i)]->aut->obj_dfa);
+            exa_array[exa_elem] = dfa_mini_canonical_copy(objects[shell_compute_minimal(i)].obj_dfa);
             uint x = hash_table_insert(thehash, exa_elem);
             if (x == exa_elem) {
                 // If this was a new automaton, we add it to the set.
@@ -1977,11 +3874,13 @@ void shell_exall_dethiera(classes cl, int level, int states, int alpha, long sta
 
     fprintf(stdout, "#### %d tests in total. Found %lu example languages.\n", count, exa_elem);
 
-    char buffer[64];
-    for (uint i = 0; i < exa_elem; i++) {
-        sprintf(buffer, "EXA%04d", i);
-        object_add_automaton_dfa(buffer, exa_array[i]);
-    }
+    object_add_automaton_dfa_family(prefix, exa_array, exa_elem);
+    // object_delete_prefix(prefix);
+    // char buffer[64];
+    // for (uint i = 0; i < exa_elem; i++) {
+    //     sprintf(buffer, "%s%04d", prefix, i);
+    //     object_add_automaton_dfa_nocheck(buffer, exa_array[i]);
+    // }
 
     exa_delete(); // Free the example array.
 
@@ -2058,7 +3957,7 @@ void shell_exall_dethiera(classes cl, int level, int states, int alpha, long sta
 
 //             not = not || class_membership[low[h]](k, NULL);
 //         }
-//         // view_nfa(objects[j]->aut->obj_nfa);
+//         // view_nfa(objects[j].aut->obj_nfa);
 //         if (j != -1 && !not&& class_membership[cl](k, NULL)) {
 //             fprintf(stdout, "#### Test %d: Found an example. Stored in variable %s.\n", i + 1, buffer);
 //             count++;
@@ -2072,9 +3971,167 @@ void shell_exall_dethiera(classes cl, int level, int states, int alpha, long sta
 //     return false;
 // }
 
+
+#define SECNANO 1000000000UL
+
+void shell_make_timestats(classes cl, int states, int alpha) {
+
+    states = max(states, 1);
+    alpha = max(alpha, 1);
+
+
+    dfa_enum* E = dfa_enum_init(states, alpha);
+    ulong count = 0;
+
+
+
+
+    // listening_mode(timeout_value);
+    listen_interrupt();
+
+    struct timespec before;
+    struct timespec after;
+    ulong nano = 0;
+    ulong positive = 0;
+
+    while (dfa_enum_next(E)) {
+
+        if (interrupt_flag) {
+            fprintf(stdout, "#### User interruption detected. Stopping the example generation.\n");
+            break;
+        }
+
+
+        //       dfa_enum_print(E);
+        dfa* A = dfa_enum_to_dfa(E);
+
+        int j = object_add_automaton_dfa(NULL, A);
+        timespec_get(&before, TIME_UTC);
+        bool res = class_membership[cl](j, memb_mode, NULL);
+        timespec_get(&after, TIME_UTC);
+        nano += (after.tv_nsec - before.tv_nsec) + (after.tv_sec - before.tv_sec) * SECNANO;
+        count++;
+        if (res) {
+            positive++;
+        }
+
+
+        if (count % 20000000 == 0) {
+            fprintf(stdout, "#### %lu tests done so far. %lu positive results.\n", count, positive);
+        }
+
+        object_free(j);
+    }
+
+    ignore_interrupt(); // Stop listening for interrupts.
+
+
+    fprintf(stdout, "#### %lu tests in total. %lu positive results.\n", count, positive);
+
+    ulong res = nano / count;
+    ulong micro = res / 1000;
+    ulong rem = res % 1000;
+    switch (memb_mode)
+    {
+    case MEMB_OPTIMAL:
+        fprintf(stdout, "#### Average time of a single test (optimized mode): %lu.%lu microseconds.\n", micro, rem);
+        break;
+    case MEMB_MINIMAL:
+        fprintf(stdout, "#### Average time of a single test (automata mode): %lu.%lu microseconds.\n", micro, rem);
+        break;
+    case MEMB_SYNTAC:
+        fprintf(stdout, "#### Average time of a single test (monoids mode): %lu.%lu microseconds.\n", micro, rem);
+        break;
+    default:
+        break;
+    }
+
+    return;
+}
+
+
+
+void shell_bugsearch(classes cl, int states, int alpha, const char* prefix) {
+
+    states = max(states, 1);
+    alpha = max(alpha, 1);
+
+
+    dfa_enum* E = dfa_enum_init(states, alpha);
+    uint count = 0;
+
+    exa_init(128);
+    hash_table* thehash = create_hash_table(8, &exa_hash, &exa_equal);
+
+
+    // listening_mode(timeout_value);
+    listen_interrupt();
+
+
+    while (dfa_enum_next(E)) {
+
+        if (interrupt_flag) {
+            fprintf(stdout, "#### User interruption detected. Stopping the example generation.\n");
+            break;
+        }
+
+
+        //       dfa_enum_print(E);
+        dfa* A = dfa_enum_to_dfa(E);
+
+        // view_dfa(A);
+
+        int j = object_add_automaton_dfa(NULL, A);
+        bool resauto = class_membership[cl](j, MEMB_MINIMAL, NULL);
+        bool resmono = class_membership[cl](j, MEMB_SYNTAC, NULL);
+        count++;
+
+        if (j != -1 && resauto != resmono) {
+            exa_array[exa_elem] = dfa_mini_canonical_copy(objects[shell_compute_minimal(j)].obj_dfa);
+            uint x = hash_table_insert(thehash, exa_elem);
+            if (x == exa_elem) {
+                // If this was a new automaton, we add it to the set.
+                exa_elem++;
+                if (exa_elem >= exa_size) {
+                    exa_grow(); // Grow the array if needed.
+                }
+            }
+            else {
+                dfa_delete(exa_array[exa_elem]);
+            }
+        }
+
+        if (count % 20000 == 0) {
+            fprintf(stdout, "#### %d tests done so far. %lu bugs found.\n", count, exa_elem);
+        }
+
+        object_free(j);
+    }
+
+    ignore_interrupt(); // Stop listening for interrupts.
+
+    dfa_enum_free(E);
+    delete_hash_table(thehash); // Delete the hash table.
+
+    fprintf(stdout, "#### %d tests in total. Found %lu bugs.\n", count, exa_elem);
+
+
+    object_add_automaton_dfa_family(prefix, exa_array, exa_elem);
+    // object_delete_prefix(prefix); // Delete all objects with chosen prefix.
+
+    // char buffer[64];
+    // for (uint i = 0; i < exa_elem; i++) {
+    //     sprintf(buffer, "%s%04d", prefix, i);
+    //     object_add_automaton_dfa_nocheck(buffer, exa_array[i]);
+    // }
+    exa_delete(); // Free the example array.
+
+    return;
+}
+
 bool shell_exall_dfatest(void) {
 
-    dfa_enum* E = dfa_enum_init(4, 3);
+    dfa_enum* E = dfa_enum_init(4, 2);
     uint count = 0;
 
     exa_init(128);
@@ -2101,16 +4158,16 @@ bool shell_exall_dfatest(void) {
             fprintf(stdout, "#### Test %d: user interruption.\n", count);
             break;
         }
-        bool resmono = class_membership[CL_TLGRP](k, NULL);
+        bool resmono = class_membership[CL_TL2MOD](k, MEMB_SYNTAC, NULL);
         // bool resauto = class_membership[CL_UL](j, NULL);
-        bool resauto = is_daplusgp_dfa(objects[jm]->aut->obj_dfa, DFAGP_GR, NULL);
-        // bool resauto = is_cycletrivialbpgp_dfa(objects[jm]->aut->obj_dfa, DFAGP_GR, NULL);
-        // bool resauto = is_cycletrivialgp_dfa(objects[jm]->aut->obj_dfa, DFAGP_AMT, NULL);
+        bool resauto = is_dabpgp_dfa(objects[jm].obj_dfa, BA_MOD, NULL, NULL);
+        // bool resauto = is_rtrivialrivialbpgp_dfa(objects[jm].aut->obj_dfa, BA_GR, NULL);
+        // bool resauto = is_rtrivialrivialgp_dfa(objects[jm].aut->obj_dfa, BA_AMT, NULL);
 
         count++;
 
         if (resmono != resauto) {
-            exa_array[exa_elem] = dfa_mini_canonical_copy(objects[shell_compute_minimal(j)]->aut->obj_dfa);
+            exa_array[exa_elem] = dfa_mini_canonical_copy(objects[shell_compute_minimal(j)].obj_dfa);
             uint x = hash_table_insert(thehash, exa_elem);
             if (x == exa_elem) {
                 // If this was a new automaton, we add it to the set.
@@ -2135,7 +4192,6 @@ bool shell_exall_dfatest(void) {
     delete_hash_table(thehash); // Delete the hash table.
 
     fprintf(stdout, "#### %d tests in total. Found %lu example languages.\n", count, exa_elem);
-
     char buffer[64];
     for (uint i = 0; i < exa_elem; i++) {
         sprintf(buffer, "EXA%04d", i);

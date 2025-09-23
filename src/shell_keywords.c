@@ -34,6 +34,8 @@ void keywords_add_all_keys(void) {
     keywords_add_key(KY_INTERFACE, "history");
     keywords_add_key(KY_INTERFACE, "limit");
     keywords_add_key(KY_TOGGLE, "toggleopti");
+    keywords_add_key(KY_TOGGLEMEMB, "togglememb");
+    keywords_add_key(KY_TIMESTATS, "timestats");
     keywords_add_key(KY_LATEX, "latex");
 
     // Commandes sauvegarde et chargement
@@ -54,6 +56,7 @@ void keywords_add_all_keys(void) {
     keywords_add_key(KY_EXALL, "exall");
     keywords_add_key(KY_NEXALL, "negexall");
     keywords_add_key(KY_FPEXALL, "fpexall");
+    keywords_add_key(KY_BUGSEARCH, "bugsearch");
     keywords_add_key(KY_INSIDE, "in");
     keywords_add_key(KY_OUTSIDE, "out");
     keywords_add_key(KY_LIST, "list");
@@ -63,8 +66,6 @@ void keywords_add_all_keys(void) {
     keywords_add_key(KY_REGEXPS, "regexps");
     keywords_add_key(KY_RECDEFS, "recdefs");
 
-    keywords_add_key(KY_FILTER, "filter");
-    keywords_add_key(KY_FMSIZE, "sizesynt");
 
     // Commandes automates
 
@@ -94,6 +95,8 @@ void keywords_add_all_keys(void) {
     keywords_add_key(KY_DETERMINIZE, "determinize");
     keywords_add_key(KY_COMPLEMENT, "complement");
     keywords_add_key(KY_NOSIMC, "nosimplec");
+    keywords_add_key(KY_FOLDING, "folding");
+    keywords_add_key(KY_DIRECTPRODUCT, "directproduct");
 
     // Commandes morphismes
     keywords_add_key(KY_SYNT, "syntactic");
@@ -119,8 +122,22 @@ void keywords_add_all_keys(void) {
     keywords_add_key(KY_SEPAR, "separation");
     keywords_add_key(KY_MEMB, "membership");
     keywords_add_key(KY_CHIERA, "chierarchies");
+    keywords_add_key(KY_NAVHIERA, "navhierarchies");
     keywords_add_key(KY_NHIERA, "neghierarchies");
     keywords_add_key(KY_FPHIERA, "fphierarchies");
+
+    // Filtering
+    keywords_add_key(KY_RNUM, "rnum");
+    keywords_add_key(KY_LNUM, "lnum");
+    keywords_add_key(KY_JNUM, "jnum");
+    keywords_add_key(KY_HNUM, "hnum");
+    keywords_add_key(KY_RMAXSIZE, "rmaxsize");
+    keywords_add_key(KY_LMAXSIZE, "lmaxsize");
+    keywords_add_key(KY_JMAXSIZE, "jmaxsize");
+    keywords_add_key(KY_HMAXSIZE, "hmaxsize");
+    keywords_add_key(KY_NOT, "not");
+    keywords_add_key(KY_FILTER, "filter");
+    keywords_add_key(KY_NOSMALLCOUNTER, "nosmallcounter");
 
     // Classes
     keywords_add_key(KY_HTGEN, "HTGEN");
@@ -141,7 +158,7 @@ void keywords_add_all_keys(void) {
     keywords_add_key(KY_GR, "GR");
     keywords_add_key(KY_GRP, "GRP");
     keywords_add_key(KY_REG, "REG");
-    keywords_add_key(KY_KNASTAT, "KNASTAT");
+    keywords_add_key(KY_EMPTY, "EMPTY");
 
     // Opérateurs
     keywords_add_key(KY_POL, "POL");
@@ -161,6 +178,7 @@ void keywords_add_all_keys(void) {
     keywords_add_key(KY_PLC, "PL");
     keywords_add_key(KY_PLC2, "PL2");
     keywords_add_key(KY_JORB, "JORB");
+    keywords_add_key(KY_KNAST, "KNAST");
 
     all_strings[keywords_count] = NULL;
 }
@@ -258,7 +276,7 @@ com_keyword string_to_keyword(const char* s) {
 }
 
 bool check_varname(const char* name) {
-    if (name == NULL || name[0] < 'A' || name[0] > 'Z') {
+    if (name == NULL || name[0] < 'A' || name[0] > 'Z' || strlen(name) > NAME_MAXSIZE) {
         return false;
     }
     for (uint i = 0; i < keywords_count; i++) {

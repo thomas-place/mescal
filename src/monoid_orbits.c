@@ -181,140 +181,6 @@ orbits* compute_gplusorbits(subsemi* S) {
 /* AT-orbits */
 /*************/
 
-// Computes the set of letters that label transitions from the SCC of e
-// Return is made as a Boolean array indexed by the alphabet
-bool* compute_maxalph_scc(morphism* M, uint e) {
-    bool* res;
-    MALLOC(res, M->r_cayley->size_alpha);
-    for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
-        res[a] = false;
-    }
-    uint c = M->rels->RCL->numcl[e];
-    for (uint i = 0; i < M->rels->RCL->cl_size[c]; i++) {
-        for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
-            if (M->rels->RCL->numcl[M->r_cayley->edges[M->rels->RCL->cl_elems[c][i]][a]] == c) {
-                res[a] = true;
-            }
-        }
-    }
-    return res;
-}
-
-// Merges two alphabets into a new one and tests simultanoeously if these alphabets were equal
-static bool merge_subalph(morphism* M, bool* m, bool* s1, bool* s2) {
-    bool res = true;
-    for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
-        if (s1[a] != s2[a]) {
-            res = false;
-        }
-        m[a] = s1[a] && s2[a];
-    }
-    return res;
-}
-
-// Tests if e and f have antecedents sharing a common alphabet
-static bool dgraph_seek_alph(dgraph* G, uint ini, uint e, uint f, bool* alph) {
-
-    // Array to memorize visited vertices
-    bool visited[G->size_graph];
-    for (uint q = 0; q < G->size_graph; q++) {
-        visited[q] = false;
-    }
-
-    // We memorize the starting vertex
-    visited[ini] = true;
-
-    dequeue* thestack = create_dequeue();
-    rigins_dequeue(ini, thestack);
-
-    // DFS
-    while (!isempty_dequeue(thestack)) {
-        if (visited[e] && visited[f]) {
-            delete_dequeue(thestack);
-            return true;
-        }
-        uint q = rigpull_dequeue(thestack);
-
-        if (alph) {
-            for (uint a = 0; a < G->size_alpha; a++) {
-                if (alph[a] && !visited[G->edges[q][a]]) {
-                    visited[G->edges[q][a]] = true;
-                    rigins_dequeue(G->edges[q][a], thestack);
-                }
-            }
-        }
-        else {
-            for (uint a = 0; a < G->size_alpha; a++) {
-
-                if (!visited[G->edges[q][a]]) {
-                    visited[G->edges[q][a]] = true;
-                    rigins_dequeue(G->edges[q][a], thestack);
-                }
-            }
-        }
-    }
-
-    delete_dequeue(thestack);
-    return false;
-}
-
-
-// Computes the maximal shared alphabet of the idempotents e and f
-// The return is made as a Boolean array indexed by the alphabet
-// If there exists no shared alphabet, the return is NULL
-bool* compute_maxalph_com_scc(morphism* M, uint e, uint f) {
-    // Alphabet of the SCC of e
-    bool* ealph = compute_maxalph_scc(M, e);
-    // Alphabet of the SCC of f
-    bool* falph = compute_maxalph_scc(M, f);
-
-    bool* merge;
-    MALLOC(merge, M->r_cayley->size_alpha);
-
-    // While the two alphabets are distinct, we consider their intersection (the largest candidate for a common alphabet).
-    while (!merge_subalph(M, merge, ealph, falph)) {
-
-        // We check if e and f are still reachable using only the intersection (but not necessarily in full)
-        if (!dgraph_seek_alph(M->r_cayley, ONE, e, f, merge)) {
-            // If this is not possible, e and f do not have a common alphabet, we return NULL
-            free(merge);
-            free(ealph);
-            free(falph);
-            return NULL;
-        }
-
-        // We now compute the alphabets of the SCCs of e and f when we restrict the alphabet to the merged one
-        parti* rSCCS = dtarjan(M->r_cayley, merge, false);
-
-        for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
-            // We reinitialize the letter a for ealph and falph
-            ealph[a] = false;
-            falph[a] = false;
-
-            // If the letter a is in the intersection, we look for an internal transition labeled by a in the SCCs restricted to merge of e and f
-            if (merge[a]) {
-                // We go through all the states of the SCC of e as long as we have not seen a transition a
-                for (uint i = 0; i < rSCCS->cl_size[rSCCS->numcl[e]]; i++) {
-                    if (rSCCS->numcl[M->r_cayley->edges[rSCCS->cl_elems[rSCCS->numcl[e]][i]][a]] == rSCCS->numcl[e]) {
-                        ealph[a] = true;
-                        break;
-                    }
-                }
-                // We go through all the states of the SCC of f as long as we have not seen a transition a
-                for (uint i = 0; i < rSCCS->cl_size[rSCCS->numcl[f]]; i++) {
-                    if (rSCCS->numcl[M->r_cayley->edges[rSCCS->cl_elems[rSCCS->numcl[f]][i]][a]] == rSCCS->numcl[f]) {
-                        falph[a] = true;
-                        break;
-                    }
-                }
-            }
-        }
-        delete_parti(rSCCS);
-    }
-    free(ealph);
-    free(falph);
-    return merge;
-}
 
 subsemi* compute_one_ptorb(morphism* M, uint e, sub_level level) {
 
@@ -325,7 +191,8 @@ subsemi* compute_one_ptorb(morphism* M, uint e, sub_level level) {
     ulong thetime = time(NULL);
 #endif
 
-    bool* malph = compute_maxalph_scc(M, e);
+    bool malph[M->r_cayley->size_alpha];
+    dgraph_compute_alph_scc(M->r_cayley, M->rels->RCL, M->rels->RCL->numcl[e], malph);
     subsemi* S = init_subsemi(M);
     S->level = level;
 
@@ -381,7 +248,6 @@ subsemi* compute_one_ptorb(morphism* M, uint e, sub_level level) {
         parti* right = dtarjan(M->r_cayley, malph, false);
         parti* left = dtarjan(M->l_cayley, malph, false);
         parti* thej = dualdtarjan(M->r_cayley, M->l_cayley, malph, false);
-        free(malph);
         S->rels->RCL = restrict_parti(right, S->size, S->mono_in_sub, S->mono_to_sub);
         S->rels->LCL = restrict_parti(left, S->size, S->mono_in_sub, S->mono_to_sub);
         S->rels->JCL = restrict_parti(thej, S->size, S->mono_in_sub, S->mono_to_sub);
@@ -396,7 +262,6 @@ subsemi* compute_one_ptorb(morphism* M, uint e, sub_level level) {
         gr_green_compute(S->idem_list, S->nb_idems, S->rels);
     }
     else {
-        free(malph);
         green_compute_sub_reg(S);
     }
 
@@ -443,27 +308,28 @@ orbits* compute_ptorbits(morphism* M, sub_level level) {
 
 
 
-static void bpg_fold(morphism* M, uint rcl, parti** fold, dgraph** g_fold, bpg_type type) {
+static void bpg_fold(morphism* M, uint rcl, parti** fold, dgraph** g_fold, basis type) {
     dgraph* rcl_g = mor_extract_rcl(M, rcl);
-    switch (type)
-    {
-    case BPG_MOD:
-        *fold = dgraph_stal_fold(rcl_g, false);
-        break;
-    case BPG_GR:
-        *fold = dgraph_stal_fold(rcl_g, true);
-        break;
-    case BPG_AMT:
-        *fold = compute_amt_fold(rcl_g);
-        break;
-    default:
-        fprintf(stderr, "Error: Invalid bpg_type in bpg_fold.\n");
-        delete_dgraph(rcl_g);
-        *fold = NULL;
-        *g_fold = NULL;
-        return;
-        break;
-    }
+    *fold = dgraph_stal_fold(rcl_g, NULL, type);
+    // switch (type)
+    // {
+    // case BA_MOD:
+    //     *fold = dgraph_stal_fold(rcl_g, NULL, BA_MOD);
+    //     break;
+    // case BA_GR:
+    //     *fold = dgraph_stal_fold(rcl_g, NULL, BA_GR);
+    //     break;
+    // case BA_AMT:
+    //     *fold = compute_amt_fold(rcl_g);
+    //     break;
+    // default:
+    //     fprintf(stderr, "Error: Invalid basis in bpg_fold.\n");
+    //     delete_dgraph(rcl_g);
+    //     *fold = NULL;
+    //     *g_fold = NULL;
+    //     return;
+    //     break;
+    // }
 
     *g_fold = create_dgraph_noedges((*fold)->size_par, M->r_cayley->size_alpha);
     for (uint i = 0; i < (*fold)->size_par; i++) {
@@ -484,18 +350,21 @@ static void bpg_fold(morphism* M, uint rcl, parti** fold, dgraph** g_fold, bpg_t
 
 
 
-subsemi* compute_one_bpgorb(morphism* M, uint e, sub_level level, bpg_type type) {
+subsemi* compute_one_bpgorb(morphism* M, uint e, sub_level level, basis type) {
 
 #ifdef DEBUG_ORBITS
     switch (type)
     {
-    case BPG_MOD:
+    case BA_ST:
+        printf("\nComputing the BPol(ST)-orbit of ");
+        break;
+    case BA_MOD:
         printf("\nComputing the BPol(MOD)-orbit of ");
         break;
-    case BPG_GR:
+    case BA_GR:
         printf("\nComputing the BPol(GR)-orbit of ");
         break;
-    case BPG_AMT:
+    case BA_AMT:
         printf("\nComputing the BPol(AMT)-orbit of ");
         break;
     default:
@@ -506,6 +375,12 @@ subsemi* compute_one_bpgorb(morphism* M, uint e, sub_level level, bpg_type type)
     printf(".\n");
     ulong thetime = time(NULL);
 #endif
+
+    // Case when the basis is ST
+    if (type == BA_ST) {
+        return compute_one_ptorb(M, e, level);
+    }
+
 
     green* G = M->rels;
 
@@ -613,7 +488,7 @@ subsemi* compute_one_bpgorb(morphism* M, uint e, sub_level level, bpg_type type)
     return theorb;
 }
 
-orbits* compute_bpgorbits(morphism* M, sub_level level, bpg_type type) {
+orbits* compute_bpgorbits(morphism* M, sub_level level, basis type) {
     orbits* res;
     MALLOC(res, 1);
     res->original = M;
@@ -841,29 +716,29 @@ subsemi* compute_one_bpddorb(morphism* M, uint e, sub_level level) {
 
 
 
-static void compute_jmult_orbits(morphism* M, uint rcl, bpg_type type, dequeue**** mults) {
+static void compute_jmult_orbits(morphism* M, uint rcl, basis type, dequeue**** mults) {
 
     // We first compute the folding of the R-class according to the type.
     dgraph* rcl_g = mor_extract_rcl(M, rcl);
-    parti* fold;
-    switch (type)
-    {
-    case BPG_MOD:
-        fold = dgraph_stal_fold(rcl_g, false);
-        break;
-    case BPG_GR:
-        fold = dgraph_stal_fold(rcl_g, true);
-        break;
-    case BPG_AMT:
-        fold = compute_amt_fold(rcl_g);
-        break;
-    default:
-        fprintf(stderr, "Error: Invalid bpg_type in compute_jmult_orbits.\n");
-        delete_dgraph(rcl_g);
-        *mults = NULL;
-        return;
-        break;
-    }
+    parti* fold = dgraph_stal_fold(rcl_g, NULL, type);
+    // switch (type)
+    // {
+    // case BA_MOD:
+    //     fold = dgraph_stal_fold(rcl_g, NULL, BA_MOD);
+    //     break;
+    // case BA_GR:
+    //     fold = dgraph_stal_fold(rcl_g, NULL, BA_GR);
+    //     break;
+    // case BA_AMT:
+    //     fold = compute_amt_fold(rcl_g);
+    //     break;
+    // default:
+    //     fprintf(stderr, "Error: Invalid basis in compute_jmult_orbits.\n");
+    //     delete_dgraph(rcl_g);
+    //     *mults = NULL;
+    //     return;
+    //     break;
+    // }
     delete_dgraph(rcl_g);
 
     // Preparation of the array of stable elements.
@@ -914,9 +789,9 @@ static void compute_jmult_orbits(morphism* M, uint rcl, bpg_type type, dequeue**
 }
 
 
-subsemi* compute_one_bpgplusorb(morphism* M, uint e, sub_level level, bpg_type type) {
-    // If the type is BPG_ST, we compute the BPol(DD)-orbit.
-    if (type == BPG_ST) {
+subsemi* compute_one_bpgplusorb(morphism* M, uint e, sub_level level, basis type) {
+    // If the type is BA_ST, we compute the BPol(DD)-orbit.
+    if (type == BA_ST) {
         return compute_one_bpddorb(M, e, level);
     }
 
@@ -929,13 +804,13 @@ subsemi* compute_one_bpgplusorb(morphism* M, uint e, sub_level level, bpg_type t
 #ifdef DEBUG_ORBITS
     switch (type)
     {
-    case BPG_MOD:
+    case BA_MOD:
         printf("\nComputing the BPol(MOD⁺)-orbit of ");
         break;
-    case BPG_GR:
+    case BA_GR:
         printf("\nComputing the BPol(GR⁺)-orbit of ");
         break;
-    case BPG_AMT:
+    case BA_AMT:
         printf("\nComputing the BPol(AMT⁺)-orbit of ");
         break;
     default:
@@ -1052,14 +927,14 @@ subsemi* compute_one_bpgplusorb(morphism* M, uint e, sub_level level, bpg_type t
     free(visited);
     delete_dequeue(eM);
     return theorb;
-}
+    }
 
 
 
 
 
 
-orbits* compute_bpgplusorbits(morphism* M, sub_level level, bpg_type type) {
+orbits* compute_bpgplusorbits(morphism* M, sub_level level, basis type) {
     orbits* res;
     MALLOC(res, 1);
     res->original = M;

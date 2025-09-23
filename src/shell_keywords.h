@@ -39,6 +39,7 @@ typedef enum {
     KY_EXALL,
     KY_NEXALL,
     KY_FPEXALL,
+    KY_BUGSEARCH,
     KY_INSIDE,
     KY_OUTSIDE,
     KY_LIST,
@@ -48,10 +49,10 @@ typedef enum {
     KY_REGEXPS,
     KY_RECDEFS,
     KY_TOGGLE,
+    KY_TOGGLEMEMB,
+    KY_TIMESTATS,
     KY_LATEX,
 
-    KY_FILTER,
-    KY_FMSIZE,
 
     // Automata commands
     KY_MINI,
@@ -81,6 +82,8 @@ typedef enum {
     KY_DETERMINIZE,
     KY_COMPLEMENT,
     KY_NOSIMC,
+    KY_FOLDING,
+    KY_DIRECTPRODUCT,
 
     // Morphisms commands
     KY_SYNT,
@@ -106,8 +109,26 @@ typedef enum {
     KY_SEPAR,
     KY_MEMB,
     KY_CHIERA,
+    KY_NAVHIERA,
     KY_NHIERA,
     KY_FPHIERA,
+
+    //Filtering
+    KY_RSIZE,
+    KY_LSIZE,
+    KY_JSIZE,
+    KY_HSIZE,
+    KY_RNUM,
+    KY_LNUM,
+    KY_JNUM,
+    KY_HNUM,
+    KY_RMAXSIZE,
+    KY_LMAXSIZE,
+    KY_JMAXSIZE,
+    KY_HMAXSIZE,
+    KY_NOT,
+    KY_FILTER,
+    KY_NOSMALLCOUNTER,
 
     // End of commands
     KY_COMEND,
@@ -132,7 +153,7 @@ typedef enum {
     KY_GR,
     KY_GRP,
     KY_REG,
-    KY_KNASTAT,
+    KY_EMPTY,
 
     // Operators
 
@@ -153,6 +174,7 @@ typedef enum {
     KY_PLC,
     KY_PLC2,
     KY_JORB,
+    KY_KNAST,
 
     // Dummy keyword
     KY_NULL

@@ -106,12 +106,20 @@ void nfa_delete(nfa* A) {
         delete_lgraph(A->trans_i);
     }
 
+
+
     free(A);
 }
 
 void dfa_delete(dfa* A) {
     if (!A) {
         return;
+    }
+    if (A->order) {
+        for (uint q = 0; q < A->trans->size_graph; q++) {
+            free(A->order[q]);
+        }
+        free(A->order);
     }
     free(A->alphabet);
     free(A->finals);
@@ -962,20 +970,26 @@ dfa* dfa_trim(dfa* A) {
     }
     dequeue* stack = create_dequeue();
     rigins_dequeue(A->initial, stack);
-    uint nb_visted = 0;
+    uint nb_visited = 0;
 
     while (!isempty_dequeue(stack)) {
         uint q = rigpull_dequeue(stack);
         if (map[q] != UINT_MAX) {
             continue;
         }
-        map[q] = nb_visted++;
+        map[q] = nb_visited++;
         for (uint a = 0; a < A->trans->size_alpha; a++) {
             rigins_dequeue(A->trans->edges[q][a], stack);
         }
     }
-
     delete_dequeue(stack);
+
+    if (nb_visited == A->trans->size_graph) {
+        free(map);
+        return dfa_copy(A);
+    }
+
+
 
     uint nb_finals = 0;
     for (uint i = 0; i < A->nb_finals; i++) {
@@ -994,7 +1008,7 @@ dfa* dfa_trim(dfa* A) {
     else {
         MALLOC(TRIM->finals, TRIM->nb_finals);
     }
-    TRIM->trans = create_dgraph_noedges(nb_visted, A->trans->size_alpha);
+    TRIM->trans = create_dgraph_noedges(nb_visited, A->trans->size_alpha);
 
 
     TRIM->initial = map[A->initial];
@@ -1103,6 +1117,69 @@ nfa* nfa_elimeps(nfa* A) {
 void nfa_elimeps_mod(nfa* A) {
     nfa* B = nfa_elimeps(A);
     nfa_overwrite(A, B);
+}
+
+
+
+dfa* dfa_direct_product(dfa* A, dfa* B) {
+    if (!A || !B || A->trans->size_alpha != B->trans->size_alpha) {
+        return NULL;
+    }
+
+
+
+    dfa* PROD;
+    CALLOC(PROD, 1);
+    PROD->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha);
+    PROD->initial = 0;
+    PROD->nb_finals = A->nb_finals * B->nb_finals;
+    MALLOC(PROD->finals, PROD->nb_finals);
+    PROD->trans = dgraph_direct_product(A->trans, B->trans);
+    uint k = 0;
+    for (uint i = 0; i < A->nb_finals; i++) {
+        for (uint j = 0; j < B->nb_finals; j++) {
+            PROD->finals[k++] = A->finals[i] * B->trans->size_graph + B->finals[j];
+        }
+    }
+    PROD->order = NULL;
+
+    MALLOC(PROD->state_names, PROD->trans->size_graph);
+    for (uint i = 0; i < PROD->trans->size_graph; i++) {
+        uint size = 4;
+        if (A->state_names) {
+            size += strlen(A->state_names[i / B->trans->size_graph]);
+        }
+        else {
+            size += get_uint_length(i / B->trans->size_graph);
+        }
+        if (B->state_names) {
+            size += strlen(B->state_names[i % B->trans->size_graph]);
+        }
+        else {
+            size += get_uint_length(i % B->trans->size_graph);
+        }
+        MALLOC(PROD->state_names[i], size);
+        PROD->state_names[i][0] = '\0';
+        char aux[64];
+        strcat(PROD->state_names[i], "(");
+        if (A->state_names) {
+            strcat(PROD->state_names[i], A->state_names[i / B->trans->size_graph]);
+        }
+        else {
+            sprintf(aux, "%d", i / B->trans->size_graph);
+            strcat(PROD->state_names[i], aux);
+        }
+        strcat(PROD->state_names[i], ",");
+        if (B->state_names) {
+            strcat(PROD->state_names[i], B->state_names[i % B->trans->size_graph]);
+        }
+        else {
+            sprintf(aux, "%d", i % B->trans->size_graph);
+            strcat(PROD->state_names[i], aux);
+        }
+        strcat(PROD->state_names[i], ")");
+    }
+    return PROD;
 }
 
 /*****************************/

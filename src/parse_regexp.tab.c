@@ -1214,13 +1214,13 @@ yyreduce:
                 {
     DEBUG("RVALUE %s", (yyvsp[0].name));
     int i = object_get_from_name((yyvsp[0].name));
-    if (i == -1 || objects[i]->type != REGEXP) {
+    if (i == -1 || objects[i].type != REGEXP) {
       fprintf(stderr,"Error: %s is not a valid regular expression variable.\n",(yyvsp[0].name));
       (yyval.regexp) = NULL;
     }
     else {
     DEBUG("Language found");
-    (yyval.regexp) = reg_copy(objects[i]->exp);
+    (yyval.regexp) = reg_copy(objects[i].exp);
   }
 }
 #line 1227 "parse_regexp.tab.c"

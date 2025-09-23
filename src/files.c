@@ -1239,13 +1239,11 @@ void files_save_object(object* theobj, char* filename) {
     case REGEXP:
         root = files_regexp_to_json(theobj->exp);
         break;
-    case AUTOMATON:
-        if (theobj->aut->dfa) {
-            root = files_dfa_to_json(theobj->aut->obj_dfa);
-        }
-        else {
-            root = files_nfa_to_json(theobj->aut->obj_nfa);
-        }
+    case NAUTOMATON:
+        root = files_nfa_to_json(theobj->obj_nfa);
+        break;
+    case DAUTOMATON:
+        root = files_dfa_to_json(theobj->obj_dfa);
         break;
     default:
         return;
@@ -1330,7 +1328,7 @@ void files_save_session(char* filename) {
     uint size = 0;
     for (int i = 0; i < nb_objects; i++) {
         {
-            if (objects[i]->parent == -1) {
+            if (objects[i].parent == -1) {
                 size++;
             }
         }
@@ -1338,19 +1336,17 @@ void files_save_session(char* filename) {
 
     json_object* thetable = json_object_new_array_ext(size);
     for (int i = 0; i < nb_objects; i++) {
-        if (objects[i]->parent == -1) {
+        if (objects[i].parent == -1) {
             json_object* oneobj = json_object_new_array_ext(2);
-            json_object_array_add(oneobj, json_object_new_string(objects[i]->name));
-            if (objects[i]->type == REGEXP) {
-                json_object_array_add(oneobj, files_regexp_to_json(objects[i]->exp));
+            json_object_array_add(oneobj, json_object_new_string(object_get_full_name(i)));
+            if (objects[i].type == REGEXP) {
+                json_object_array_add(oneobj, files_regexp_to_json(objects[i].exp));
             }
-            if (objects[i]->type == AUTOMATON) {
-                if (objects[i]->aut->dfa) {
-                    json_object_array_add(oneobj, files_dfa_to_json(objects[i]->aut->obj_dfa));
-                }
-                else {
-                    json_object_array_add(oneobj, files_nfa_to_json(objects[i]->aut->obj_nfa));
-                }
+            else if (objects[i].type == NAUTOMATON) {
+                json_object_array_add(oneobj, files_nfa_to_json(objects[i].obj_nfa));
+            }
+            else if (objects[i].type == DAUTOMATON) {
+                json_object_array_add(oneobj, files_dfa_to_json(objects[i].obj_dfa));
             }
             json_object_array_add(thetable, oneobj);
         }

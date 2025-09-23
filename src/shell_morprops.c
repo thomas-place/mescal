@@ -4,7 +4,7 @@
 
 
 
-uint m_cexa[6];
+uint m_cexa[16];
 
 static uint* get_counter(FILE* out) {
     if (out) {
@@ -16,7 +16,7 @@ static uint* get_counter(FILE* out) {
 char m_buffers[6][100];
 
 static char* m_sprint(int j, uint i) {
-    mor_sprint_name_utf8(objects[j]->mor->obj, m_cexa[i], m_buffers[i]);
+    mor_sprint_name_utf8(objects[j].mor->obj, m_cexa[i], m_buffers[i]);
     return m_buffers[i];
 }
 
@@ -25,7 +25,7 @@ bool shell_morprop_htgentriv(int j, char* name, FILE* out) {
     if (out) {
         fprintf(out, "#### Checking if the H-classes of 1 and all generators in the %s are trivial.\n", name);
     }
-    if (is_htrivial_generators(objects[j]->mor->obj, get_counter(out))) {
+    if (is_htrivial_generators(objects[j].mor->obj, get_counter(out))) {
         if (out) {
             fprintf(out, "#### The H-classes of 1 and all generators in the %s are trivial.\n", name);
         }
@@ -45,7 +45,7 @@ bool shell_morprop_monotriv(int j, char* name, FILE* out) {
     if (out) {
         fprintf(out, "#### Checking if the %s is trivial.\n", name);
     }
-    if (is_trivial_monoid(objects[j]->mor->obj, get_counter(out))) {
+    if (is_trivial_monoid(objects[j].mor->obj, get_counter(out))) {
         if (out) {
             fprintf(out, "#### The %s is trivial.\n", name);
         }
@@ -64,7 +64,7 @@ bool shell_morprop_semitriv(int j, char* name, FILE* out) {
     if (out) {
         fprintf(out, "#### Checking if the %s is trivial.\n", name);
     }
-    if (is_trivial_semigroup(objects[j]->mor->obj, get_counter(out))) {
+    if (is_trivial_semigroup(objects[j].mor->obj, get_counter(out))) {
         if (out) {
             fprintf(out, "#### The %s is trivial.\n", name);
         }
@@ -104,7 +104,7 @@ bool shell_morprop_letterind(int j, char* name, FILE* out) {
         fprintf(out, "#### Checking if the %s is letter uniform.\n", name);
     }
 
-    if (is_letterind_mono(objects[j]->mor->obj, get_counter(out))) {
+    if (is_letterind_mono(objects[j].mor->obj, get_counter(out))) {
         if (out) {
             fprintf(out, "#### The %s is letter uniform.\n", name);
         }
@@ -114,9 +114,9 @@ bool shell_morprop_letterind(int j, char* name, FILE* out) {
     else {
         if (out) {
             fprintf(out, "#### The %s maps the letters ", name);
-            fprint_letter_utf8(objects[j]->mor->obj->alphabet[0], out);
+            fprint_letter_utf8(objects[j].mor->obj->alphabet[0], out);
             fprintf(out, " and ");
-            fprint_letter_utf8(objects[j]->mor->obj->alphabet[m_cexa[0]], out);
+            fprint_letter_utf8(objects[j].mor->obj->alphabet[m_cexa[0]], out);
             fprintf(out, " to distinct elements.\n");
         }
         return false;
@@ -127,7 +127,7 @@ bool shell_morprop_monogroup(int j, char* name, FILE* out) {
     if (out) {
         fprintf(out, "#### Checking if the %s is a group.\n", name);
     }
-    if (is_group_mono(objects[j]->mor->obj, get_counter(out))) {
+    if (is_group_mono(objects[j].mor->obj, get_counter(out))) {
         if (out) {
             fprintf(out, "#### The %s is a group.\n", name);
         }
@@ -146,7 +146,7 @@ bool shell_morprop_semigroup(int j, char* name, FILE* out) {
     if (out) {
         fprintf(out, "#### Checking if the %s is a group.\n", name);
     }
-    if (is_group_semigroup(objects[j]->mor->obj, get_counter(out))) {
+    if (is_group_semigroup(objects[j].mor->obj, get_counter(out))) {
         if (out) {
             fprintf(out, "#### The %s is a group.\n", name);
         }
@@ -154,7 +154,7 @@ bool shell_morprop_semigroup(int j, char* name, FILE* out) {
     else {
         if (out) {
             fprintf(out, "#### The %s is not a group.\n", name);
-            fprintf(out, "#### For instance, the elements %s and %s are not J-equivalent.\n", m_sprint(j, 0), m_sprint(j, 1));
+            fprintf(out, "#### For instance, the elements %s and %s are not H-equivalent.\n", m_sprint(j, 0), m_sprint(j, 1));
         }
         return false;
     }
@@ -166,7 +166,7 @@ bool shell_morprop_monocom(int j, char* name, FILE* out) {
     if (out) {
         fprintf(out, "#### Checking if the %s is commutative.\n", name);
     }
-    if (is_comm_mono(objects[j]->mor->obj, get_counter(out))) {
+    if (is_comm_mono(objects[j].mor->obj, get_counter(out))) {
         if (out) {
             fprintf(out, "#### The %s is commutative.\n", name);
         }
@@ -245,7 +245,7 @@ bool shell_morprop_monoidem(int j, char* name, FILE* out) {
     if (out) {
         fprintf(out, "#### Checking if the %s is idempotent.\n", name);
     }
-    if (is_idem_mono(objects[j]->mor->obj, get_counter(out))) {
+    if (is_idem_mono(objects[j].mor->obj, get_counter(out))) {
         if (out) {
             fprintf(out, "#### The %s is idempotent.\n", name);
         }
@@ -305,7 +305,7 @@ bool shell_morprop_monogreen(int j, green_relation R, char* name, FILE* out) {
     if (out) {
         fprintf(out, "#### Checking if the %s is %c-trivial.\n", name, green_rel_array[R]);
     }
-    if (is_gtrivial_mono(objects[j]->mor->obj, R, get_counter(out))) {
+    if (is_gtrivial_mono(objects[j].mor->obj, R, get_counter(out))) {
         if (out) {
             fprintf(out, "#### The %s is %c-trivial.\n", name, green_rel_array[R]);
         }
@@ -365,7 +365,7 @@ bool shell_morprop_monoda(int j, char* name, FILE* out) {
     if (out) {
         fprintf(out, "#### Checking if the %s is in DA.\n", name);
     }
-    if (is_da_mono(objects[j]->mor->obj, get_counter(out))) {
+    if (is_da_mono(objects[j].mor->obj, get_counter(out))) {
         if (out) {
             fprintf(out, "#### The %s is in DA.\n", name);
         }
@@ -426,7 +426,7 @@ bool shell_morprop_monojsat(int j, char* name, FILE* out) {
     if (out) {
         fprintf(out, "#### Checking if the %s M satisfies the inequation 1 ⩽ s for all s ∊ M.\n", name);
     }
-    if (is_jsat_mono(objects[j]->mor->obj, get_counter(out))) {
+    if (is_jsat_mono(objects[j].mor->obj, get_counter(out))) {
         if (out) {
             fprintf(out, "#### The inequation is satisfied.\n");
         }
@@ -444,7 +444,7 @@ bool shell_morprop_monoejsat(int j, char* name, FILE* out) {
     if (out) {
         fprintf(out, "#### Checking if the %s M satisfies the inequation 1 ⩽ e for all e ∊ E(M).\n", name);
     }
-    if (is_ejsat_mono(objects[j]->mor->obj, get_counter(out))) {
+    if (is_ejsat_mono(objects[j].mor->obj, get_counter(out))) {
         if (out) {
             fprintf(out, "#### The inequation is satisfied.\n");
         }
@@ -509,10 +509,10 @@ bool shell_morprop_bpgroupeq(int j, kernel_type type, char* ker, char* name, FIL
     bool res;
     switch (type) {
     case KER_MOD:
-        res = is_bpolmod_mono(shell_compute_ker(j, type, LV_REG), get_counter(out));
+        res = is_bpolmod_mono(objects[j].mor->obj, get_counter(out));
         break;
     case KER_AMT:
-        res = is_bpolamt_mono(shell_compute_ker(j, type, LV_REG), get_counter(out));
+        res = is_bpolamt_mono(objects[j].mor->obj, get_counter(out));
         break;
     default:
         res = false;
@@ -536,7 +536,7 @@ bool shell_morprop_blockg(int j, char* name, FILE* out) {
         fprintf(out, "#### Checking if the %s is a block group.\n", name);
     }
 
-    if (is_blockg_mono(objects[j]->mor->obj, get_counter(out))) {
+    if (is_blockg_mono(objects[j].mor->obj, get_counter(out))) {
         if (out) {
             fprintf(out, "#### The %s is a block group.\n", name);
         }
@@ -615,7 +615,7 @@ bool shell_morprop_knastat(int j, char* name, FILE* out) {
         fprintf(out, "     for all q,r,s,t ∊ M such that {q,e,f}, {r,e,f}, {s,e,f} and {t,e,f} are AT-sets and all e,f ∊ E(M).\n");
     }
 
-    if (is_knast_at_mono(shell_compute_orbits(j, ORB_PT, LV_REG), get_counter(out))) {
+    if (is_knast_at_mono(objects[j].mor->obj, get_counter(out))) {
         if (out) {
             fprintf(out, "#### The equation is satisfied.\n");
         }

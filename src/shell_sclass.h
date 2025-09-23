@@ -71,6 +71,9 @@ typedef enum {
     CL_JORBGRP,
     CL_JORBAT,
 
+
+    CL_KNASTAMTP,
+    CL_KNASTGRP,
     CL_KNASTAT,
 
     // Unambiguous Polynomial closure
@@ -156,6 +159,7 @@ typedef enum {
     CL_GR,
     CL_GRP,
     CL_REG,
+    CL_EMPTY,
 
     // Number of classes
     CL_END,
@@ -280,6 +284,8 @@ void info_jorb_amtp(FILE*);
 void info_jorb_grp(FILE*);
 void info_jorb_at(FILE*);
 
+void info_knastamtp(FILE*);
+void info_knastgrp(FILE*);
 void info_knastat(FILE*);
 
 /**********************************/
@@ -384,6 +390,7 @@ void info_amtp(FILE*);
 void info_gr(FILE*);
 void info_grp(FILE*);
 void info_reg(FILE*);
+void info_empty(FILE*);
 
 
 /*********************/

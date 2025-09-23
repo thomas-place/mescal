@@ -119,14 +119,15 @@ bool error_nbpars(const char* str, com_parameters* pars, short pmin, short pmax)
 }
 
 bool error_parobtype(const char* str, int p, int i, ob_type type) {
-    if (i < 0 || objects[i]->type != type) {
+    if (i < 0 || objects[i].type != type) {
         fprintf(stderr, "#### Error  : parameter %d in the command \"%s\" is not ", p + 1, str);
         switch (type)
         {
         case REGEXP:
             fprintf(stderr, "a regular expression.\n");
             break;
-        case AUTOMATON:
+        case NAUTOMATON:
+        case DAUTOMATON:
             fprintf(stderr, "an automaton.\n");
             break;
         case MORPHISM:

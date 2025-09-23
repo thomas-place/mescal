@@ -62,7 +62,7 @@ dequeue* compute_j_ideal_alph(morphism* M, uint s, bool* alph, bool* rest) {
 
 
 
-uint get_rlink(morphism* M, parti* R, uint g, uint r) {
+uint get_rlink(morphism* M, parti* R, uint g, uint r, bool* alpha) {
     dequeue* queue = create_dequeue();
     dequeue* elems = create_dequeue();
     rigins_dequeue(r, queue);
@@ -84,6 +84,9 @@ uint get_rlink(morphism* M, parti* R, uint g, uint r) {
         }
         visited[rs] = true;
         for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
+            if (alpha && !alpha[a]) {
+                continue; // Skip this letter if it is not in the alphabet.
+            }
             if (R->numcl[g] == R->numcl[M->r_cayley->edges[rs][a]]) {
                 rigins_dequeue(M->r_cayley->edges[rs][a], queue);
                 rigins_dequeue(M->r_cayley->edges[s][a], elems);
@@ -97,7 +100,7 @@ uint get_rlink(morphism* M, parti* R, uint g, uint r) {
 }
 
 
-uint get_llink(morphism* M, parti* L, uint h, uint t) {
+uint get_llink(morphism* M, parti* L, uint h, uint t, bool* alpha) {
     dequeue* queue = create_dequeue();
     dequeue* elems = create_dequeue();
     rigins_dequeue(t, queue);
@@ -121,6 +124,9 @@ uint get_llink(morphism* M, parti* L, uint h, uint t) {
         }
         visited[st] = true;
         for (uint a = 0; a < M->l_cayley->size_alpha; a++) {
+            if (alpha && !alpha[a]) {
+                continue; // Skip this letter if it is not in the alphabet.
+            }
             if (L->numcl[h] == L->numcl[M->l_cayley->edges[st][a]]) {
                 rigins_dequeue(M->l_cayley->edges[st][a], queue);
                 rigins_dequeue(M->l_cayley->edges[s][a], elems);

@@ -9,33 +9,33 @@
 #include <stdlib.h>
 
 //#define DEBUG_HASH
-#undef DEBUG_HASH
+//#undef DEBUG_HASH
 
 typedef struct {
     uint size;         //!< Size of the hash table.
     uint num_elements; //!< Number of elements in the hash table.
     uint inserts;
     uint collisions; //!< Number of collisions in the hash table.
-    uint *table;     //!< Pointer to the hash table.
-    uint (*hash_func)(
+    uint* table;     //!< Pointer to the hash table.
+    uint(*hash_func)(
         uint, uint); //!< Hash function to compute the index for a given key.
     bool (*comp)(
         uint, uint); //!< Comparison function for the values in the hash table.
 } hash_table;
 
-hash_table *create_hash_table(
+hash_table* create_hash_table(
     uchar init, //!< Initial power of two for the size of the hash table.
-    uint (*hash_func)(
+    uint(*hash_func)(
         uint, uint), //!< Hash function to compute the index for a given key.
     bool (*comp)(
         uint, uint) //!< Comparison function for the values in the hash table.
 );
 
-void delete_hash_table(hash_table *ht //!< The hash table to delete.
+void delete_hash_table(hash_table* ht //!< The hash table to delete.
 );
 
-uint hash_table_insert(hash_table *ht, //!< The hash table.
-                       uint index      //!< Index of the object in the object
+uint hash_table_insert(hash_table* ht, //!< The hash table.
+    uint index      //!< Index of the object in the object
 );
 
 // typedef struct {

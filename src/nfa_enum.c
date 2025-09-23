@@ -40,13 +40,13 @@ void dfa_enum_free(dfa_enum* A) {
 }
 
 bool dfa_enum_next(dfa_enum* A) {
-    /* if (A->final < A->used[A->states - 1] - 1) {
-        A->final++;
-        return true;
-    }
-    else {
-        A->final = 0;
-    } */
+    // if (A->final < A->used[A->states - 1] - 1) {
+    //     A->final++;
+    //     return true;
+    // }
+    // else {
+    //     A->final = 0;
+    // }
 
     for (short i = A->states - 1; i > 0; i--) {
         if (A->used[i] < i + 1) {

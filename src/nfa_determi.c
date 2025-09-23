@@ -270,8 +270,180 @@ dfa* nfa_determinize(nfa* A, bool names) {
     return DFA;
 }
 
+void dfa_get_mirror_info(dfa* A, dfa_mirror_info* mirror) {
+    uint n = A->trans->size_alpha * A->trans->size_graph;
+    MALLOC(mirror->edges, n);
+    MALLOC(mirror->ed_edges, n);
+    MALLOC(mirror->st_edges, n);
+    uint* temp;
+    CALLOC(temp, n);
+
+    for (uint q = 0; q < A->trans->size_graph; q++) {
+        for (uint a = 0; a < A->trans->size_alpha; a++) {
+            temp[A->trans->edges[q][a] * A->trans->size_alpha + a]++;
+        }
+    }
 
 
+    mirror->st_edges[0] = 0;
+    mirror->ed_edges[0] = 0;
+    for (uint i = 1; i < n; i++) {
+        mirror->st_edges[i] = mirror->st_edges[i - 1] + temp[i - 1];
+        mirror->ed_edges[i] = mirror->st_edges[i];
+    }
+    free(temp);
+
+
+    for (uint q = 0; q < A->trans->size_graph; q++) {
+        for (uint a = 0; a < A->trans->size_alpha; a++) {
+            uint i = A->trans->edges[q][a] * A->trans->size_alpha + a;
+            mirror->edges[mirror->ed_edges[i]] = q;
+            mirror->ed_edges[i]++;
+        }
+    }
+
+}
+
+
+
+
+dfa* dfa_determinize_mirror(dfa* A, bool names) {
+    if (!A) {
+        return NULL;
+    }
+
+    dfa_mirror_info mirror;
+    dfa_get_mirror_info(A, &mirror); // Get the mirror information of the DFA.
+
+    uchar power = get_uint_lbinary(A->trans->size_graph) + 2; // We compute the initial power of two for the size of the hash table.
+    uint thesize = 1U << power; // The size of the hash table is 2^power.
+
+    det_cons_init(thesize, A->trans->size_graph, A->trans->size_alpha);
+
+    // Initialize the hash table.
+    hash_table* thehash = create_hash_table(power, &det_cons_hash, &det_cons_equal);
+
+    // Stack containing the elements to be processed.
+    dequeue* thestack = create_dequeue();
+
+    // Create the first element: the set of initial states of the mirror (the final states of the original DFA).
+    uint ini = 0;
+    for (uint i = 0; i < A->trans->size_graph; i++) {
+        if (ini < A->nb_finals && A->finals[ini] == i) {
+            // If the state i is a final state in A, we add it to the set.
+            det_cons_sets[i] = true;
+            ini++;
+        }
+        else {
+            // If the state i is not an initial state of the NFA, we do not add it to the set.
+            det_cons_sets[i] = false;
+        }
+    }
+    det_cons_elem++;
+    hash_table_insert(thehash, 0); // Insert this set in the hash table.
+    rigins_dequeue(0, thestack); // Add the identity to the stack.
+
+    while (!isempty_dequeue(thestack)) {
+        // We retrieve the state to be processed.
+        uint s = rigpull_dequeue(thestack);
+
+        // We calculate the transition from this state.
+        for (uint a = 0; a < A->trans->size_alpha; a++) {
+            ulong i = det_cons_elem * det_cons_states; // The number of the new element is the next one.
+            ulong j = s * det_cons_states;
+            for (uint q = 0; q < A->trans->size_graph; q++) {
+                det_cons_sets[i + q] = false; // Initialize the new set to false.
+            }
+            for (uint q = 0; q < A->trans->size_graph; q++) {
+                if (!det_cons_sets[j + q]) {
+                    continue; // If the state q is not in the set, we skip it.
+                }
+                uint index = q * A->trans->size_alpha + a;
+                uint h = mirror.st_edges[index]; // Get the first edge for the letter a from state q.
+                while (h < mirror.ed_edges[index]) {
+                    uint r = mirror.edges[h]; // For each state q in the set of states of the current state s,
+                    det_cons_sets[i + r] = true; // we add the states reachable from q by the letter a to the new set.
+                    h++;
+                }
+            }
+
+            uint h = hash_table_insert(thehash, det_cons_elem); // Try to insert the new state in the hash table.
+
+            if (h == det_cons_elem) {
+                // The state was not already constructed.
+                rigins_dequeue(det_cons_elem, thestack); // We add it to the stack for future processing.
+
+
+                // Prepare the next state in the table.
+                det_cons_elem++; // Increment the number of states constructed.
+                det_cons_grow(); // If the number of states constructed is larger than the size of the table, we double the size.
+            }
+
+            // Assign the next element of s for a.
+            ulong sa = s * det_cons_letters + a;
+            det_cons_next[sa] = h;
+        }
+    }
+
+    free(mirror.edges);
+    free(mirror.ed_edges);
+    free(mirror.st_edges);
+    // We have finished the depth-first search. We can delete the stack and the hash table.
+    delete_hash_table(thehash); // Delete the hash table.
+    delete_dequeue(thestack);
+
+    // We can now build the DFA.
+    dfa* DFA;
+    CALLOC(DFA, 1);
+    DFA->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha); // Copy letter names
+    DFA->trans = create_dgraph_noedges(det_cons_elem, A->trans->size_alpha); // Create the graph.
+
+    DFA->initial = 0; // The initial state of the DFA is the first state constructed.
+
+    // Computing the final states.
+    bool* tempfinals;
+    CALLOC(tempfinals, det_cons_elem);
+    DFA->nb_finals = 0;
+    for (uint i = 0; i < det_cons_elem; i++) {
+        if (det_cons_sets[i * det_cons_states + A->initial]) {
+            tempfinals[i] = true; // If it contains a final state, we mark it as a final state.
+            DFA->nb_finals++;
+        }
+
+    }
+
+    // Assigning the finals states.
+    uint h = 0;
+    MALLOC(DFA->finals, DFA->nb_finals); // Allocate the finals array.
+    for (uint i = 0; i < det_cons_elem; i++) {
+        if (tempfinals[i]) {
+            DFA->finals[h] = i; // If the state is a final state, we add it to the list of finals states of the DFA.
+            h++;
+        }
+    }
+    free(tempfinals); // We can delete the temporary array used to store the final states.
+
+    // Computing the transitions of the DFA.
+    DFA->trans = create_dgraph_noedges(det_cons_elem, A->trans->size_alpha);
+    for (uint i = 0; i < det_cons_elem; i++) {
+        for (uint a = 0; a < A->trans->size_alpha; a++) {
+            DFA->trans->edges[i][a] = det_cons_next[i * det_cons_letters + a]; // The next state for the letter a.
+        }
+    }
+
+    // Computation of the state names    
+    if (names) {
+        DFA->state_names = det_cons_names(A->state_names); // We compute the names of the states of the DFA.
+    }
+    else {
+        DFA->state_names = NULL;
+    }
+
+
+    // We can delete the arrays used in the subset construction.
+    det_cons_delete();
+    return DFA;
+}
 
 
 

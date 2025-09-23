@@ -38,6 +38,17 @@
 
 /**
  * @brief
+ * Structure used to store a variable name prefix.
+ */
+typedef struct {
+    char* name; //!< The variable name prefix.
+    uint count; //!< The number of objects with this prefix.
+    uchar digits; //!< The number of digits used for the suffix.
+} ob_prefixname;
+
+
+/**
+ * @brief
  * Types of kernels available for computation.
  */
 typedef enum {
@@ -69,18 +80,7 @@ typedef enum {
     ORB_SIZE,
 } orbits_type;
 
-/**
- * @brief
- * Structure used to represent an automaton and various information.
- */
-typedef struct {
-    union
-    {
-        nfa* obj_nfa; //!< The automaton.
-        dfa* obj_dfa; //!< The automaton.
-    };
-    bool dfa; //!< Boolean indicating if the automaton is a DFA (true) or an NFA (false).
-} ob_automaton;
+
 
 
 /**
@@ -124,25 +124,34 @@ typedef enum {
  * The different types of objects.
  */
 typedef enum {
+    EMPTYOBJ,     //!< Empty object.
     REGEXP,    //!< Regular expression.
-    AUTOMATON, //!< Automaton.
+    NAUTOMATON,       //!< Nondeterministic finite automaton.
+    DAUTOMATON,       //!< Deterministic finite automaton.
     MORPHISM,  //!< Morphism.
     RECDEF,    //!< Recursive definition of regular expressions.
     DUMMY,     //!< Empty object (used to handle errors).
 } ob_type;
 
+
 extern char* object_types_names[DUMMY];
+
+#define NAME_MAXSIZE 128 //!< Maximum size of the variable name.
 
 /**
  * @brief
  * Type used to represent an object.
  */
 typedef struct {
-    char* name;   //!< Variable name (NULL if the object is a dependency).
+    //char name[NAME_MAXSIZE];   //!< Variable name (NULL if the object is a dependency).
+    ob_prefixname* prefix; //<! Prefix of the variable name (Index in the prefixnames array). Equal to -1 if the object is a dependency (noname). Full name is prefix + number.
+    uint number; //!< Number of object for this variable name (added as a suffix to the name). UINT_MAX if not used.
+
     ob_type type; //!< Type of the object.
     union {
         regexp* exp;       //!< Case of a regular expression.
-        ob_automaton* aut;          //!< Case of an automaton.
+        nfa* obj_nfa;     //!< Case of a nondeterministic finite automaton.
+        dfa* obj_dfa;     //!< Case of a deterministic finite automaton.
         ob_morphism* mor;  //!< Case of a morphism.
         ob_recursion* rec; //!< Case of a recursive definition of regular expressions.
     };
@@ -154,7 +163,7 @@ typedef struct {
  * @brief
  * The array of objects.
  */
-extern object** objects;
+extern object* objects;
 
 /**
  * @brief
@@ -175,21 +184,49 @@ void init_objects_array(void);
 void grow_objects_array(void);
 
 /************************/
-/* Création/Suppression */
+/* Creation/Deletion */
 /************************/
 
 /**
  * @brief
- * Initialization of a new object. Does not define its type.
- *
- * @attention
- * The input variable name is duplicated.
+ * Initialization of a new prefix name used as a full name (no number suffix).
  *
  * @return
- * The new object.
+ * The created prefix name.
  */
-object* object_init(const char* //!< The variable name of the object.
+ob_prefixname* create_prefixname_full(const char* name //!< The variable name prefix (duplicated).
 );
+
+
+/**
+ * @brief
+ * Initialization of a new prefix name.
+ *
+ * @return
+ * The created prefix name.
+ */
+ob_prefixname* create_prefixname(const char* name, //!< The variable name prefix (duplicated).
+    uint count //!< The number of objects with this prefix.
+);
+
+/**
+ * @brief
+ * Removes one instance of a prefix name by decrementing the count. If the count reaches 0, the prefix name is deleted.
+ */
+void remove_instance_prefixname(ob_prefixname* prefixname //!< The prefix name to delete.
+);
+
+
+/**
+ * @brief
+ * Initialization of a new object in the table. Does not define its type.
+ *
+ * @return
+ * The index of the created object.
+ */
+int object_init(const char* name //!< The variable name of the object.
+);
+
 
 /**
  * @brief
@@ -197,6 +234,13 @@ object* object_init(const char* //!< The variable name of the object.
  */
 void object_swap(int, //!< The index of the first object.
     int  //!< The index of the second object.
+);
+
+/**
+ * @brief
+ * Auxiliary function to free an object.
+ */
+void object_free_aux(object* //!< The object to free.
 );
 
 /**
@@ -212,9 +256,32 @@ void object_free(int //!< Index of the object.
  */
 void object_free_all(void);
 
+/**
+ * @brief
+ * Deletes all objects with a given prefix.
+ *
+ * @remark
+ * The prefix is the first part of the variable name.
+ */
+void object_delete_prefix(const char* //!< The prefix of the variable names to delete.
+);
+
 /************************/
 /* Get/insert an object */
 /************************/
+
+/**
+ * @brief
+ * Gets the full name of an object.
+ *
+ * @remark
+ * The full name is written in a buffer (no allocation is done).
+ *
+ * @return
+ * The full name of the object (prefix + number) or NULL if the object has no prefix.
+ */
+const char* object_get_full_name(int i //!< The index of the object.
+);
 
 /**
  * @brief
@@ -281,6 +348,8 @@ int object_add_automaton_dfa(const char* name, //!< The desired variable name (N
     dfa* A //!< The automaton.
 );
 
+void object_add_automaton_dfa_family(const char* pname, dfa** array, uint count);
+
 /**
  * @brief
  * Adds a new object of type morphism.
@@ -311,77 +380,7 @@ int shell_copy_generic(int i, //!< The index of the object to copy.
 );
 
 
-/***********/
-/* Sorting */
-/***********/
 
-/**
- * @brief
- * Default comparison function for objects. Sorts according to the
- * variable name.
- *
- * @return
- * A negative value if the first object should be placed before the second one,
- * a positive value if the second object should be placed before the first one,
- * and 0 if the two objects are equal.
- */
-int object_compare(int, //!< The index of the first object.
-    int //!< The index of the second object.
-);
-
-/**
- * @brief
- * Comparison function for objects. Sorts according to the size of the syntactic
- * monoid.
- *
- * @remark
- * Recursive definition objects are placed at the end of the list (they have no
- * syntactic monoid).
- *
- * @attention
- * Computes the syntactic morphisms of the objects if they have not been computed.
- *
- * @return
- * A negative value if the first object should be placed before the second one,
- * a positive value if the second object should be placed before the first one,
- * and 0 if the two objects are equal.
- */
-int object_compare_synt(int //!< The index of the first object.
-    ,
-    int //!< The index of the second object.
-);
-
-/**
- * @brief
- * Comparison function for objects. Sorts according to the size of the minimal
- * automaton.
- *
- * @remark
- * Recursive definition objects are placed at the end of the list (they have no
- * minimal automaton).
- *
- * @attention
- * Computes the minimal automata of the objects if they have not been computed.
- *
- * @return
- * A negative value if the first object should be placed before the second one,
- * a positive value if the second object should be placed before the first one,
- * and 0 if the two objects are equal.
- */
-int object_compare_mini(int //!< The index of the first object.
-    ,
-    int //!< The index of the second object.
-);
-
-/**
- * @brief
- * Sorts the array of objects according to the comparison function passed as input.
- *
- * @remark
- * Uses a heap sort algorithm.
- */
-void object_sort_array(int (*comp)(int, int) //!< The comparison function.
-);
 
 /***********************************************/
 /* Computing information on an existing object */

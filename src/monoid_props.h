@@ -306,7 +306,7 @@ bool is_idem_orbmono(orbits*,    //!< The orbits.
 /*******************/
 /* H,R,L,J-trivial */
 /*******************/
-
+parti* grel_to_parti(green* G, green_relation P);
 
 /**
  * @brief
@@ -542,7 +542,7 @@ bool is_blockg_mono(morphism*,   //!< The morphism.
  * @return
  * A Boolean indicating whether the morphisme satisfies the BPol(MOD) equation.
  */
-bool is_bpolmod_mono(subsemi*,  //!< The MOD-kernel.
+bool is_bpolmod_mono(morphism*,  //!< The MOD-kernel.
     uint* //!< Pointer on a uint array to return a counterexample.
 );
 
@@ -562,7 +562,7 @@ bool is_bpolmod_mono(subsemi*,  //!< The MOD-kernel.
  * @return
  * A Boolean indicating whether the morphisme satisfies the BPol(AMT) equation.
  */
-bool is_bpolamt_mono(subsemi*,  //!< The morphism. 
+bool is_bpolamt_mono(morphism*,  //!< The morphism. 
     uint* //!< Pointer on a uint array to return a counterexample.
 );
 
@@ -586,8 +586,7 @@ bool is_knast_mono(orbits*, //!< The DD-orbits of the morphism.
  * Tests if the G-kernel satisfies Knast's equation for a group vari G.
  *
  * @remark
- * Takes the G⁺-orbits as input. We first check that they are J-trivial as this is
- * faster.
+ * Takes the G⁺-orbits as input.
  *
  * @remark
  * If the test fails and the second parameter is not NULL, it will be set to a
@@ -607,8 +606,7 @@ bool is_knast_ker(orbits*, //!< The G⁺-orbits.
  * Tests if a morphism satisfies the BPol(AMT⁺) equation.
  *
  * @remark
- * Takes the AMT⁺-orbits as input. We first check that they are J-trivial as this is
- * faster.
+ * Takes the AMT⁺-orbits as input.
  *
  * @remark
  * If the test fails and the second parameter is not NULL, it will be set to a
@@ -627,8 +625,7 @@ bool is_bpolamtp_mono(orbits*, //!< The AMT⁺-orbits.
  * Tests if a morphism satisfies the BPol(GR⁺) equation.
  *
  * @remark
- * Takes the GR⁺-orbits as input. We first check that they are J-trivial as this is
- * faster.
+ * Takes the GR⁺-orbits as input.
  *
  * @remark
  * If the test fails and the second parameter is not NULL, it will be set to a
@@ -649,18 +646,14 @@ bool is_bpolgrp_mono(orbits*, //!< The GR⁺-orbits.
  * Tests if a morphism satisfies the AT-variant of Knast's equation.
  *
  * @remark
- * Takes the AT-orbits as input. We first check that they are J-trivial as this is
- * faster.
- *
- * @remark
  * If the test fails and the second parameter is not NULL, it will be set to a
  * counterexample: the elements q,r,s,t,e,f that do not satisfy the equation.
  *
  * @return
  * A Boolean indicating whether si the morphism satisfies the AT-variant of Knast's equation.
  */
-bool is_knast_at_mono(orbits*,   //!< The AT-orbits.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_knast_at_mono(morphism* M,   //!< The morphism.
+    uint* cexa //!< Pointer on a uint array to return a counterexample.
 );
 
 

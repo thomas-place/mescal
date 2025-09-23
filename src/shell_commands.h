@@ -324,6 +324,21 @@ int shell_intersect_nfa(char* varname, //!< The variable name for the new object
 
 /**
  * @brief
+ * Full direct product of two DFA (resutling DFA recognizes the intersection)
+ *
+ * @remark
+ * If an object with the same name already exists, it is deleted.
+ *
+ * @return
+ * The index of the created DFA.
+ */
+int shell_directproduct_dfa(char* varname, //!< The variable name for the new object.
+    com_parameters* pars, //!< The parameters of the command.
+    const char* str //!< string used to call the command.
+);
+
+/**
+ * @brief
  * Concatenation of two NFAs.
  *
  * @remark
@@ -459,6 +474,21 @@ int shell_brzozowski_nfa(char* varname, //!< The variable name for the new objec
  * The index of the created NFA.
  */
 int shell_invtrans(char* varname, //!< The variable name for the new object.
+    com_parameters* pars, //!< The parameters of the command.
+    const char* str //!< string used to call the command.
+);
+
+/**
+ * @brief
+ * Folds DFA according to a group basis.
+ *
+ * @remark
+ * If an object with the same name already exists, it is deleted.
+ *
+ * @return
+ * The index of the created DFA.
+ */
+int shell_folding_dfa(char* varname, //!< The variable name for the new object.
     com_parameters* pars, //!< The parameters of the command.
     const char* str //!< string used to call the command.
 );
@@ -649,6 +679,17 @@ int shell_toggle_optimization(com_parameters* pars, //!< The parameters of the c
 
 /**
  * @brief
+ * Toggles mode for membership tests.
+ *
+ * @return
+ * -1 on success, -2 on failure.
+ */
+int shell_toggle_membership(com_parameters* pars, //!< The parameters of the command.
+    const char* str //!< The string used to call the command.
+);
+
+/**
+ * @brief
  * Displays the MOD-kernel of a morphism.
  *
  * @return
@@ -762,7 +803,7 @@ int shell_permutation(com_parameters* pars, //!< The parameters of the command.
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_cycletrivial(com_parameters* pars, //!< The parameters of the command.
+int shell_rtrivialrivial(com_parameters* pars, //!< The parameters of the command.
     const char* str //!< The string used to call the command.
 );
 
@@ -822,6 +863,17 @@ int shell_separation(com_parameters* pars, //!< Command parameters (should inclu
  * -1 on success, -2 on failure.
  */
 int shell_print_chiera(com_parameters* pars, //!< Command parameters (should include the input language).
+    const char* str //!< The command name.
+);
+
+/**
+ * @brief
+ * Summary of all available tests for concatenation hierarchies.
+ *
+ * @return
+ * -1 on success, -2 on failure.
+ */
+int shell_print_navhiera(com_parameters* pars, //!< Command parameters (should include the input language).
     const char* str //!< The command name.
 );
 
@@ -944,5 +996,28 @@ int shell_browse_dfas_fp(com_parameters* pars, //!< The parameters of the comman
     const char* str //!< The string used to call the command.
 );
 
+
+/**
+ * @brief
+ * Browses all DFAs of a given alphabet size and number of states and checks whether membership has a distinct result for automata and morphisms.
+ *
+ * @return
+ * -1 on success, -2 on failure.
+ */
+int shell_browse_dfas_bug(com_parameters* pars, //!< The parameters of the command.
+    const char* str //!< The string used to call the command.
+);
+
+
+/**
+ * @brief
+ * Browses all DFAs of a given alphabet size and number of states and computes the average time of a membership test for a given class.
+ *
+ * @return
+ * -1 on success, -2 on failure.
+ */
+int shell_browse_dfas_time(com_parameters* pars, //!< The parameters of the command.
+    const char* str //!< The string used to call the command.
+);
 
 #endif

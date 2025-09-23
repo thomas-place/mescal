@@ -20,6 +20,14 @@ typedef unsigned char uchar;
 typedef unsigned short ushort;
 typedef unsigned int uint;
 typedef unsigned long ulong;
+
+typedef enum {
+    BA_ST,
+    BA_MOD,
+    BA_AMT,
+    BA_GR
+} basis;
+
 #ifndef max
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 #endif

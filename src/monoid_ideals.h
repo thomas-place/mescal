@@ -149,7 +149,8 @@ dequeue* compute_j_ideal_alph(morphism*, //!< The morphism.
 uint get_rlink(morphism*, //!< The morphism.
     parti*,       //!< The R-classes.
     uint,            //!< Idempotent.
-    uint               //!< Start element.
+    uint,               //!< Start element.
+    bool* alpha //!< An array of Booleans indexed by the letters: search a ling over this alphabet (NULL if not used).
 );
 
 /**
@@ -163,7 +164,8 @@ uint get_rlink(morphism*, //!< The morphism.
 uint get_llink(morphism*, //!< The morphism.
     parti*,         //!< The L-classes.
     uint,             //!< Idempotent.
-    uint               //!< Start element.
+    uint,               //!< Start element.
+    bool* alpha //!< An array of Booleans indexed by the letters: search a ling over this alphabet (NULL if not used).
 );
 
 

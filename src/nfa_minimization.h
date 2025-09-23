@@ -141,8 +141,13 @@ dfa* dfa_hopcroft(dfa*   //!< The DFA.
  *
  * @return
  * The canonical ordering of the states.
+ *
+ * @attention
+ * The input DFA is assumed to be minimal. This is not checked.
  */
-bool** dfa_mini_canonical_ordering(dfa*  //!< The DFA to order (must be minimal).
+void dfa_mini_canonical_ordering(dfa*  //!< The DFA to order (must be minimal).
 );
+
+
 
 #endif

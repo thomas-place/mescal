@@ -10,6 +10,7 @@
 #include "shell_languages.h"
 #include "shell_sclass.h"
 #include "tools.h"
+#include "nfa_patterns.h"
 #include <stdio.h>
 
 #define DIMEN 3
@@ -18,6 +19,31 @@
 extern uint slice_test, width_test;
 
 void test(void) {
+
+
+    // word* W = create_empty_word();
+    // letter la = { 'a', -1 };
+    // letter lb = { 'b', -1 };
+    // rigcon_word(la, W);
+    // rigcon_word(lb, W);
+    // nfa* A = create_sing_word(W);
+    // nfa* B = nfa_star(A);
+    // nfa* C = create_sing_letter(la);
+    // nfa* D = create_sing_letter(lb);
+    // nfa* E = nfa_concat(C, false, B, false);
+    // nfa* F = nfa_concat(E, false, D, false);
+    // nfa* G = nfa_star(F);
+
+    // dfa* H = nfa_brzozowski(G);
+    // view_dfa(H);
+
+    // if (is_nosimple_counter_dfa(H, NULL)) {
+    //     printf("The automaton is a nosimple counter.\n");
+    // }
+    // else {
+    //     printf("The automaton is not a nosimple counter.\n");
+    // }
+
 
     shell_exall_dfatest();
 

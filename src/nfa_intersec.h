@@ -72,36 +72,22 @@ void* nfa_intersect_mixed(void* I1, //!< First NFA or DFA.
     bool names //!< A Boolean indicating whether the state names have to be saved.
 );
 
+/**
+ * @brief
+ * Computes the power product of a DFA (for specified initial states).
+ *
+ * @remark
+ * The input DFA must be deterministic and complete.
+ *
+ * @return
+ * A DFA that is the power product of the input DFA with itself n times.
+ */
+dfa* dfa_power_prod(dfa* A, //!< The DFA to be iterated.
+    uint n, //!< The number of copies of the DFA to be used in the product.
+    int* initial_states, //!< List of initial states for each copy of the DFA (the number of initial states must be equal to n).
+    int* final_states //!< List of final states for each copy of the DFA (the number of final states must be equal to n). Optionnal parameter, can be NULL.
+);
 
-
-
-// /**
-//  * @brief
-//  * Type used for representing a pair of states.
-//  */
-// typedef struct {
-//     uint q1; //!< First state.
-//     uint q2; //!< Second state.
-// } nfa_prod_pair;
-
-
-// /**
-//  * @brief
-//  * Intersection of two NFAs with the product automaton construction. Returns only
-//  * the pairs of reachable states.
-//  *
-//  * @remark
-//  * The size of the computed array is returned via the pointer size.
-//  *
-//  * @return
-//  * An array containing the pairs of reachable states in the product automaton.
-//  */
-// nfa_prod_pair* nfa_intersec_reach(nfa*, //!< The first NFA.
-//     nfa*,                         //!< The second NFA.
-//     uint,                          //!< Starting state in the first NFA.
-//     uint,                           //!< Starting state in the second NFA.
-//     uint*                            //!< Pointer used to return the size of the computed array.
-// );
 
 
 /**
@@ -121,12 +107,50 @@ prod_pair* dgraph_intersec(dgraph*, //!< The first graph
     uint*                            //!< Pointer used to return the size of the computed array.
 );
 
+bool dgraph_exists_path(dgraph*, //!< The graph
+    uint,                          //!< Starting state in the graph.
+    uint,                           //!< Ending state in the graph.
+    bool strict,                     //!< A Boolean indicating whether the path must be strict (no self-loops).
+    uint** word //!< The word that is the intersection path (NULL if not needed).
+);
+
+bool dgraph_exists_path_alpha(dgraph*, //!< The graph
+    uint s,                          //!< Starting state in the graph.
+    uint e,                           //!< Ending state in the graph.
+    bool strict,                     //!< A Boolean indicating whether the path must be strict (no self-loops).
+    bool* alpha, //!< The alphabet to use for the path (NULL if not needed).
+    uint** word //!< The word that is the intersection path (NULL if not needed).
+);
+
+uint dgraph_exists_path_letter_alpha(dgraph* g, //!< The graph
+    uint s,                          //!< Starting state in the graph.
+    uint b,                           //!< Letter searched.
+    bool* alpha, //!< The alphabet to use for the path (NULL if not needed).
+    uint** word //!< The word that is the intersection path (NULL if not needed).
+);
+
+
+
+
 bool dgraph_exists_intersec_path(dgraph*, //!< The first graph
     dgraph*,                         //!< The second graph
     uint,                          //!< Starting state in the first graph.
     uint,                           //!< Starting state in the second graph.
     uint,                           //!< Ending state in the first graph.
-    uint                            //!< Ending state in the second graph.
+    uint,                            //!< Ending state in the second graph.
+    bool strict,                     //!< A Boolean indicating whether the path must be strict (no self-loops).
+    uint** word //!< The word that is the intersection path (NULL if not needed).
+);
+
+bool dgraph_exists_intersec_path_alpha(dgraph*, //!< The first graph
+    dgraph*,                         //!< The second graph
+    uint,                          //!< Starting state in the first graph.
+    uint,                           //!< Starting state in the second graph.
+    uint,                           //!< Ending state in the first graph.
+    uint,                            //!< Ending state in the second graph.
+    bool strict,                     //!< A Boolean indicating whether the path must be strict (no self-loops).
+    bool* alpha, //!< The alphabet to use for the path (NULL if not needed).
+    uint** word //!< The word that is the intersection path (NULL if not needed).
 );
 
 

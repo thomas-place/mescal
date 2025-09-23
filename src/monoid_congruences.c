@@ -332,8 +332,8 @@ ufind* iden_bpolmod_mono(morphism* M) {
     // Otherwise, we create a trivial union-find
     ufind* uf = create_ufind(M->r_cayley->size_graph);
 
-    parti* FOLDR = mor_stal_fold(M, false, true);
-    parti* FOLDL = mor_stal_fold(M, false, false);
+    parti* FOLDR = dgraph_stal_fold(M->r_cayley, M->rels->RCL, BA_MOD);
+    parti* FOLDL = dgraph_stal_fold(M->l_cayley, M->rels->LCL, BA_MOD);
 
     dgraph* gr = shrink_mod(M->r_cayley, FOLDR, M->rels->RCL);
     dgraph* glinv = shrink_mod_mirror(M->l_cayley, FOLDL, M->rels->LCL);
@@ -379,8 +379,10 @@ ufind* iden_bpolamt_mono(morphism* M) {
     ufind* uf = create_ufind(M->r_cayley->size_graph);
 
     // Computation of the spanning trees for all (regular) R-classes and L-classes
-    num_span_trees* rspans = compute_num_span_trees(M, true);
-    num_span_trees* lspans = compute_num_span_trees(M, false);
+    num_span_forest* rspan = compute_span_forest(M->r_cayley, M->rels->RCL, M->idem_array);
+    num_span_forest* lspan = compute_span_forest(M->l_cayley, M->rels->LCL, M->idem_array);
+    // num_span_trees* rspans = compute_num_span_trees(M, true);
+    // num_span_trees* lspans = compute_num_span_trees(M, false);
 
     // Loop over all idempotents e = qr
     for (uint i = 0; i < M->nb_idems; i++) {
@@ -397,8 +399,8 @@ ufind* iden_bpolamt_mono(morphism* M) {
             dequeue* p1 = create_dequeue();
             dequeue* p2 = create_dequeue();
 
-
-            compute_amt_pairs_regular(rspans, lspans, e, f, p1, p2);
+            compute_amt_pairs_regular(M, rspan, lspan, e, f, p1, p2);
+            // compute_amt_pairs_regular(rspans, lspans, e, f, p1, p2);
 
 
             for (uint p = 0; p < size_dequeue(p1); p++) {
@@ -410,8 +412,10 @@ ufind* iden_bpolamt_mono(morphism* M) {
             delete_dequeue(p2);
         }
     }
-    delete_num_span_trees(rspans);
-    delete_num_span_trees(lspans);
+    delete_span_forest(rspan);
+    delete_span_forest(lspan);
+    // delete_num_span_trees(rspans);
+    // delete_num_span_trees(lspans);
 
     compute_leastcong(M, uf);
     return uf;
@@ -639,8 +643,11 @@ ufind* iden_bpolamtp_mono(orbits* L) {
 
 
     // Computation of the spanning trees for all (regular) R-classes and L-classes
-    num_span_trees* rspans = compute_num_span_trees(M, true);
-    num_span_trees* lspans = compute_num_span_trees(M, false);
+
+    num_span_forest* rspan = compute_span_forest(M->r_cayley, M->rels->RCL, M->idem_array);
+    num_span_forest* lspan = compute_span_forest(M->l_cayley, M->rels->LCL, M->idem_array);
+    // num_span_trees* rspans = compute_num_span_trees(M, true);
+    // num_span_trees* lspans = compute_num_span_trees(M, false);
 
 
     // Loop over all minimal idempotents e.
@@ -663,7 +670,9 @@ ufind* iden_bpolamtp_mono(orbits* L) {
                     // We compute the anti AMT-pairs (q,t) where q is in the R-class of g and t is in the L-class of h
                     dequeue* p1 = create_dequeue();
                     dequeue* p2 = create_dequeue();
-                    compute_amt_pairs_regular(rspans, lspans, g, h, p1, p2);
+
+                    compute_amt_pairs_regular(M, rspan, lspan, g, h, p1, p2);
+                    // compute_amt_pairs_regular(rspans, lspans, g, h, p1, p2);
 
                     for (uint p = 0; p < size_dequeue(p1); p++) {
                         uint q = lefread_dequeue(p1, p);
@@ -680,8 +689,10 @@ ufind* iden_bpolamtp_mono(orbits* L) {
             delete_dequeue(candidates);
         }
     }
-    delete_num_span_trees(rspans);
-    delete_num_span_trees(lspans);
+    delete_span_forest(rspan);
+    delete_span_forest(lspan);
+    // delete_num_span_trees(rspans);
+    // delete_num_span_trees(lspans);
     compute_leastcong(M, uf);
     return uf;
 }
@@ -691,9 +702,8 @@ ufind* iden_bpolgrp_mono(orbits* L) {
     morphism* M = L->original;
     ufind* uf = create_ufind(M->r_cayley->size_graph);
 
-
-    parti* FOLDR = mor_stal_fold(M, true, true);
-    parti* FOLDL = mor_stal_fold(M, true, false);
+    parti* FOLDR = dgraph_stal_fold(M->r_cayley, M->rels->RCL, BA_GR);
+    parti* FOLDL = dgraph_stal_fold(M->l_cayley, M->rels->LCL, BA_GR);
 
     dgraph* gr = shrink_grp(M->r_cayley, FOLDR, M->rels->RCL);
     dgraph* glinv = shrink_grp_mirror(M->l_cayley, FOLDL, M->rels->LCL);

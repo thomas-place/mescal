@@ -112,6 +112,20 @@ parti* restrict_parti_subset(
     uint*  // Mapping from the original subset to the full set.
 );
 
+/**
+ * @brief
+ * Computes the inverse mapping of a partition.
+ *
+ * @details
+ * For each element in the partitioned set, the inverse mapping gives the index of
+ * the element in its class.
+ *
+ * @return
+ * The inverse mapping of the partition.
+ */
+uint* parti_compute_inv(parti* P //!< The partition.
+);
+
 /**************/
 /* Union-Find */
 /**************/
