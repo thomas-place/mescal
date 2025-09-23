@@ -61,13 +61,13 @@ e[res] :  e[exp1] PLUS_TOK e[exp2] { $res = reg_union($exp1, $exp2); }
 | VARIABLE[var] {
     DEBUG("RVALUE %s", $var);
     int i = object_get_from_name($var);
-    if (i == -1 || objects[i]->type != REGEXP) {
+    if (i == -1 || objects[i].type != REGEXP) {
       fprintf(stderr,"Error: %s is not a valid regular expression variable.\n",$var);
       $res = NULL;
     }
     else {
     DEBUG("Language found");
-    $res = reg_copy(objects[i]->exp);
+    $res = reg_copy(objects[i].exp);
   }
 }
 | VARIABLE[var] BRK_OPEN 'i' BRK_CLOSE { $res = reg_var_symbolic($var,  0); }
