@@ -98,7 +98,6 @@ $(function(){initNavTree('monoid__kernels_8h.html',''); initResizable(true); });
 
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">monoid_kernels.h File Reference</div></div>
 </div><!--header-->
@@ -109,372 +108,62 @@ $(function(){initNavTree('monoid__kernels_8h.html',''); initResizable(true); });
 <div class="textblock"><code>#include &quot;<a class="el" href="monoid_8h_source.html">monoid.h</a>&quot;</code><br />
 <code>#include &quot;monoid_sub.h&quot;</code><br />
 <code>#include &quot;<a class="el" href="sep__group_8h_source.html">sep_group.h</a>&quot;</code><br />
+<code>#include &quot;flint/fmpz.h&quot;</code><br />
+<code>#include &quot;flint/fmpz_mat.h&quot;</code><br />
 </div>
 <p><a href="monoid__kernels_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnum__span__trees.html">num_span_trees</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type used to store the information needed to compute the AMT-kernel.  <a href="structnum__span__trees.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsingle__num__span__tree.html">single_num_span_tree</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type used to store the information needed to compute the FOLDING of a R-class.  <a href="structsingle__num__span__tree.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a847714c8b835ca8e92cef6b27a013aab" id="r_a847714c8b835ca8e92cef6b27a013aab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a847714c8b835ca8e92cef6b27a013aab">morphism_to_dfa_kernel</a> (<a class="el" href="structmorphism.html">morphism</a> *)</td></tr>
-<tr class="memdesc:a847714c8b835ca8e92cef6b27a013aab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a DFA from the right Cayley graph of a morphism. Discards all transitions which are entering a new regular R-class.  <br /></td></tr>
-<tr class="separator:a847714c8b835ca8e92cef6b27a013aab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4422c5d98265d37b5306783dc18ee48b" id="r_a4422c5d98265d37b5306783dc18ee48b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4422c5d98265d37b5306783dc18ee48b">morphism_to_dnfa_kernel</a> (<a class="el" href="structmorphism.html">morphism</a> *)</td></tr>
+<tr class="memdesc:a4422c5d98265d37b5306783dc18ee48b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a DFA from the right Cayley graph of a morphism. Discards all transitions which are entering a new regular R-class.  <br /></td></tr>
+<tr class="separator:a4422c5d98265d37b5306783dc18ee48b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a990ba79cd7a69d344c30b25a5adc108a" id="r_a990ba79cd7a69d344c30b25a5adc108a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a990ba79cd7a69d344c30b25a5adc108a">morphism_to_dfa_rcl</a> (<a class="el" href="structmorphism.html">morphism</a> *)</td></tr>
 <tr class="memdesc:a990ba79cd7a69d344c30b25a5adc108a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a DFA from the right Cayley graph of a morphism. Discards all transitions which are not internal to the R-classes.  <br /></td></tr>
 <tr class="separator:a990ba79cd7a69d344c30b25a5adc108a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa9f02aeb0ae1a6eab48e52906ae517a" id="r_afa9f02aeb0ae1a6eab48e52906ae517a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afa9f02aeb0ae1a6eab48e52906ae517a">morphism_to_dfa_lcl</a> (<a class="el" href="structmorphism.html">morphism</a> *)</td></tr>
 <tr class="memdesc:afa9f02aeb0ae1a6eab48e52906ae517a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a DFA from the left Cayley graph of a morphism. Discards all transitions which are not internal to the L-classes.  <br /></td></tr>
 <tr class="separator:afa9f02aeb0ae1a6eab48e52906ae517a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aebe5cf3600ecbf357b660ed4c4ef82fd" id="r_aebe5cf3600ecbf357b660ed4c4ef82fd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structsubsemi.html">subsemi</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aebe5cf3600ecbf357b660ed4c4ef82fd">get_grp_kernel</a> (<a class="el" href="structmorphism.html">morphism</a> *, sub_level)</td></tr>
-<tr class="memdesc:aebe5cf3600ecbf357b660ed4c4ef82fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the GR-kernel of a morphism.  <br /></td></tr>
-<tr class="separator:aebe5cf3600ecbf357b660ed4c4ef82fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4cb8f9617960d35361464732357de54b" id="r_a4cb8f9617960d35361464732357de54b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structsubsemi.html">subsemi</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4cb8f9617960d35361464732357de54b">get_mod_kernel</a> (<a class="el" href="structmorphism.html">morphism</a> *, sub_level)</td></tr>
-<tr class="memdesc:a4cb8f9617960d35361464732357de54b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the MOD-kernel of a morphism.  <br /></td></tr>
-<tr class="separator:a4cb8f9617960d35361464732357de54b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8f3c805e51e9fe566a3a0f2484b242fd" id="r_a8f3c805e51e9fe566a3a0f2484b242fd"><td class="memItemLeft" align="right" valign="top"><a id="a8f3c805e51e9fe566a3a0f2484b242fd" name="a8f3c805e51e9fe566a3a0f2484b242fd"></a>
-<a class="el" href="structsingle__num__span__tree.html">single_num_span_tree</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>compute_single_span_tree</b> (<a class="el" href="structdgraph.html">dgraph</a> *G)</td></tr>
-<tr class="separator:a8f3c805e51e9fe566a3a0f2484b242fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3998fe454ee50665e7505b11dcc4d2b5" id="r_a3998fe454ee50665e7505b11dcc4d2b5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnum__span__trees.html">num_span_trees</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3998fe454ee50665e7505b11dcc4d2b5">compute_num_span_trees</a> (<a class="el" href="structmorphism.html">morphism</a> *, bool)</td></tr>
-<tr class="memdesc:a3998fe454ee50665e7505b11dcc4d2b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the spanning trees from a morphism.  <br /></td></tr>
-<tr class="separator:a3998fe454ee50665e7505b11dcc4d2b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa90b72ef5fa0568c10824b65dd6d9250" id="r_aa90b72ef5fa0568c10824b65dd6d9250"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa90b72ef5fa0568c10824b65dd6d9250">delete_num_span_trees</a> (<a class="el" href="structnum__span__trees.html">num_span_trees</a> *)</td></tr>
-<tr class="memdesc:aa90b72ef5fa0568c10824b65dd6d9250"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes the structure used to store the spanning trees.  <br /></td></tr>
-<tr class="separator:aa90b72ef5fa0568c10824b65dd6d9250"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab86a0a8771f67739c613660c8fbb0e2" id="r_aab86a0a8771f67739c613660c8fbb0e2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aab86a0a8771f67739c613660c8fbb0e2">delete_single_num_span_tree</a> (<a class="el" href="structsingle__num__span__tree.html">single_num_span_tree</a> *)</td></tr>
-<tr class="separator:aab86a0a8771f67739c613660c8fbb0e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d0edbf160f9bd87b910e829c1a76098" id="r_a1d0edbf160f9bd87b910e829c1a76098"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structparti.html">parti</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1d0edbf160f9bd87b910e829c1a76098">compute_amt_fold</a> (<a class="el" href="structdgraph.html">dgraph</a> *)</td></tr>
-<tr class="memdesc:a1d0edbf160f9bd87b910e829c1a76098"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the regular elements of the AMT-kernel in a morphism.  <br /></td></tr>
-<tr class="separator:a1d0edbf160f9bd87b910e829c1a76098"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a62bb23de74dbc668ee0e0846abe432bc" id="r_a62bb23de74dbc668ee0e0846abe432bc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a62bb23de74dbc668ee0e0846abe432bc">compute_amt_kernel_regular</a> (<a class="el" href="structmorphism.html">morphism</a> *, bool *, uint *)</td></tr>
-<tr class="memdesc:a62bb23de74dbc668ee0e0846abe432bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the regular elements of the AMT-kernel in a morphism.  <br /></td></tr>
-<tr class="separator:a62bb23de74dbc668ee0e0846abe432bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a347f04e51d0fb4d448f01b2fa85d408e" id="r_a347f04e51d0fb4d448f01b2fa85d408e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a347f04e51d0fb4d448f01b2fa85d408e">compute_amt_pairs_regular</a> (<a class="el" href="structnum__span__trees.html">num_span_trees</a> *, <a class="el" href="structnum__span__trees.html">num_span_trees</a> *, uint, uint, <a class="el" href="structdequeue.html">dequeue</a> *, <a class="el" href="structdequeue.html">dequeue</a> *)</td></tr>
-<tr class="memdesc:a347f04e51d0fb4d448f01b2fa85d408e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the anti AMT-pairs (q,t) where q is in the R-class of e and t is in the L-class of f.  <br /></td></tr>
-<tr class="separator:a347f04e51d0fb4d448f01b2fa85d408e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1dfe3ace499a7f927418c7b06b97cd00" id="r_a1dfe3ace499a7f927418c7b06b97cd00"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structsubsemi.html">subsemi</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1dfe3ace499a7f927418c7b06b97cd00">get_amt_kernel</a> (<a class="el" href="structmorphism.html">morphism</a> *, sub_level)</td></tr>
-<tr class="memdesc:a1dfe3ace499a7f927418c7b06b97cd00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the AMT-kernel of a morphism.  <br /></td></tr>
-<tr class="separator:a1dfe3ace499a7f927418c7b06b97cd00"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af93ac7704f677b2957af8c9d35bff33c" id="r_af93ac7704f677b2957af8c9d35bff33c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structsubsemi.html">subsemi</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af93ac7704f677b2957af8c9d35bff33c">get_kernel</a> (<a class="el" href="structmorphism.html">morphism</a> *M, sub_level level, basis ba)</td></tr>
+<tr class="memdesc:af93ac7704f677b2957af8c9d35bff33c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the kernel of a morphism for one of the three bases MOD, AMT or GR.  <br /></td></tr>
+<tr class="separator:af93ac7704f677b2957af8c9d35bff33c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Computation of kernels. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a1d0edbf160f9bd87b910e829c1a76098" name="a1d0edbf160f9bd87b910e829c1a76098"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1d0edbf160f9bd87b910e829c1a76098">&#9670;&#160;</a></span>compute_amt_fold()</h2>
+<a id="af93ac7704f677b2957af8c9d35bff33c" name="af93ac7704f677b2957af8c9d35bff33c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af93ac7704f677b2957af8c9d35bff33c">&#9670;&#160;</a></span>get_kernel()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structparti.html">parti</a> * compute_amt_fold </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structdgraph.html">dgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>g</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Computes the regular elements of the AMT-kernel in a morphism. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">g</td><td>The morphism. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a62bb23de74dbc668ee0e0846abe432bc" name="a62bb23de74dbc668ee0e0846abe432bc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a62bb23de74dbc668ee0e0846abe432bc">&#9670;&#160;</a></span>compute_amt_kernel_regular()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void compute_amt_kernel_regular </td>
+          <td class="memname"><a class="el" href="structsubsemi.html">subsemi</a> * get_kernel </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structmorphism.html">morphism</a> *</td>          <td class="paramname"><span class="paramname"><em>M</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bool *</td>          <td class="paramname"><span class="paramname"><em>mono_in_sub</em></span>, </td>
+          <td class="paramtype">sub_level</td>          <td class="paramname"><span class="paramname"><em>level</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint *</td>          <td class="paramname"><span class="paramname"><em>size</em></span>&#160;)</td>
+          <td class="paramtype">basis</td>          <td class="paramname"><span class="paramname"><em>ba</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Computes the regular elements of the AMT-kernel in a morphism. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">M</td><td>The morphism.  </td></tr>
-    <tr><td class="paramname">mono_in_sub</td><td>The array to fill with the elements of the kernel.  </td></tr>
-    <tr><td class="paramname">size</td><td>Used to return the size of the kernel. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a347f04e51d0fb4d448f01b2fa85d408e" name="a347f04e51d0fb4d448f01b2fa85d408e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a347f04e51d0fb4d448f01b2fa85d408e">&#9670;&#160;</a></span>compute_amt_pairs_regular()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void compute_amt_pairs_regular </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structnum__span__trees.html">num_span_trees</a> *</td>          <td class="paramname"><span class="paramname"><em>rspans</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structnum__span__trees.html">num_span_trees</a> *</td>          <td class="paramname"><span class="paramname"><em>lspans</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>e</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>f</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structdequeue.html">dequeue</a> *</td>          <td class="paramname"><span class="paramname"><em>p1</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structdequeue.html">dequeue</a> *</td>          <td class="paramname"><span class="paramname"><em>p2</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Computes the anti AMT-pairs (q,t) where q is in the R-class of e and t is in the L-class of f. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">rspans</td><td>The spanning trees of the R-classes  </td></tr>
-    <tr><td class="paramname">lspans</td><td>The spanning trees of the L-classes  </td></tr>
-    <tr><td class="paramname">e</td><td>The idempotent e.  </td></tr>
-    <tr><td class="paramname">f</td><td>The idempotent f.  </td></tr>
-    <tr><td class="paramname">p1</td><td>The dequeue to fill with the first elements of each anti-pair.  </td></tr>
-    <tr><td class="paramname">p2</td><td>The dequeue to fill with the second elements of each anti-pair. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a3998fe454ee50665e7505b11dcc4d2b5" name="a3998fe454ee50665e7505b11dcc4d2b5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3998fe454ee50665e7505b11dcc4d2b5">&#9670;&#160;</a></span>compute_num_span_trees()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structnum__span__trees.html">num_span_trees</a> * compute_num_span_trees </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structmorphism.html">morphism</a> *</td>          <td class="paramname"><span class="paramname"><em>M</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>right</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Computes the spanning trees from a morphism. </p>
-<dl class="section return"><dt>Returns</dt><dd>The spanning trees. </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">M</td><td>The morphism.  </td></tr>
-    <tr><td class="paramname">right</td><td>True if the spanning trees are computed from the right Cayley graph, false if they are computed from the left one. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="aa90b72ef5fa0568c10824b65dd6d9250" name="aa90b72ef5fa0568c10824b65dd6d9250"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa90b72ef5fa0568c10824b65dd6d9250">&#9670;&#160;</a></span>delete_num_span_trees()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void delete_num_span_trees </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structnum__span__trees.html">num_span_trees</a> *</td>          <td class="paramname"><span class="paramname"><em>S</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Deletes the structure used to store the spanning trees. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">S</td><td>The structure to delete. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="aab86a0a8771f67739c613660c8fbb0e2" name="aab86a0a8771f67739c613660c8fbb0e2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aab86a0a8771f67739c613660c8fbb0e2">&#9670;&#160;</a></span>delete_single_num_span_tree()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void delete_single_num_span_tree </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structsingle__num__span__tree.html">single_num_span_tree</a> *</td>          <td class="paramname"><span class="paramname"><em>S</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">S</td><td>The structure to delete. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a1dfe3ace499a7f927418c7b06b97cd00" name="a1dfe3ace499a7f927418c7b06b97cd00"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1dfe3ace499a7f927418c7b06b97cd00">&#9670;&#160;</a></span>get_amt_kernel()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structsubsemi.html">subsemi</a> * get_amt_kernel </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structmorphism.html">morphism</a> *</td>          <td class="paramname"><span class="paramname"><em>M</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">sub_level</td>          <td class="paramname"><span class="paramname"><em></em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Computes the AMT-kernel of a morphism. </p>
-<dl class="section remark"><dt>Remarks</dt><dd>The only available computation level is LV_REG. If another level is passed, the computation defaults to LV_REG.</dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>The AMT-kernel (restricted to its regular elements). </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">M</td><td>The morphism. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="aebe5cf3600ecbf357b660ed4c4ef82fd" name="aebe5cf3600ecbf357b660ed4c4ef82fd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aebe5cf3600ecbf357b660ed4c4ef82fd">&#9670;&#160;</a></span>get_grp_kernel()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structsubsemi.html">subsemi</a> * get_grp_kernel </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structmorphism.html">morphism</a> *</td>          <td class="paramname"><span class="paramname"><em>M</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">sub_level</td>          <td class="paramname"><span class="paramname"><em>level</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Computes the GR-kernel of a morphism. </p>
+<p>Computes the kernel of a morphism for one of the three bases MOD, AMT or GR. </p>
 <dl class="section remark"><dt>Remarks</dt><dd>The available computation levels are LV_REG and LV_FULL. If LV_GREG is used, the computation defaults to LV_FULL.</dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>The GR-kernel. </dd></dl>
+<dl class="section attention"><dt>Attention</dt><dd>LV_FULL is not available for AMT-kernels. If used, the computation default to LV_REG.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The kernel. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">M</td><td>The morphism.  </td></tr>
-    <tr><td class="paramname">level</td><td>The desired computation level of the subsemigroup. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a4cb8f9617960d35361464732357de54b" name="a4cb8f9617960d35361464732357de54b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4cb8f9617960d35361464732357de54b">&#9670;&#160;</a></span>get_mod_kernel()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structsubsemi.html">subsemi</a> * get_mod_kernel </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structmorphism.html">morphism</a> *</td>          <td class="paramname"><span class="paramname"><em>M</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">sub_level</td>          <td class="paramname"><span class="paramname"><em>level</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Computes the MOD-kernel of a morphism. </p>
-<dl class="section remark"><dt>Remarks</dt><dd>The available computation levels are LV_REG and LV_FULL. If LV_GREG is used, the computation defaults to LV_FULL.</dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>The MOD-kernel. </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">M</td><td>The morphism.  </td></tr>
-    <tr><td class="paramname">level</td><td>The desired computation level of the subsemigroup. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a847714c8b835ca8e92cef6b27a013aab" name="a847714c8b835ca8e92cef6b27a013aab"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a847714c8b835ca8e92cef6b27a013aab">&#9670;&#160;</a></span>morphism_to_dfa_kernel()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structnfa.html">nfa</a> * morphism_to_dfa_kernel </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structmorphism.html">morphism</a> *</td>          <td class="paramname"><span class="paramname"><em>M</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Computes a DFA from the right Cayley graph of a morphism. Discards all transitions which are entering a new regular R-class. </p>
-<dl class="section remark"><dt>Remarks</dt><dd>Used to compute full Kernels.</dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>The DFA. </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">M</td><td>The morphism. </td></tr>
+    <tr><td class="paramname">level</td><td>The desired computation level of the subsemigroup.  </td></tr>
+    <tr><td class="paramname">ba</td><td>The basis of the kernel (BA_MOD, BA_AMT or BA_GR). If BA_ST is used, an error is raised. </td></tr>
   </table>
   </dd>
 </dl>
@@ -525,6 +214,33 @@ Functions</h2></td></tr>
 
 <p>Computes a DFA from the right Cayley graph of a morphism. Discards all transitions which are not internal to the R-classes. </p>
 <dl class="section remark"><dt>Remarks</dt><dd>Used to compute the restriction of Kernels to regular elements.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The DFA. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">M</td><td>The morphism. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a4422c5d98265d37b5306783dc18ee48b" name="a4422c5d98265d37b5306783dc18ee48b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4422c5d98265d37b5306783dc18ee48b">&#9670;&#160;</a></span>morphism_to_dnfa_kernel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structnfa.html">nfa</a> * morphism_to_dnfa_kernel </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structmorphism.html">morphism</a> *</td>          <td class="paramname"><span class="paramname"><em>M</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Computes a DFA from the right Cayley graph of a morphism. Discards all transitions which are entering a new regular R-class. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>Used to compute full Kernels.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>The DFA. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">

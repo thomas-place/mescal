@@ -1,11 +1,25 @@
 var searchData=
 [
-  ['table_0',['table',['../structhash__table.html#a5e35db520baa35875e7879fb84546744',1,'hash_table']]],
-  ['thetype_1',['thetype',['../structcom__command.html#a75e751ad4cb2034b199bd75db2f2821d',1,'com_command']]],
-  ['timeout_5fflag_2',['timeout_flag',['../interrupt_8h.html#a5560bdeaaf31b22228362ddcf193e9ec',1,'interrupt.c']]],
-  ['timeout_5fvalue_3',['timeout_value',['../interrupt_8h.html#aeab98f87dc3936f60df5b08528973e2a',1,'interrupt.c']]],
-  ['trans_4',['trans',['../structnfa.html#a23a8fe53e9f9c6a66c47cf47002b0227',1,'nfa::trans'],['../structdfa.html#acb554f3338241b1d6b6fa15fd2b07fc8',1,'dfa::trans']]],
-  ['trans_5fe_5',['trans_e',['../structnfa.html#aa9ea5c51ee0cacb2ad264334f75b439a',1,'nfa']]],
-  ['trans_5fi_6',['trans_i',['../structnfa.html#a0a562a02ea7bc9f01778ae03549430d2',1,'nfa']]],
-  ['type_7',['type',['../structobject.html#a28a9c5851852cc350ec71d1eee0657ee',1,'object']]]
+  ['sign_5fboolean_0',['sign_boolean',['../structfilters__info.html#a39f060b361962238533c613818b4cce5',1,'filters_info']]],
+  ['size_1',['size',['../structgraph.html#ac4eedf6504059cb9f46fda5e26b5bc41',1,'graph::size'],['../structsubsemi.html#abe492ed3ebc53ee7648c332096e31fe6',1,'subsemi::size'],['../structmccluskey__auto.html#affa5642f9ca62183030931479d95f044',1,'mccluskey_auto::size'],['../structglushkov__info.html#a0f0b4c8cf06de38cbf075d105627f9c0',1,'glushkov_info::size'],['../structbarray.html#a11e67ec165575bb52ca6fbb6fdfccb96',1,'barray::size'],['../structdlist.html#a0191dd71227df552cd65b93c372e9054',1,'dlist::size'],['../structhash__table.html#a6f76929415db00efcdc91663c9dab542',1,'hash_table::size']]],
+  ['size_5falpha_2',['size_alpha',['../structlgraph.html#a127026c6fa46a6b7ae06f5c96d91a1a8',1,'lgraph::size_alpha'],['../structdgraph.html#ab1fd38d56798962590f050d4a68d2ed1',1,'dgraph::size_alpha'],['../structnum__span__forest.html#aa12020060be8fad995f5be2f79056b84',1,'num_span_forest::size_alpha']]],
+  ['size_5farray_3',['size_array',['../structbinheap.html#a9731ce358c07f56398b562d8b8c0fdae',1,'binheap::size_array'],['../structbarray.html#a7fc6c3dd62097bba8f663dce5b7682a7',1,'barray::size_array'],['../structdequeue.html#af86a100fefac9917b2bfb81c6224b64c',1,'dequeue::size_array'],['../structdequeue__gen.html#acab5645b911430f53e57fe4c115f323e',1,'dequeue_gen::size_array'],['../structword.html#a8f384ca4eeb2d8a0b825beb2ce631c3c',1,'word::size_array']]],
+  ['size_5ffound_4',['size_found',['../structexall__profile.html#aaf05177d9cb8105183692b9e3c0f2b35',1,'exall_profile']]],
+  ['size_5fgraph_5',['size_graph',['../structlgraph.html#a3f7c6a4ba04a165bb40a51d325278ac3',1,'lgraph::size_graph'],['../structdgraph.html#a20eb00cc3371ff58922cf9fb73c1ea70',1,'dgraph::size_graph'],['../structnum__span__forest.html#ac79a89582cb8b2ece1c99ec5297513a5',1,'num_span_forest::size_graph']]],
+  ['size_5fheap_6',['size_heap',['../structbinheap.html#a9b025defdc2cfc361f7f0a5533621c64',1,'binheap']]],
+  ['size_5fpar_7',['size_par',['../structhopcroft__partition.html#a5e9480acb9b017b5d97771e42d13f53f',1,'hopcroft_partition::size_par'],['../structparti.html#a217b551155601264d129183015af5d3e',1,'parti::size_par'],['../structufind.html#a9b3779258bbb9253334060521cada2c4',1,'ufind::size_par']]],
+  ['size_5fset_8',['size_set',['../structhopcroft__partition.html#a2ef5906f2048e78ae74d8463c8e8f81e',1,'hopcroft_partition::size_set'],['../structparti.html#ab37ee370b5865c3f737e89f9c02da753',1,'parti::size_set'],['../structufind.html#a2445d78fd0b6edfa5899108e899ff7ad',1,'ufind::size_set']]],
+  ['size_5ftab_9',['size_tab',['../structufind.html#ab92cdac797803f363c4d8d4364861cfd',1,'ufind']]],
+  ['sizec_10',['sizec',['../structufind.html#a7bbfaf6489c216821bfdac1e9f51b6b1',1,'ufind']]],
+  ['span_5fforest_11',['span_forest',['../structnum__span__forest.html#aebcc8d96829a446726cebe7a6fdf6be9',1,'num_span_forest']]],
+  ['st_5fedges_12',['st_edges',['../structdfa__mirror__info.html#a7198862d9124fa660bfc838ebfb0ce7b',1,'dfa_mirror_info']]],
+  ['state_5fnames_13',['state_names',['../structnfa.html#a83ce1bc6bde3528d75a6fbb7b4aa258d',1,'nfa::state_names'],['../structdfa.html#a2a5678c648c83390d4a65bedb47b50c6',1,'dfa::state_names']]],
+  ['states_14',['states',['../structdfa__enum.html#a42c6cf6bc37ce4811cedec72c20d5904',1,'dfa_enum::states'],['../structexall__profile.html#a26eb7bb41a7ff33475690d980f4bee70',1,'exall_profile::states']]],
+  ['storage_15',['storage',['../structdgraph.html#ac79fae3314319677c37cd42a3517ffdd',1,'dgraph::storage'],['../structparti.html#a309d4b26b38a716586e581a944c460fe',1,'parti::storage']]],
+  ['string_16',['string',['../structstring__chain.html#ab0680ad503a4896de57844dbb7ab9503',1,'string_chain']]],
+  ['sub_5fto_5fmono_17',['sub_to_mono',['../structsubsemi.html#ac5277bf6f12fd48fdb5f83ccb77b09ed',1,'subsemi']]],
+  ['sylet_18',['sylet',['../structregexp.html#a02afd95cd2bd541e1fce1d5081a72478',1,'regexp']]],
+  ['symbolic_5fcount_19',['symbolic_count',['../regexp_8h.html#a06077d10cbe197b94c51dfa686c39a46',1,'regexp.c']]],
+  ['symbolic_5fnames_20',['symbolic_names',['../regexp_8h.html#ab037eb418b5068a691e2f98854ced361',1,'regexp.c']]],
+  ['syvar_21',['syvar',['../structregexp.html#a83aa63be6e7da768610e400dff5f74f3',1,'regexp']]]
 ];

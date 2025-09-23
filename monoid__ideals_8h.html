@@ -130,12 +130,12 @@ Functions</h2></td></tr>
 <tr class="memitem:ab18b7781ca36b6a192432adacfbb1d01" id="r_ab18b7781ca36b6a192432adacfbb1d01"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdequeue.html">dequeue</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab18b7781ca36b6a192432adacfbb1d01">compute_j_ideal_alph</a> (<a class="el" href="structmorphism.html">morphism</a> *, uint, bool *, bool *)</td></tr>
 <tr class="memdesc:ab18b7781ca36b6a192432adacfbb1d01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computation of a given restricted left/right ideal of an element. The restriction is given by a sub-alphabet: the only available transitions are those labeled by a letter in this sub-alphabet.  <br /></td></tr>
 <tr class="separator:ab18b7781ca36b6a192432adacfbb1d01"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af723c8001a8cba777e0d24d3cc38a27f" id="r_af723c8001a8cba777e0d24d3cc38a27f"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af723c8001a8cba777e0d24d3cc38a27f">get_rlink</a> (<a class="el" href="structmorphism.html">morphism</a> *, <a class="el" href="structparti.html">parti</a> *, uint, uint)</td></tr>
-<tr class="memdesc:af723c8001a8cba777e0d24d3cc38a27f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given an idempotent g and an element q such that g R q, compute an element s such that g = qr.  <br /></td></tr>
-<tr class="separator:af723c8001a8cba777e0d24d3cc38a27f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac3be6d524e6b4539cd6d979a43b1fad" id="r_aac3be6d524e6b4539cd6d979a43b1fad"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aac3be6d524e6b4539cd6d979a43b1fad">get_llink</a> (<a class="el" href="structmorphism.html">morphism</a> *, <a class="el" href="structparti.html">parti</a> *, uint, uint)</td></tr>
-<tr class="memdesc:aac3be6d524e6b4539cd6d979a43b1fad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given an idempotent h and an element t such that h R t, compute an element s such that h = st.  <br /></td></tr>
-<tr class="separator:aac3be6d524e6b4539cd6d979a43b1fad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a337a527564013ef2380c08f3699e961a" id="r_a337a527564013ef2380c08f3699e961a"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a337a527564013ef2380c08f3699e961a">get_rlink</a> (<a class="el" href="structmorphism.html">morphism</a> *, <a class="el" href="structparti.html">parti</a> *, uint, uint, bool *alpha)</td></tr>
+<tr class="memdesc:a337a527564013ef2380c08f3699e961a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given an idempotent g and an element q such that g R q, compute an element s such that g = qr.  <br /></td></tr>
+<tr class="separator:a337a527564013ef2380c08f3699e961a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9051c670815798e19dc871de9ccc2242" id="r_a9051c670815798e19dc871de9ccc2242"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9051c670815798e19dc871de9ccc2242">get_llink</a> (<a class="el" href="structmorphism.html">morphism</a> *, <a class="el" href="structparti.html">parti</a> *, uint, uint, bool *alpha)</td></tr>
+<tr class="memdesc:a9051c670815798e19dc871de9ccc2242"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given an idempotent h and an element t such that h R t, compute an element s such that h = st.  <br /></td></tr>
+<tr class="separator:a9051c670815798e19dc871de9ccc2242"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Computations of ideals in monoids. </p>
@@ -386,8 +386,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aac3be6d524e6b4539cd6d979a43b1fad" name="aac3be6d524e6b4539cd6d979a43b1fad"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aac3be6d524e6b4539cd6d979a43b1fad">&#9670;&#160;</a></span>get_llink()</h2>
+<a id="a9051c670815798e19dc871de9ccc2242" name="a9051c670815798e19dc871de9ccc2242"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9051c670815798e19dc871de9ccc2242">&#9670;&#160;</a></span>get_llink()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -410,7 +410,12 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>t</em></span>&#160;)</td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>t</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool *</td>          <td class="paramname"><span class="paramname"><em>alpha</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -422,15 +427,16 @@ Functions</h2></td></tr>
     <tr><td class="paramname">M</td><td>The morphism.  </td></tr>
     <tr><td class="paramname">L</td><td>The L-classes.  </td></tr>
     <tr><td class="paramname">h</td><td>Idempotent.  </td></tr>
-    <tr><td class="paramname">t</td><td>Start element. </td></tr>
+    <tr><td class="paramname">t</td><td>Start element.  </td></tr>
+    <tr><td class="paramname">alpha</td><td>An array of Booleans indexed by the letters: search a ling over this alphabet (NULL if not used). </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="af723c8001a8cba777e0d24d3cc38a27f" name="af723c8001a8cba777e0d24d3cc38a27f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af723c8001a8cba777e0d24d3cc38a27f">&#9670;&#160;</a></span>get_rlink()</h2>
+<a id="a337a527564013ef2380c08f3699e961a" name="a337a527564013ef2380c08f3699e961a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a337a527564013ef2380c08f3699e961a">&#9670;&#160;</a></span>get_rlink()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -453,7 +459,12 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>r</em></span>&#160;)</td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>r</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool *</td>          <td class="paramname"><span class="paramname"><em>alpha</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -465,7 +476,8 @@ Functions</h2></td></tr>
     <tr><td class="paramname">M</td><td>The morphism.  </td></tr>
     <tr><td class="paramname">R</td><td>The R-classes.  </td></tr>
     <tr><td class="paramname">g</td><td>Idempotent.  </td></tr>
-    <tr><td class="paramname">r</td><td>Start element. </td></tr>
+    <tr><td class="paramname">r</td><td>Start element.  </td></tr>
+    <tr><td class="paramname">alpha</td><td>An array of Booleans indexed by the letters: search a ling over this alphabet (NULL if not used). </td></tr>
   </table>
   </dd>
 </dl>

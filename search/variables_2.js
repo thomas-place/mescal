@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['dec_0',['dec',['../structsyletter.html#a680fcb7cf519ac894b1628aed9d529c4',1,'syletter::dec'],['../structsyvariable.html#a527efa8acfc8c10d094d938ee1bbcf9e',1,'syvariable::dec']]],
-  ['def_1',['def',['../structob__recursion.html#a4b02743733a7f35325c83e6dd6f47214',1,'ob_recursion']]],
-  ['depend_2',['depend',['../structobject.html#ab3ec10f84c467c06465473f8110ff356',1,'object']]],
-  ['dfa_3',['dfa',['../structob__automaton.html#aba3d187fac41e9a8fd6055773a5dc398',1,'ob_automaton']]],
-  ['done_4',['done',['../structexall__profile.html#acb043d8d7a4b45f2a999f150b7665c47',1,'exall_profile']]],
-  ['dropped_5',['dropped',['../structnum__span__trees.html#a7bc3bcedf6b07266b08ed4ea8d7e3623',1,'num_span_trees::dropped'],['../structsingle__num__span__tree.html#a36db644788cd2e6b643785ff991a380c',1,'single_num_span_tree::dropped']]]
+  ['cl_5felems_0',['cl_elems',['../structparti.html#a26659c022afb0b04e79e24bbb388b603',1,'parti']]],
+  ['cl_5fsize_1',['cl_size',['../structparti.html#afaa45df12132da8cb66049f382844bf3',1,'parti']]],
+  ['classes_2',['classes',['../structhopcroft__partition.html#a7e42b99dd8d49e07c5efbc469e9e6806',1,'hopcroft_partition']]],
+  ['collisions_3',['collisions',['../structhash__table.html#a30204ff90953e39f5203246c010c6e7c',1,'hash_table']]],
+  ['comp_4',['comp',['../structhash__table.html#a3011b14ea383553a3a0206e7cc1b47b7',1,'hash_table']]],
+  ['count_5',['count',['../structcom__parameters.html#aac9fd9fca0daf4a3c5ce3a4bdac61234',1,'com_parameters::count'],['../structob__prefixname.html#aa4287bb878997fba10867f7ef80fe719',1,'ob_prefixname::count']]]
 ];

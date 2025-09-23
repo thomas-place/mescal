@@ -1,9 +1,49 @@
 var shell__filtering_8h =
 [
+    [ "filters_info", "structfilters__info.html", "structfilters__info" ],
+    [ "FILTER_MAXCLASSES", "shell__filtering_8h.html#a7d4a0a1edfe66a71863c98e78cbd1e70", null ],
+    [ "bool_filter", "shell__filtering_8h.html#a77b1930a168e08c8f8d29b1e2f47f9f1", [
+      [ "FILTER_NOSIMC", "shell__filtering_8h.html#a77b1930a168e08c8f8d29b1e2f47f9f1a3ec32bdabe3e4b415c3a01f50c12c28b", null ],
+      [ "FILTER_NOSMALLCOUNTER", "shell__filtering_8h.html#a77b1930a168e08c8f8d29b1e2f47f9f1a597eff145724e74dafa84201bd15c4f3", null ],
+      [ "FILTER_BOOLSIZE", "shell__filtering_8h.html#a77b1930a168e08c8f8d29b1e2f47f9f1a6cf4a02010299dc7e8061b5851f20d77", null ]
+    ] ],
+    [ "num_filter", "shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52", [
+      [ "FILTER_MINI", "shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52a6b6dbdfc4fcdb79502b8d5d53b8fe05a", null ],
+      [ "FILTER_SYNT", "shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52a9abadd27e831bf27b7ec51bbc6d58ebd", null ],
+      [ "FILTER_IDEMS", "shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52a877b524b04baa112320e49afdc366180", null ],
+      [ "FILTER_RNUM", "shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52a6afb83478537cc2c1af80848565a8a97", null ],
+      [ "FILTER_LNUM", "shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52ad892c06f51091f923971060eba9fa0cb", null ],
+      [ "FILTER_JNUM", "shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52a587596a99c6c66253adf174944ff610c", null ],
+      [ "FILTER_HNUM", "shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52a6fd325cc38615694d6428fc8a204adf0", null ],
+      [ "FILTER_RMAXSIZE", "shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52a52fe11a4f403dc3bf36e3f8858c298ef", null ],
+      [ "FILTER_LMAXSIZE", "shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52a4dc5771a0c084468006faa8898e100cd", null ],
+      [ "FILTER_JMAXSIZE", "shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52af2aa8c31a14a6af6c7a3117fb9594e1f", null ],
+      [ "FILTER_HMAXSIZE", "shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52aa513f0644c784bd3013f2159ab75559d", null ],
+      [ "FILTER_NUMSIZE", "shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52a3ab08e8e9f7b7e1739b3f7b56b2721f9", null ]
+    ] ],
+    [ "object_compare", "shell__filtering_8h.html#a15040ce938721fcbaca3610f2307ce1a", null ],
+    [ "object_compare_numerical", "shell__filtering_8h.html#a9c4e7abdcf55a504f5a75bc15d21688b", null ],
+    [ "object_sort_array", "shell__filtering_8h.html#a02f63581890fb55d43000fdf06f2c00a", null ],
     [ "shell_delete", "shell__filtering_8h.html#a623ac29446c24e538aba99376efcba26", null ],
     [ "shell_delete_all", "shell__filtering_8h.html#a48d8fdcdc89c24a23b5abf2c22607ce2", null ],
+    [ "shell_extract_hmaxsize", "shell__filtering_8h.html#aeadd8b8ec45b4e072093c7e33fdffe0d", null ],
+    [ "shell_extract_hnum", "shell__filtering_8h.html#aa62315d733dc650300bb5cf8a58110be", null ],
+    [ "shell_extract_idemnum", "shell__filtering_8h.html#ae75c8cd810fa03a3a9c570be738148d3", null ],
+    [ "shell_extract_jmaxsize", "shell__filtering_8h.html#a193d32fad8b0f8672a5be7d7c2fa3bd9", null ],
+    [ "shell_extract_jnum", "shell__filtering_8h.html#a405ec672eafc5554191882457af37b69", null ],
+    [ "shell_extract_lmaxsize", "shell__filtering_8h.html#ae1e00c19f9b6267c25c0f6548f0cded4", null ],
+    [ "shell_extract_lnum", "shell__filtering_8h.html#ac5c93ee878080a25d544e819829557a0", null ],
+    [ "shell_extract_rmaxsize", "shell__filtering_8h.html#a73bb89fcd7ee153c99bc8988f4b2b703", null ],
+    [ "shell_extract_rnum", "shell__filtering_8h.html#ad7405709f94daad75992917a52345af6", null ],
+    [ "shell_extract_sizemini", "shell__filtering_8h.html#a4ede950c1e903e0e32b342caa5177d9c", null ],
+    [ "shell_extract_sizesynt", "shell__filtering_8h.html#a74d1827f84e7f81f93d21fb687e2be02", null ],
+    [ "shell_filter_delete", "shell__filtering_8h.html#aad6ba70d572bb9380aabc93c541becd7", null ],
     [ "shell_filter_objects", "shell__filtering_8h.html#afef9114a97c4e46b773141bcfe4817c2", null ],
     [ "shell_recursive_init", "shell__filtering_8h.html#adb507ee7eebc186d3b6b29ce4f2b3ab7", null ],
     [ "shell_reset", "shell__filtering_8h.html#ad3eebd6056e28e8cc499403af5bf3cdd", null ],
-    [ "shell_sort", "shell__filtering_8h.html#aa867731a9cd3acb37a67cd422f1d03b8", null ]
+    [ "shell_retrieve_filters", "shell__filtering_8h.html#a23a7c1b511faba02ea47ef9aa5e1b897", null ],
+    [ "shell_sort", "shell__filtering_8h.html#aa867731a9cd3acb37a67cd422f1d03b8", null ],
+    [ "bool_extractors", "shell__filtering_8h.html#ad10de159f760be10367f90d574ce597a", null ],
+    [ "extractor", "shell__filtering_8h.html#a6fec4a6a3d415d5698b83195a4feea68", null ],
+    [ "num_extractors", "shell__filtering_8h.html#a5fccbeda467d88bc064dd0ad884a92b1", null ]
 ];

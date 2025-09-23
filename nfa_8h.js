@@ -12,6 +12,7 @@ var nfa_8h =
     [ "dfa_copy", "nfa_8h.html#a68197f5343a9e2c85947ccc9a84f11b3", null ],
     [ "dfa_copy_exalpha", "nfa_8h.html#a918f5fe3c14cb0373c18c1abe562daf8", null ],
     [ "dfa_delete", "nfa_8h.html#aaef744cc8d20f2f1606864672d2a0bde", null ],
+    [ "dfa_direct_product", "nfa_8h.html#a566d2b594e8f4a753e7b09dcc2cb7a05", null ],
     [ "dfa_exists_path", "nfa_8h.html#a4ea5c472b08908f2fa8eda796b525aef", null ],
     [ "dfa_mirror", "nfa_8h.html#ab2d7cf3110dc6238af5468ef3b0edfc9", null ],
     [ "dfa_print_state", "nfa_8h.html#a6d85fc99b2f617f1759031f62a3eefbf", null ],

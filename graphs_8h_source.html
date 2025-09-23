@@ -198,187 +198,206 @@ $(function(){initNavTree('graphs_8h_source.html',''); initResizable(true); });
 <div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span><span class="keywordtype">int</span> <a class="code hl_function" href="graphs_8h.html#aa771c03d7e613494b7cb7699790ba003">dgraph_nb_edges</a>(<a class="code hl_struct" href="structdgraph.html">dgraph</a>* <span class="comment">//&lt;! The graph.</span></div>
 <div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>);</div>
 <div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span> </div>
-<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span><span class="comment">/***********/</span></div>
-<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span><span class="comment">/* Mirrors */</span></div>
-<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span><span class="comment">/***********/</span></div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span><span class="comment">/**************/</span></div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span><span class="comment">/*+ Products +*/</span></div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span><span class="comment">/**************/</span></div>
 <div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span></div>
-<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span><a class="code hl_struct" href="structgraph.html">graph</a>* <a class="code hl_function" href="graphs_8h.html#a67e75d4e63dee41143abceb6c09fe73c">graph_mirror</a>(<a class="code hl_struct" href="structgraph.html">graph</a>* <span class="comment">//&lt;! The graph.</span></div>
-<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>);</div>
-<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span></div>
-<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span><a class="code hl_struct" href="structlgraph.html">lgraph</a>* <a class="code hl_function" href="graphs_8h.html#a1320dc14ae37171752a32162e7318794">lgraph_mirror</a>(<a class="code hl_struct" href="structlgraph.html">lgraph</a>* <span class="comment">//&lt;! The graph.</span></div>
-<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>);</div>
-<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span></div>
-<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span><a class="code hl_struct" href="structlgraph.html">lgraph</a>* <a class="code hl_function" href="graphs_8h.html#a21fe7ba13afee887bd34de8ec466304d">dgraph_mirror</a>(<a class="code hl_struct" href="structdgraph.html">dgraph</a>* <span class="comment">//&lt;! The graph.</span></div>
-<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>);</div>
-<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span> </div>
-<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span> </div>
-<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span><span class="comment">/************/</span></div>
-<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span><span class="comment">/* Searches */</span></div>
-<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span><span class="comment">/************/</span></div>
-<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span></div>
-<div class="foldopen" id="foldopen00253" data-start="{" data-end="};">
-<div class="line"><a id="l00253" name="l00253"></a><span class="lineno"><a class="line" href="graphs_8h.html#af79428132abe4bab1bda312319693dc8">  253</a></span><span class="keyword">typedef</span> <span class="keyword">enum</span> {</div>
-<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>    DFS,</div>
-<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>    BFS,</div>
-<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>} <a class="code hl_enumeration" href="graphs_8h.html#af79428132abe4bab1bda312319693dc8">graph_stype</a>;</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span><a class="code hl_struct" href="structdgraph.html">dgraph</a>* <a class="code hl_function" href="graphs_8h.html#abdcbbb1435c747652fb69ebc4f53d0b7">dgraph_direct_product</a>(<a class="code hl_struct" href="structdgraph.html">dgraph</a>* g1, </div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>    <a class="code hl_struct" href="structdgraph.html">dgraph</a>* g2 </div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>);</div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span> </div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span> </div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span><span class="comment">/***********/</span></div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span><span class="comment">/* Mirrors */</span></div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span><span class="comment">/***********/</span></div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span></div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span><a class="code hl_struct" href="structgraph.html">graph</a>* <a class="code hl_function" href="graphs_8h.html#a67e75d4e63dee41143abceb6c09fe73c">graph_mirror</a>(<a class="code hl_struct" href="structgraph.html">graph</a>* <span class="comment">//&lt;! The graph.</span></div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>);</div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span></div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span><a class="code hl_struct" href="structlgraph.html">lgraph</a>* <a class="code hl_function" href="graphs_8h.html#a1320dc14ae37171752a32162e7318794">lgraph_mirror</a>(<a class="code hl_struct" href="structlgraph.html">lgraph</a>* <span class="comment">//&lt;! The graph.</span></div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>);</div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span></div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span><a class="code hl_struct" href="structlgraph.html">lgraph</a>* <a class="code hl_function" href="graphs_8h.html#a21fe7ba13afee887bd34de8ec466304d">dgraph_mirror</a>(<a class="code hl_struct" href="structdgraph.html">dgraph</a>* <span class="comment">//&lt;! The graph.</span></div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>);</div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span> </div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span> </div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span><span class="comment">/************/</span></div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span><span class="comment">/* Searches */</span></div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span><span class="comment">/************/</span></div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span></div>
+<div class="foldopen" id="foldopen00279" data-start="{" data-end="};">
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno"><a class="line" href="graphs_8h.html#af79428132abe4bab1bda312319693dc8">  279</a></span><span class="keyword">typedef</span> <span class="keyword">enum</span> {</div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>    DFS,</div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>    BFS,</div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>} <a class="code hl_enumeration" href="graphs_8h.html#af79428132abe4bab1bda312319693dc8">graph_stype</a>;</div>
 </div>
-<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span></div>
-<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span><span class="keywordtype">void</span> <a class="code hl_function" href="graphs_8h.html#aeeb7b7ce09f2240afd39c27d5b4521ea">graph_search_update</a>(<a class="code hl_enumeration" href="graphs_8h.html#af79428132abe4bab1bda312319693dc8">graph_stype</a>, </div>
-<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>    <a class="code hl_struct" href="structgraph.html">graph</a>*,     </div>
-<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>    <a class="code hl_struct" href="structdequeue.html">dequeue</a>*,   </div>
-<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>    <span class="keywordtype">bool</span>*       </div>
-<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>);</div>
-<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span></div>
-<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span><a class="code hl_struct" href="structdequeue.html">dequeue</a>* <a class="code hl_function" href="graphs_8h.html#af7c2b72480599c777652489a95d5517e">graph_search</a>(<a class="code hl_enumeration" href="graphs_8h.html#af79428132abe4bab1bda312319693dc8">graph_stype</a>, </div>
-<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>    <a class="code hl_struct" href="structgraph.html">graph</a>*,     </div>
-<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>    <a class="code hl_struct" href="structdequeue.html">dequeue</a>*,   </div>
-<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>    <span class="keywordtype">bool</span>*       </div>
-<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>);</div>
-<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span></div>
-<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span><span class="keywordtype">void</span> <a class="code hl_function" href="graphs_8h.html#a1871ffbe9a1c44bf18edc7a6665deb2b">lgraph_search_update</a>(<a class="code hl_enumeration" href="graphs_8h.html#af79428132abe4bab1bda312319693dc8">graph_stype</a>, </div>
-<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span>    <a class="code hl_struct" href="structlgraph.html">lgraph</a>*,    </div>
-<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>    <a class="code hl_struct" href="structdequeue.html">dequeue</a>*,   </div>
-<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span>    <span class="keywordtype">bool</span>*,      </div>
-<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>    <span class="keywordtype">bool</span>*       </div>
-<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>);</div>
-<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span></div>
-<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span><a class="code hl_struct" href="structdequeue.html">dequeue</a>* <a class="code hl_function" href="graphs_8h.html#a621e6cd9609980aa14d2382e210e4825">lgraph_search</a>(<a class="code hl_enumeration" href="graphs_8h.html#af79428132abe4bab1bda312319693dc8">graph_stype</a>, </div>
-<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span>    <a class="code hl_struct" href="structlgraph.html">lgraph</a>*,    </div>
-<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span>    <a class="code hl_struct" href="structdequeue.html">dequeue</a>*,   </div>
-<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span>    <span class="keywordtype">bool</span>*,      </div>
-<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span>    <span class="keywordtype">bool</span>*       </div>
-<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span>);</div>
-<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span></div>
-<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span><span class="keywordtype">void</span> <a class="code hl_function" href="graphs_8h.html#a25e1c54a054182ba449641b87f41efdb">dgraph_search_update</a>(<a class="code hl_enumeration" href="graphs_8h.html#af79428132abe4bab1bda312319693dc8">graph_stype</a>, </div>
-<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span>    <a class="code hl_struct" href="structdgraph.html">dgraph</a>*,    </div>
-<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span>    <a class="code hl_struct" href="structdequeue.html">dequeue</a>*,   </div>
-<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span>    <span class="keywordtype">bool</span>*,      </div>
-<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>    <span class="keywordtype">bool</span>*       </div>
-<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>);</div>
-<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span></div>
-<div class="line"><a id="l00377" name="l00377"></a><span class="lineno">  377</span><a class="code hl_struct" href="structdequeue.html">dequeue</a>* <a class="code hl_function" href="graphs_8h.html#a9c0a43517e0be4fd197a10bd4338d3f9">dgraph_search</a>(<a class="code hl_enumeration" href="graphs_8h.html#af79428132abe4bab1bda312319693dc8">graph_stype</a>, </div>
-<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span>    <a class="code hl_struct" href="structdgraph.html">dgraph</a>*,    </div>
-<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span>    <a class="code hl_struct" href="structdequeue.html">dequeue</a>*,   </div>
-<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span>    <span class="keywordtype">bool</span>*,      </div>
-<div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span>    <span class="keywordtype">bool</span>*       </div>
-<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span>);</div>
-<div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span> </div>
-<div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span> </div>
-<div class="line"><a id="l00385" name="l00385"></a><span class="lineno">  385</span></div>
-<div class="line"><a id="l00399" name="l00399"></a><span class="lineno">  399</span><span class="keywordtype">void</span> <a class="code hl_function" href="graphs_8h.html#a9ae94228232e6b8c7c271208c11808a1">twin_dgraph_search_update</a>(<a class="code hl_enumeration" href="graphs_8h.html#af79428132abe4bab1bda312319693dc8">graph_stype</a>, </div>
-<div class="line"><a id="l00400" name="l00400"></a><span class="lineno">  400</span>    <a class="code hl_struct" href="structdgraph.html">dgraph</a>*,    </div>
-<div class="line"><a id="l00401" name="l00401"></a><span class="lineno">  401</span>    <a class="code hl_struct" href="structdgraph.html">dgraph</a>*,    </div>
-<div class="line"><a id="l00402" name="l00402"></a><span class="lineno">  402</span>    <a class="code hl_struct" href="structdequeue.html">dequeue</a>*,   </div>
-<div class="line"><a id="l00403" name="l00403"></a><span class="lineno">  403</span>    <span class="keywordtype">bool</span>*,      </div>
-<div class="line"><a id="l00404" name="l00404"></a><span class="lineno">  404</span>    <span class="keywordtype">bool</span>*       </div>
-<div class="line"><a id="l00405" name="l00405"></a><span class="lineno">  405</span>);</div>
-<div class="line"><a id="l00406" name="l00406"></a><span class="lineno">  406</span></div>
-<div class="line"><a id="l00425" name="l00425"></a><span class="lineno">  425</span><a class="code hl_struct" href="structdequeue.html">dequeue</a>* <a class="code hl_function" href="graphs_8h.html#a71a9720e9ed9b7adc22d418205e9f7b4">twin_dgraph_search</a>(<a class="code hl_enumeration" href="graphs_8h.html#af79428132abe4bab1bda312319693dc8">graph_stype</a>, </div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span></div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span><span class="keywordtype">void</span> <a class="code hl_function" href="graphs_8h.html#aeeb7b7ce09f2240afd39c27d5b4521ea">graph_search_update</a>(<a class="code hl_enumeration" href="graphs_8h.html#af79428132abe4bab1bda312319693dc8">graph_stype</a>, </div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>    <a class="code hl_struct" href="structgraph.html">graph</a>*,     </div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span>    <a class="code hl_struct" href="structdequeue.html">dequeue</a>*,   </div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>    <span class="keywordtype">bool</span>*       </div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>);</div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span></div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span><a class="code hl_struct" href="structdequeue.html">dequeue</a>* <a class="code hl_function" href="graphs_8h.html#af7c2b72480599c777652489a95d5517e">graph_search</a>(<a class="code hl_enumeration" href="graphs_8h.html#af79428132abe4bab1bda312319693dc8">graph_stype</a>, </div>
+<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>    <a class="code hl_struct" href="structgraph.html">graph</a>*,     </div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>    <a class="code hl_struct" href="structdequeue.html">dequeue</a>*,   </div>
+<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>    <span class="keywordtype">bool</span>*       </div>
+<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span>);</div>
+<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span></div>
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span><span class="keywordtype">void</span> <a class="code hl_function" href="graphs_8h.html#a1871ffbe9a1c44bf18edc7a6665deb2b">lgraph_search_update</a>(<a class="code hl_enumeration" href="graphs_8h.html#af79428132abe4bab1bda312319693dc8">graph_stype</a>, </div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span>    <a class="code hl_struct" href="structlgraph.html">lgraph</a>*,    </div>
+<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span>    <a class="code hl_struct" href="structdequeue.html">dequeue</a>*,   </div>
+<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span>    <span class="keywordtype">bool</span>*,      </div>
+<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span>    <span class="keywordtype">bool</span>*       </div>
+<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span>);</div>
+<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span></div>
+<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span><a class="code hl_struct" href="structdequeue.html">dequeue</a>* <a class="code hl_function" href="graphs_8h.html#a621e6cd9609980aa14d2382e210e4825">lgraph_search</a>(<a class="code hl_enumeration" href="graphs_8h.html#af79428132abe4bab1bda312319693dc8">graph_stype</a>, </div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>    <a class="code hl_struct" href="structlgraph.html">lgraph</a>*,    </div>
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>    <a class="code hl_struct" href="structdequeue.html">dequeue</a>*,   </div>
+<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>    <span class="keywordtype">bool</span>*,      </div>
+<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>    <span class="keywordtype">bool</span>*       </div>
+<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>);</div>
+<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span></div>
+<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span><span class="keywordtype">void</span> <a class="code hl_function" href="graphs_8h.html#a25e1c54a054182ba449641b87f41efdb">dgraph_search_update</a>(<a class="code hl_enumeration" href="graphs_8h.html#af79428132abe4bab1bda312319693dc8">graph_stype</a>, </div>
+<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span>    <a class="code hl_struct" href="structdgraph.html">dgraph</a>*,    </div>
+<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span>    <a class="code hl_struct" href="structdequeue.html">dequeue</a>*,   </div>
+<div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span>    <span class="keywordtype">bool</span>*,      </div>
+<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span>    <span class="keywordtype">bool</span>*       </div>
+<div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span>);</div>
+<div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span></div>
+<div class="line"><a id="l00403" name="l00403"></a><span class="lineno">  403</span><a class="code hl_struct" href="structdequeue.html">dequeue</a>* <a class="code hl_function" href="graphs_8h.html#a9c0a43517e0be4fd197a10bd4338d3f9">dgraph_search</a>(<a class="code hl_enumeration" href="graphs_8h.html#af79428132abe4bab1bda312319693dc8">graph_stype</a>, </div>
+<div class="line"><a id="l00404" name="l00404"></a><span class="lineno">  404</span>    <a class="code hl_struct" href="structdgraph.html">dgraph</a>*,    </div>
+<div class="line"><a id="l00405" name="l00405"></a><span class="lineno">  405</span>    <a class="code hl_struct" href="structdequeue.html">dequeue</a>*,   </div>
+<div class="line"><a id="l00406" name="l00406"></a><span class="lineno">  406</span>    <span class="keywordtype">bool</span>*,      </div>
+<div class="line"><a id="l00407" name="l00407"></a><span class="lineno">  407</span>    <span class="keywordtype">bool</span>*       </div>
+<div class="line"><a id="l00408" name="l00408"></a><span class="lineno">  408</span>);</div>
+<div class="line"><a id="l00409" name="l00409"></a><span class="lineno">  409</span> </div>
+<div class="line"><a id="l00410" name="l00410"></a><span class="lineno">  410</span> </div>
+<div class="line"><a id="l00411" name="l00411"></a><span class="lineno">  411</span></div>
+<div class="line"><a id="l00425" name="l00425"></a><span class="lineno">  425</span><span class="keywordtype">void</span> <a class="code hl_function" href="graphs_8h.html#a9ae94228232e6b8c7c271208c11808a1">twin_dgraph_search_update</a>(<a class="code hl_enumeration" href="graphs_8h.html#af79428132abe4bab1bda312319693dc8">graph_stype</a>, </div>
 <div class="line"><a id="l00426" name="l00426"></a><span class="lineno">  426</span>    <a class="code hl_struct" href="structdgraph.html">dgraph</a>*,    </div>
 <div class="line"><a id="l00427" name="l00427"></a><span class="lineno">  427</span>    <a class="code hl_struct" href="structdgraph.html">dgraph</a>*,    </div>
 <div class="line"><a id="l00428" name="l00428"></a><span class="lineno">  428</span>    <a class="code hl_struct" href="structdequeue.html">dequeue</a>*,   </div>
 <div class="line"><a id="l00429" name="l00429"></a><span class="lineno">  429</span>    <span class="keywordtype">bool</span>*,      </div>
 <div class="line"><a id="l00430" name="l00430"></a><span class="lineno">  430</span>    <span class="keywordtype">bool</span>*       </div>
 <div class="line"><a id="l00431" name="l00431"></a><span class="lineno">  431</span>);</div>
-<div class="line"><a id="l00432" name="l00432"></a><span class="lineno">  432</span> </div>
-<div class="line"><a id="l00433" name="l00433"></a><span class="lineno">  433</span><span class="comment">/********************************/</span></div>
-<div class="line"><a id="l00434" name="l00434"></a><span class="lineno">  434</span><span class="comment">/*+ Disjoint merging of graphs +*/</span></div>
-<div class="line"><a id="l00435" name="l00435"></a><span class="lineno">  435</span><span class="comment">/********************************/</span></div>
-<div class="line"><a id="l00436" name="l00436"></a><span class="lineno">  436</span></div>
-<div class="line"><a id="l00448" name="l00448"></a><span class="lineno">  448</span><a class="code hl_struct" href="structgraph.html">graph</a>* <a class="code hl_function" href="graphs_8h.html#adb17d1bc074506de7625d2c759a07556">merge_graphs</a>(uint*, </div>
-<div class="line"><a id="l00449" name="l00449"></a><span class="lineno">  449</span>    uint,   </div>
-<div class="line"><a id="l00450" name="l00450"></a><span class="lineno">  450</span>    ...     </div>
-<div class="line"><a id="l00451" name="l00451"></a><span class="lineno">  451</span>);</div>
-<div class="line"><a id="l00452" name="l00452"></a><span class="lineno">  452</span></div>
-<div class="line"><a id="l00467" name="l00467"></a><span class="lineno">  467</span><a class="code hl_struct" href="structlgraph.html">lgraph</a>* <a class="code hl_function" href="graphs_8h.html#accd55f5ff9f4d520b49c2581686bff03">merge_lgraphs</a>(uint*, </div>
-<div class="line"><a id="l00468" name="l00468"></a><span class="lineno">  468</span>    uint, </div>
-<div class="line"><a id="l00469" name="l00469"></a><span class="lineno">  469</span>    ... </div>
-<div class="line"><a id="l00470" name="l00470"></a><span class="lineno">  470</span>);</div>
-<div class="line"><a id="l00471" name="l00471"></a><span class="lineno">  471</span> </div>
-<div class="line"><a id="l00472" name="l00472"></a><span class="lineno">  472</span><span class="comment">/**************************************************/</span></div>
-<div class="line"><a id="l00473" name="l00473"></a><span class="lineno">  473</span><span class="comment">/*+ Merging graphs with the same set of vertices +*/</span></div>
-<div class="line"><a id="l00474" name="l00474"></a><span class="lineno">  474</span><span class="comment">/**************************************************/</span></div>
-<div class="line"><a id="l00475" name="l00475"></a><span class="lineno">  475</span></div>
-<div class="line"><a id="l00490" name="l00490"></a><span class="lineno">  490</span><a class="code hl_struct" href="structgraph.html">graph</a>* <a class="code hl_function" href="graphs_8h.html#ad372b203857f457bd1cee4f0786a050d">ldgraphs_to_graph</a>(uint, </div>
-<div class="line"><a id="l00491" name="l00491"></a><span class="lineno">  491</span>    uint, </div>
-<div class="line"><a id="l00492" name="l00492"></a><span class="lineno">  492</span>    uint, </div>
-<div class="line"><a id="l00493" name="l00493"></a><span class="lineno">  493</span>    uint, </div>
-<div class="line"><a id="l00494" name="l00494"></a><span class="lineno">  494</span>    ...   </div>
-<div class="line"><a id="l00495" name="l00495"></a><span class="lineno">  495</span>);</div>
-<div class="line"><a id="l00496" name="l00496"></a><span class="lineno">  496</span></div>
-<div class="line"><a id="l00511" name="l00511"></a><span class="lineno">  511</span><a class="code hl_struct" href="structlgraph.html">lgraph</a>* <a class="code hl_function" href="graphs_8h.html#a35649adc0b9a583c083acdecd260197a">ldgraphs_to_lgraph</a>(uint, </div>
-<div class="line"><a id="l00512" name="l00512"></a><span class="lineno">  512</span>    uint, </div>
-<div class="line"><a id="l00513" name="l00513"></a><span class="lineno">  513</span>    uint, </div>
-<div class="line"><a id="l00514" name="l00514"></a><span class="lineno">  514</span>    ...   </div>
-<div class="line"><a id="l00515" name="l00515"></a><span class="lineno">  515</span>);</div>
-<div class="line"><a id="l00516" name="l00516"></a><span class="lineno">  516</span></div>
-<div class="line"><a id="l00524" name="l00524"></a><span class="lineno">  524</span><a class="code hl_struct" href="structlgraph.html">lgraph</a>* <a class="code hl_function" href="graphs_8h.html#a10ac0ddac7534b40351650bf0c3d90fe">dgraph_to_lgraph</a>(<a class="code hl_struct" href="structdgraph.html">dgraph</a>* </div>
-<div class="line"><a id="l00525" name="l00525"></a><span class="lineno">  525</span>);</div>
-<div class="line"><a id="l00526" name="l00526"></a><span class="lineno">  526</span></div>
-<div class="line"><a id="l00534" name="l00534"></a><span class="lineno">  534</span><a class="code hl_struct" href="structgraph.html">graph</a>* <a class="code hl_function" href="graphs_8h.html#a52da04c1af11929a4dae1936ea998186">lgraph_to_graph</a>(<a class="code hl_struct" href="structlgraph.html">lgraph</a>* </div>
-<div class="line"><a id="l00535" name="l00535"></a><span class="lineno">  535</span>);</div>
-<div class="line"><a id="l00536" name="l00536"></a><span class="lineno">  536</span></div>
-<div class="line"><a id="l00549" name="l00549"></a><span class="lineno">  549</span><a class="code hl_struct" href="structgraph.html">graph</a>* <a class="code hl_function" href="graphs_8h.html#a241e2ae201bfb4efae360e64b437e718">lgraph_to_graph_alpha</a>(<a class="code hl_struct" href="structlgraph.html">lgraph</a>*, </div>
-<div class="line"><a id="l00550" name="l00550"></a><span class="lineno">  550</span>    <span class="keywordtype">bool</span>* </div>
-<div class="line"><a id="l00551" name="l00551"></a><span class="lineno">  551</span>);</div>
-<div class="line"><a id="l00552" name="l00552"></a><span class="lineno">  552</span> </div>
-<div class="line"><a id="l00553" name="l00553"></a><span class="lineno">  553</span></div>
-<div class="line"><a id="l00561" name="l00561"></a><span class="lineno">  561</span><a class="code hl_struct" href="structgraph.html">graph</a>* <a class="code hl_function" href="graphs_8h.html#a155ee826cfc5a288be03e0a4711239e3">dgraph_to_graph</a>(<a class="code hl_struct" href="structdgraph.html">dgraph</a>* </div>
-<div class="line"><a id="l00562" name="l00562"></a><span class="lineno">  562</span>);</div>
-<div class="line"><a id="l00563" name="l00563"></a><span class="lineno">  563</span></div>
-<div class="line"><a id="l00576" name="l00576"></a><span class="lineno">  576</span><a class="code hl_struct" href="structgraph.html">graph</a>* <a class="code hl_function" href="graphs_8h.html#af4572aae68e83742af6071d202d80263">dgraph_to_graph_alpha</a>(<a class="code hl_struct" href="structdgraph.html">dgraph</a>*, </div>
-<div class="line"><a id="l00577" name="l00577"></a><span class="lineno">  577</span>    <span class="keywordtype">bool</span>* </div>
-<div class="line"><a id="l00578" name="l00578"></a><span class="lineno">  578</span>);</div>
-<div class="line"><a id="l00579" name="l00579"></a><span class="lineno">  579</span> </div>
-<div class="line"><a id="l00580" name="l00580"></a><span class="lineno">  580</span> </div>
-<div class="line"><a id="l00581" name="l00581"></a><span class="lineno">  581</span><span class="comment">/***************************************/</span></div>
-<div class="line"><a id="l00582" name="l00582"></a><span class="lineno">  582</span><span class="comment">/*+ Computation of adjacents vertices +*/</span></div>
-<div class="line"><a id="l00583" name="l00583"></a><span class="lineno">  583</span><span class="comment">/***************************************/</span></div>
-<div class="line"><a id="l00584" name="l00584"></a><span class="lineno">  584</span></div>
-<div class="line"><a id="l00594" name="l00594"></a><span class="lineno">  594</span><a class="code hl_struct" href="structdequeue.html">dequeue</a>* <a class="code hl_function" href="graphs_8h.html#a65bd76d322515fd370db7c6f98b7510a">lgraph_reachable</a>(<a class="code hl_struct" href="structlgraph.html">lgraph</a>*,  </div>
-<div class="line"><a id="l00595" name="l00595"></a><span class="lineno">  595</span>    <a class="code hl_struct" href="structdequeue.html">dequeue</a>*, </div>
-<div class="line"><a id="l00596" name="l00596"></a><span class="lineno">  596</span>    uint       </div>
+<div class="line"><a id="l00432" name="l00432"></a><span class="lineno">  432</span></div>
+<div class="line"><a id="l00451" name="l00451"></a><span class="lineno">  451</span><a class="code hl_struct" href="structdequeue.html">dequeue</a>* <a class="code hl_function" href="graphs_8h.html#a71a9720e9ed9b7adc22d418205e9f7b4">twin_dgraph_search</a>(<a class="code hl_enumeration" href="graphs_8h.html#af79428132abe4bab1bda312319693dc8">graph_stype</a>, </div>
+<div class="line"><a id="l00452" name="l00452"></a><span class="lineno">  452</span>    <a class="code hl_struct" href="structdgraph.html">dgraph</a>*,    </div>
+<div class="line"><a id="l00453" name="l00453"></a><span class="lineno">  453</span>    <a class="code hl_struct" href="structdgraph.html">dgraph</a>*,    </div>
+<div class="line"><a id="l00454" name="l00454"></a><span class="lineno">  454</span>    <a class="code hl_struct" href="structdequeue.html">dequeue</a>*,   </div>
+<div class="line"><a id="l00455" name="l00455"></a><span class="lineno">  455</span>    <span class="keywordtype">bool</span>*,      </div>
+<div class="line"><a id="l00456" name="l00456"></a><span class="lineno">  456</span>    <span class="keywordtype">bool</span>*       </div>
+<div class="line"><a id="l00457" name="l00457"></a><span class="lineno">  457</span>);</div>
+<div class="line"><a id="l00458" name="l00458"></a><span class="lineno">  458</span> </div>
+<div class="line"><a id="l00459" name="l00459"></a><span class="lineno">  459</span></div>
+<div class="line"><a id="l00473" name="l00473"></a><span class="lineno">  473</span><a class="code hl_struct" href="structdgraph.html">dgraph</a>* <a class="code hl_function" href="graphs_8h.html#ab7c321371b79b590957444a00d8d41b3">dgraph_paths</a>(<a class="code hl_struct" href="structdgraph.html">dgraph</a>* G, </div>
+<div class="line"><a id="l00474" name="l00474"></a><span class="lineno">  474</span>    uint start </div>
+<div class="line"><a id="l00475" name="l00475"></a><span class="lineno">  475</span>);</div>
+<div class="line"><a id="l00476" name="l00476"></a><span class="lineno">  476</span> </div>
+<div class="line"><a id="l00477" name="l00477"></a><span class="lineno">  477</span> </div>
+<div class="line"><a id="l00478" name="l00478"></a><span class="lineno">  478</span> </div>
+<div class="line"><a id="l00479" name="l00479"></a><span class="lineno">  479</span><span class="comment">/********************************/</span></div>
+<div class="line"><a id="l00480" name="l00480"></a><span class="lineno">  480</span><span class="comment">/*+ Disjoint merging of graphs +*/</span></div>
+<div class="line"><a id="l00481" name="l00481"></a><span class="lineno">  481</span><span class="comment">/********************************/</span></div>
+<div class="line"><a id="l00482" name="l00482"></a><span class="lineno">  482</span></div>
+<div class="line"><a id="l00494" name="l00494"></a><span class="lineno">  494</span><a class="code hl_struct" href="structgraph.html">graph</a>* <a class="code hl_function" href="graphs_8h.html#adb17d1bc074506de7625d2c759a07556">merge_graphs</a>(uint*, </div>
+<div class="line"><a id="l00495" name="l00495"></a><span class="lineno">  495</span>    uint,   </div>
+<div class="line"><a id="l00496" name="l00496"></a><span class="lineno">  496</span>    ...     </div>
+<div class="line"><a id="l00497" name="l00497"></a><span class="lineno">  497</span>);</div>
+<div class="line"><a id="l00498" name="l00498"></a><span class="lineno">  498</span></div>
+<div class="line"><a id="l00513" name="l00513"></a><span class="lineno">  513</span><a class="code hl_struct" href="structlgraph.html">lgraph</a>* <a class="code hl_function" href="graphs_8h.html#accd55f5ff9f4d520b49c2581686bff03">merge_lgraphs</a>(uint*, </div>
+<div class="line"><a id="l00514" name="l00514"></a><span class="lineno">  514</span>    uint, </div>
+<div class="line"><a id="l00515" name="l00515"></a><span class="lineno">  515</span>    ... </div>
+<div class="line"><a id="l00516" name="l00516"></a><span class="lineno">  516</span>);</div>
+<div class="line"><a id="l00517" name="l00517"></a><span class="lineno">  517</span> </div>
+<div class="line"><a id="l00518" name="l00518"></a><span class="lineno">  518</span><span class="comment">/**************************************************/</span></div>
+<div class="line"><a id="l00519" name="l00519"></a><span class="lineno">  519</span><span class="comment">/*+ Merging graphs with the same set of vertices +*/</span></div>
+<div class="line"><a id="l00520" name="l00520"></a><span class="lineno">  520</span><span class="comment">/**************************************************/</span></div>
+<div class="line"><a id="l00521" name="l00521"></a><span class="lineno">  521</span></div>
+<div class="line"><a id="l00536" name="l00536"></a><span class="lineno">  536</span><a class="code hl_struct" href="structgraph.html">graph</a>* <a class="code hl_function" href="graphs_8h.html#ad372b203857f457bd1cee4f0786a050d">ldgraphs_to_graph</a>(uint, </div>
+<div class="line"><a id="l00537" name="l00537"></a><span class="lineno">  537</span>    uint, </div>
+<div class="line"><a id="l00538" name="l00538"></a><span class="lineno">  538</span>    uint, </div>
+<div class="line"><a id="l00539" name="l00539"></a><span class="lineno">  539</span>    uint, </div>
+<div class="line"><a id="l00540" name="l00540"></a><span class="lineno">  540</span>    ...   </div>
+<div class="line"><a id="l00541" name="l00541"></a><span class="lineno">  541</span>);</div>
+<div class="line"><a id="l00542" name="l00542"></a><span class="lineno">  542</span></div>
+<div class="line"><a id="l00557" name="l00557"></a><span class="lineno">  557</span><a class="code hl_struct" href="structlgraph.html">lgraph</a>* <a class="code hl_function" href="graphs_8h.html#a35649adc0b9a583c083acdecd260197a">ldgraphs_to_lgraph</a>(uint, </div>
+<div class="line"><a id="l00558" name="l00558"></a><span class="lineno">  558</span>    uint, </div>
+<div class="line"><a id="l00559" name="l00559"></a><span class="lineno">  559</span>    uint, </div>
+<div class="line"><a id="l00560" name="l00560"></a><span class="lineno">  560</span>    ...   </div>
+<div class="line"><a id="l00561" name="l00561"></a><span class="lineno">  561</span>);</div>
+<div class="line"><a id="l00562" name="l00562"></a><span class="lineno">  562</span></div>
+<div class="line"><a id="l00570" name="l00570"></a><span class="lineno">  570</span><a class="code hl_struct" href="structlgraph.html">lgraph</a>* <a class="code hl_function" href="graphs_8h.html#a10ac0ddac7534b40351650bf0c3d90fe">dgraph_to_lgraph</a>(<a class="code hl_struct" href="structdgraph.html">dgraph</a>* </div>
+<div class="line"><a id="l00571" name="l00571"></a><span class="lineno">  571</span>);</div>
+<div class="line"><a id="l00572" name="l00572"></a><span class="lineno">  572</span></div>
+<div class="line"><a id="l00580" name="l00580"></a><span class="lineno">  580</span><a class="code hl_struct" href="structgraph.html">graph</a>* <a class="code hl_function" href="graphs_8h.html#a52da04c1af11929a4dae1936ea998186">lgraph_to_graph</a>(<a class="code hl_struct" href="structlgraph.html">lgraph</a>* </div>
+<div class="line"><a id="l00581" name="l00581"></a><span class="lineno">  581</span>);</div>
+<div class="line"><a id="l00582" name="l00582"></a><span class="lineno">  582</span></div>
+<div class="line"><a id="l00595" name="l00595"></a><span class="lineno">  595</span><a class="code hl_struct" href="structgraph.html">graph</a>* <a class="code hl_function" href="graphs_8h.html#a241e2ae201bfb4efae360e64b437e718">lgraph_to_graph_alpha</a>(<a class="code hl_struct" href="structlgraph.html">lgraph</a>*, </div>
+<div class="line"><a id="l00596" name="l00596"></a><span class="lineno">  596</span>    <span class="keywordtype">bool</span>* </div>
 <div class="line"><a id="l00597" name="l00597"></a><span class="lineno">  597</span>);</div>
 <div class="line"><a id="l00598" name="l00598"></a><span class="lineno">  598</span> </div>
-<div class="line"><a id="l00599" name="l00599"></a><span class="lineno">  599</span> </div>
-<div class="line"><a id="l00600" name="l00600"></a><span class="lineno">  600</span> </div>
-<div class="line"><a id="l00601" name="l00601"></a><span class="lineno">  601</span> </div>
-<div class="line"><a id="l00602" name="l00602"></a><span class="lineno">  602</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00599" name="l00599"></a><span class="lineno">  599</span></div>
+<div class="line"><a id="l00607" name="l00607"></a><span class="lineno">  607</span><a class="code hl_struct" href="structgraph.html">graph</a>* <a class="code hl_function" href="graphs_8h.html#a155ee826cfc5a288be03e0a4711239e3">dgraph_to_graph</a>(<a class="code hl_struct" href="structdgraph.html">dgraph</a>* </div>
+<div class="line"><a id="l00608" name="l00608"></a><span class="lineno">  608</span>);</div>
+<div class="line"><a id="l00609" name="l00609"></a><span class="lineno">  609</span></div>
+<div class="line"><a id="l00622" name="l00622"></a><span class="lineno">  622</span><a class="code hl_struct" href="structgraph.html">graph</a>* <a class="code hl_function" href="graphs_8h.html#af4572aae68e83742af6071d202d80263">dgraph_to_graph_alpha</a>(<a class="code hl_struct" href="structdgraph.html">dgraph</a>*, </div>
+<div class="line"><a id="l00623" name="l00623"></a><span class="lineno">  623</span>    <span class="keywordtype">bool</span>* </div>
+<div class="line"><a id="l00624" name="l00624"></a><span class="lineno">  624</span>);</div>
+<div class="line"><a id="l00625" name="l00625"></a><span class="lineno">  625</span> </div>
+<div class="line"><a id="l00626" name="l00626"></a><span class="lineno">  626</span> </div>
+<div class="line"><a id="l00627" name="l00627"></a><span class="lineno">  627</span><span class="comment">/***************************************/</span></div>
+<div class="line"><a id="l00628" name="l00628"></a><span class="lineno">  628</span><span class="comment">/*+ Computation of adjacents vertices +*/</span></div>
+<div class="line"><a id="l00629" name="l00629"></a><span class="lineno">  629</span><span class="comment">/***************************************/</span></div>
+<div class="line"><a id="l00630" name="l00630"></a><span class="lineno">  630</span></div>
+<div class="line"><a id="l00640" name="l00640"></a><span class="lineno">  640</span><a class="code hl_struct" href="structdequeue.html">dequeue</a>* <a class="code hl_function" href="graphs_8h.html#a65bd76d322515fd370db7c6f98b7510a">lgraph_reachable</a>(<a class="code hl_struct" href="structlgraph.html">lgraph</a>*,  </div>
+<div class="line"><a id="l00641" name="l00641"></a><span class="lineno">  641</span>    <a class="code hl_struct" href="structdequeue.html">dequeue</a>*, </div>
+<div class="line"><a id="l00642" name="l00642"></a><span class="lineno">  642</span>    uint       </div>
+<div class="line"><a id="l00643" name="l00643"></a><span class="lineno">  643</span>);</div>
+<div class="line"><a id="l00644" name="l00644"></a><span class="lineno">  644</span> </div>
+<div class="line"><a id="l00645" name="l00645"></a><span class="lineno">  645</span> </div>
+<div class="line"><a id="l00646" name="l00646"></a><span class="lineno">  646</span> </div>
+<div class="line"><a id="l00647" name="l00647"></a><span class="lineno">  647</span> </div>
+<div class="line"><a id="l00648" name="l00648"></a><span class="lineno">  648</span> </div>
+<div class="line"><a id="l00649" name="l00649"></a><span class="lineno">  649</span><span class="preprocessor">#endif</span></div>
 <div class="ttc" id="agraphs_8h_html_a0b8a154099b1de9a184476ba30df7afb"><div class="ttname"><a href="graphs_8h.html#a0b8a154099b1de9a184476ba30df7afb">copy_dgraph</a></div><div class="ttdeci">dgraph * copy_dgraph(dgraph *g)</div><div class="ttdoc">Makes a copy of a complete deterministic directed graph.</div><div class="ttdef"><b>Definition</b> graphs.c:148</div></div>
-<div class="ttc" id="agraphs_8h_html_a10ac0ddac7534b40351650bf0c3d90fe"><div class="ttname"><a href="graphs_8h.html#a10ac0ddac7534b40351650bf0c3d90fe">dgraph_to_lgraph</a></div><div class="ttdeci">lgraph * dgraph_to_lgraph(dgraph *)</div><div class="ttdoc">Conversion of a complete deterministic labeled graph into a standard labeled graph.</div><div class="ttdef"><b>Definition</b> graphs.c:702</div></div>
-<div class="ttc" id="agraphs_8h_html_a1320dc14ae37171752a32162e7318794"><div class="ttname"><a href="graphs_8h.html#a1320dc14ae37171752a32162e7318794">lgraph_mirror</a></div><div class="ttdeci">lgraph * lgraph_mirror(lgraph *)</div><div class="ttdoc">Computes the mirror of a directed labeled graph.</div><div class="ttdef"><b>Definition</b> graphs.c:203</div></div>
-<div class="ttc" id="agraphs_8h_html_a155ee826cfc5a288be03e0a4711239e3"><div class="ttname"><a href="graphs_8h.html#a155ee826cfc5a288be03e0a4711239e3">dgraph_to_graph</a></div><div class="ttdeci">graph * dgraph_to_graph(dgraph *)</div><div class="ttdoc">Conversion of a deterministic labeled graph into a unlabeled graph.</div><div class="ttdef"><b>Definition</b> graphs.c:754</div></div>
-<div class="ttc" id="agraphs_8h_html_a1871ffbe9a1c44bf18edc7a6665deb2b"><div class="ttname"><a href="graphs_8h.html#a1871ffbe9a1c44bf18edc7a6665deb2b">lgraph_search_update</a></div><div class="ttdeci">void lgraph_search_update(graph_stype, lgraph *, dequeue *, bool *, bool *)</div><div class="ttdoc">Search in a labeled graph. A set of already visited vertices is taken as input. This set is updated b...</div><div class="ttdef"><b>Definition</b> graphs.c:276</div></div>
+<div class="ttc" id="agraphs_8h_html_a10ac0ddac7534b40351650bf0c3d90fe"><div class="ttname"><a href="graphs_8h.html#a10ac0ddac7534b40351650bf0c3d90fe">dgraph_to_lgraph</a></div><div class="ttdeci">lgraph * dgraph_to_lgraph(dgraph *)</div><div class="ttdoc">Conversion of a complete deterministic labeled graph into a standard labeled graph.</div><div class="ttdef"><b>Definition</b> graphs.c:759</div></div>
+<div class="ttc" id="agraphs_8h_html_a1320dc14ae37171752a32162e7318794"><div class="ttname"><a href="graphs_8h.html#a1320dc14ae37171752a32162e7318794">lgraph_mirror</a></div><div class="ttdeci">lgraph * lgraph_mirror(lgraph *)</div><div class="ttdoc">Computes the mirror of a directed labeled graph.</div><div class="ttdef"><b>Definition</b> graphs.c:233</div></div>
+<div class="ttc" id="agraphs_8h_html_a155ee826cfc5a288be03e0a4711239e3"><div class="ttname"><a href="graphs_8h.html#a155ee826cfc5a288be03e0a4711239e3">dgraph_to_graph</a></div><div class="ttdeci">graph * dgraph_to_graph(dgraph *)</div><div class="ttdoc">Conversion of a deterministic labeled graph into a unlabeled graph.</div><div class="ttdef"><b>Definition</b> graphs.c:811</div></div>
+<div class="ttc" id="agraphs_8h_html_a1871ffbe9a1c44bf18edc7a6665deb2b"><div class="ttname"><a href="graphs_8h.html#a1871ffbe9a1c44bf18edc7a6665deb2b">lgraph_search_update</a></div><div class="ttdeci">void lgraph_search_update(graph_stype, lgraph *, dequeue *, bool *, bool *)</div><div class="ttdoc">Search in a labeled graph. A set of already visited vertices is taken as input. This set is updated b...</div><div class="ttdef"><b>Definition</b> graphs.c:306</div></div>
 <div class="ttc" id="agraphs_8h_html_a19ffdaeccb79ec238aff6e832b5446b0"><div class="ttname"><a href="graphs_8h.html#a19ffdaeccb79ec238aff6e832b5446b0">delete_lgraph</a></div><div class="ttdeci">void delete_lgraph(lgraph *)</div><div class="ttdoc">Releases a directed graph.</div><div class="ttdef"><b>Definition</b> graphs.c:89</div></div>
 <div class="ttc" id="agraphs_8h_html_a1a732d4c9d1a518b14acc8e1516c46a5"><div class="ttname"><a href="graphs_8h.html#a1a732d4c9d1a518b14acc8e1516c46a5">create_dgraph_noedges</a></div><div class="ttdeci">dgraph * create_dgraph_noedges(uint, uint)</div><div class="ttdoc">Creates a complete deterministic directed graph without edges.</div><div class="ttdef"><b>Definition</b> graphs.c:117</div></div>
-<div class="ttc" id="agraphs_8h_html_a21fe7ba13afee887bd34de8ec466304d"><div class="ttname"><a href="graphs_8h.html#a21fe7ba13afee887bd34de8ec466304d">dgraph_mirror</a></div><div class="ttdeci">lgraph * dgraph_mirror(dgraph *)</div><div class="ttdoc">Computes the mirror of a complete deterministic directed labeled graph.</div><div class="ttdef"><b>Definition</b> graphs.c:218</div></div>
-<div class="ttc" id="agraphs_8h_html_a241e2ae201bfb4efae360e64b437e718"><div class="ttname"><a href="graphs_8h.html#a241e2ae201bfb4efae360e64b437e718">lgraph_to_graph_alpha</a></div><div class="ttdeci">graph * lgraph_to_graph_alpha(lgraph *, bool *)</div><div class="ttdoc">Conversion of a standard labeled graph into a unlabeled graph. Restricted version.</div><div class="ttdef"><b>Definition</b> graphs.c:724</div></div>
-<div class="ttc" id="agraphs_8h_html_a25e1c54a054182ba449641b87f41efdb"><div class="ttname"><a href="graphs_8h.html#a25e1c54a054182ba449641b87f41efdb">dgraph_search_update</a></div><div class="ttdeci">void dgraph_search_update(graph_stype, dgraph *, dequeue *, bool *, bool *)</div><div class="ttdoc">Search in a desterministic complete labeled graph. A set of already visited vertices is taken as inpu...</div><div class="ttdef"><b>Definition</b> graphs.c:337</div></div>
-<div class="ttc" id="agraphs_8h_html_a35649adc0b9a583c083acdecd260197a"><div class="ttname"><a href="graphs_8h.html#a35649adc0b9a583c083acdecd260197a">ldgraphs_to_lgraph</a></div><div class="ttdeci">lgraph * ldgraphs_to_lgraph(uint, uint, uint,...)</div><div class="ttdoc">Merging an arbitrary number of labeled graphs using the same set of vertices into a single labeled gr...</div><div class="ttdef"><b>Definition</b> graphs.c:641</div></div>
+<div class="ttc" id="agraphs_8h_html_a21fe7ba13afee887bd34de8ec466304d"><div class="ttname"><a href="graphs_8h.html#a21fe7ba13afee887bd34de8ec466304d">dgraph_mirror</a></div><div class="ttdeci">lgraph * dgraph_mirror(dgraph *)</div><div class="ttdoc">Computes the mirror of a complete deterministic directed labeled graph.</div><div class="ttdef"><b>Definition</b> graphs.c:248</div></div>
+<div class="ttc" id="agraphs_8h_html_a241e2ae201bfb4efae360e64b437e718"><div class="ttname"><a href="graphs_8h.html#a241e2ae201bfb4efae360e64b437e718">lgraph_to_graph_alpha</a></div><div class="ttdeci">graph * lgraph_to_graph_alpha(lgraph *, bool *)</div><div class="ttdoc">Conversion of a standard labeled graph into a unlabeled graph. Restricted version.</div><div class="ttdef"><b>Definition</b> graphs.c:781</div></div>
+<div class="ttc" id="agraphs_8h_html_a25e1c54a054182ba449641b87f41efdb"><div class="ttname"><a href="graphs_8h.html#a25e1c54a054182ba449641b87f41efdb">dgraph_search_update</a></div><div class="ttdeci">void dgraph_search_update(graph_stype, dgraph *, dequeue *, bool *, bool *)</div><div class="ttdoc">Search in a desterministic complete labeled graph. A set of already visited vertices is taken as inpu...</div><div class="ttdef"><b>Definition</b> graphs.c:367</div></div>
+<div class="ttc" id="agraphs_8h_html_a35649adc0b9a583c083acdecd260197a"><div class="ttname"><a href="graphs_8h.html#a35649adc0b9a583c083acdecd260197a">ldgraphs_to_lgraph</a></div><div class="ttdeci">lgraph * ldgraphs_to_lgraph(uint, uint, uint,...)</div><div class="ttdoc">Merging an arbitrary number of labeled graphs using the same set of vertices into a single labeled gr...</div><div class="ttdef"><b>Definition</b> graphs.c:698</div></div>
 <div class="ttc" id="agraphs_8h_html_a387700484e72c4cfe219203d5dae8dae"><div class="ttname"><a href="graphs_8h.html#a387700484e72c4cfe219203d5dae8dae">create_graph_noedges</a></div><div class="ttdeci">graph * create_graph_noedges(uint)</div><div class="ttdoc">Creates a directed unlabeled graph without edges.</div><div class="ttdef"><b>Definition</b> graphs.c:14</div></div>
 <div class="ttc" id="agraphs_8h_html_a3d9b13b4993159a2683f85eeac7d8073"><div class="ttname"><a href="graphs_8h.html#a3d9b13b4993159a2683f85eeac7d8073">delete_dgraph</a></div><div class="ttdeci">void delete_dgraph(dgraph *)</div><div class="ttdoc">Release of a complete deterministic directed graph.</div><div class="ttdef"><b>Definition</b> graphs.c:139</div></div>
 <div class="ttc" id="agraphs_8h_html_a4251bf45eff73ef9edcfcada89b5bcb0"><div class="ttname"><a href="graphs_8h.html#a4251bf45eff73ef9edcfcada89b5bcb0">create_graph_selfloops</a></div><div class="ttdeci">graph * create_graph_selfloops(uint)</div><div class="ttdoc">Creates a directed unlabeled graph whose only edges are self-loops.</div></div>
 <div class="ttc" id="agraphs_8h_html_a4a361eb7c35d2a25d872a6850c81a8e4"><div class="ttname"><a href="graphs_8h.html#a4a361eb7c35d2a25d872a6850c81a8e4">create_lgraph_noedges</a></div><div class="ttdeci">lgraph * create_lgraph_noedges(uint, uint)</div><div class="ttdoc">Creates a directed graph without edges.</div><div class="ttdef"><b>Definition</b> graphs.c:66</div></div>
-<div class="ttc" id="agraphs_8h_html_a52da04c1af11929a4dae1936ea998186"><div class="ttname"><a href="graphs_8h.html#a52da04c1af11929a4dae1936ea998186">lgraph_to_graph</a></div><div class="ttdeci">graph * lgraph_to_graph(lgraph *)</div><div class="ttdoc">Conversion of a standard labeled graph into a unlabeled graph.</div><div class="ttdef"><b>Definition</b> graphs.c:713</div></div>
-<div class="ttc" id="agraphs_8h_html_a621e6cd9609980aa14d2382e210e4825"><div class="ttname"><a href="graphs_8h.html#a621e6cd9609980aa14d2382e210e4825">lgraph_search</a></div><div class="ttdeci">dequeue * lgraph_search(graph_stype, lgraph *, dequeue *, bool *, bool *)</div><div class="ttdoc">Search in a labeled graph. Reachable vertices are returned inside a dequeue sorted in increasing orde...</div><div class="ttdef"><b>Definition</b> graphs.c:317</div></div>
-<div class="ttc" id="agraphs_8h_html_a65bd76d322515fd370db7c6f98b7510a"><div class="ttname"><a href="graphs_8h.html#a65bd76d322515fd370db7c6f98b7510a">lgraph_reachable</a></div><div class="ttdeci">dequeue * lgraph_reachable(lgraph *, dequeue *, uint)</div><div class="ttdoc">Given a labeled graph, a list of vertices in this graph and a label, computed the list of all vertice...</div><div class="ttdef"><b>Definition</b> graphs.c:783</div></div>
-<div class="ttc" id="agraphs_8h_html_a67e75d4e63dee41143abceb6c09fe73c"><div class="ttname"><a href="graphs_8h.html#a67e75d4e63dee41143abceb6c09fe73c">graph_mirror</a></div><div class="ttdeci">graph * graph_mirror(graph *)</div><div class="ttdoc">Computes the mirror of a directed unlabeled graph.</div><div class="ttdef"><b>Definition</b> graphs.c:189</div></div>
+<div class="ttc" id="agraphs_8h_html_a52da04c1af11929a4dae1936ea998186"><div class="ttname"><a href="graphs_8h.html#a52da04c1af11929a4dae1936ea998186">lgraph_to_graph</a></div><div class="ttdeci">graph * lgraph_to_graph(lgraph *)</div><div class="ttdoc">Conversion of a standard labeled graph into a unlabeled graph.</div><div class="ttdef"><b>Definition</b> graphs.c:770</div></div>
+<div class="ttc" id="agraphs_8h_html_a621e6cd9609980aa14d2382e210e4825"><div class="ttname"><a href="graphs_8h.html#a621e6cd9609980aa14d2382e210e4825">lgraph_search</a></div><div class="ttdeci">dequeue * lgraph_search(graph_stype, lgraph *, dequeue *, bool *, bool *)</div><div class="ttdoc">Search in a labeled graph. Reachable vertices are returned inside a dequeue sorted in increasing orde...</div><div class="ttdef"><b>Definition</b> graphs.c:347</div></div>
+<div class="ttc" id="agraphs_8h_html_a65bd76d322515fd370db7c6f98b7510a"><div class="ttname"><a href="graphs_8h.html#a65bd76d322515fd370db7c6f98b7510a">lgraph_reachable</a></div><div class="ttdeci">dequeue * lgraph_reachable(lgraph *, dequeue *, uint)</div><div class="ttdoc">Given a labeled graph, a list of vertices in this graph and a label, computes the list of all vertice...</div><div class="ttdef"><b>Definition</b> graphs.c:840</div></div>
+<div class="ttc" id="agraphs_8h_html_a67e75d4e63dee41143abceb6c09fe73c"><div class="ttname"><a href="graphs_8h.html#a67e75d4e63dee41143abceb6c09fe73c">graph_mirror</a></div><div class="ttdeci">graph * graph_mirror(graph *)</div><div class="ttdoc">Computes the mirror of a directed unlabeled graph.</div><div class="ttdef"><b>Definition</b> graphs.c:219</div></div>
 <div class="ttc" id="agraphs_8h_html_a6e182821558818a23e67a0a04c8158ed"><div class="ttname"><a href="graphs_8h.html#a6e182821558818a23e67a0a04c8158ed">copy_lgraph</a></div><div class="ttdeci">lgraph * copy_lgraph(lgraph *g)</div><div class="ttdoc">Makes a copy of a labeled graph.</div><div class="ttdef"><b>Definition</b> graphs.c:104</div></div>
-<div class="ttc" id="agraphs_8h_html_a71a9720e9ed9b7adc22d418205e9f7b4"><div class="ttname"><a href="graphs_8h.html#a71a9720e9ed9b7adc22d418205e9f7b4">twin_dgraph_search</a></div><div class="ttdeci">dequeue * twin_dgraph_search(graph_stype, dgraph *, dgraph *, dequeue *, bool *, bool *)</div><div class="ttdoc">Search in two deterministic complete labeled graphs (same set of vertices, same alphabet)....</div><div class="ttdef"><b>Definition</b> graphs.c:441</div></div>
+<div class="ttc" id="agraphs_8h_html_a71a9720e9ed9b7adc22d418205e9f7b4"><div class="ttname"><a href="graphs_8h.html#a71a9720e9ed9b7adc22d418205e9f7b4">twin_dgraph_search</a></div><div class="ttdeci">dequeue * twin_dgraph_search(graph_stype, dgraph *, dgraph *, dequeue *, bool *, bool *)</div><div class="ttdoc">Search in two deterministic complete labeled graphs (same set of vertices, same alphabet)....</div><div class="ttdef"><b>Definition</b> graphs.c:471</div></div>
 <div class="ttc" id="agraphs_8h_html_a8bb6c6479a6b698be6d8b76c67f6687a"><div class="ttname"><a href="graphs_8h.html#a8bb6c6479a6b698be6d8b76c67f6687a">delete_graph</a></div><div class="ttdeci">void delete_graph(graph *)</div><div class="ttdoc">Releases a directed unlabeled graph.</div><div class="ttdef"><b>Definition</b> graphs.c:41</div></div>
-<div class="ttc" id="agraphs_8h_html_a9ae94228232e6b8c7c271208c11808a1"><div class="ttname"><a href="graphs_8h.html#a9ae94228232e6b8c7c271208c11808a1">twin_dgraph_search_update</a></div><div class="ttdeci">void twin_dgraph_search_update(graph_stype, dgraph *, dgraph *, dequeue *, bool *, bool *)</div><div class="ttdoc">Search in two deterministic complete labeled graphs (same set of vertices, same alphabet)....</div><div class="ttdef"><b>Definition</b> graphs.c:396</div></div>
-<div class="ttc" id="agraphs_8h_html_a9c0a43517e0be4fd197a10bd4338d3f9"><div class="ttname"><a href="graphs_8h.html#a9c0a43517e0be4fd197a10bd4338d3f9">dgraph_search</a></div><div class="ttdeci">dequeue * dgraph_search(graph_stype, dgraph *, dequeue *, bool *, bool *)</div><div class="ttdoc">Search in a desterministic complete labeled graph. Reachable vertices are returned inside a dequeue s...</div><div class="ttdef"><b>Definition</b> graphs.c:373</div></div>
+<div class="ttc" id="agraphs_8h_html_a9ae94228232e6b8c7c271208c11808a1"><div class="ttname"><a href="graphs_8h.html#a9ae94228232e6b8c7c271208c11808a1">twin_dgraph_search_update</a></div><div class="ttdeci">void twin_dgraph_search_update(graph_stype, dgraph *, dgraph *, dequeue *, bool *, bool *)</div><div class="ttdoc">Search in two deterministic complete labeled graphs (same set of vertices, same alphabet)....</div><div class="ttdef"><b>Definition</b> graphs.c:426</div></div>
+<div class="ttc" id="agraphs_8h_html_a9c0a43517e0be4fd197a10bd4338d3f9"><div class="ttname"><a href="graphs_8h.html#a9c0a43517e0be4fd197a10bd4338d3f9">dgraph_search</a></div><div class="ttdeci">dequeue * dgraph_search(graph_stype, dgraph *, dequeue *, bool *, bool *)</div><div class="ttdoc">Search in a desterministic complete labeled graph. Reachable vertices are returned inside a dequeue s...</div><div class="ttdef"><b>Definition</b> graphs.c:403</div></div>
 <div class="ttc" id="agraphs_8h_html_aa771c03d7e613494b7cb7699790ba003"><div class="ttname"><a href="graphs_8h.html#aa771c03d7e613494b7cb7699790ba003">dgraph_nb_edges</a></div><div class="ttdeci">int dgraph_nb_edges(dgraph *)</div><div class="ttdoc">Computes the number of edges in a complete deterministic directed labeled graph.</div><div class="ttdef"><b>Definition</b> graphs.c:183</div></div>
+<div class="ttc" id="agraphs_8h_html_ab7c321371b79b590957444a00d8d41b3"><div class="ttname"><a href="graphs_8h.html#ab7c321371b79b590957444a00d8d41b3">dgraph_paths</a></div><div class="ttdeci">dgraph * dgraph_paths(dgraph *G, uint start)</div><div class="ttdoc">Computes a path from a given strating vertex to all other reachable vertices in a directed unlabeled ...</div><div class="ttdef"><b>Definition</b> graphs.c:495</div></div>
+<div class="ttc" id="agraphs_8h_html_abdcbbb1435c747652fb69ebc4f53d0b7"><div class="ttname"><a href="graphs_8h.html#abdcbbb1435c747652fb69ebc4f53d0b7">dgraph_direct_product</a></div><div class="ttdeci">dgraph * dgraph_direct_product(dgraph *g1, dgraph *g2)</div><div class="ttdoc">Computes the direct product of two deterministic directed labeled graphs.</div><div class="ttdef"><b>Definition</b> graphs.c:190</div></div>
 <div class="ttc" id="agraphs_8h_html_abe82614bf3e450bc5604e3d816420370"><div class="ttname"><a href="graphs_8h.html#abe82614bf3e450bc5604e3d816420370">copy_graph</a></div><div class="ttdeci">graph * copy_graph(graph *g)</div><div class="ttdoc">Makes a copy of a directed graph.</div><div class="ttdef"><b>Definition</b> graphs.c:53</div></div>
-<div class="ttc" id="agraphs_8h_html_accd55f5ff9f4d520b49c2581686bff03"><div class="ttname"><a href="graphs_8h.html#accd55f5ff9f4d520b49c2581686bff03">merge_lgraphs</a></div><div class="ttdeci">lgraph * merge_lgraphs(uint *, uint,...)</div><div class="ttdoc">Disjoint merge of an arbitrary number of labeled graphs.</div><div class="ttdef"><b>Definition</b> graphs.c:506</div></div>
-<div class="ttc" id="agraphs_8h_html_ad372b203857f457bd1cee4f0786a050d"><div class="ttname"><a href="graphs_8h.html#ad372b203857f457bd1cee4f0786a050d">ldgraphs_to_graph</a></div><div class="ttdeci">graph * ldgraphs_to_graph(uint, uint, uint, uint,...)</div><div class="ttdoc">Merging an arbitrary number of graphs using the same set of vertices into a single unlabeled graph.</div><div class="ttdef"><b>Definition</b> graphs.c:563</div></div>
-<div class="ttc" id="agraphs_8h_html_adb17d1bc074506de7625d2c759a07556"><div class="ttname"><a href="graphs_8h.html#adb17d1bc074506de7625d2c759a07556">merge_graphs</a></div><div class="ttdeci">graph * merge_graphs(uint *, uint,...)</div><div class="ttdoc">Disjoint merge of an arbitrary number of unlabeled graphs.</div><div class="ttdef"><b>Definition</b> graphs.c:471</div></div>
-<div class="ttc" id="agraphs_8h_html_aeeb7b7ce09f2240afd39c27d5b4521ea"><div class="ttname"><a href="graphs_8h.html#aeeb7b7ce09f2240afd39c27d5b4521ea">graph_search_update</a></div><div class="ttdeci">void graph_search_update(graph_stype, graph *, dequeue *, bool *)</div><div class="ttdoc">Searches in an unlabeled graph. A set of already visited vertices is taken as input....</div><div class="ttdef"><b>Definition</b> graphs.c:235</div></div>
+<div class="ttc" id="agraphs_8h_html_accd55f5ff9f4d520b49c2581686bff03"><div class="ttname"><a href="graphs_8h.html#accd55f5ff9f4d520b49c2581686bff03">merge_lgraphs</a></div><div class="ttdeci">lgraph * merge_lgraphs(uint *, uint,...)</div><div class="ttdoc">Disjoint merge of an arbitrary number of labeled graphs.</div><div class="ttdef"><b>Definition</b> graphs.c:563</div></div>
+<div class="ttc" id="agraphs_8h_html_ad372b203857f457bd1cee4f0786a050d"><div class="ttname"><a href="graphs_8h.html#ad372b203857f457bd1cee4f0786a050d">ldgraphs_to_graph</a></div><div class="ttdeci">graph * ldgraphs_to_graph(uint, uint, uint, uint,...)</div><div class="ttdoc">Merging an arbitrary number of graphs using the same set of vertices into a single unlabeled graph.</div><div class="ttdef"><b>Definition</b> graphs.c:620</div></div>
+<div class="ttc" id="agraphs_8h_html_adb17d1bc074506de7625d2c759a07556"><div class="ttname"><a href="graphs_8h.html#adb17d1bc074506de7625d2c759a07556">merge_graphs</a></div><div class="ttdeci">graph * merge_graphs(uint *, uint,...)</div><div class="ttdoc">Disjoint merge of an arbitrary number of unlabeled graphs.</div><div class="ttdef"><b>Definition</b> graphs.c:528</div></div>
+<div class="ttc" id="agraphs_8h_html_aeeb7b7ce09f2240afd39c27d5b4521ea"><div class="ttname"><a href="graphs_8h.html#aeeb7b7ce09f2240afd39c27d5b4521ea">graph_search_update</a></div><div class="ttdeci">void graph_search_update(graph_stype, graph *, dequeue *, bool *)</div><div class="ttdoc">Searches in an unlabeled graph. A set of already visited vertices is taken as input....</div><div class="ttdef"><b>Definition</b> graphs.c:265</div></div>
 <div class="ttc" id="agraphs_8h_html_aef11eda5e05a1dbfad39933d41742199"><div class="ttname"><a href="graphs_8h.html#aef11eda5e05a1dbfad39933d41742199">graph_nb_edges</a></div><div class="ttdeci">int graph_nb_edges(graph *)</div><div class="ttdoc">Computes the number of edges in a directed unlabeled graph.</div><div class="ttdef"><b>Definition</b> graphs.c:165</div></div>
-<div class="ttc" id="agraphs_8h_html_af4572aae68e83742af6071d202d80263"><div class="ttname"><a href="graphs_8h.html#af4572aae68e83742af6071d202d80263">dgraph_to_graph_alpha</a></div><div class="ttdeci">graph * dgraph_to_graph_alpha(dgraph *, bool *)</div><div class="ttdoc">Conversion of a deterministic labeled graph into a unlabeled graph. Restricted version.</div><div class="ttdef"><b>Definition</b> graphs.c:765</div></div>
+<div class="ttc" id="agraphs_8h_html_af4572aae68e83742af6071d202d80263"><div class="ttname"><a href="graphs_8h.html#af4572aae68e83742af6071d202d80263">dgraph_to_graph_alpha</a></div><div class="ttdeci">graph * dgraph_to_graph_alpha(dgraph *, bool *)</div><div class="ttdoc">Conversion of a deterministic labeled graph into a unlabeled graph. Restricted version.</div><div class="ttdef"><b>Definition</b> graphs.c:822</div></div>
 <div class="ttc" id="agraphs_8h_html_af658f08157b289523d755188a95ebd39"><div class="ttname"><a href="graphs_8h.html#af658f08157b289523d755188a95ebd39">lgraph_nb_edges</a></div><div class="ttdeci">int lgraph_nb_edges(lgraph *)</div><div class="ttdoc">Computes the number of edges in a directed labeled graph.</div><div class="ttdef"><b>Definition</b> graphs.c:173</div></div>
-<div class="ttc" id="agraphs_8h_html_af79428132abe4bab1bda312319693dc8"><div class="ttname"><a href="graphs_8h.html#af79428132abe4bab1bda312319693dc8">graph_stype</a></div><div class="ttdeci">graph_stype</div><div class="ttdoc">Names for the two available algorithms for searches.</div><div class="ttdef"><b>Definition</b> graphs.h:253</div></div>
-<div class="ttc" id="agraphs_8h_html_af7c2b72480599c777652489a95d5517e"><div class="ttname"><a href="graphs_8h.html#af7c2b72480599c777652489a95d5517e">graph_search</a></div><div class="ttdeci">dequeue * graph_search(graph_stype, graph *, dequeue *, bool *)</div><div class="ttdoc">Searches in an unlabeled graph. Reachable vertices are returned inside a dequeue sorted in increasing...</div><div class="ttdef"><b>Definition</b> graphs.c:256</div></div>
+<div class="ttc" id="agraphs_8h_html_af79428132abe4bab1bda312319693dc8"><div class="ttname"><a href="graphs_8h.html#af79428132abe4bab1bda312319693dc8">graph_stype</a></div><div class="ttdeci">graph_stype</div><div class="ttdoc">Names for the two available algorithms for searches.</div><div class="ttdef"><b>Definition</b> graphs.h:279</div></div>
+<div class="ttc" id="agraphs_8h_html_af7c2b72480599c777652489a95d5517e"><div class="ttname"><a href="graphs_8h.html#af7c2b72480599c777652489a95d5517e">graph_search</a></div><div class="ttdeci">dequeue * graph_search(graph_stype, graph *, dequeue *, bool *)</div><div class="ttdoc">Searches in an unlabeled graph. Reachable vertices are returned inside a dequeue sorted in increasing...</div><div class="ttdef"><b>Definition</b> graphs.c:286</div></div>
 <div class="ttc" id="astructdequeue_html"><div class="ttname"><a href="structdequeue.html">dequeue</a></div><div class="ttdoc">Type used to represent a dequeue of unsigned integers.</div><div class="ttdef"><b>Definition</b> type_dequeue.h:26</div></div>
 <div class="ttc" id="astructdgraph_html"><div class="ttname"><a href="structdgraph.html">dgraph</a></div><div class="ttdoc">Type used to represent a complete deterministic directed labeled graph.</div><div class="ttdef"><b>Definition</b> graphs.h:73</div></div>
 <div class="ttc" id="astructdgraph_html_a20eb00cc3371ff58922cf9fb73c1ea70"><div class="ttname"><a href="structdgraph.html#a20eb00cc3371ff58922cf9fb73c1ea70">dgraph::size_graph</a></div><div class="ttdeci">uint size_graph</div><div class="ttdoc">Number of vertices.</div><div class="ttdef"><b>Definition</b> graphs.h:74</div></div>

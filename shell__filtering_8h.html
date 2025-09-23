@@ -98,7 +98,11 @@ $(function(){initNavTree('shell__filtering_8h.html',''); initResizable(true); })
 
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a>  </div>
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#define-members">Macros</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">shell_filtering.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -109,15 +113,101 @@ $(function(){initNavTree('shell__filtering_8h.html',''); initResizable(true); })
 </div>
 <p><a href="shell__filtering_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfilters__info.html">filters_info</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a7d4a0a1edfe66a71863c98e78cbd1e70" id="r_a7d4a0a1edfe66a71863c98e78cbd1e70"><td class="memItemLeft" align="right" valign="top"><a id="a7d4a0a1edfe66a71863c98e78cbd1e70" name="a7d4a0a1edfe66a71863c98e78cbd1e70"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FILTER_MAXCLASSES</b>&#160;&#160;&#160;64</td></tr>
+<tr class="memdesc:a7d4a0a1edfe66a71863c98e78cbd1e70"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum number of classes for the filters. <br /></td></tr>
+<tr class="separator:a7d4a0a1edfe66a71863c98e78cbd1e70"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:add14f7b44711479cdbd9ce0a81affa52" id="r_add14f7b44711479cdbd9ce0a81affa52"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#add14f7b44711479cdbd9ce0a81affa52">num_filter</a> { <br />
+&#160;&#160;<a class="el" href="#add14f7b44711479cdbd9ce0a81affa52a6b6dbdfc4fcdb79502b8d5d53b8fe05a">FILTER_MINI</a>
+, <a class="el" href="#add14f7b44711479cdbd9ce0a81affa52a9abadd27e831bf27b7ec51bbc6d58ebd">FILTER_SYNT</a>
+, <a class="el" href="#add14f7b44711479cdbd9ce0a81affa52a877b524b04baa112320e49afdc366180">FILTER_IDEMS</a>
+, <a class="el" href="#add14f7b44711479cdbd9ce0a81affa52a6afb83478537cc2c1af80848565a8a97">FILTER_RNUM</a>
+, <br />
+&#160;&#160;<a class="el" href="#add14f7b44711479cdbd9ce0a81affa52ad892c06f51091f923971060eba9fa0cb">FILTER_LNUM</a>
+, <a class="el" href="#add14f7b44711479cdbd9ce0a81affa52a587596a99c6c66253adf174944ff610c">FILTER_JNUM</a>
+, <a class="el" href="#add14f7b44711479cdbd9ce0a81affa52a6fd325cc38615694d6428fc8a204adf0">FILTER_HNUM</a>
+, <a class="el" href="#add14f7b44711479cdbd9ce0a81affa52a52fe11a4f403dc3bf36e3f8858c298ef">FILTER_RMAXSIZE</a>
+, <br />
+&#160;&#160;<a class="el" href="#add14f7b44711479cdbd9ce0a81affa52a4dc5771a0c084468006faa8898e100cd">FILTER_LMAXSIZE</a>
+, <a class="el" href="#add14f7b44711479cdbd9ce0a81affa52af2aa8c31a14a6af6c7a3117fb9594e1f">FILTER_JMAXSIZE</a>
+, <a class="el" href="#add14f7b44711479cdbd9ce0a81affa52aa513f0644c784bd3013f2159ab75559d">FILTER_HMAXSIZE</a>
+, <b>FILTER_NUMSIZE</b>
+<br />
+ }</td></tr>
+<tr class="separator:add14f7b44711479cdbd9ce0a81affa52"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77b1930a168e08c8f8d29b1e2f47f9f1" id="r_a77b1930a168e08c8f8d29b1e2f47f9f1"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a77b1930a168e08c8f8d29b1e2f47f9f1">bool_filter</a> { <a class="el" href="#a77b1930a168e08c8f8d29b1e2f47f9f1a3ec32bdabe3e4b415c3a01f50c12c28b">FILTER_NOSIMC</a>
+, <a class="el" href="#a77b1930a168e08c8f8d29b1e2f47f9f1a597eff145724e74dafa84201bd15c4f3">FILTER_NOSMALLCOUNTER</a>
+, <b>FILTER_BOOLSIZE</b>
+ }</td></tr>
+<tr class="separator:a77b1930a168e08c8f8d29b1e2f47f9f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a74d1827f84e7f81f93d21fb687e2be02" id="r_a74d1827f84e7f81f93d21fb687e2be02"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a74d1827f84e7f81f93d21fb687e2be02">shell_extract_sizesynt</a> (int i)</td></tr>
+<tr class="memdesc:a74d1827f84e7f81f93d21fb687e2be02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts the size of the syntactic monoid of an object.  <br /></td></tr>
+<tr class="separator:a74d1827f84e7f81f93d21fb687e2be02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ede950c1e903e0e32b342caa5177d9c" id="r_a4ede950c1e903e0e32b342caa5177d9c"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4ede950c1e903e0e32b342caa5177d9c">shell_extract_sizemini</a> (int i)</td></tr>
+<tr class="memdesc:a4ede950c1e903e0e32b342caa5177d9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts the size of the minimal automaton of an object.  <br /></td></tr>
+<tr class="separator:a4ede950c1e903e0e32b342caa5177d9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae75c8cd810fa03a3a9c570be738148d3" id="r_ae75c8cd810fa03a3a9c570be738148d3"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae75c8cd810fa03a3a9c570be738148d3">shell_extract_idemnum</a> (int i)</td></tr>
+<tr class="memdesc:ae75c8cd810fa03a3a9c570be738148d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts the number of idempotents in the syntactic monoid of an object.  <br /></td></tr>
+<tr class="separator:ae75c8cd810fa03a3a9c570be738148d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7405709f94daad75992917a52345af6" id="r_ad7405709f94daad75992917a52345af6"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad7405709f94daad75992917a52345af6">shell_extract_rnum</a> (int i)</td></tr>
+<tr class="memdesc:ad7405709f94daad75992917a52345af6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extarcts the number of R-classes in the syntactic monoid of an object.  <br /></td></tr>
+<tr class="separator:ad7405709f94daad75992917a52345af6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac5c93ee878080a25d544e819829557a0" id="r_ac5c93ee878080a25d544e819829557a0"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac5c93ee878080a25d544e819829557a0">shell_extract_lnum</a> (int i)</td></tr>
+<tr class="memdesc:ac5c93ee878080a25d544e819829557a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extarcts the number of L-classes in the syntactic monoid of an object.  <br /></td></tr>
+<tr class="separator:ac5c93ee878080a25d544e819829557a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a405ec672eafc5554191882457af37b69" id="r_a405ec672eafc5554191882457af37b69"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a405ec672eafc5554191882457af37b69">shell_extract_jnum</a> (int i)</td></tr>
+<tr class="memdesc:a405ec672eafc5554191882457af37b69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extarcts the number of J-classes in the syntactic monoid of an object.  <br /></td></tr>
+<tr class="separator:a405ec672eafc5554191882457af37b69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa62315d733dc650300bb5cf8a58110be" id="r_aa62315d733dc650300bb5cf8a58110be"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa62315d733dc650300bb5cf8a58110be">shell_extract_hnum</a> (int i)</td></tr>
+<tr class="memdesc:aa62315d733dc650300bb5cf8a58110be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extarcts the number of H-classes in the syntactic monoid of an object.  <br /></td></tr>
+<tr class="separator:aa62315d733dc650300bb5cf8a58110be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73bb89fcd7ee153c99bc8988f4b2b703" id="r_a73bb89fcd7ee153c99bc8988f4b2b703"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a73bb89fcd7ee153c99bc8988f4b2b703">shell_extract_rmaxsize</a> (int i)</td></tr>
+<tr class="memdesc:a73bb89fcd7ee153c99bc8988f4b2b703"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts the maximal size of an R-class in the syntactic monoid of an object.  <br /></td></tr>
+<tr class="separator:a73bb89fcd7ee153c99bc8988f4b2b703"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1e00c19f9b6267c25c0f6548f0cded4" id="r_ae1e00c19f9b6267c25c0f6548f0cded4"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae1e00c19f9b6267c25c0f6548f0cded4">shell_extract_lmaxsize</a> (int i)</td></tr>
+<tr class="memdesc:ae1e00c19f9b6267c25c0f6548f0cded4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts the maximal size of an L-class in the syntactic monoid of an object.  <br /></td></tr>
+<tr class="separator:ae1e00c19f9b6267c25c0f6548f0cded4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a193d32fad8b0f8672a5be7d7c2fa3bd9" id="r_a193d32fad8b0f8672a5be7d7c2fa3bd9"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a193d32fad8b0f8672a5be7d7c2fa3bd9">shell_extract_jmaxsize</a> (int i)</td></tr>
+<tr class="memdesc:a193d32fad8b0f8672a5be7d7c2fa3bd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts the maximal size of a J-class in the syntactic monoid of an object.  <br /></td></tr>
+<tr class="separator:a193d32fad8b0f8672a5be7d7c2fa3bd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeadd8b8ec45b4e072093c7e33fdffe0d" id="r_aeadd8b8ec45b4e072093c7e33fdffe0d"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aeadd8b8ec45b4e072093c7e33fdffe0d">shell_extract_hmaxsize</a> (int i)</td></tr>
+<tr class="memdesc:aeadd8b8ec45b4e072093c7e33fdffe0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts the maximal size of an H-class in the syntactic monoid of an object.  <br /></td></tr>
+<tr class="separator:aeadd8b8ec45b4e072093c7e33fdffe0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23a7c1b511faba02ea47ef9aa5e1b897" id="r_a23a7c1b511faba02ea47ef9aa5e1b897"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a23a7c1b511faba02ea47ef9aa5e1b897">shell_retrieve_filters</a> (<a class="el" href="structcom__parameters.html">com_parameters</a> *pars, <a class="el" href="structfilters__info.html">filters_info</a> *info)</td></tr>
+<tr class="memdesc:a23a7c1b511faba02ea47ef9aa5e1b897"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the filters from the command parameters.  <br /></td></tr>
+<tr class="separator:a23a7c1b511faba02ea47ef9aa5e1b897"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afef9114a97c4e46b773141bcfe4817c2" id="r_afef9114a97c4e46b773141bcfe4817c2"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afef9114a97c4e46b773141bcfe4817c2">shell_filter_objects</a> (<a class="el" href="structcom__parameters.html">com_parameters</a> *pars, ob_type)</td></tr>
 <tr class="memdesc:afef9114a97c4e46b773141bcfe4817c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Displays of all objects of a given type in memory.  <br /></td></tr>
 <tr class="separator:afef9114a97c4e46b773141bcfe4817c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15040ce938721fcbaca3610f2307ce1a" id="r_a15040ce938721fcbaca3610f2307ce1a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a15040ce938721fcbaca3610f2307ce1a">object_compare</a> (int, int)</td></tr>
+<tr class="memdesc:a15040ce938721fcbaca3610f2307ce1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default comparison function for objects. Sorts according to the variable name.  <br /></td></tr>
+<tr class="separator:a15040ce938721fcbaca3610f2307ce1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c4e7abdcf55a504f5a75bc15d21688b" id="r_a9c4e7abdcf55a504f5a75bc15d21688b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9c4e7abdcf55a504f5a75bc15d21688b">object_compare_numerical</a> (int i1, int i2)</td></tr>
+<tr class="memdesc:a9c4e7abdcf55a504f5a75bc15d21688b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Comparison function for objects. Sorts according to the numerical value given by the extractor function.  <br /></td></tr>
+<tr class="separator:a9c4e7abdcf55a504f5a75bc15d21688b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02f63581890fb55d43000fdf06f2c00a" id="r_a02f63581890fb55d43000fdf06f2c00a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a02f63581890fb55d43000fdf06f2c00a">object_sort_array</a> (int(*comp)(int, int))</td></tr>
+<tr class="memdesc:a02f63581890fb55d43000fdf06f2c00a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sorts the array of objects according to the comparison function passed as input.  <br /></td></tr>
+<tr class="separator:a02f63581890fb55d43000fdf06f2c00a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa867731a9cd3acb37a67cd422f1d03b8" id="r_aa867731a9cd3acb37a67cd422f1d03b8"><td class="memItemLeft" align="right" valign="top"><a id="aa867731a9cd3acb37a67cd422f1d03b8" name="aa867731a9cd3acb37a67cd422f1d03b8"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>shell_sort</b> (<a class="el" href="structcom__parameters.html">com_parameters</a> *pars)</td></tr>
 <tr class="memdesc:aa867731a9cd3acb37a67cd422f1d03b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sorts the objects array according to a comparison function given as input. <br /></td></tr>
 <tr class="separator:aa867731a9cd3acb37a67cd422f1d03b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad6ba70d572bb9380aabc93c541becd7" id="r_aad6ba70d572bb9380aabc93c541becd7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aad6ba70d572bb9380aabc93c541becd7">shell_filter_delete</a> (<a class="el" href="structcom__parameters.html">com_parameters</a> *pars, ob_type type)</td></tr>
+<tr class="memdesc:aad6ba70d572bb9380aabc93c541becd7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes all object that do not satify the filters.  <br /></td></tr>
+<tr class="separator:aad6ba70d572bb9380aabc93c541becd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a623ac29446c24e538aba99376efcba26" id="r_a623ac29446c24e538aba99376efcba26"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a623ac29446c24e538aba99376efcba26">shell_delete</a> (<a class="el" href="structcom__parameters.html">com_parameters</a> *pars, const char *str)</td></tr>
 <tr class="memdesc:a623ac29446c24e538aba99376efcba26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes an object.  <br /></td></tr>
 <tr class="separator:a623ac29446c24e538aba99376efcba26"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -130,10 +220,165 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>shell_sort</b> (<a cla
 <tr class="memitem:ad3eebd6056e28e8cc499403af5bf3cdd" id="r_ad3eebd6056e28e8cc499403af5bf3cdd"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad3eebd6056e28e8cc499403af5bf3cdd">shell_reset</a> (<a class="el" href="structcom__parameters.html">com_parameters</a> *pars, const char *str)</td></tr>
 <tr class="memdesc:ad3eebd6056e28e8cc499403af5bf3cdd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes the state names in an NFA.  <br /></td></tr>
 <tr class="separator:ad3eebd6056e28e8cc499403af5bf3cdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a5fccbeda467d88bc064dd0ad884a92b1" id="r_a5fccbeda467d88bc064dd0ad884a92b1"><td class="memItemLeft" align="right" valign="top"><a id="a5fccbeda467d88bc064dd0ad884a92b1" name="a5fccbeda467d88bc064dd0ad884a92b1"></a>
+uint(*&#160;</td><td class="memItemRight" valign="bottom"><b>num_extractors</b> [FILTER_NUMSIZE])(int i)</td></tr>
+<tr class="memdesc:a5fccbeda467d88bc064dd0ad884a92b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array of pointers to functions that extract numerical values from objects. <br /></td></tr>
+<tr class="separator:a5fccbeda467d88bc064dd0ad884a92b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad10de159f760be10367f90d574ce597a" id="r_ad10de159f760be10367f90d574ce597a"><td class="memItemLeft" align="right" valign="top"><a id="ad10de159f760be10367f90d574ce597a" name="ad10de159f760be10367f90d574ce597a"></a>
+bool(*&#160;</td><td class="memItemRight" valign="bottom"><b>bool_extractors</b> [FILTER_BOOLSIZE])(int i)</td></tr>
+<tr class="memdesc:ad10de159f760be10367f90d574ce597a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array of pointers to functions that extract boolean values from objects. <br /></td></tr>
+<tr class="separator:ad10de159f760be10367f90d574ce597a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6fec4a6a3d415d5698b83195a4feea68" id="r_a6fec4a6a3d415d5698b83195a4feea68"><td class="memItemLeft" align="right" valign="top">uint(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6fec4a6a3d415d5698b83195a4feea68">extractor</a> )(int)</td></tr>
+<tr class="memdesc:a6fec4a6a3d415d5698b83195a4feea68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the function that extracts a numerical value from an object for the object_compare_numerical function.  <br /></td></tr>
+<tr class="separator:a6fec4a6a3d415d5698b83195a4feea68"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Header file for objects filtering in the shell. </p>
-</div><h2 class="groupheader">Function Documentation</h2>
+</div><h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="a77b1930a168e08c8f8d29b1e2f47f9f1" name="a77b1930a168e08c8f8d29b1e2f47f9f1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a77b1930a168e08c8f8d29b1e2f47f9f1">&#9670;&#160;</a></span>bool_filter</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#a77b1930a168e08c8f8d29b1e2f47f9f1">bool_filter</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a77b1930a168e08c8f8d29b1e2f47f9f1a3ec32bdabe3e4b415c3a01f50c12c28b" name="a77b1930a168e08c8f8d29b1e2f47f9f1a3ec32bdabe3e4b415c3a01f50c12c28b"></a>FILTER_NOSIMC&#160;</td><td class="fielddoc"><p>No simple counter. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a77b1930a168e08c8f8d29b1e2f47f9f1a597eff145724e74dafa84201bd15c4f3" name="a77b1930a168e08c8f8d29b1e2f47f9f1a597eff145724e74dafa84201bd15c4f3"></a>FILTER_NOSMALLCOUNTER&#160;</td><td class="fielddoc"><p>No small counter. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="add14f7b44711479cdbd9ce0a81affa52" name="add14f7b44711479cdbd9ce0a81affa52"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#add14f7b44711479cdbd9ce0a81affa52">&#9670;&#160;</a></span>num_filter</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#add14f7b44711479cdbd9ce0a81affa52">num_filter</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="add14f7b44711479cdbd9ce0a81affa52a6b6dbdfc4fcdb79502b8d5d53b8fe05a" name="add14f7b44711479cdbd9ce0a81affa52a6b6dbdfc4fcdb79502b8d5d53b8fe05a"></a>FILTER_MINI&#160;</td><td class="fielddoc"><p>Filter by the size of the minimal automaton. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="add14f7b44711479cdbd9ce0a81affa52a9abadd27e831bf27b7ec51bbc6d58ebd" name="add14f7b44711479cdbd9ce0a81affa52a9abadd27e831bf27b7ec51bbc6d58ebd"></a>FILTER_SYNT&#160;</td><td class="fielddoc"><p>Filter by the size of the syntactic monoid. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="add14f7b44711479cdbd9ce0a81affa52a877b524b04baa112320e49afdc366180" name="add14f7b44711479cdbd9ce0a81affa52a877b524b04baa112320e49afdc366180"></a>FILTER_IDEMS&#160;</td><td class="fielddoc"><p>Filter by the number of idempotents in the syntactic monoid. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="add14f7b44711479cdbd9ce0a81affa52a6afb83478537cc2c1af80848565a8a97" name="add14f7b44711479cdbd9ce0a81affa52a6afb83478537cc2c1af80848565a8a97"></a>FILTER_RNUM&#160;</td><td class="fielddoc"><p>Filter by the number of R-classes in the syntactic monoid. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="add14f7b44711479cdbd9ce0a81affa52ad892c06f51091f923971060eba9fa0cb" name="add14f7b44711479cdbd9ce0a81affa52ad892c06f51091f923971060eba9fa0cb"></a>FILTER_LNUM&#160;</td><td class="fielddoc"><p>Filter by the number of L-classes in the syntactic monoid. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="add14f7b44711479cdbd9ce0a81affa52a587596a99c6c66253adf174944ff610c" name="add14f7b44711479cdbd9ce0a81affa52a587596a99c6c66253adf174944ff610c"></a>FILTER_JNUM&#160;</td><td class="fielddoc"><p>Filter by the number of J-classes in the syntactic monoid. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="add14f7b44711479cdbd9ce0a81affa52a6fd325cc38615694d6428fc8a204adf0" name="add14f7b44711479cdbd9ce0a81affa52a6fd325cc38615694d6428fc8a204adf0"></a>FILTER_HNUM&#160;</td><td class="fielddoc"><p>Filter by the number of H-classes in the syntactic monoid. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="add14f7b44711479cdbd9ce0a81affa52a52fe11a4f403dc3bf36e3f8858c298ef" name="add14f7b44711479cdbd9ce0a81affa52a52fe11a4f403dc3bf36e3f8858c298ef"></a>FILTER_RMAXSIZE&#160;</td><td class="fielddoc"><p>Filter by the maximal size of an R-class in the syntactic monoid. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="add14f7b44711479cdbd9ce0a81affa52a4dc5771a0c084468006faa8898e100cd" name="add14f7b44711479cdbd9ce0a81affa52a4dc5771a0c084468006faa8898e100cd"></a>FILTER_LMAXSIZE&#160;</td><td class="fielddoc"><p>Filter by the maximal size of an L-class in the syntactic monoid. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="add14f7b44711479cdbd9ce0a81affa52af2aa8c31a14a6af6c7a3117fb9594e1f" name="add14f7b44711479cdbd9ce0a81affa52af2aa8c31a14a6af6c7a3117fb9594e1f"></a>FILTER_JMAXSIZE&#160;</td><td class="fielddoc"><p>Filter by the maximal size of a J-class in the syntactic monoid. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="add14f7b44711479cdbd9ce0a81affa52aa513f0644c784bd3013f2159ab75559d" name="add14f7b44711479cdbd9ce0a81affa52aa513f0644c784bd3013f2159ab75559d"></a>FILTER_HMAXSIZE&#160;</td><td class="fielddoc"><p>Filter by the maximal size of an H-class in the syntactic monoid. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a15040ce938721fcbaca3610f2307ce1a" name="a15040ce938721fcbaca3610f2307ce1a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15040ce938721fcbaca3610f2307ce1a">&#9670;&#160;</a></span>object_compare()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int object_compare </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>i1</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>i2</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Default comparison function for objects. Sorts according to the variable name. </p>
+<dl class="section return"><dt>Returns</dt><dd>A negative value if the first object should be placed before the second one, a positive value if the second object should be placed before the first one, and 0 if the two objects are equal. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i1</td><td>The index of the first object.  </td></tr>
+    <tr><td class="paramname">i2</td><td>The index of the second object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a9c4e7abdcf55a504f5a75bc15d21688b" name="a9c4e7abdcf55a504f5a75bc15d21688b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c4e7abdcf55a504f5a75bc15d21688b">&#9670;&#160;</a></span>object_compare_numerical()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int object_compare_numerical </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>i1</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>i2</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Comparison function for objects. Sorts according to the numerical value given by the extractor function. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>Recursive definition objects are placed at the end of the list (they are not considered by extarctor functions).</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A negative value if the first object should be placed before the second one, a positive value if the second object should be placed before the first one, and 0 if the two objects are equal. </dd></dl>
+
+</div>
+</div>
+<a id="a02f63581890fb55d43000fdf06f2c00a" name="a02f63581890fb55d43000fdf06f2c00a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a02f63581890fb55d43000fdf06f2c00a">&#9670;&#160;</a></span>object_sort_array()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void object_sort_array </td>
+          <td>(</td>
+          <td class="paramtype">int(*</td>          <td class="paramname"><span class="paramname"><em>comp&#160;</em></span>)(int, int)</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sorts the array of objects according to the comparison function passed as input. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>Uses a heap sort algorithm. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">comp</td><td>The comparison function. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a623ac29446c24e538aba99376efcba26" name="a623ac29446c24e538aba99376efcba26"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a623ac29446c24e538aba99376efcba26">&#9670;&#160;</a></span>shell_delete()</h2>
 
@@ -196,6 +441,327 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>shell_sort</b> (<a cla
 
 </div>
 </div>
+<a id="aeadd8b8ec45b4e072093c7e33fdffe0d" name="aeadd8b8ec45b4e072093c7e33fdffe0d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeadd8b8ec45b4e072093c7e33fdffe0d">&#9670;&#160;</a></span>shell_extract_hmaxsize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint shell_extract_hmaxsize </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>i</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Extracts the maximal size of an H-class in the syntactic monoid of an object. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The syntactic morphism of the object is computed if it has not already been computed.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The maximal size of an H-class in the syntactic monoid of the object or UINT_MAX if the object is a recursive definition or if the syntactic morphism could not be computed. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>the index of the object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aa62315d733dc650300bb5cf8a58110be" name="aa62315d733dc650300bb5cf8a58110be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa62315d733dc650300bb5cf8a58110be">&#9670;&#160;</a></span>shell_extract_hnum()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint shell_extract_hnum </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>i</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Extarcts the number of H-classes in the syntactic monoid of an object. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The syntactic morphism of the object is computed if it has not already been computed.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The number of H-classes in the syntactic monoid of the object or UINT_MAX if the object is a recursive definition or if the syntactic morphism could not be computed. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>the index of the object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ae75c8cd810fa03a3a9c570be738148d3" name="ae75c8cd810fa03a3a9c570be738148d3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae75c8cd810fa03a3a9c570be738148d3">&#9670;&#160;</a></span>shell_extract_idemnum()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint shell_extract_idemnum </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>i</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Extracts the number of idempotents in the syntactic monoid of an object. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The syntactic morphism of the object is computed if it has not already been computed.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The number of idempotents in the syntactic monoid of the object or UINT_MAX if the object is a recursive definition or if the syntactic morphism could not be computed. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>the index of the object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a193d32fad8b0f8672a5be7d7c2fa3bd9" name="a193d32fad8b0f8672a5be7d7c2fa3bd9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a193d32fad8b0f8672a5be7d7c2fa3bd9">&#9670;&#160;</a></span>shell_extract_jmaxsize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint shell_extract_jmaxsize </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>i</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Extracts the maximal size of a J-class in the syntactic monoid of an object. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The syntactic morphism of the object is computed if it has not already been computed.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The maximal size of a J-class in the syntactic monoid of the object or UINT_MAX if the object is a recursive definition or if the syntactic morphism could not be computed. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>the index of the object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a405ec672eafc5554191882457af37b69" name="a405ec672eafc5554191882457af37b69"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a405ec672eafc5554191882457af37b69">&#9670;&#160;</a></span>shell_extract_jnum()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint shell_extract_jnum </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>i</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Extarcts the number of J-classes in the syntactic monoid of an object. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The syntactic morphism of the object is computed if it has not already been computed.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The number of J-classes in the syntactic monoid of the object or UINT_MAX if the object is a recursive definition or if the syntactic morphism could not be computed. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>the index of the object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ae1e00c19f9b6267c25c0f6548f0cded4" name="ae1e00c19f9b6267c25c0f6548f0cded4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1e00c19f9b6267c25c0f6548f0cded4">&#9670;&#160;</a></span>shell_extract_lmaxsize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint shell_extract_lmaxsize </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>i</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Extracts the maximal size of an L-class in the syntactic monoid of an object. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The syntactic morphism of the object is computed if it has not already been computed.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The maximal size of an L-class in the syntactic monoid of the object or UINT_MAX if the object is a recursive definition or if the syntactic morphism could not be computed. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>the index of the object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ac5c93ee878080a25d544e819829557a0" name="ac5c93ee878080a25d544e819829557a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac5c93ee878080a25d544e819829557a0">&#9670;&#160;</a></span>shell_extract_lnum()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint shell_extract_lnum </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>i</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Extarcts the number of L-classes in the syntactic monoid of an object. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The syntactic morphism of the object is computed if it has not already been computed.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The number of L-classes in the syntactic monoid of the object or UINT_MAX if the object is a recursive definition or if the syntactic morphism could not be computed. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>the index of the object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a73bb89fcd7ee153c99bc8988f4b2b703" name="a73bb89fcd7ee153c99bc8988f4b2b703"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73bb89fcd7ee153c99bc8988f4b2b703">&#9670;&#160;</a></span>shell_extract_rmaxsize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint shell_extract_rmaxsize </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>i</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Extracts the maximal size of an R-class in the syntactic monoid of an object. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The syntactic morphism of the object is computed if it has not already been computed.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The maximal size of an R-class in the syntactic monoid of the object or UINT_MAX if the object is a recursive definition or if the syntactic morphism could not be computed. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>the index of the object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ad7405709f94daad75992917a52345af6" name="ad7405709f94daad75992917a52345af6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7405709f94daad75992917a52345af6">&#9670;&#160;</a></span>shell_extract_rnum()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint shell_extract_rnum </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>i</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Extarcts the number of R-classes in the syntactic monoid of an object. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The syntactic morphism of the object is computed if it has not already been computed.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The number of R-classes in the syntactic monoid of the object or UINT_MAX if the object is a recursive definition or if the syntactic morphism could not be computed. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>the index of the object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a4ede950c1e903e0e32b342caa5177d9c" name="a4ede950c1e903e0e32b342caa5177d9c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ede950c1e903e0e32b342caa5177d9c">&#9670;&#160;</a></span>shell_extract_sizemini()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint shell_extract_sizemini </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>i</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Extracts the size of the minimal automaton of an object. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The minimal automaton of the object is computed if it has not already been computed.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The size of the minimal automaton of the object or UINT_MAX if the object is a recursive definition or if the minimal automaton could not be computed. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>the index of the object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a74d1827f84e7f81f93d21fb687e2be02" name="a74d1827f84e7f81f93d21fb687e2be02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a74d1827f84e7f81f93d21fb687e2be02">&#9670;&#160;</a></span>shell_extract_sizesynt()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint shell_extract_sizesynt </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>i</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Extracts the size of the syntactic monoid of an object. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The syntactic morphism of the object is computed if it has not already been computed.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The size of the syntactic monoid of the object or UINT_MAX if the object is a recursive definition or if the syntactic morphism could not be computed. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">i</td><td>the index of the object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aad6ba70d572bb9380aabc93c541becd7" name="aad6ba70d572bb9380aabc93c541becd7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad6ba70d572bb9380aabc93c541becd7">&#9670;&#160;</a></span>shell_filter_delete()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int shell_filter_delete </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structcom__parameters.html">com_parameters</a> *</td>          <td class="paramname"><span class="paramname"><em>pars</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ob_type</td>          <td class="paramname"><span class="paramname"><em>type</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Deletes all object that do not satify the filters. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>-1 in case of success, -2 in case of error. </dd></dl>
+
+</div>
+</div>
 <a id="afef9114a97c4e46b773141bcfe4817c2" name="afef9114a97c4e46b773141bcfe4817c2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afef9114a97c4e46b773141bcfe4817c2">&#9670;&#160;</a></span>shell_filter_objects()</h2>
 
@@ -216,6 +782,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>shell_sort</b> (<a cla
 </div><div class="memdoc">
 
 <p>Displays of all objects of a given type in memory. </p>
+<dl class="section return"><dt>Returns</dt><dd>-1 in case of success, -2 in case of error. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pars</td><td>The parameters of the command.  </td></tr>
@@ -291,6 +858,66 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>shell_sort</b> (<a cla
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a23a7c1b511faba02ea47ef9aa5e1b897" name="a23a7c1b511faba02ea47ef9aa5e1b897"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a23a7c1b511faba02ea47ef9aa5e1b897">&#9670;&#160;</a></span>shell_retrieve_filters()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int shell_retrieve_filters </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structcom__parameters.html">com_parameters</a> *</td>          <td class="paramname"><span class="paramname"><em>pars</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structfilters__info.html">filters_info</a> *</td>          <td class="paramname"><span class="paramname"><em>info</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Retrieves the filters from the command parameters. </p>
+<dl class="section return"><dt>Returns</dt><dd>-1 in case of success, -2 in case of error. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pars</td><td>The parameters of the command.  </td></tr>
+    <tr><td class="paramname">info</td><td>The structure to fill with the filters information. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a6fec4a6a3d415d5698b83195a4feea68" name="a6fec4a6a3d415d5698b83195a4feea68"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6fec4a6a3d415d5698b83195a4feea68">&#9670;&#160;</a></span>extractor</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint(* extractor) (int) </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel extern">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Pointer to the function that extracts a numerical value from an object for the object_compare_numerical function. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>Initially set to NULL. </dd></dl>
 
 </div>
 </div>

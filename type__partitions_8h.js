@@ -9,6 +9,7 @@ var type__partitions_8h =
     [ "find_ufind", "type__partitions_8h.html#a481203dffe281af516a68781db0fc014", null ],
     [ "istrivial_parti", "type__partitions_8h.html#af7200b2faa67eed6b87be0063849fa3a", null ],
     [ "makeset_ufind", "type__partitions_8h.html#a62655320ae4b57a153d0b2aac3c77d23", null ],
+    [ "parti_compute_inv", "type__partitions_8h.html#a001e74f4bcb79178abb0e5f0695b0b33", null ],
     [ "parti_to_ufind", "type__partitions_8h.html#aae51c6f12433c7a8ae7b1feee494008d", null ],
     [ "print_ufind", "type__partitions_8h.html#acfc5afeeb214b546ebb18a1fe762e12e", null ],
     [ "restrict_parti", "type__partitions_8h.html#a23609b0363c11c45e05ec6d620c3395e", null ],

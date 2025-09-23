@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['kers_0',['kers',['../structob__morphism.html#a45fabd66d4fcdd32dec6f5ef81e278be',1,'ob_morphism']]]
+  ['jcl_0',['JCL',['../structgreen.html#aa4debfc5c547bba8d19fab66bfc7f47d',1,'green']]]
 ];

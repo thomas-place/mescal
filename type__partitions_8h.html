@@ -140,6 +140,9 @@ Functions</h2></td></tr>
 <tr class="memitem:abca81bbdbe7c24785bf29302ae64440b" id="r_abca81bbdbe7c24785bf29302ae64440b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structparti.html">parti</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abca81bbdbe7c24785bf29302ae64440b">restrict_parti_subset</a> (<a class="el" href="structparti.html">parti</a> *, uint, bool *, uint *, uint *)</td></tr>
 <tr class="memdesc:abca81bbdbe7c24785bf29302ae64440b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Restriction of a partition to a subset of the partitioned set. Input partition is already a partition of a subset.  <br /></td></tr>
 <tr class="separator:abca81bbdbe7c24785bf29302ae64440b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a001e74f4bcb79178abb0e5f0695b0b33" id="r_a001e74f4bcb79178abb0e5f0695b0b33"><td class="memItemLeft" align="right" valign="top">uint *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a001e74f4bcb79178abb0e5f0695b0b33">parti_compute_inv</a> (<a class="el" href="structparti.html">parti</a> *P)</td></tr>
+<tr class="memdesc:a001e74f4bcb79178abb0e5f0695b0b33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the inverse mapping of a partition.  <br /></td></tr>
+<tr class="separator:a001e74f4bcb79178abb0e5f0695b0b33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09f94e2635329e4d1aeb680c6b5adef1" id="r_a09f94e2635329e4d1aeb680c6b5adef1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structufind.html">ufind</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a09f94e2635329e4d1aeb680c6b5adef1">create_ufind</a> (uint)</td></tr>
 <tr class="memdesc:a09f94e2635329e4d1aeb680c6b5adef1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creation of a trivial union-find partition (all classes are singletons).  <br /></td></tr>
 <tr class="separator:a09f94e2635329e4d1aeb680c6b5adef1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -370,6 +373,33 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">uf</td><td>The union-find partition. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a001e74f4bcb79178abb0e5f0695b0b33" name="a001e74f4bcb79178abb0e5f0695b0b33"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a001e74f4bcb79178abb0e5f0695b0b33">&#9670;&#160;</a></span>parti_compute_inv()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint * parti_compute_inv </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structparti.html">parti</a> *</td>          <td class="paramname"><span class="paramname"><em>P</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Computes the inverse mapping of a partition. </p>
+<p>For each element in the partitioned set, the inverse mapping gives the index of the element in its class.</p>
+<dl class="section return"><dt>Returns</dt><dd>The inverse mapping of the partition. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">P</td><td>The partition. </td></tr>
   </table>
   </dd>
 </dl>

@@ -117,22 +117,47 @@ $(function(){initNavTree('nfa__determi_8h_source.html',''); initResizable(true);
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><a class="code hl_struct" href="structdfa.html">dfa</a>* <a class="code hl_function" href="nfa__determi_8h.html#a0e1a0a215ca6198ad15b58916c399197">nfa_determinize</a>(<a class="code hl_struct" href="structnfa.html">nfa</a>*, </div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    <span class="keywordtype">bool</span>                   </div>
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>);</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span></div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><a class="code hl_struct" href="structnfa.html">nfa</a>* <a class="code hl_function" href="nfa__determi_8h.html#a2f91c4c2e2317374d3cf1e14ea25588e">nfa_complement</a>(<a class="code hl_struct" href="structnfa.html">nfa</a>* </div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>);</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span></div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span><a class="code hl_struct" href="structdfa.html">dfa</a>* <a class="code hl_function" href="nfa__determi_8h.html#a3c01d189950cd0249a008bf600a93f1b">dfa_complement</a>(<a class="code hl_struct" href="structdfa.html">dfa</a>* </div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span> </div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span></div>
+<div class="foldopen" id="foldopen00039" data-start="{" data-end="};">
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="structdfa__mirror__info.html">   39</a></span><span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno"><a class="line" href="structdfa__mirror__info.html#acfab40b422d8837eac5ff498059bf5c2">   40</a></span>    uint* <a class="code hl_variable" href="structdfa__mirror__info.html#acfab40b422d8837eac5ff498059bf5c2">edges</a>; </div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno"><a class="line" href="structdfa__mirror__info.html#a7198862d9124fa660bfc838ebfb0ce7b">   41</a></span>    uint* <a class="code hl_variable" href="structdfa__mirror__info.html#a7198862d9124fa660bfc838ebfb0ce7b">st_edges</a>; </div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno"><a class="line" href="structdfa__mirror__info.html#aab43fccae6fcafb43caca86e6629c04b">   43</a></span>    uint* <a class="code hl_variable" href="structdfa__mirror__info.html#aab43fccae6fcafb43caca86e6629c04b">ed_edges</a>; </div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>} <a class="code hl_struct" href="structdfa__mirror__info.html">dfa_mirror_info</a>;</div>
+</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span><span class="keywordtype">void</span> <a class="code hl_function" href="nfa__determi_8h.html#add8546c1f4d2b6eb4376861b08c618d9">dfa_get_mirror_info</a>(<a class="code hl_struct" href="structdfa.html">dfa</a>* A, </div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    <a class="code hl_struct" href="structdfa__mirror__info.html">dfa_mirror_info</a>* mirror </div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>);</div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span></div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><a class="code hl_struct" href="structdfa.html">dfa</a>* <a class="code hl_function" href="nfa__determi_8h.html#a924e53c4ea06727b1ab3054b42528f46">dfa_determinize_mirror</a>(<a class="code hl_struct" href="structdfa.html">dfa</a>*, </div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    <span class="keywordtype">bool</span>                   </div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>);</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span> </div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span></div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><a class="code hl_struct" href="structnfa.html">nfa</a>* <a class="code hl_function" href="nfa__determi_8h.html#a2f91c4c2e2317374d3cf1e14ea25588e">nfa_complement</a>(<a class="code hl_struct" href="structnfa.html">nfa</a>* </div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>);</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span></div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span><a class="code hl_struct" href="structdfa.html">dfa</a>* <a class="code hl_function" href="nfa__determi_8h.html#a3c01d189950cd0249a008bf600a93f1b">dfa_complement</a>(<a class="code hl_struct" href="structdfa.html">dfa</a>* </div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>);</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span> </div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span><span class="preprocessor">#endif</span></div>
 <div class="ttc" id="anfa_8h_html"><div class="ttname"><a href="nfa_8h.html">nfa.h</a></div><div class="ttdoc">Implementation of NFAs.</div></div>
 <div class="ttc" id="anfa__determi_8h_html_a0e1a0a215ca6198ad15b58916c399197"><div class="ttname"><a href="nfa__determi_8h.html#a0e1a0a215ca6198ad15b58916c399197">nfa_determinize</a></div><div class="ttdeci">dfa * nfa_determinize(nfa *, bool)</div><div class="ttdoc">Determinization of a NFA with the subset construction.</div><div class="ttdef"><b>Definition</b> nfa_determi.c:137</div></div>
-<div class="ttc" id="anfa__determi_8h_html_a2f91c4c2e2317374d3cf1e14ea25588e"><div class="ttname"><a href="nfa__determi_8h.html#a2f91c4c2e2317374d3cf1e14ea25588e">nfa_complement</a></div><div class="ttdeci">nfa * nfa_complement(nfa *)</div><div class="ttdoc">Complementation of a NFA.</div><div class="ttdef"><b>Definition</b> nfa_determi.c:284</div></div>
-<div class="ttc" id="anfa__determi_8h_html_a3c01d189950cd0249a008bf600a93f1b"><div class="ttname"><a href="nfa__determi_8h.html#a3c01d189950cd0249a008bf600a93f1b">dfa_complement</a></div><div class="ttdeci">dfa * dfa_complement(dfa *)</div><div class="ttdoc">Complementation of a DFA.</div><div class="ttdef"><b>Definition</b> nfa_determi.c:318</div></div>
-<div class="ttc" id="astructdfa_html"><div class="ttname"><a href="structdfa.html">dfa</a></div><div class="ttdoc">Type used to represent a complete DFA.</div><div class="ttdef"><b>Definition</b> nfa.h:59</div></div>
-<div class="ttc" id="astructnfa_html"><div class="ttname"><a href="structnfa.html">nfa</a></div><div class="ttdoc">Type used to represent a NFA.</div><div class="ttdef"><b>Definition</b> nfa.h:41</div></div>
+<div class="ttc" id="anfa__determi_8h_html_a2f91c4c2e2317374d3cf1e14ea25588e"><div class="ttname"><a href="nfa__determi_8h.html#a2f91c4c2e2317374d3cf1e14ea25588e">nfa_complement</a></div><div class="ttdeci">nfa * nfa_complement(nfa *)</div><div class="ttdoc">Complementation of a NFA.</div><div class="ttdef"><b>Definition</b> nfa_determi.c:456</div></div>
+<div class="ttc" id="anfa__determi_8h_html_a3c01d189950cd0249a008bf600a93f1b"><div class="ttname"><a href="nfa__determi_8h.html#a3c01d189950cd0249a008bf600a93f1b">dfa_complement</a></div><div class="ttdeci">dfa * dfa_complement(dfa *)</div><div class="ttdoc">Complementation of a DFA.</div><div class="ttdef"><b>Definition</b> nfa_determi.c:490</div></div>
+<div class="ttc" id="anfa__determi_8h_html_a924e53c4ea06727b1ab3054b42528f46"><div class="ttname"><a href="nfa__determi_8h.html#a924e53c4ea06727b1ab3054b42528f46">dfa_determinize_mirror</a></div><div class="ttdeci">dfa * dfa_determinize_mirror(dfa *, bool)</div><div class="ttdoc">Determinization of the mirror of a DFA with the subset construction.</div><div class="ttdef"><b>Definition</b> nfa_determi.c:310</div></div>
+<div class="ttc" id="anfa__determi_8h_html_add8546c1f4d2b6eb4376861b08c618d9"><div class="ttname"><a href="nfa__determi_8h.html#add8546c1f4d2b6eb4376861b08c618d9">dfa_get_mirror_info</a></div><div class="ttdeci">void dfa_get_mirror_info(dfa *A, dfa_mirror_info *mirror)</div><div class="ttdoc">Initializes the dfa_mirror_info structure from a dfa.</div><div class="ttdef"><b>Definition</b> nfa_determi.c:273</div></div>
+<div class="ttc" id="astructdfa__mirror__info_html"><div class="ttname"><a href="structdfa__mirror__info.html">dfa_mirror_info</a></div><div class="ttdoc">Represents the required information for determinization of the mirror of a DFA.</div><div class="ttdef"><b>Definition</b> nfa_determi.h:39</div></div>
+<div class="ttc" id="astructdfa__mirror__info_html_a7198862d9124fa660bfc838ebfb0ce7b"><div class="ttname"><a href="structdfa__mirror__info.html#a7198862d9124fa660bfc838ebfb0ce7b">dfa_mirror_info::st_edges</a></div><div class="ttdeci">uint * st_edges</div><div class="ttdoc">For each state q and each label a st_edges[q * size_alpha + a] is the index of the first edge in edge...</div><div class="ttdef"><b>Definition</b> nfa_determi.h:41</div></div>
+<div class="ttc" id="astructdfa__mirror__info_html_aab43fccae6fcafb43caca86e6629c04b"><div class="ttname"><a href="structdfa__mirror__info.html#aab43fccae6fcafb43caca86e6629c04b">dfa_mirror_info::ed_edges</a></div><div class="ttdeci">uint * ed_edges</div><div class="ttdoc">For each state q and each label a ed_edges[q * size_alpha + a] is the index following that of the las...</div><div class="ttdef"><b>Definition</b> nfa_determi.h:43</div></div>
+<div class="ttc" id="astructdfa__mirror__info_html_acfab40b422d8837eac5ff498059bf5c2"><div class="ttname"><a href="structdfa__mirror__info.html#acfab40b422d8837eac5ff498059bf5c2">dfa_mirror_info::edges</a></div><div class="ttdeci">uint * edges</div><div class="ttdoc">The edges of the mirror DFA (size size_alpha * size_graph).</div><div class="ttdef"><b>Definition</b> nfa_determi.h:40</div></div>
+<div class="ttc" id="astructdfa_html"><div class="ttname"><a href="structdfa.html">dfa</a></div><div class="ttdoc">Type used to represent a complete DFA.</div><div class="ttdef"><b>Definition</b> nfa.h:61</div></div>
+<div class="ttc" id="astructnfa_html"><div class="ttname"><a href="structnfa.html">nfa</a></div><div class="ttdoc">Type used to represent a NFA.</div><div class="ttdef"><b>Definition</b> nfa.h:43</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

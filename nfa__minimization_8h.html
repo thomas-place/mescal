@@ -140,9 +140,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a240bda45cca37dc21760552179df3cc6" id="r_a240bda45cca37dc21760552179df3cc6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdfa.html">dfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a240bda45cca37dc21760552179df3cc6">dfa_hopcroft</a> (<a class="el" href="structdfa.html">dfa</a> *)</td></tr>
 <tr class="memdesc:a240bda45cca37dc21760552179df3cc6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hopcroft's minimization algorithm.  <br /></td></tr>
 <tr class="separator:a240bda45cca37dc21760552179df3cc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a330219616b3371bbf441fa90e336d60d" id="r_a330219616b3371bbf441fa90e336d60d"><td class="memItemLeft" align="right" valign="top">bool **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a330219616b3371bbf441fa90e336d60d">dfa_mini_canonical_ordering</a> (<a class="el" href="structdfa.html">dfa</a> *)</td></tr>
-<tr class="memdesc:a330219616b3371bbf441fa90e336d60d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the canonical ordering of the states of a minimal DFA.  <br /></td></tr>
-<tr class="separator:a330219616b3371bbf441fa90e336d60d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af38f97b18e70a208fd56338ec60bdbda" id="r_af38f97b18e70a208fd56338ec60bdbda"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af38f97b18e70a208fd56338ec60bdbda">dfa_mini_canonical_ordering</a> (<a class="el" href="structdfa.html">dfa</a> *)</td></tr>
+<tr class="memdesc:af38f97b18e70a208fd56338ec60bdbda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the canonical ordering of the states of a minimal DFA.  <br /></td></tr>
+<tr class="separator:af38f97b18e70a208fd56338ec60bdbda"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Minimization. </p>
@@ -321,14 +321,14 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a330219616b3371bbf441fa90e336d60d" name="a330219616b3371bbf441fa90e336d60d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a330219616b3371bbf441fa90e336d60d">&#9670;&#160;</a></span>dfa_mini_canonical_ordering()</h2>
+<a id="af38f97b18e70a208fd56338ec60bdbda" name="af38f97b18e70a208fd56338ec60bdbda"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af38f97b18e70a208fd56338ec60bdbda">&#9670;&#160;</a></span>dfa_mini_canonical_ordering()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool ** dfa_mini_canonical_ordering </td>
+          <td class="memname">void dfa_mini_canonical_ordering </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span></td><td>)</td>
           <td></td>
@@ -339,6 +339,7 @@ Functions</h2></td></tr>
 <p>Computes the canonical ordering of the states of a minimal DFA. </p>
 <p>Canonical ordering </p>
 <dl class="section return"><dt>Returns</dt><dd>The canonical ordering of the states.</dd></dl>
+<dl class="section attention"><dt>Attention</dt><dd>The input DFA is assumed to be minimal. This is not checked.</dd></dl>
 <p>Canonical ordering </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">

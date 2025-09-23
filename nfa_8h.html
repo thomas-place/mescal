@@ -217,6 +217,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>nfa_reset_state_names
 <tr class="memitem:a65850b317b3b5a1318aa3d170c24bb7d" id="r_a65850b317b3b5a1318aa3d170c24bb7d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a65850b317b3b5a1318aa3d170c24bb7d">nfa_trim_mod</a> (<a class="el" href="structnfa.html">nfa</a> *)</td></tr>
 <tr class="memdesc:a65850b317b3b5a1318aa3d170c24bb7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Elimination of all states that are not simultaneously reachable from an initial state and co-reachable from a final state. Overwrites the input NFA.  <br /></td></tr>
 <tr class="separator:a65850b317b3b5a1318aa3d170c24bb7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a566d2b594e8f4a753e7b09dcc2cb7a05" id="r_a566d2b594e8f4a753e7b09dcc2cb7a05"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdfa.html">dfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a566d2b594e8f4a753e7b09dcc2cb7a05">dfa_direct_product</a> (<a class="el" href="structdfa.html">dfa</a> *A, <a class="el" href="structdfa.html">dfa</a> *B)</td></tr>
+<tr class="separator:a566d2b594e8f4a753e7b09dcc2cb7a05"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5d5ed8a743ecf11962c3b2d981b42ad6" id="r_a5d5ed8a743ecf11962c3b2d981b42ad6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5d5ed8a743ecf11962c3b2d981b42ad6">nfa_random</a> (uint, uint, uint)</td></tr>
 <tr class="memdesc:a5d5ed8a743ecf11962c3b2d981b42ad6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a random NFA.  <br /></td></tr>
 <tr class="separator:a5d5ed8a743ecf11962c3b2d981b42ad6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -533,6 +535,34 @@ If the NFA is not complete, an additional sink state is added.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">A</td><td>The DFA. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a566d2b594e8f4a753e7b09dcc2cb7a05" name="a566d2b594e8f4a753e7b09dcc2cb7a05"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a566d2b594e8f4a753e7b09dcc2cb7a05">&#9670;&#160;</a></span>dfa_direct_product()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdfa.html">dfa</a> * dfa_direct_product </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>B</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The first DFA.  </td></tr>
+    <tr><td class="paramname">B</td><td>The second DFA. </td></tr>
   </table>
   </dd>
 </dl>

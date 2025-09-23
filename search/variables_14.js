@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['val_0',['val',['../structdcell.html#ab84b495cf45baadd598e699445c8b91b',1,'dcell']]],
-  ['value_1',['value',['../structavlnode.html#a6c97769b5b308ec7c925cb4a117a68f4',1,'avlnode::value'],['../structuint__avlnode.html#a7597b689844f908b5ffabc060814ddae',1,'uint_avlnode::value']]]
+  ['used_0',['used',['../structdfa__enum.html#a72bf04cb1232fcd6dc71a88d27d35158',1,'dfa_enum']]],
+  ['used_5fboolean_1',['used_boolean',['../structfilters__info.html#ae6e1edddb803845a9ef90fb25ed348cc',1,'filters_info']]],
+  ['used_5fnumerical_2',['used_numerical',['../structfilters__info.html#a2795ef7647de93a36ed079bc73c1e3b4',1,'filters_info']]]
 ];

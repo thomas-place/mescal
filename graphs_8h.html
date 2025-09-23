@@ -183,6 +183,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>delete_dgraph</b> (<a
 <tr class="memitem:aa771c03d7e613494b7cb7699790ba003" id="r_aa771c03d7e613494b7cb7699790ba003"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa771c03d7e613494b7cb7699790ba003">dgraph_nb_edges</a> (<a class="el" href="structdgraph.html">dgraph</a> *)</td></tr>
 <tr class="memdesc:aa771c03d7e613494b7cb7699790ba003"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the number of edges in a complete deterministic directed labeled graph.  <br /></td></tr>
 <tr class="separator:aa771c03d7e613494b7cb7699790ba003"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abdcbbb1435c747652fb69ebc4f53d0b7" id="r_abdcbbb1435c747652fb69ebc4f53d0b7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdgraph.html">dgraph</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abdcbbb1435c747652fb69ebc4f53d0b7">dgraph_direct_product</a> (<a class="el" href="structdgraph.html">dgraph</a> *g1, <a class="el" href="structdgraph.html">dgraph</a> *g2)</td></tr>
+<tr class="memdesc:abdcbbb1435c747652fb69ebc4f53d0b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the direct product of two deterministic directed labeled graphs.  <br /></td></tr>
+<tr class="separator:abdcbbb1435c747652fb69ebc4f53d0b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67e75d4e63dee41143abceb6c09fe73c" id="r_a67e75d4e63dee41143abceb6c09fe73c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structgraph.html">graph</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a67e75d4e63dee41143abceb6c09fe73c">graph_mirror</a> (<a class="el" href="structgraph.html">graph</a> *)</td></tr>
 <tr class="memdesc:a67e75d4e63dee41143abceb6c09fe73c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the mirror of a directed unlabeled graph.  <br /></td></tr>
 <tr class="separator:a67e75d4e63dee41143abceb6c09fe73c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -216,6 +219,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>delete_dgraph</b> (<a
 <tr class="memitem:a71a9720e9ed9b7adc22d418205e9f7b4" id="r_a71a9720e9ed9b7adc22d418205e9f7b4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdequeue.html">dequeue</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a71a9720e9ed9b7adc22d418205e9f7b4">twin_dgraph_search</a> (<a class="el" href="#af79428132abe4bab1bda312319693dc8">graph_stype</a>, <a class="el" href="structdgraph.html">dgraph</a> *, <a class="el" href="structdgraph.html">dgraph</a> *, <a class="el" href="structdequeue.html">dequeue</a> *, bool *, bool *)</td></tr>
 <tr class="memdesc:a71a9720e9ed9b7adc22d418205e9f7b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Search in two deterministic complete labeled graphs (same set of vertices, same alphabet). Reachable vertices are returned inside a dequeue sorted in increasing order.  <br /></td></tr>
 <tr class="separator:a71a9720e9ed9b7adc22d418205e9f7b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7c321371b79b590957444a00d8d41b3" id="r_ab7c321371b79b590957444a00d8d41b3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdgraph.html">dgraph</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab7c321371b79b590957444a00d8d41b3">dgraph_paths</a> (<a class="el" href="structdgraph.html">dgraph</a> *G, uint start)</td></tr>
+<tr class="memdesc:ab7c321371b79b590957444a00d8d41b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a path from a given strating vertex to all other reachable vertices in a directed unlabeled graph.  <br /></td></tr>
+<tr class="separator:ab7c321371b79b590957444a00d8d41b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb17d1bc074506de7625d2c759a07556" id="r_adb17d1bc074506de7625d2c759a07556"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structgraph.html">graph</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adb17d1bc074506de7625d2c759a07556">merge_graphs</a> (uint *, uint,...)</td></tr>
 <tr class="memdesc:adb17d1bc074506de7625d2c759a07556"><td class="mdescLeft">&#160;</td><td class="mdescRight">Disjoint merge of an arbitrary number of unlabeled graphs.  <br /></td></tr>
 <tr class="separator:adb17d1bc074506de7625d2c759a07556"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -244,7 +250,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>delete_dgraph</b> (<a
 <tr class="memdesc:af4572aae68e83742af6071d202d80263"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion of a deterministic labeled graph into a unlabeled graph. Restricted version.  <br /></td></tr>
 <tr class="separator:af4572aae68e83742af6071d202d80263"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a65bd76d322515fd370db7c6f98b7510a" id="r_a65bd76d322515fd370db7c6f98b7510a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdequeue.html">dequeue</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a65bd76d322515fd370db7c6f98b7510a">lgraph_reachable</a> (<a class="el" href="structlgraph.html">lgraph</a> *, <a class="el" href="structdequeue.html">dequeue</a> *, uint)</td></tr>
-<tr class="memdesc:a65bd76d322515fd370db7c6f98b7510a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given a labeled graph, a list of vertices in this graph and a label, computed the list of all vertices connected to a vertex in the input list by an edge labeled by the input label.  <br /></td></tr>
+<tr class="memdesc:a65bd76d322515fd370db7c6f98b7510a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given a labeled graph, a list of vertices in this graph and a label, computes the list of all vertices connected to a vertex in the input list by an edge labeled by the input label.  <br /></td></tr>
 <tr class="separator:a65bd76d322515fd370db7c6f98b7510a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -437,6 +443,41 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>delete_dgraph</b> (<a
 
 </div>
 </div>
+<a id="abdcbbb1435c747652fb69ebc4f53d0b7" name="abdcbbb1435c747652fb69ebc4f53d0b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abdcbbb1435c747652fb69ebc4f53d0b7">&#9670;&#160;</a></span>dgraph_direct_product()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdgraph.html">dgraph</a> * dgraph_direct_product </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdgraph.html">dgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>g1</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structdgraph.html">dgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>g2</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Computes the direct product of two deterministic directed labeled graphs. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The vertex (q1,q2) is is encoded as the integer q1 * g2-&gt;size_graph + q2 in the resulting graph.</dd>
+<dd>
+The graphs need not be complete. A undefined edge is represented by the destination value UINT_MAX in both the input graphs and the resulting graph.</dd></dl>
+<dl class="section attention"><dt>Attention</dt><dd>The two graphs must have the same alphabet size.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The resulting graph. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">g1</td><td>The first graph.  </td></tr>
+    <tr><td class="paramname">g2</td><td>The second graph. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a21fe7ba13afee887bd34de8ec466304d" name="a21fe7ba13afee887bd34de8ec466304d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a21fe7ba13afee887bd34de8ec466304d">&#9670;&#160;</a></span>dgraph_mirror()</h2>
 
@@ -474,6 +515,40 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>delete_dgraph</b> (<a
 
 <p>Computes the number of edges in a complete deterministic directed labeled graph. </p>
 <dl class="section return"><dt>Returns</dt><dd>The number of edges in the graph. </dd></dl>
+
+</div>
+</div>
+<a id="ab7c321371b79b590957444a00d8d41b3" name="ab7c321371b79b590957444a00d8d41b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab7c321371b79b590957444a00d8d41b3">&#9670;&#160;</a></span>dgraph_paths()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdgraph.html">dgraph</a> * dgraph_paths </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdgraph.html">dgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>G</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>start</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Computes a path from a given strating vertex to all other reachable vertices in a directed unlabeled graph. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The paths are computed using a breadth-first search.</dd>
+<dd>
+It is allowed for the input graph to have non-defined edges (in these cases the value <code>UINT_MAX</code> is used to represent the non-defined edges).</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A graph containing the back edges of the paths. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">G</td><td>The graph.  </td></tr>
+    <tr><td class="paramname">start</td><td>The starting vertex. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -950,7 +1025,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>delete_dgraph</b> (<a
       </table>
 </div><div class="memdoc">
 
-<p>Given a labeled graph, a list of vertices in this graph and a label, computed the list of all vertices connected to a vertex in the input list by an edge labeled by the input label. </p>
+<p>Given a labeled graph, a list of vertices in this graph and a label, computes the list of all vertices connected to a vertex in the input list by an edge labeled by the input label. </p>
 <dl class="section return"><dt>Returns</dt><dd>The list of all connected vertices sorted in increasing order. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">

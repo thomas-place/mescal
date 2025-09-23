@@ -23,6 +23,7 @@ var files_dup =
     [ "nfa_intersec.h", "nfa__intersec_8h.html", "nfa__intersec_8h" ],
     [ "nfa_mccluskey.h", "nfa__mccluskey_8h.html", "nfa__mccluskey_8h" ],
     [ "nfa_minimization.h", "nfa__minimization_8h.html", "nfa__minimization_8h" ],
+    [ "nfa_patterns.h", "nfa__patterns_8h.html", null ],
     [ "nfa_props.h", "nfa__props_8h_source.html", null ],
     [ "parse_regexp.h", "parse__regexp_8h_source.html", null ],
     [ "parser.h", "parser_8h_source.html", null ],

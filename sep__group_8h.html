@@ -98,6 +98,7 @@ $(function(){initNavTree('sep__group_8h.html',''); initResizable(true); });
 
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">sep_group.h File Reference</div></div>
 </div><!--header-->
@@ -111,19 +112,45 @@ $(function(){initNavTree('sep__group_8h.html',''); initResizable(true); });
 <code>#include &quot;printing.h&quot;</code><br />
 <code>#include &quot;<a class="el" href="type__dlist_8h_source.html">type_dlist.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="type__partitions_8h_source.html">type_partitions.h</a>&quot;</code><br />
+<code>#include &quot;flint/fmpz.h&quot;</code><br />
+<code>#include &quot;flint/fmpz_mat.h&quot;</code><br />
 <code>#include &lt;stdbool.h&gt;</code><br />
 <code>#include &lt;stdlib.h&gt;</code><br />
 </div>
 <p><a href="sep__group_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structnum__span__forest.html">num_span_forest</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type used to store the information needed to solve AMT-separation on the SCCs of a dgraph.  <a href="structnum__span__forest.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a1d7ccd80f14a29a87aecfeaea361804b" id="r_a1d7ccd80f14a29a87aecfeaea361804b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structparti.html">parti</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1d7ccd80f14a29a87aecfeaea361804b">dgraph_stal_fold</a> (<a class="el" href="structdgraph.html">dgraph</a> *G, bool grp)</td></tr>
-<tr class="memdesc:a1d7ccd80f14a29a87aecfeaea361804b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the Stalling partition obtained from a graph.  <br /></td></tr>
-<tr class="separator:a1d7ccd80f14a29a87aecfeaea361804b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae65d8e67bb206c5d64cdeedaa5bf8b25" id="r_ae65d8e67bb206c5d64cdeedaa5bf8b25"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structparti.html">parti</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae65d8e67bb206c5d64cdeedaa5bf8b25">mor_stal_fold</a> (<a class="el" href="structmorphism.html">morphism</a> *M, bool grp, bool rcl)</td></tr>
-<tr class="memdesc:ae65d8e67bb206c5d64cdeedaa5bf8b25"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the Stalling partition obtained from the right or left Cayley graph of the morphism.  <br /></td></tr>
-<tr class="separator:ae65d8e67bb206c5d64cdeedaa5bf8b25"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a817c7bc19cd0948d4ae6c8c1320d7c02" id="r_a817c7bc19cd0948d4ae6c8c1320d7c02"><td class="memItemLeft" align="right" valign="top"><a id="a817c7bc19cd0948d4ae6c8c1320d7c02" name="a817c7bc19cd0948d4ae6c8c1320d7c02"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>solve_system_amt</b> (fmpz_mat_t MAT, int *target, uint nb_rows, uint nb_cols)</td></tr>
+<tr class="separator:a817c7bc19cd0948d4ae6c8c1320d7c02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a86cc062484c0692151dde3ccc040d7ae" id="r_a86cc062484c0692151dde3ccc040d7ae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnum__span__forest.html">num_span_forest</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a86cc062484c0692151dde3ccc040d7ae">compute_span_forest</a> (<a class="el" href="structdgraph.html">dgraph</a> *G, <a class="el" href="structparti.html">parti</a> *sccs, bool *allowed)</td></tr>
+<tr class="memdesc:a86cc062484c0692151dde3ccc040d7ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a spanning forest from a dgraph.  <br /></td></tr>
+<tr class="separator:a86cc062484c0692151dde3ccc040d7ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3fd71303743188790b7e98a37d4bce1" id="r_ab3fd71303743188790b7e98a37d4bce1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab3fd71303743188790b7e98a37d4bce1">delete_span_forest</a> (<a class="el" href="structnum__span__forest.html">num_span_forest</a> *forest)</td></tr>
+<tr class="memdesc:ab3fd71303743188790b7e98a37d4bce1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes the structure used to store the spanning forest.  <br /></td></tr>
+<tr class="separator:ab3fd71303743188790b7e98a37d4bce1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a913f4569c82aac52c66837d5b37e505e" id="r_a913f4569c82aac52c66837d5b37e505e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structparti.html">parti</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a913f4569c82aac52c66837d5b37e505e">dgraph_amt_fold</a> (<a class="el" href="structdgraph.html">dgraph</a> *g, <a class="el" href="structparti.html">parti</a> *sccs)</td></tr>
+<tr class="memdesc:a913f4569c82aac52c66837d5b37e505e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the folding of a dgraph according to the AMT-separation.  <br /></td></tr>
+<tr class="separator:a913f4569c82aac52c66837d5b37e505e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62bb23de74dbc668ee0e0846abe432bc" id="r_a62bb23de74dbc668ee0e0846abe432bc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a62bb23de74dbc668ee0e0846abe432bc">compute_amt_kernel_regular</a> (<a class="el" href="structmorphism.html">morphism</a> *, bool *, uint *)</td></tr>
+<tr class="memdesc:a62bb23de74dbc668ee0e0846abe432bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the regular elements of the AMT-kernel in a morphism (non-regular elements are ignored).  <br /></td></tr>
+<tr class="separator:a62bb23de74dbc668ee0e0846abe432bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf25019f095c90748444ba96b1d0cfd7" id="r_adf25019f095c90748444ba96b1d0cfd7"><td class="memItemLeft" align="right" valign="top"><a id="adf25019f095c90748444ba96b1d0cfd7" name="adf25019f095c90748444ba96b1d0cfd7"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>build_hnf_matrix_two</b> (<a class="el" href="structdgraph.html">dgraph</a> *g1, <a class="el" href="structdgraph.html">dgraph</a> *g2, <a class="el" href="structnum__span__forest.html">num_span_forest</a> *span1, <a class="el" href="structnum__span__forest.html">num_span_forest</a> *span2, uint q1, uint q2, fmpz_mat_t MAT)</td></tr>
+<tr class="separator:adf25019f095c90748444ba96b1d0cfd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad682f819620b40fee0bbceb3635c6c5f" id="r_ad682f819620b40fee0bbceb3635c6c5f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad682f819620b40fee0bbceb3635c6c5f">compute_amt_pairs_regular</a> (<a class="el" href="structmorphism.html">morphism</a> *M, <a class="el" href="structnum__span__forest.html">num_span_forest</a> *rspan, <a class="el" href="structnum__span__forest.html">num_span_forest</a> *lspan, uint e, uint f, <a class="el" href="structdequeue.html">dequeue</a> *first, <a class="el" href="structdequeue.html">dequeue</a> *second)</td></tr>
+<tr class="memdesc:ad682f819620b40fee0bbceb3635c6c5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the anti AMT-pairs (q,t) where q is in the R-class of e and t is in the L-class of f.  <br /></td></tr>
+<tr class="separator:ad682f819620b40fee0bbceb3635c6c5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac34fad8f4bfe9ff8a33715d89e55e828" id="r_ac34fad8f4bfe9ff8a33715d89e55e828"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structparti.html">parti</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac34fad8f4bfe9ff8a33715d89e55e828">dgraph_stal_fold</a> (<a class="el" href="structdgraph.html">dgraph</a> *G, <a class="el" href="structparti.html">parti</a> *sccs, basis ba)</td></tr>
+<tr class="memdesc:ac34fad8f4bfe9ff8a33715d89e55e828"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the Stalling partition obtained from a dgraph.  <br /></td></tr>
+<tr class="separator:ac34fad8f4bfe9ff8a33715d89e55e828"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7d0cacd6c6d7618c5e4a3d58d5093f3b" id="r_a7d0cacd6c6d7618c5e4a3d58d5093f3b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdgraph.html">dgraph</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7d0cacd6c6d7618c5e4a3d58d5093f3b">shrink_mod</a> (<a class="el" href="structdgraph.html">dgraph</a> *g, <a class="el" href="structparti.html">parti</a> *fold, <a class="el" href="structparti.html">parti</a> *sccs)</td></tr>
 <tr class="memdesc:a7d0cacd6c6d7618c5e4a3d58d5093f3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the graph obtained by folding a right or left Cayley graph according to the Stalling partition. Modulo mode: the alphabet is reduced to a single letter.  <br /></td></tr>
 <tr class="separator:a7d0cacd6c6d7618c5e4a3d58d5093f3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -136,6 +163,11 @@ Functions</h2></td></tr>
 <tr class="memitem:aaf10974d1c9e2ec19351c2c791b3a879" id="r_aaf10974d1c9e2ec19351c2c791b3a879"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdgraph.html">dgraph</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaf10974d1c9e2ec19351c2c791b3a879">shrink_grp_mirror</a> (<a class="el" href="structdgraph.html">dgraph</a> *g, <a class="el" href="structparti.html">parti</a> *fold, <a class="el" href="structparti.html">parti</a> *sccs)</td></tr>
 <tr class="memdesc:aaf10974d1c9e2ec19351c2c791b3a879"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the graph obtained by folding a right or left Cayley graph according to the Stalling partition. Group mode: the alphabet is preserved. Mirror mode: the transitions are reversed.  <br /></td></tr>
 <tr class="separator:aaf10974d1c9e2ec19351c2c791b3a879"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b72dd5fc7dad79ad62f0435cc9fa699" id="r_a3b72dd5fc7dad79ad62f0435cc9fa699"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdgraph.html">dgraph</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3b72dd5fc7dad79ad62f0435cc9fa699">dgraph_implement_fold</a> (<a class="el" href="structdgraph.html">dgraph</a> *g, <a class="el" href="structparti.html">parti</a> *sccs, <a class="el" href="structparti.html">parti</a> *fold)</td></tr>
+<tr class="memdesc:a3b72dd5fc7dad79ad62f0435cc9fa699"><td class="mdescLeft">&#160;</td><td class="mdescRight">Folds a single SCC of a dgraph according to a folding partition generated from MOD, AMT or GR.  <br /></td></tr>
+<tr class="separator:a3b72dd5fc7dad79ad62f0435cc9fa699"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a2d11c6d6d4d12a2bb47846a4902294" id="r_a3a2d11c6d6d4d12a2bb47846a4902294"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdfa.html">dfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3a2d11c6d6d4d12a2bb47846a4902294">dfa_compute_folding</a> (<a class="el" href="structdfa.html">dfa</a> *A, basis ba)</td></tr>
+<tr class="separator:a3a2d11c6d6d4d12a2bb47846a4902294"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac4b016507ec36e71194f10ed93f5201a" id="r_ac4b016507ec36e71194f10ed93f5201a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structparti.html">parti</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac4b016507ec36e71194f10ed93f5201a">nfa_inv_ext</a> (<a class="el" href="structnfa.html">nfa</a> *)</td></tr>
 <tr class="memdesc:ac4b016507ec36e71194f10ed93f5201a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computation of the inverse transitions inside the SCCs of an NFA.  <br /></td></tr>
 <tr class="separator:ac4b016507ec36e71194f10ed93f5201a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -164,6 +196,140 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Separation by group languages. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="a62bb23de74dbc668ee0e0846abe432bc" name="a62bb23de74dbc668ee0e0846abe432bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a62bb23de74dbc668ee0e0846abe432bc">&#9670;&#160;</a></span>compute_amt_kernel_regular()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void compute_amt_kernel_regular </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structmorphism.html">morphism</a> *</td>          <td class="paramname"><span class="paramname"><em>M</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool *</td>          <td class="paramname"><span class="paramname"><em>mono_in_sub</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint *</td>          <td class="paramname"><span class="paramname"><em>size</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Computes the regular elements of the AMT-kernel in a morphism (non-regular elements are ignored). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">M</td><td>The morphism.  </td></tr>
+    <tr><td class="paramname">mono_in_sub</td><td>The array to fill with the elements of the kernel.  </td></tr>
+    <tr><td class="paramname">size</td><td>Used to return the size of the kernel. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ad682f819620b40fee0bbceb3635c6c5f" name="ad682f819620b40fee0bbceb3635c6c5f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad682f819620b40fee0bbceb3635c6c5f">&#9670;&#160;</a></span>compute_amt_pairs_regular()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void compute_amt_pairs_regular </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structmorphism.html">morphism</a> *</td>          <td class="paramname"><span class="paramname"><em>M</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structnum__span__forest.html">num_span_forest</a> *</td>          <td class="paramname"><span class="paramname"><em>rspan</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structnum__span__forest.html">num_span_forest</a> *</td>          <td class="paramname"><span class="paramname"><em>lspan</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>e</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>f</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structdequeue.html">dequeue</a> *</td>          <td class="paramname"><span class="paramname"><em>first</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structdequeue.html">dequeue</a> *</td>          <td class="paramname"><span class="paramname"><em>second</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Computes the anti AMT-pairs (q,t) where q is in the R-class of e and t is in the L-class of f. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">M</td><td>The morphism.  </td></tr>
+    <tr><td class="paramname">rspan</td><td>The spanning forest of the R-classes  </td></tr>
+    <tr><td class="paramname">lspan</td><td>The spanning forest of the L-classes  </td></tr>
+    <tr><td class="paramname">e</td><td>The idempotent e.  </td></tr>
+    <tr><td class="paramname">f</td><td>The idempotent f.  </td></tr>
+    <tr><td class="paramname">first</td><td>The dequeue to fill with the first elements of each anti-pair.  </td></tr>
+    <tr><td class="paramname">second</td><td>The dequeue to fill with the second elements of each anti-pair. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a86cc062484c0692151dde3ccc040d7ae" name="a86cc062484c0692151dde3ccc040d7ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86cc062484c0692151dde3ccc040d7ae">&#9670;&#160;</a></span>compute_span_forest()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structnum__span__forest.html">num_span_forest</a> * compute_span_forest </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdgraph.html">dgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>G</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structparti.html">parti</a> *</td>          <td class="paramname"><span class="paramname"><em>sccs</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool *</td>          <td class="paramname"><span class="paramname"><em>allowed</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Computes a spanning forest from a dgraph. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The sccs are not mandatory. If a NULL pointer is given, it is assumed that the dgraph consists of a single SCC (if this is not the case, the result is undefined) and the returned forest will contain a single tree whose root is the first state of the dgraph.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The spanning forest. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">G</td><td>The dgraph  </td></tr>
+    <tr><td class="paramname">sccs</td><td>The partition into SCCs of the states (can be NULL).  </td></tr>
+    <tr><td class="paramname">allowed</td><td>Array of booleans indexed by the states. If allowed[q] is true, the state q is allowed to be a root of a tree in the spanning forest. Can be NULL, in which case all states are allowed to be roots of the trees in the spanning forest. Only considered when sccs is not NULL. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="aaae76cb432a5b278f8556403d1255bff" name="aaae76cb432a5b278f8556403d1255bff"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aaae76cb432a5b278f8556403d1255bff">&#9670;&#160;</a></span>decid_grp_sep()</h2>
 
@@ -290,8 +456,130 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a1d7ccd80f14a29a87aecfeaea361804b" name="a1d7ccd80f14a29a87aecfeaea361804b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1d7ccd80f14a29a87aecfeaea361804b">&#9670;&#160;</a></span>dgraph_stal_fold()</h2>
+<a id="ab3fd71303743188790b7e98a37d4bce1" name="ab3fd71303743188790b7e98a37d4bce1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3fd71303743188790b7e98a37d4bce1">&#9670;&#160;</a></span>delete_span_forest()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void delete_span_forest </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structnum__span__forest.html">num_span_forest</a> *</td>          <td class="paramname"><span class="paramname"><em>forest</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Deletes the structure used to store the spanning forest. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">forest</td><td>The structure to delete. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a3a2d11c6d6d4d12a2bb47846a4902294" name="a3a2d11c6d6d4d12a2bb47846a4902294"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a2d11c6d6d4d12a2bb47846a4902294">&#9670;&#160;</a></span>dfa_compute_folding()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdfa.html">dfa</a> * dfa_compute_folding </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">basis</td>          <td class="paramname"><span class="paramname"><em>ba</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The DFA to fold.  </td></tr>
+    <tr><td class="paramname">ba</td><td>The basis mode (ST, MOD, AMT or GR). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a913f4569c82aac52c66837d5b37e505e" name="a913f4569c82aac52c66837d5b37e505e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a913f4569c82aac52c66837d5b37e505e">&#9670;&#160;</a></span>dgraph_amt_fold()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structparti.html">parti</a> * dgraph_amt_fold </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdgraph.html">dgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>g</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structparti.html">parti</a> *</td>          <td class="paramname"><span class="paramname"><em>sccs</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Computes the folding of a dgraph according to the AMT-separation. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The partition into sccs is not mandatory. If a NULL pointer is given, it is assumed that the dgraph consists of a single SCC (if this is not the case, the result is undefined). </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">g</td><td>The dgraph to fold.  </td></tr>
+    <tr><td class="paramname">sccs</td><td>The partition into SCCs of the states (can be NULL). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a3b72dd5fc7dad79ad62f0435cc9fa699" name="a3b72dd5fc7dad79ad62f0435cc9fa699"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b72dd5fc7dad79ad62f0435cc9fa699">&#9670;&#160;</a></span>dgraph_implement_fold()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdgraph.html">dgraph</a> * dgraph_implement_fold </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdgraph.html">dgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>g</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structparti.html">parti</a> *</td>          <td class="paramname"><span class="paramname"><em>sccs</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structparti.html">parti</a> *</td>          <td class="paramname"><span class="paramname"><em>fold</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Folds a single SCC of a dgraph according to a folding partition generated from MOD, AMT or GR. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The sccs are not mandatory. If a NULL pointer is given, it is assumed that the dgraph contain no edge outside of the SCCs (if this is not the case, the result is undefined). If the sccs are given, the edges outside of the SCCs are not copied to the folded graph.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The folded graph. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">g</td><td>The dgraph to fold.  </td></tr>
+    <tr><td class="paramname">sccs</td><td>The partition into SCCs of the states.  </td></tr>
+    <tr><td class="paramname">fold</td><td>The partition to use for the fold. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ac34fad8f4bfe9ff8a33715d89e55e828" name="ac34fad8f4bfe9ff8a33715d89e55e828"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac34fad8f4bfe9ff8a33715d89e55e828">&#9670;&#160;</a></span>dgraph_stal_fold()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -304,49 +592,26 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>grp</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Computes the Stalling partition obtained from a graph. </p>
-<dl class="section remark"><dt>Remarks</dt><dd>In group mode, the alphabet is preserved, in modulo mode, it is reduced to a single letter.</dd></dl>
-<dl class="section return"><dt>Returns</dt><dd>The partition. </dd></dl>
-
-</div>
-</div>
-<a id="ae65d8e67bb206c5d64cdeedaa5bf8b25" name="ae65d8e67bb206c5d64cdeedaa5bf8b25"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae65d8e67bb206c5d64cdeedaa5bf8b25">&#9670;&#160;</a></span>mor_stal_fold()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structparti.html">parti</a> * mor_stal_fold </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structmorphism.html">morphism</a> *</td>          <td class="paramname"><span class="paramname"><em>M</em></span>, </td>
+          <td class="paramtype"><a class="el" href="structparti.html">parti</a> *</td>          <td class="paramname"><span class="paramname"><em>sccs</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>grp</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>rcl</em></span>&#160;)</td>
+          <td class="paramtype">basis</td>          <td class="paramname"><span class="paramname"><em>ba</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Computes the Stalling partition obtained from the right or left Cayley graph of the morphism. </p>
-<dl class="section remark"><dt>Remarks</dt><dd>In group mode, the alphabet is preserved, in modulo mode, it is reduced to a single letter.</dd></dl>
+<p>Computes the Stalling partition obtained from a dgraph. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>In group mode, the alphabet is preserved, in modulo mode, it is reduced to a single letter.</dd>
+<dd>
+The partition into sccs is not mandatory. If a NULL pointer is given, it is assumed that all existing transitions are internal to the SCCs (if not, the result is undefined). A transition is non-existent if its outgoing edge is <code>UINT_MAX</code>.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>The partition. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">M</td><td>The morphism.  </td></tr>
-    <tr><td class="paramname">grp</td><td>true: group mode, false: modulo mode.  </td></tr>
-    <tr><td class="paramname">rcl</td><td>true: right Cayley graph, false: left Cayley graph. </td></tr>
+    <tr><td class="paramname">G</td><td>The graph to fold.  </td></tr>
+    <tr><td class="paramname">sccs</td><td>The partition into SCCs of the states.  </td></tr>
+    <tr><td class="paramname">ba</td><td>The basis mode (ST, MOD, AMT or GR). </td></tr>
   </table>
   </dd>
 </dl>

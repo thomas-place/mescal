@@ -99,7 +99,6 @@ $(function(){initNavTree('monoid__orbits_8h.html',''); initResizable(true); });
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">monoid_orbits.h File Reference</div></div>
 </div><!--header-->
@@ -119,15 +118,6 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structorbits.html">orbits</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type used to represent C-orbits of a morphism.  <a href="structorbits.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
-Enumerations</h2></td></tr>
-<tr class="memitem:aa4dbd082f5eecf86e82004cd62ff7d66" id="r_aa4dbd082f5eecf86e82004cd62ff7d66"><td class="memItemLeft" align="right" valign="top"><a id="aa4dbd082f5eecf86e82004cd62ff7d66" name="aa4dbd082f5eecf86e82004cd62ff7d66"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>bpg_type</b> { <b>BPG_ST</b>
-, <b>BPG_MOD</b>
-, <b>BPG_GR</b>
-, <b>BPG_AMT</b>
- }</td></tr>
-<tr class="separator:aa4dbd082f5eecf86e82004cd62ff7d66"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -149,12 +139,6 @@ Functions</h2></td></tr>
 <tr class="memitem:a4619ba7565fc0d51924a00578728a567" id="r_a4619ba7565fc0d51924a00578728a567"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structorbits.html">orbits</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4619ba7565fc0d51924a00578728a567">compute_gplusorbits</a> (<a class="el" href="structsubsemi.html">subsemi</a> *)</td></tr>
 <tr class="memdesc:a4619ba7565fc0d51924a00578728a567"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialization of the G⁺-orbits set.  <br /></td></tr>
 <tr class="separator:a4619ba7565fc0d51924a00578728a567"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae13e1034916ee7653ddea0fcf7562e08" id="r_ae13e1034916ee7653ddea0fcf7562e08"><td class="memItemLeft" align="right" valign="top">bool *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae13e1034916ee7653ddea0fcf7562e08">compute_maxalph_scc</a> (<a class="el" href="structmorphism.html">morphism</a> *, uint)</td></tr>
-<tr class="memdesc:ae13e1034916ee7653ddea0fcf7562e08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given an element of a monoid, computes the set of letters which label a transition in the strongly connected component of this element in the right Cayley graph.  <br /></td></tr>
-<tr class="separator:ae13e1034916ee7653ddea0fcf7562e08"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a141a024b3d607ff5a79e894939005894" id="r_a141a024b3d607ff5a79e894939005894"><td class="memItemLeft" align="right" valign="top">bool *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a141a024b3d607ff5a79e894939005894">compute_maxalph_com_scc</a> (<a class="el" href="structmorphism.html">morphism</a> *, uint, uint)</td></tr>
-<tr class="memdesc:a141a024b3d607ff5a79e894939005894"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the maximal shared alphabet between two idempotents.  <br /></td></tr>
-<tr class="separator:a141a024b3d607ff5a79e894939005894"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad9704e14366092e9daa5a65d20de29f3" id="r_ad9704e14366092e9daa5a65d20de29f3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structsubsemi.html">subsemi</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad9704e14366092e9daa5a65d20de29f3">compute_one_ptorb</a> (<a class="el" href="structmorphism.html">morphism</a> *, uint, sub_level)</td></tr>
 <tr class="memdesc:ad9704e14366092e9daa5a65d20de29f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the PT-orbit associated to a given idempotent.  <br /></td></tr>
 <tr class="separator:ad9704e14366092e9daa5a65d20de29f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -167,30 +151,30 @@ Functions</h2></td></tr>
 <tr class="memitem:a6b123e597f3290c02a3e57cdbb6179ac" id="r_a6b123e597f3290c02a3e57cdbb6179ac"><td class="memItemLeft" align="right" valign="top">bool **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6b123e597f3290c02a3e57cdbb6179ac">compute_polgpairs</a> (<a class="el" href="structsubsemi.html">subsemi</a> *, <a class="el" href="structdequeue.html">dequeue</a> *, uint)</td></tr>
 <tr class="memdesc:a6b123e597f3290c02a3e57cdbb6179ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a subset of the Pol(G)-pairs associated to a given morphism. The comutation depends on the G-kernel which is given as input.  <br /></td></tr>
 <tr class="separator:a6b123e597f3290c02a3e57cdbb6179ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aad92b1ff7a58f485d69805d3fe4205b8" id="r_aad92b1ff7a58f485d69805d3fe4205b8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structsubsemi.html">subsemi</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aad92b1ff7a58f485d69805d3fe4205b8">compute_one_bpgorb</a> (<a class="el" href="structmorphism.html">morphism</a> *M, uint, sub_level, bpg_type)</td></tr>
-<tr class="memdesc:aad92b1ff7a58f485d69805d3fe4205b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the BPol(G)-orbit associated to a given idempotent for group class G. The G-kernel needs to be given as an input.  <br /></td></tr>
-<tr class="separator:aad92b1ff7a58f485d69805d3fe4205b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1664540d51a56cdbcae0892a08c7ffca" id="r_a1664540d51a56cdbcae0892a08c7ffca"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structorbits.html">orbits</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1664540d51a56cdbcae0892a08c7ffca">compute_bpgorbits</a> (<a class="el" href="structmorphism.html">morphism</a> *M, sub_level, bpg_type)</td></tr>
-<tr class="memdesc:a1664540d51a56cdbcae0892a08c7ffca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialization of the BPol(G)-orbits set.  <br /></td></tr>
-<tr class="separator:a1664540d51a56cdbcae0892a08c7ffca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af7ea35d917f4e3c286ad03f83198ba9c" id="r_af7ea35d917f4e3c286ad03f83198ba9c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structsubsemi.html">subsemi</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af7ea35d917f4e3c286ad03f83198ba9c">compute_one_bpgorb</a> (<a class="el" href="structmorphism.html">morphism</a> *M, uint, sub_level, basis)</td></tr>
+<tr class="memdesc:af7ea35d917f4e3c286ad03f83198ba9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the BPol(G)-orbit associated to a given idempotent for group class G. The G-kernel needs to be given as an input.  <br /></td></tr>
+<tr class="separator:af7ea35d917f4e3c286ad03f83198ba9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abe131720187387a4f66c83a1ef7a05a3" id="r_abe131720187387a4f66c83a1ef7a05a3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structorbits.html">orbits</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abe131720187387a4f66c83a1ef7a05a3">compute_bpgorbits</a> (<a class="el" href="structmorphism.html">morphism</a> *M, sub_level, basis)</td></tr>
+<tr class="memdesc:abe131720187387a4f66c83a1ef7a05a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialization of the BPol(G)-orbits set.  <br /></td></tr>
+<tr class="separator:abe131720187387a4f66c83a1ef7a05a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae8a4562a0885f4c0b4d959ca92545eeb" id="r_ae8a4562a0885f4c0b4d959ca92545eeb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structsubsemi.html">subsemi</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae8a4562a0885f4c0b4d959ca92545eeb">compute_one_orbit_from_pairs</a> (<a class="el" href="structmorphism.html">morphism</a> *, uint, <a class="el" href="structdequeue.html">dequeue</a> *, bool **, sub_level)</td></tr>
 <tr class="memdesc:ae8a4562a0885f4c0b4d959ca92545eeb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given an idempotent e, computes the associated BPol(C)-orbit from a relevant subset of the Pol(C)-pairs.  <br /></td></tr>
 <tr class="separator:ae8a4562a0885f4c0b4d959ca92545eeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a149eafe376f5a68cdd22a0308374a075" id="r_a149eafe376f5a68cdd22a0308374a075"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structsubsemi.html">subsemi</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a149eafe376f5a68cdd22a0308374a075">compute_one_bpddorb</a> (<a class="el" href="structmorphism.html">morphism</a> *M, uint e, sub_level level)</td></tr>
 <tr class="memdesc:a149eafe376f5a68cdd22a0308374a075"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the BPol(DD)-orbit associated to a given idempotent.  <br /></td></tr>
 <tr class="separator:a149eafe376f5a68cdd22a0308374a075"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8362c5f9ca69e3b114f4fe86920e881b" id="r_a8362c5f9ca69e3b114f4fe86920e881b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structsubsemi.html">subsemi</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8362c5f9ca69e3b114f4fe86920e881b">compute_one_bpgplusorb</a> (<a class="el" href="structmorphism.html">morphism</a> *, uint, sub_level, bpg_type)</td></tr>
-<tr class="memdesc:a8362c5f9ca69e3b114f4fe86920e881b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the BPol(G⁺)-orbit associated to a given idempotent for group class G.  <br /></td></tr>
-<tr class="separator:a8362c5f9ca69e3b114f4fe86920e881b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab262160f42bb70d21a4aa6514e5917a1" id="r_ab262160f42bb70d21a4aa6514e5917a1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structorbits.html">orbits</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab262160f42bb70d21a4aa6514e5917a1">compute_bpgplusorbits</a> (<a class="el" href="structmorphism.html">morphism</a> *, sub_level, bpg_type)</td></tr>
-<tr class="memdesc:ab262160f42bb70d21a4aa6514e5917a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialization of the BPol(G⁺)-orbits set.  <br /></td></tr>
-<tr class="separator:ab262160f42bb70d21a4aa6514e5917a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4f93958d723a0a4b9c3e84e9e86cd59c" id="r_a4f93958d723a0a4b9c3e84e9e86cd59c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structsubsemi.html">subsemi</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4f93958d723a0a4b9c3e84e9e86cd59c">compute_one_bpgplusorb</a> (<a class="el" href="structmorphism.html">morphism</a> *, uint, sub_level, basis)</td></tr>
+<tr class="memdesc:a4f93958d723a0a4b9c3e84e9e86cd59c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the BPol(G⁺)-orbit associated to a given idempotent for group class G.  <br /></td></tr>
+<tr class="separator:a4f93958d723a0a4b9c3e84e9e86cd59c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1722fb4e4a64734f081776bb3ed01e37" id="r_a1722fb4e4a64734f081776bb3ed01e37"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structorbits.html">orbits</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1722fb4e4a64734f081776bb3ed01e37">compute_bpgplusorbits</a> (<a class="el" href="structmorphism.html">morphism</a> *, sub_level, basis)</td></tr>
+<tr class="memdesc:a1722fb4e4a64734f081776bb3ed01e37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialization of the BPol(G⁺)-orbits set.  <br /></td></tr>
+<tr class="separator:a1722fb4e4a64734f081776bb3ed01e37"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Computation of orbits. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="a1664540d51a56cdbcae0892a08c7ffca" name="a1664540d51a56cdbcae0892a08c7ffca"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1664540d51a56cdbcae0892a08c7ffca">&#9670;&#160;</a></span>compute_bpgorbits()</h2>
+<a id="abe131720187387a4f66c83a1ef7a05a3" name="abe131720187387a4f66c83a1ef7a05a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abe131720187387a4f66c83a1ef7a05a3">&#9670;&#160;</a></span>compute_bpgorbits()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -208,7 +192,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bpg_type</td>          <td class="paramname"><span class="paramname"><em>type</em></span>&#160;)</td>
+          <td class="paramtype">basis</td>          <td class="paramname"><span class="paramname"><em>type</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -228,8 +212,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ab262160f42bb70d21a4aa6514e5917a1" name="ab262160f42bb70d21a4aa6514e5917a1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab262160f42bb70d21a4aa6514e5917a1">&#9670;&#160;</a></span>compute_bpgplusorbits()</h2>
+<a id="a1722fb4e4a64734f081776bb3ed01e37" name="a1722fb4e4a64734f081776bb3ed01e37"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1722fb4e4a64734f081776bb3ed01e37">&#9670;&#160;</a></span>compute_bpgplusorbits()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -247,7 +231,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bpg_type</td>          <td class="paramname"><span class="paramname"><em>type</em></span>&#160;)</td>
+          <td class="paramtype">basis</td>          <td class="paramname"><span class="paramname"><em>type</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -353,74 +337,6 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a141a024b3d607ff5a79e894939005894" name="a141a024b3d607ff5a79e894939005894"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a141a024b3d607ff5a79e894939005894">&#9670;&#160;</a></span>compute_maxalph_com_scc()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool * compute_maxalph_com_scc </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structmorphism.html">morphism</a> *</td>          <td class="paramname"><span class="paramname"><em>M</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>e</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>f</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Computes the maximal shared alphabet between two idempotents. </p>
-<dl class="section return"><dt>Returns</dt><dd>An array of Boolean indexed by the letters marking those in the set (NULL is not sharded alphabet exists). </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">M</td><td>The morphism.  </td></tr>
-    <tr><td class="paramname">e</td><td>The first idempotent.  </td></tr>
-    <tr><td class="paramname">f</td><td>The second idempotent. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="ae13e1034916ee7653ddea0fcf7562e08" name="ae13e1034916ee7653ddea0fcf7562e08"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae13e1034916ee7653ddea0fcf7562e08">&#9670;&#160;</a></span>compute_maxalph_scc()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool * compute_maxalph_scc </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structmorphism.html">morphism</a> *</td>          <td class="paramname"><span class="paramname"><em>M</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>e</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Given an element of a monoid, computes the set of letters which label a transition in the strongly connected component of this element in the right Cayley graph. </p>
-<dl class="section return"><dt>Returns</dt><dd>An array of Boolean indexed by the letters marking those in the set. </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">M</td><td>The morphism.  </td></tr>
-    <tr><td class="paramname">e</td><td>The element. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a id="a149eafe376f5a68cdd22a0308374a075" name="a149eafe376f5a68cdd22a0308374a075"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a149eafe376f5a68cdd22a0308374a075">&#9670;&#160;</a></span>compute_one_bpddorb()</h2>
 
@@ -461,8 +377,8 @@ If the monoid has a non-empty neutral element, the BPol(DD)-orbit is the same as
 
 </div>
 </div>
-<a id="aad92b1ff7a58f485d69805d3fe4205b8" name="aad92b1ff7a58f485d69805d3fe4205b8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aad92b1ff7a58f485d69805d3fe4205b8">&#9670;&#160;</a></span>compute_one_bpgorb()</h2>
+<a id="af7ea35d917f4e3c286ad03f83198ba9c" name="af7ea35d917f4e3c286ad03f83198ba9c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af7ea35d917f4e3c286ad03f83198ba9c">&#9670;&#160;</a></span>compute_one_bpgorb()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -485,7 +401,7 @@ If the monoid has a non-empty neutral element, the BPol(DD)-orbit is the same as
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bpg_type</td>          <td class="paramname"><span class="paramname"><em>type</em></span>&#160;)</td>
+          <td class="paramtype">basis</td>          <td class="paramname"><span class="paramname"><em>type</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -505,8 +421,8 @@ If the monoid has a non-empty neutral element, the BPol(DD)-orbit is the same as
 
 </div>
 </div>
-<a id="a8362c5f9ca69e3b114f4fe86920e881b" name="a8362c5f9ca69e3b114f4fe86920e881b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8362c5f9ca69e3b114f4fe86920e881b">&#9670;&#160;</a></span>compute_one_bpgplusorb()</h2>
+<a id="a4f93958d723a0a4b9c3e84e9e86cd59c" name="a4f93958d723a0a4b9c3e84e9e86cd59c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4f93958d723a0a4b9c3e84e9e86cd59c">&#9670;&#160;</a></span>compute_one_bpgplusorb()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -529,7 +445,7 @@ If the monoid has a non-empty neutral element, the BPol(DD)-orbit is the same as
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bpg_type</td>          <td class="paramname"><span class="paramname"><em>type</em></span>&#160;)</td>
+          <td class="paramtype">basis</td>          <td class="paramname"><span class="paramname"><em>type</em></span>&#160;)</td>
         </tr>
       </table>
 </div><div class="memdoc">

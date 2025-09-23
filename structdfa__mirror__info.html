@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.13.2"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Mescal: Member List</title>
+<title>Mescal: dfa_mirror_info Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -71,7 +71,7 @@ $(function() {
 </div>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(function(){initNavTree('structsingle__num__span__tree.html',''); initResizable(true); });
+$(function(){initNavTree('structdfa__mirror__info.html',''); initResizable(true); });
 /* @license-end */
 </script>
 <div id="doc-content">
@@ -97,20 +97,44 @@ $(function(){initNavTree('structsingle__num__span__tree.html',''); initResizable
 </div>
 
 <div class="header">
-  <div class="headertitle"><div class="title">single_num_span_tree Member List</div></div>
+  <div class="summary">
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="structdfa__mirror__info-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">dfa_mirror_info Struct Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>This is the complete list of members for <a class="el" href="structsingle__num__span__tree.html">single_num_span_tree</a>, including all inherited members.</p>
-<table class="directory">
-  <tr class="even"><td class="entry"><a class="el" href="structsingle__num__span__tree.html#a50ba3b7199b84b5d827066f25bbad238">cay</a></td><td class="entry"><a class="el" href="structsingle__num__span__tree.html">single_num_span_tree</a></td><td class="entry"></td></tr>
-  <tr class="odd"><td class="entry"><a class="el" href="structsingle__num__span__tree.html#a36db644788cd2e6b643785ff991a380c">dropped</a></td><td class="entry"><a class="el" href="structsingle__num__span__tree.html">single_num_span_tree</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="structsingle__num__span__tree.html#acf1dfb3bdf3652a87fd7d6a7301d05bc">span_tree</a></td><td class="entry"><a class="el" href="structsingle__num__span__tree.html">single_num_span_tree</a></td><td class="entry"></td></tr>
-</table></div><!-- contents -->
+<p>Represents the required information for determinization of the mirror of a DFA.  
+ <a href="#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="nfa__determi_8h_source.html">nfa_determi.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:acfab40b422d8837eac5ff498059bf5c2" id="r_acfab40b422d8837eac5ff498059bf5c2"><td class="memItemLeft" align="right" valign="top"><a id="acfab40b422d8837eac5ff498059bf5c2" name="acfab40b422d8837eac5ff498059bf5c2"></a>
+uint *&#160;</td><td class="memItemRight" valign="bottom"><b>edges</b></td></tr>
+<tr class="memdesc:acfab40b422d8837eac5ff498059bf5c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The edges of the mirror DFA (size size_alpha * size_graph). <br /></td></tr>
+<tr class="separator:acfab40b422d8837eac5ff498059bf5c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7198862d9124fa660bfc838ebfb0ce7b" id="r_a7198862d9124fa660bfc838ebfb0ce7b"><td class="memItemLeft" align="right" valign="top"><a id="a7198862d9124fa660bfc838ebfb0ce7b" name="a7198862d9124fa660bfc838ebfb0ce7b"></a>
+uint *&#160;</td><td class="memItemRight" valign="bottom"><b>st_edges</b></td></tr>
+<tr class="memdesc:a7198862d9124fa660bfc838ebfb0ce7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">For each state q and each label a st_edges[q * size_alpha + a] is the index of the first edge in edges that starts from q with label a. <br /></td></tr>
+<tr class="separator:a7198862d9124fa660bfc838ebfb0ce7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab43fccae6fcafb43caca86e6629c04b" id="r_aab43fccae6fcafb43caca86e6629c04b"><td class="memItemLeft" align="right" valign="top"><a id="aab43fccae6fcafb43caca86e6629c04b" name="aab43fccae6fcafb43caca86e6629c04b"></a>
+uint *&#160;</td><td class="memItemRight" valign="bottom"><b>ed_edges</b></td></tr>
+<tr class="memdesc:aab43fccae6fcafb43caca86e6629c04b"><td class="mdescLeft">&#160;</td><td class="mdescRight">For each state q and each label a ed_edges[q * size_alpha + a] is the index following that of the last edge in edges that starts from q with label a. <br /></td></tr>
+<tr class="separator:aab43fccae6fcafb43caca86e6629c04b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Represents the required information for determinization of the mirror of a DFA. </p>
+</div><hr/>The documentation for this struct was generated from the following file:<ul>
+<li><a class="el" href="nfa__determi_8h_source.html">nfa_determi.h</a></li>
+</ul>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
+    <li class="navelem"><a class="el" href="structdfa__mirror__info.html">dfa_mirror_info</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.13.2 </li>
   </ul>
 </div>

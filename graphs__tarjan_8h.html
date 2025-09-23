@@ -125,10 +125,270 @@ Functions</h2></td></tr>
 <tr class="memitem:af79aee13cda46d3ee0c450bc2fd1b509" id="r_af79aee13cda46d3ee0c450bc2fd1b509"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structparti.html">parti</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af79aee13cda46d3ee0c450bc2fd1b509">dualdtarjan</a> (<a class="el" href="structdgraph.html">dgraph</a> *g1, <a class="el" href="structdgraph.html">dgraph</a> *g2, bool *alph, bool ismor)</td></tr>
 <tr class="memdesc:af79aee13cda46d3ee0c450bc2fd1b509"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tarjan's algorihtm for two complete deterministic labeled graphs sharing the same state set and alphabet. Computation is done in the merge of the two graphs.  <br /></td></tr>
 <tr class="separator:af79aee13cda46d3ee0c450bc2fd1b509"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36ace540fbdfe9feb2d6cf5d360f1a49" id="r_a36ace540fbdfe9feb2d6cf5d360f1a49"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdgraph.html">dgraph</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a36ace540fbdfe9feb2d6cf5d360f1a49">dgraph_extract</a> (<a class="el" href="structdgraph.html">dgraph</a> *g, <a class="el" href="structparti.html">parti</a> *P, uint *inv, uint j)</td></tr>
+<tr class="memdesc:a36ace540fbdfe9feb2d6cf5d360f1a49"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts a single SCC of a dgraph and makes it a new dgraph.  <br /></td></tr>
+<tr class="separator:a36ace540fbdfe9feb2d6cf5d360f1a49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6dcddb3fa196ce1772a6a8c36bdf8ec3" id="r_a6dcddb3fa196ce1772a6a8c36bdf8ec3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6dcddb3fa196ce1772a6a8c36bdf8ec3">dgraph_compute_alph_scc</a> (<a class="el" href="structdgraph.html">dgraph</a> *g, <a class="el" href="structparti.html">parti</a> *sccs, uint scc, bool *alph)</td></tr>
+<tr class="memdesc:a6dcddb3fa196ce1772a6a8c36bdf8ec3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the alphabet of a strongly connected component of a labeled graph.  <br /></td></tr>
+<tr class="separator:a6dcddb3fa196ce1772a6a8c36bdf8ec3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb554fd64e4f6093f786310bbde3134a" id="r_acb554fd64e4f6093f786310bbde3134a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acb554fd64e4f6093f786310bbde3134a">dgraph_common_alph_loop</a> (<a class="el" href="structdgraph.html">dgraph</a> *g, <a class="el" href="structparti.html">parti</a> *sccs, uint *inv_sccs, uint q1, uint q2, bool *alph)</td></tr>
+<tr class="memdesc:acb554fd64e4f6093f786310bbde3134a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the alphabet of a strongly connected component of a labeled graph.  <br /></td></tr>
+<tr class="separator:acb554fd64e4f6093f786310bbde3134a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a681e000e15b3f617fdb9f18292d636bc" id="r_a681e000e15b3f617fdb9f18292d636bc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a681e000e15b3f617fdb9f18292d636bc">dgraph_discard_nonscc_edges</a> (<a class="el" href="structdgraph.html">dgraph</a> *g, <a class="el" href="structparti.html">parti</a> *sccs)</td></tr>
+<tr class="memdesc:a681e000e15b3f617fdb9f18292d636bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modifies a dgraph by discarding all edges that are not internal to an SCC.  <br /></td></tr>
+<tr class="separator:a681e000e15b3f617fdb9f18292d636bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9642e53a4a84f028ba797e7497609ff8" id="r_a9642e53a4a84f028ba797e7497609ff8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdgraph.html">dgraph</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9642e53a4a84f028ba797e7497609ff8">dgraph_copy_discard_nonscc_edges</a> (<a class="el" href="structdgraph.html">dgraph</a> *g, <a class="el" href="structparti.html">parti</a> *sccs)</td></tr>
+<tr class="memdesc:a9642e53a4a84f028ba797e7497609ff8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copies a dgraph while discarding all edges that go from a state to a different SCC.  <br /></td></tr>
+<tr class="separator:a9642e53a4a84f028ba797e7497609ff8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeecf914a36fe1c8eb5ab89e1fc680b8f" id="r_aeecf914a36fe1c8eb5ab89e1fc680b8f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aeecf914a36fe1c8eb5ab89e1fc680b8f">dgraph_ntrivial_loop</a> (<a class="el" href="structdgraph.html">dgraph</a> *g, <a class="el" href="structparti.html">parti</a> *sccs, uint q)</td></tr>
+<tr class="memdesc:aeecf914a36fe1c8eb5ab89e1fc680b8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tests if there exists a non-trivial loop on a given state q of a dgraph.  <br /></td></tr>
+<tr class="separator:aeecf914a36fe1c8eb5ab89e1fc680b8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Implementation of Tarjan's algorithm. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="acb554fd64e4f6093f786310bbde3134a" name="acb554fd64e4f6093f786310bbde3134a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acb554fd64e4f6093f786310bbde3134a">&#9670;&#160;</a></span>dgraph_common_alph_loop()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool dgraph_common_alph_loop </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdgraph.html">dgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>g</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structparti.html">parti</a> *</td>          <td class="paramname"><span class="paramname"><em>sccs</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint *</td>          <td class="paramname"><span class="paramname"><em>inv_sccs</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>q1</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>q2</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool *</td>          <td class="paramname"><span class="paramname"><em>alph</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Computes the alphabet of a strongly connected component of a labeled graph. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The alphabet is computed as an array of Booleans indexed by the letters. If a letter is in the alphabet, the corresponding cell is set to true.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the alphabet is not empty, false otherwise. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">g</td><td>The graph.  </td></tr>
+    <tr><td class="paramname">sccs</td><td>The partition of the graph into strongly connected components.  </td></tr>
+    <tr><td class="paramname">inv_sccs</td><td>The inverse mapping of the partition.  </td></tr>
+    <tr><td class="paramname">q1</td><td>The index of the state in the first SCC.  </td></tr>
+    <tr><td class="paramname">q2</td><td>The index of the state in the second SCC.  </td></tr>
+    <tr><td class="paramname">alph</td><td>The alphabet of the SCC (an array indexed by the letters). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a6dcddb3fa196ce1772a6a8c36bdf8ec3" name="a6dcddb3fa196ce1772a6a8c36bdf8ec3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6dcddb3fa196ce1772a6a8c36bdf8ec3">&#9670;&#160;</a></span>dgraph_compute_alph_scc()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void dgraph_compute_alph_scc </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdgraph.html">dgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>g</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structparti.html">parti</a> *</td>          <td class="paramname"><span class="paramname"><em>sccs</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>scc</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool *</td>          <td class="paramname"><span class="paramname"><em>alph</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Computes the alphabet of a strongly connected component of a labeled graph. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The alphabet is computed as an array of Booleans indexed by the letters. This array muste be allocated by the caller and must have a size equal to the number of labels in the graph. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">g</td><td>The graph.  </td></tr>
+    <tr><td class="paramname">sccs</td><td>The partition of the graph into strongly connected components.  </td></tr>
+    <tr><td class="paramname">scc</td><td>The index of the SCC.  </td></tr>
+    <tr><td class="paramname">alph</td><td>The array used to store the computed alphabet (an array indexed by the letters). </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a9642e53a4a84f028ba797e7497609ff8" name="a9642e53a4a84f028ba797e7497609ff8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9642e53a4a84f028ba797e7497609ff8">&#9670;&#160;</a></span>dgraph_copy_discard_nonscc_edges()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdgraph.html">dgraph</a> * dgraph_copy_discard_nonscc_edges </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdgraph.html">dgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>g</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structparti.html">parti</a> *</td>          <td class="paramname"><span class="paramname"><em>sccs</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Copies a dgraph while discarding all edges that go from a state to a different SCC. </p>
+<dl class="section return"><dt>Returns</dt><dd>A pointer to the resulting dgraph. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">g</td><td>The dgraph to copy.  </td></tr>
+    <tr><td class="paramname">sccs</td><td>The SCCs of the dgraph. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a681e000e15b3f617fdb9f18292d636bc" name="a681e000e15b3f617fdb9f18292d636bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a681e000e15b3f617fdb9f18292d636bc">&#9670;&#160;</a></span>dgraph_discard_nonscc_edges()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void dgraph_discard_nonscc_edges </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdgraph.html">dgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>g</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structparti.html">parti</a> *</td>          <td class="paramname"><span class="paramname"><em>sccs</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Modifies a dgraph by discarding all edges that are not internal to an SCC. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>Discarded edges are give the destination value UINT_MAX. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">g</td><td>The dgraph to modify.  </td></tr>
+    <tr><td class="paramname">sccs</td><td>The partition of the dgraph into sccs. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a36ace540fbdfe9feb2d6cf5d360f1a49" name="a36ace540fbdfe9feb2d6cf5d360f1a49"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36ace540fbdfe9feb2d6cf5d360f1a49">&#9670;&#160;</a></span>dgraph_extract()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdgraph.html">dgraph</a> * dgraph_extract </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdgraph.html">dgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>g</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structparti.html">parti</a> *</td>          <td class="paramname"><span class="paramname"><em>P</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint *</td>          <td class="paramname"><span class="paramname"><em>inv</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>j</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Extracts a single SCC of a dgraph and makes it a new dgraph. </p>
+<dl class="section return"><dt>Returns</dt><dd>A pointer to the extracted dgraph. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">g</td><td>The dgraph to extract the SCC from.  </td></tr>
+    <tr><td class="paramname">P</td><td>The partition of the dgraph.  </td></tr>
+    <tr><td class="paramname">inv</td><td>The inverse mapping of the partition.  </td></tr>
+    <tr><td class="paramname">j</td><td>The index of the SCC to extract. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aeecf914a36fe1c8eb5ab89e1fc680b8f" name="aeecf914a36fe1c8eb5ab89e1fc680b8f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeecf914a36fe1c8eb5ab89e1fc680b8f">&#9670;&#160;</a></span>dgraph_ntrivial_loop()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool dgraph_ntrivial_loop </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdgraph.html">dgraph</a> *</td>          <td class="paramname"><span class="paramname"><em>g</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structparti.html">parti</a> *</td>          <td class="paramname"><span class="paramname"><em>sccs</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint</td>          <td class="paramname"><span class="paramname"><em>q</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Tests if there exists a non-trivial loop on a given state q of a dgraph. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>This function checks if the scc of q contains at least two states or if there is an edge from q to itself labeled by a letter in the alphabet.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A Boolean indicating whether there exists a non-trivial loop on the state q. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">g</td><td>The dgraph to test.  </td></tr>
+    <tr><td class="paramname">sccs</td><td>The SCCs of the dgraph.  </td></tr>
+    <tr><td class="paramname">q</td><td>The state q. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a626c4582b69f8ff34fff68c2f542838d" name="a626c4582b69f8ff34fff68c2f542838d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a626c4582b69f8ff34fff68c2f542838d">&#9670;&#160;</a></span>dtarjan()</h2>
 

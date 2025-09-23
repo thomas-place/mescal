@@ -98,6 +98,7 @@ $(function(){initNavTree('nfa__determi_8h.html',''); initResizable(true); });
 
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">nfa_determi.h File Reference</div></div>
 </div><!--header-->
@@ -110,11 +111,23 @@ $(function(){initNavTree('nfa__determi_8h.html',''); initResizable(true); });
 </div>
 <p><a href="nfa__determi_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdfa__mirror__info.html">dfa_mirror_info</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents the required information for determinization of the mirror of a DFA.  <a href="structdfa__mirror__info.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a0e1a0a215ca6198ad15b58916c399197" id="r_a0e1a0a215ca6198ad15b58916c399197"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdfa.html">dfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0e1a0a215ca6198ad15b58916c399197">nfa_determinize</a> (<a class="el" href="structnfa.html">nfa</a> *, bool)</td></tr>
 <tr class="memdesc:a0e1a0a215ca6198ad15b58916c399197"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determinization of a NFA with the subset construction.  <br /></td></tr>
 <tr class="separator:a0e1a0a215ca6198ad15b58916c399197"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add8546c1f4d2b6eb4376861b08c618d9" id="r_add8546c1f4d2b6eb4376861b08c618d9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#add8546c1f4d2b6eb4376861b08c618d9">dfa_get_mirror_info</a> (<a class="el" href="structdfa.html">dfa</a> *A, <a class="el" href="structdfa__mirror__info.html">dfa_mirror_info</a> *mirror)</td></tr>
+<tr class="memdesc:add8546c1f4d2b6eb4376861b08c618d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the <a class="el" href="structdfa__mirror__info.html" title="Represents the required information for determinization of the mirror of a DFA.">dfa_mirror_info</a> structure from a dfa.  <br /></td></tr>
+<tr class="separator:add8546c1f4d2b6eb4376861b08c618d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a924e53c4ea06727b1ab3054b42528f46" id="r_a924e53c4ea06727b1ab3054b42528f46"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structdfa.html">dfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a924e53c4ea06727b1ab3054b42528f46">dfa_determinize_mirror</a> (<a class="el" href="structdfa.html">dfa</a> *, bool)</td></tr>
+<tr class="memdesc:a924e53c4ea06727b1ab3054b42528f46"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determinization of the mirror of a DFA with the subset construction.  <br /></td></tr>
+<tr class="separator:a924e53c4ea06727b1ab3054b42528f46"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2f91c4c2e2317374d3cf1e14ea25588e" id="r_a2f91c4c2e2317374d3cf1e14ea25588e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structnfa.html">nfa</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2f91c4c2e2317374d3cf1e14ea25588e">nfa_complement</a> (<a class="el" href="structnfa.html">nfa</a> *)</td></tr>
 <tr class="memdesc:a2f91c4c2e2317374d3cf1e14ea25588e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Complementation of a NFA.  <br /></td></tr>
 <tr class="separator:a2f91c4c2e2317374d3cf1e14ea25588e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -145,6 +158,68 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">A</td><td>The DFA. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a924e53c4ea06727b1ab3054b42528f46" name="a924e53c4ea06727b1ab3054b42528f46"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a924e53c4ea06727b1ab3054b42528f46">&#9670;&#160;</a></span>dfa_determinize_mirror()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structdfa.html">dfa</a> * dfa_determinize_mirror </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>names</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Determinization of the mirror of a DFA with the subset construction. </p>
+<dl class="section remark"><dt>Remarks</dt><dd>The input Boolean is used to indicate whether the names of the states have to be saved (this only impacts display). A stated is named by the corresponding set of states in the subset construction.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The complete DFA built from the mirror with the subset construction. </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The DFA.  </td></tr>
+    <tr><td class="paramname">names</td><td>A Boolean indicating whether the state names have to be saved. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="add8546c1f4d2b6eb4376861b08c618d9" name="add8546c1f4d2b6eb4376861b08c618d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#add8546c1f4d2b6eb4376861b08c618d9">&#9670;&#160;</a></span>dfa_get_mirror_info()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void dfa_get_mirror_info </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structdfa.html">dfa</a> *</td>          <td class="paramname"><span class="paramname"><em>A</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structdfa__mirror__info.html">dfa_mirror_info</a> *</td>          <td class="paramname"><span class="paramname"><em>mirror</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initializes the <a class="el" href="structdfa__mirror__info.html" title="Represents the required information for determinization of the mirror of a DFA.">dfa_mirror_info</a> structure from a dfa. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>The DFA.  </td></tr>
+    <tr><td class="paramname">mirror</td><td>The structure to be initialized (arrays are allocated by the function). </td></tr>
   </table>
   </dd>
 </dl>
