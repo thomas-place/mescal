@@ -480,7 +480,7 @@ typedef struct
     facto_type type; //!< The type of the node.
     uint elem;       //!< The value of the node.
     uint letter;     //!< The letter associated to the node (only for leaf nodes).
-    int st_children; //!< First index of the children in the array of children (only for binary nodes).
+    int st_children; //!< First index of the children in the array of children (only for binary and idempotent nodes).
     int nb_children; //!< The number of children.
 } facto_node;
 
