@@ -4,7 +4,7 @@ var searchData=
   ['capacity_1',['capacity',['../structdyn__edge__pair.html#a38ae22899a229e5f4e48165235fd0fa0',1,'dyn_edge_pair::capacity'],['../structdyn__edge__triple.html#a133eac490c4fa07850c9e0bc9c4378be',1,'dyn_edge_triple::capacity']]],
   ['char_2',['CHAR',['../regexp_8h.html#a945e1b6cec6225bade72691d362c68faa4618cf21306b3c647741afa7ebefcab8',1,'regexp.h']]],
   ['check_5fnull_3',['CHECK_NULL',['../alloc_8h.html#aa44a749b8ec174a5780a521e07b9b86b',1,'alloc.h']]],
-  ['check_5fnull_4',['check_null',['../alloc_8c.html#a4310f3e2cf0b85c13534389cc7479f33',1,'check_null(const char *function, char *file, int line, int n,...):&#160;alloc.c'],['../alloc_8h.html#a4310f3e2cf0b85c13534389cc7479f33',1,'check_null(const char *function, char *file, int line, int n,...):&#160;alloc 2.c']]],
+  ['check_5fnull_4',['check_null',['../alloc_8c.html#a4310f3e2cf0b85c13534389cc7479f33',1,'check_null(const char *function, char *file, int line, int n,...):&#160;alloc.c'],['../alloc_8h.html#a4310f3e2cf0b85c13534389cc7479f33',1,'check_null(const char *function, char *file, int line, int n,...):&#160;alloc.c']]],
   ['check_5fvarname_5',['check_varname',['../shell__keywords_8h.html#a08db16b0cc0cf6c5af952e32863357fd',1,'shell_keywords.c']]],
   ['childrens_6',['childrens',['../structfacto__forest.html#a31755e7d7616e48d56bf38afa6ea45e0',1,'facto_forest']]],
   ['cl_5felems_7',['cl_elems',['../structparti.html#a26659c022afb0b04e79e24bbb388b603',1,'parti']]],

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['check_5fnull_0',['check_null',['../alloc_8c.html#a4310f3e2cf0b85c13534389cc7479f33',1,'check_null(const char *function, char *file, int line, int n,...):&#160;alloc.c'],['../alloc_8h.html#a4310f3e2cf0b85c13534389cc7479f33',1,'check_null(const char *function, char *file, int line, int n,...):&#160;alloc 2.c']]],
+  ['check_5fnull_0',['check_null',['../alloc_8c.html#a4310f3e2cf0b85c13534389cc7479f33',1,'check_null(const char *function, char *file, int line, int n,...):&#160;alloc.c'],['../alloc_8h.html#a4310f3e2cf0b85c13534389cc7479f33',1,'check_null(const char *function, char *file, int line, int n,...):&#160;alloc.c']]],
   ['check_5fvarname_1',['check_varname',['../shell__keywords_8h.html#a08db16b0cc0cf6c5af952e32863357fd',1,'shell_keywords.c']]],
   ['com_5ffree_5fcommand_2',['com_free_command',['../shell__keywords_8h.html#a5cc69f0af778390f154a71b1cee0a7f0',1,'shell_keywords.c']]],
   ['com_5ffree_5fparameters_3',['com_free_parameters',['../shell__keywords_8h.html#aefb1d6ddd64f9172404e677228d6762a',1,'shell_keywords.c']]],

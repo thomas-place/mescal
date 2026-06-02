@@ -131,6 +131,10 @@ document.addEventListener('DOMContentLoaded',() => { initNavTree('alloc_8h.html'
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-define-members" class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
+<tr class="memitem:a6e9065fa464226eca86be44dc194e563" id="r_a6e9065fa464226eca86be44dc194e563"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a6e9065fa464226eca86be44dc194e563">MEMCPY</a>(destp,  srcp,  num_objects)</td></tr>
+<tr class="memdesc:a6e9065fa464226eca86be44dc194e563"><td class="mdescLeft">&#160;</td><td class="mdescRight">Macro for copying memory using the memcpy() function.  <br /></td></tr>
+<tr class="memitem:aeaadfd923ab7cb57f5e9831f51dbd935" id="r_aeaadfd923ab7cb57f5e9831f51dbd935"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#aeaadfd923ab7cb57f5e9831f51dbd935">MEMSET</a>(destp,  val,  num_objects)</td></tr>
+<tr class="memdesc:aeaadfd923ab7cb57f5e9831f51dbd935"><td class="mdescLeft">&#160;</td><td class="mdescRight">Macro for writing memory using the memset() function.  <br /></td></tr>
 <tr class="memitem:ab1cd6d564a53c48b9fff06fc1b642a06" id="r_ab1cd6d564a53c48b9fff06fc1b642a06"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#ab1cd6d564a53c48b9fff06fc1b642a06">MALLOC</a>(p,  num_objects)</td></tr>
 <tr class="memdesc:ab1cd6d564a53c48b9fff06fc1b642a06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Macro for allocating memory using the malloc() function.  <br /></td></tr>
 <tr class="memitem:a5038968dee3708c3e33a35f818c16452" id="r_a5038968dee3708c3e33a35f818c16452"><td class="memItemLeft">#define&#160;</td><td class="memItemRight"><a class="el" href="#a5038968dee3708c3e33a35f818c16452">CALLOC</a>(p,  num_objects)</td></tr>
@@ -150,10 +154,10 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Macros and functions to help memory allocation. </p>
 <p>The macros <a class="el" href="#ab1cd6d564a53c48b9fff06fc1b642a06" title="Macro for allocating memory using the malloc() function.">MALLOC()</a>, <a class="el" href="#a5038968dee3708c3e33a35f818c16452" title="Macro for allocating memory using the calloc() function.">CALLOC()</a> and <a class="el" href="#a698d049d23598a7e3997ecca97ac7e54" title="Macro for reallocating memory using the realloc() function.">REALLOC()</a> from this file make it possible to allocate dynamic memory. If they fail, they print an error message on the standard error, indicating the function, file and line where the allocation failed, and they then quit the program.</p>
-<p>The function multiple_free() is used to free several pointers at once.</p>
+<p>The function <a class="el" href="#a95dd19b1b2af33029f7ccb78d5f17039" title="Function to free memory using the free() function.">multiple_free()</a> is used to free several pointers at once.</p>
 <dl class="section attention"><dt>Attention</dt><dd>None of these pointers should be <span class="tt">NULL</span>, and all must have been dynamically allocated before the call.</dd></dl>
 <p>The macro <a class="el" href="#aa44a749b8ec174a5780a521e07b9b86b" title="Macro to test if one or more pointers are NULL.">CHECK_NULL()</a> checks whether one or several pointers are non-<span class="tt">NULL</span>.</p>
-<p>The function check_null() shouldn't be used directly, it is used by the macro <a class="el" href="#aa44a749b8ec174a5780a521e07b9b86b" title="Macro to test if one or more pointers are NULL.">CHECK_NULL()</a>. </p>
+<p>The function <a class="el" href="#a4310f3e2cf0b85c13534389cc7479f33" title="Do not use this function directly; instead, use the macro CHECK_NULL(), which includes the error&#39;s lo...">check_null()</a> shouldn't be used directly, it is used by the macro <a class="el" href="#aa44a749b8ec174a5780a521e07b9b86b" title="Macro to test if one or more pointers are NULL.">CHECK_NULL()</a>. </p>
 </div><a name="doc-define-members" id="doc-define-members"></a><h2 id="header-doc-define-members" class="groupheader">Macro Definition Documentation</h2>
 <a id="a5038968dee3708c3e33a35f818c16452" name="a5038968dee3708c3e33a35f818c16452"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5038968dee3708c3e33a35f818c16452">&#9670;&#160;</a></span>CALLOC</h2>
@@ -173,12 +177,13 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span> {                                                                       \</div>
-<div class="line">    DEBUG(<span class="stringliteral">&quot;Callocating  %lu objects.&quot;</span>, (<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span>)(num_objects));      \</div>
-<div class="line">    <span class="keywordtype">void</span> *tmp = calloc((num_objects), <span class="keyword">sizeof</span> *(p));                        \</div>
-<div class="line">    if (!tmp)                                                              \</div>
-<div class="line">        FATAL(<span class="stringliteral">&quot;Calloc error.&quot;</span>);                                            \</div>
-<div class="line">    (p) = tmp;                                                             \</div>
+<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span>                                                                    \</div>
+<div class="line">{                                                                     \</div>
+<div class="line">    DEBUG(<span class="stringliteral">&quot;Callocating  %lu objects.&quot;</span>, (<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span>)(num_objects)); \</div>
+<div class="line">    <span class="keywordtype">void</span> *tmp = calloc((num_objects), <span class="keyword">sizeof</span> *(p));                   \</div>
+<div class="line">    if (!tmp)                                                         \</div>
+<div class="line">        FATAL(<span class="stringliteral">&quot;Calloc error.&quot;</span>);                                       \</div>
+<div class="line">    (p) = tmp;                                                        \</div>
 <div class="line">} <span class="keywordflow">while</span> (0)</div>
 </div><!-- fragment -->
 <p>Macro for allocating memory using the calloc() function. </p>
@@ -192,7 +197,7 @@ Functions</h2></td></tr>
 <p>Allocates memory, initialized at 0, to store <span class="tt">num_objects</span>, * each of type <span class="tt">*p</span>.</p>
 <p><b>Example of use:</b> </p><div class="fragment"><div class="line"><span class="keyword">struct </span>foo *p;</div>
 <div class="line"><a class="code hl_define" href="#a5038968dee3708c3e33a35f818c16452">CALLOC</a>(p, 10); <span class="comment">// Allocates an array of 10 struct foo, initialized to 0.</span></div>
-<div class="ttc" id="aalloc_8h_html_a5038968dee3708c3e33a35f818c16452"><div class="ttname"><a href="#a5038968dee3708c3e33a35f818c16452">CALLOC</a></div><div class="ttdeci">#define CALLOC(p, num_objects)</div><div class="ttdoc">Macro for allocating memory using the calloc() function.</div><div class="ttdef"><b>Definition</b> alloc.h:85</div></div>
+<div class="ttc" id="aalloc_8h_html_a5038968dee3708c3e33a35f818c16452"><div class="ttname"><a href="#a5038968dee3708c3e33a35f818c16452">CALLOC</a></div><div class="ttdeci">#define CALLOC(p, num_objects)</div><div class="ttdoc">Macro for allocating memory using the calloc() function.</div><div class="ttdef"><b>Definition</b> alloc.h:120</div></div>
 </div><!-- fragment --><p>If allocation fails, displays an error message and quits the program.</p>
 <dl class="section attention"><dt>Attention</dt><dd>The pointer <span class="tt">p</span> must have been declared, but must not point to an already dynamically allocated area (otherwise a memory leak will occur). If <span class="tt">p</span> already points to a dynamically allocated area, use REALLOC.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="#a698d049d23598a7e3997ecca97ac7e54" title="Macro for reallocating memory using the realloc() function.">REALLOC()</a>. </dd></dl>
@@ -217,7 +222,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">check_null(__func__, __FILE__, __LINE__, n __VA_OPT__(, ) __VA_ARGS__)</div>
+<b>Value:</b><div class="fragment"><div class="line"><a class="code hl_function" href="alloc_8c.html#a4310f3e2cf0b85c13534389cc7479f33">check_null</a>(__func__, __FILE__, __LINE__, n __VA_OPT__(, ) __VA_ARGS__)</div>
+<div class="ttc" id="aalloc_8c_html_a4310f3e2cf0b85c13534389cc7479f33"><div class="ttname"><a href="alloc_8c.html#a4310f3e2cf0b85c13534389cc7479f33">check_null</a></div><div class="ttdeci">void check_null(const char *function, char *file, int line, int n,...)</div><div class="ttdoc">Do not use this function directly; instead, use the macro CHECK_NULL(), which includes the error&#39;s lo...</div><div class="ttdef"><b>Definition</b> alloc.c:18</div></div>
 </div><!-- fragment -->
 <p>Macro to test if one or more pointers are NULL. </p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -230,7 +236,7 @@ Functions</h2></td></tr>
 <p>There must be one pointer to test for each string, and vice versa.</p>
 <p>The string following each pointer allows customizing the error message.</p>
 <p><b>Example of use:</b> </p><div class="fragment"><div class="line"><a class="code hl_define" href="#aa44a749b8ec174a5780a521e07b9b86b">CHECK_NULL</a>(3, p1, <span class="stringliteral">&quot;Name1&quot;</span>, p2, <span class="stringliteral">&quot;Name2&quot;</span>, p3, <span class="stringliteral">&quot;Name3&quot;</span>);</div>
-<div class="ttc" id="aalloc_8h_html_aa44a749b8ec174a5780a521e07b9b86b"><div class="ttname"><a href="#aa44a749b8ec174a5780a521e07b9b86b">CHECK_NULL</a></div><div class="ttdeci">#define CHECK_NULL(n,...)</div><div class="ttdoc">Macro to test if one or more pointers are NULL.</div><div class="ttdef"><b>Definition</b> alloc.h:165</div></div>
+<div class="ttc" id="aalloc_8h_html_aa44a749b8ec174a5780a521e07b9b86b"><div class="ttname"><a href="#aa44a749b8ec174a5780a521e07b9b86b">CHECK_NULL</a></div><div class="ttdeci">#define CHECK_NULL(n,...)</div><div class="ttdoc">Macro to test if one or more pointers are NULL.</div><div class="ttdef"><b>Definition</b> alloc.h:203</div></div>
 </div><!-- fragment --><p> Here, 3 is the number of pointers to check, and <span class="tt">p1</span>, <span class="tt">p2</span>, and <span class="tt">p3</span> are the pointers. If <span class="tt">p1</span> and <span class="tt">p3</span> are NULL, the macro will display an error message in the following form:</p>
 <p>❌ <span style="color:#ff0000">[CRITICAL]</span> Name1 is NULL!<br  />
  ❌ <span style="color:#ff0000">[CRITICAL]</span> Name3 is NULL!</p>
@@ -256,12 +262,13 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span> {                                                                       \</div>
-<div class="line">    DEBUG(<span class="stringliteral">&quot;Allocating  %lu objects.&quot;</span>, (<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span>)(num_objects));       \</div>
-<div class="line">    <span class="keywordtype">void</span> *tmp = malloc(<span class="keyword">sizeof</span> *(p) * (num_objects));                       \</div>
-<div class="line">    if (!tmp)                                                              \</div>
-<div class="line">        FATAL(<span class="stringliteral">&quot;Malloc error.&quot;</span>);                                            \</div>
-<div class="line">    (p) = tmp;                                                             \</div>
+<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span>                                                                   \</div>
+<div class="line">{                                                                    \</div>
+<div class="line">    DEBUG(<span class="stringliteral">&quot;Allocating  %lu objects.&quot;</span>, (<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span>)(num_objects)); \</div>
+<div class="line">    <span class="keywordtype">void</span> *tmp = malloc(<span class="keyword">sizeof</span> *(p) * (num_objects));                 \</div>
+<div class="line">    if (!tmp)                                                        \</div>
+<div class="line">        FATAL(<span class="stringliteral">&quot;Malloc error.&quot;</span>);                                      \</div>
+<div class="line">    (p) = tmp;                                                       \</div>
 <div class="line">} <span class="keywordflow">while</span> (0)</div>
 </div><!-- fragment -->
 <p>Macro for allocating memory using the malloc() function. </p>
@@ -275,10 +282,94 @@ Functions</h2></td></tr>
 <p>Allocates memory to store <span class="tt">num_objects</span>, each of type <span class="tt">*p</span>.</p>
 <p><b>Example of use:</b> </p><div class="fragment"><div class="line"><span class="keyword">struct </span>foo *p;</div>
 <div class="line"><a class="code hl_define" href="#ab1cd6d564a53c48b9fff06fc1b642a06">MALLOC</a>(p, 10); <span class="comment">// Allocate an array of 10 struct foo.</span></div>
-<div class="ttc" id="aalloc_8h_html_ab1cd6d564a53c48b9fff06fc1b642a06"><div class="ttname"><a href="#ab1cd6d564a53c48b9fff06fc1b642a06">MALLOC</a></div><div class="ttdeci">#define MALLOC(p, num_objects)</div><div class="ttdoc">Macro for allocating memory using the malloc() function.</div><div class="ttdef"><b>Definition</b> alloc.h:53</div></div>
+<div class="ttc" id="aalloc_8h_html_ab1cd6d564a53c48b9fff06fc1b642a06"><div class="ttname"><a href="#ab1cd6d564a53c48b9fff06fc1b642a06">MALLOC</a></div><div class="ttdeci">#define MALLOC(p, num_objects)</div><div class="ttdoc">Macro for allocating memory using the malloc() function.</div><div class="ttdef"><b>Definition</b> alloc.h:87</div></div>
 </div><!-- fragment --><p>If allocation fails, displays an error message and quits the program.</p>
 <dl class="section attention"><dt>Attention</dt><dd>The <span class="tt">p</span> pointer must have been declared, but must not point to a zone that has already been dynamically allocated (otherwise a memory leak will occur). If <span class="tt">p</span> already points to a dynamically allocated zone, use REALLOC.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="#a698d049d23598a7e3997ecca97ac7e54" title="Macro for reallocating memory using the realloc() function.">REALLOC()</a> </dd></dl>
+
+</div>
+</div>
+<a id="a6e9065fa464226eca86be44dc194e563" name="a6e9065fa464226eca86be44dc194e563"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6e9065fa464226eca86be44dc194e563">&#9670;&#160;</a></span>MEMCPY</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MEMCPY</td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>destp</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>srcp</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>num_objects</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span>                                                               \</div>
+<div class="line">{                                                                \</div>
+<div class="line">    DEBUG(<span class="stringliteral">&quot;Copying %lu objects.&quot;</span>, (<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span>)(num_objects)); \</div>
+<div class="line">    memcpy((destp), (srcp), <span class="keyword">sizeof</span> *(srcp) * (num_objects));     \</div>
+<div class="line">} <span class="keywordflow">while</span> (0)</div>
+</div><!-- fragment -->
+<p>Macro for copying memory using the memcpy() function. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">destp</td><td>Destination pointer. </td></tr>
+    <tr><td class="paramname">srcp</td><td>Source pointer. </td></tr>
+    <tr><td class="paramname">num_objects</td><td>Number of objects to allocate.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Copies <span class="tt">num_objects</span> in destp, each of type <span class="tt">*srcp</span>. </p>
+
+</div>
+</div>
+<a id="aeaadfd923ab7cb57f5e9831f51dbd935" name="aeaadfd923ab7cb57f5e9831f51dbd935"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeaadfd923ab7cb57f5e9831f51dbd935">&#9670;&#160;</a></span>MEMSET</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MEMSET</td>
+          <td>(</td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>destp</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>val</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"></td>          <td class="paramname"><span class="paramname"><em>num_objects</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span>                                                               \</div>
+<div class="line">{                                                                \</div>
+<div class="line">    DEBUG(<span class="stringliteral">&quot;Setting %lu objects.&quot;</span>, (<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span>)(num_objects)); \</div>
+<div class="line">    memset((destp), (val), <span class="keyword">sizeof</span> *(destp) * (num_objects));     \</div>
+<div class="line">} <span class="keywordflow">while</span> (0)</div>
+</div><!-- fragment -->
+<p>Macro for writing memory using the memset() function. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">destp</td><td>Destination pointer. </td></tr>
+    <tr><td class="paramname">val</td><td>Value to set. </td></tr>
+    <tr><td class="paramname">num_objects</td><td>Number of objects to allocate.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Copies <span class="tt">num_objects</span> in destp, each of type <span class="tt">*srcp</span>. </p>
 
 </div>
 </div>
@@ -300,13 +391,15 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span> {                                                                       \</div>
-<div class="line">    DEBUG(<span class="stringliteral">&quot;Reallocating  %lu objects.&quot;</span>, (<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span>)(num_objects));     \</div>
-<div class="line">    <span class="keywordtype">void</span> *tmp = realloc((p), <span class="keyword">sizeof</span> *(p) * (num_objects));                 \</div>
-<div class="line">    if (!tmp) {                                                            \</div>
-<div class="line">        FATAL(<span class="stringliteral">&quot;Realloc error.&quot;</span>);                                           \</div>
-<div class="line">    }                                                                      \</div>
-<div class="line">    (p) = tmp;                                                             \</div>
+<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span>                                                                     \</div>
+<div class="line">{                                                                      \</div>
+<div class="line">    DEBUG(<span class="stringliteral">&quot;Reallocating  %lu objects.&quot;</span>, (<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span>)(num_objects)); \</div>
+<div class="line">    <span class="keywordtype">void</span> *tmp = realloc((p), <span class="keyword">sizeof</span> *(p) * (num_objects));             \</div>
+<div class="line">    if (!tmp)                                                          \</div>
+<div class="line">    {                                                                  \</div>
+<div class="line">        FATAL(<span class="stringliteral">&quot;Realloc error.&quot;</span>);                                       \</div>
+<div class="line">    }                                                                  \</div>
+<div class="line">    (p) = tmp;                                                         \</div>
 <div class="line">} <span class="keywordflow">while</span> (0)</div>
 </div><!-- fragment -->
 <p>Macro for reallocating memory using the realloc() function. </p>
@@ -325,7 +418,7 @@ Functions</h2></td></tr>
 <div class="line"><a class="code hl_define" href="#a698d049d23598a7e3997ecca97ac7e54">REALLOC</a>(p, 20); <span class="comment">// Re-allocate an array of 20 struct foo by copying the</span></div>
 <div class="line">                <span class="comment">// original array at the begining of the new array, and</span></div>
 <div class="line">                <span class="comment">// assign the address of the first cell in this array to `p`.</span></div>
-<div class="ttc" id="aalloc_8h_html_a698d049d23598a7e3997ecca97ac7e54"><div class="ttname"><a href="#a698d049d23598a7e3997ecca97ac7e54">REALLOC</a></div><div class="ttdeci">#define REALLOC(p, num_objects)</div><div class="ttdoc">Macro for reallocating memory using the realloc() function.</div><div class="ttdef"><b>Definition</b> alloc.h:122</div></div>
+<div class="ttc" id="aalloc_8h_html_a698d049d23598a7e3997ecca97ac7e54"><div class="ttname"><a href="#a698d049d23598a7e3997ecca97ac7e54">REALLOC</a></div><div class="ttdeci">#define REALLOC(p, num_objects)</div><div class="ttdoc">Macro for reallocating memory using the realloc() function.</div><div class="ttdef"><b>Definition</b> alloc.h:158</div></div>
 </div><!-- fragment --><p>If allocation fails, displays an error message and quits the program.</p>
 <dl class="section attention"><dt>Attention</dt><dd>The <span class="tt">p</span> pointer must have been declared and point to an already dynamically allocated zone. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="#ab1cd6d564a53c48b9fff06fc1b642a06" title="Macro for allocating memory using the malloc() function.">MALLOC()</a>, <a class="el" href="#a5038968dee3708c3e33a35f818c16452" title="Macro for allocating memory using the calloc() function.">CALLOC()</a> </dd></dl>
@@ -399,8 +492,8 @@ Functions</h2></td></tr>
 <div class="line"><a class="code hl_define" href="#ab1cd6d564a53c48b9fff06fc1b642a06">MALLOC</a>(p2, 10);</div>
 <div class="line"><a class="code hl_define" href="#ab1cd6d564a53c48b9fff06fc1b642a06">MALLOC</a>(p3, 10);</div>
 <div class="line"><span class="comment">// ...</span></div>
-<div class="line"><a class="code hl_function" href="#a95dd19b1b2af33029f7ccb78d5f17039">multiple_free</a>(p1, p2, p3, NULL);</div>
-<div class="ttc" id="aalloc_8h_html_a95dd19b1b2af33029f7ccb78d5f17039"><div class="ttname"><a href="#a95dd19b1b2af33029f7ccb78d5f17039">multiple_free</a></div><div class="ttdeci">void multiple_free(void *p,...)</div><div class="ttdoc">Function to free memory using the free() function.</div><div class="ttdef"><b>Definition</b> alloc 2.c:8</div></div>
+<div class="line"><a class="code hl_function" href="alloc_8c.html#a95dd19b1b2af33029f7ccb78d5f17039">multiple_free</a>(p1, p2, p3, NULL);</div>
+<div class="ttc" id="aalloc_8c_html_a95dd19b1b2af33029f7ccb78d5f17039"><div class="ttname"><a href="alloc_8c.html#a95dd19b1b2af33029f7ccb78d5f17039">multiple_free</a></div><div class="ttdeci">void multiple_free(void *p,...)</div><div class="ttdoc">Function to free memory using the free() function.</div><div class="ttdef"><b>Definition</b> alloc.c:8</div></div>
 </div><!-- fragment --><dl class="section attention"><dt>Attention</dt><dd>This function is dangerous and should only be used if you know what you are doing! The pointers to be freed <b>must not</b> be NULL. In the example above, if <span class="tt">p2</span> is NULL, <span class="tt">p3</span> will not be freed, which can cause a memory leak. </dd></dl>
 
 </div>

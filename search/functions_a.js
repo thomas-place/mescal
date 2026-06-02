@@ -30,5 +30,5 @@ var searchData=
   ['mor_5fregular_5fjclass_27',['mor_regular_jclass',['../monoid_8h.html#a557079ba18af91ad6d8ee175fa1872c0',1,'monoid.h']]],
   ['mor_5frmirror_28',['mor_rmirror',['../monoid_8h.html#acbf04050c8d1420de5d9dac17d9840a2',1,'monoid.c']]],
   ['morphism_5fto_5fdfa_29',['morphism_to_dfa',['../monoid_8h.html#a0f0ef550c4f7a0067f4ebe20eede43c6',1,'monoid.c']]],
-  ['multiple_5ffree_30',['multiple_free',['../alloc_8c.html#a95dd19b1b2af33029f7ccb78d5f17039',1,'multiple_free(void *p,...):&#160;alloc.c'],['../alloc_8h.html#a95dd19b1b2af33029f7ccb78d5f17039',1,'multiple_free(void *p,...):&#160;alloc 2.c']]]
+  ['multiple_5ffree_30',['multiple_free',['../alloc_8c.html#a95dd19b1b2af33029f7ccb78d5f17039',1,'multiple_free(void *p,...):&#160;alloc.c'],['../alloc_8h.html#a95dd19b1b2af33029f7ccb78d5f17039',1,'multiple_free(void *p,...):&#160;alloc.c']]]
 ];

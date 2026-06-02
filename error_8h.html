@@ -229,7 +229,8 @@ To change the debug level, you must define the <a class="el" href="#ac2d33ccaf63
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">PRINT_DEBUG(KO, <span class="stringliteral">&quot;CRITICAL&quot;</span>, CRITICAL_L, msg, __VA_ARGS__)</div>
+<b>Value:</b><div class="fragment"><div class="line">PRINT_DEBUG(<a class="code hl_define" href="#acb00992efca56626cdf0907e5edb5b51">KO</a>, <span class="stringliteral">&quot;CRITICAL&quot;</span>, CRITICAL_L, msg, __VA_ARGS__)</div>
+<div class="ttc" id="aerror_8h_html_acb00992efca56626cdf0907e5edb5b51"><div class="ttname"><a href="#acb00992efca56626cdf0907e5edb5b51">KO</a></div><div class="ttdeci">#define KO</div><div class="ttdoc">Symbole ❌.</div><div class="ttdef"><b>Definition</b> error.h:63</div></div>
 </div><!-- fragment -->
 <p>Print a CRITICAL message. </p>
 
@@ -253,7 +254,8 @@ To change the debug level, you must define the <a class="el" href="#ac2d33ccaf63
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">PRINT_DEBUG(HINT, <span class="stringliteral">&quot;DEBUG&quot;</span>, DEBUG_L, msg, __VA_ARGS__)</div>
+<b>Value:</b><div class="fragment"><div class="line">PRINT_DEBUG(<a class="code hl_define" href="#a1296c786529f6fae6847c40248dcbbf2">HINT</a>, <span class="stringliteral">&quot;DEBUG&quot;</span>, DEBUG_L, msg, __VA_ARGS__)</div>
+<div class="ttc" id="aerror_8h_html_a1296c786529f6fae6847c40248dcbbf2"><div class="ttname"><a href="#a1296c786529f6fae6847c40248dcbbf2">HINT</a></div><div class="ttdeci">#define HINT</div><div class="ttdoc">Symbole ✨.</div><div class="ttdef"><b>Definition</b> error.h:59</div></div>
 </div><!-- fragment -->
 <p>Print a DEBUG message. </p>
 
@@ -306,7 +308,8 @@ To change the debug level, you must define the <a class="el" href="#ac2d33ccaf63
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">PRINT_DEBUG(ATTENTION, <span class="stringliteral">&quot;ERROR&quot;</span>, ERROR_L, msg, __VA_ARGS__)</div>
+<b>Value:</b><div class="fragment"><div class="line">PRINT_DEBUG(<a class="code hl_define" href="#aff65d067caaba7ee69c6d5d8afdb2819">ATTENTION</a>, <span class="stringliteral">&quot;ERROR&quot;</span>, ERROR_L, msg, __VA_ARGS__)</div>
+<div class="ttc" id="aerror_8h_html_aff65d067caaba7ee69c6d5d8afdb2819"><div class="ttname"><a href="#aff65d067caaba7ee69c6d5d8afdb2819">ATTENTION</a></div><div class="ttdeci">#define ATTENTION</div><div class="ttdoc">Symbole ❗.</div><div class="ttdef"><b>Definition</b> error.h:57</div></div>
 </div><!-- fragment -->
 <p>Print an ERROR message. </p>
 
@@ -331,7 +334,7 @@ To change the debug level, you must define the <a class="el" href="#ac2d33ccaf63
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span> {                                                                       \</div>
-<div class="line">    PRINT_ERROR(KO, <span class="stringliteral">&quot;FATAL&quot;</span>, __func__, __FILE__, __LINE__,                 \</div>
+<div class="line">    PRINT_ERROR(<a class="code hl_define" href="#acb00992efca56626cdf0907e5edb5b51">KO</a>, <span class="stringliteral">&quot;FATAL&quot;</span>, __func__, __FILE__, __LINE__,                 \</div>
 <div class="line">                msg __VA_OPT__(, ) __VA_ARGS__);                           \</div>
 <div class="line">    exit(EXIT_FAILURE);                                                    \</div>
 <div class="line">} <span class="keywordflow">while</span> (0)</div>
@@ -358,7 +361,7 @@ To change the debug level, you must define the <a class="el" href="#ac2d33ccaf63
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">PRINT_DEBUG(HINT, <span class="stringliteral">&quot;INFO&quot;</span>, INFO_L, msg, __VA_ARGS__)</div>
+<b>Value:</b><div class="fragment"><div class="line">PRINT_DEBUG(<a class="code hl_define" href="#a1296c786529f6fae6847c40248dcbbf2">HINT</a>, <span class="stringliteral">&quot;INFO&quot;</span>, INFO_L, msg, __VA_ARGS__)</div>
 </div><!-- fragment -->
 <p>Print an INFO message. </p>
 
@@ -398,10 +401,11 @@ To change the debug level, you must define the <a class="el" href="#ac2d33ccaf63
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span> {                                                                       \</div>
-<div class="line">    if ((<span class="keywordtype">int</span>)DEBUG_LEVEL &gt; (<span class="keywordtype">int</span>)level)                                     \</div>
+<div class="line">    if ((<span class="keywordtype">int</span>)<a class="code hl_define" href="#ac2d33ccaf63f5d5b66552b95426c0137">DEBUG_LEVEL</a> &gt; (<span class="keywordtype">int</span>)level)                                     \</div>
 <div class="line">        PRINT_ERROR(symbol, name, __func__, __FILE__, __LINE__,            \</div>
 <div class="line">                    msg __VA_OPT__(, ) __VA_ARGS__);                       \</div>
 <div class="line">} <span class="keywordflow">while</span> (0)</div>
+<div class="ttc" id="aerror_8h_html_ac2d33ccaf63f5d5b66552b95426c0137"><div class="ttname"><a href="#ac2d33ccaf63f5d5b66552b95426c0137">DEBUG_LEVEL</a></div><div class="ttdeci">#define DEBUG_LEVEL</div><div class="ttdoc">Debug level, INFO by default.</div><div class="ttdef"><b>Definition</b> error.h:99</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -490,7 +494,8 @@ To change the debug level, you must define the <a class="el" href="#ac2d33ccaf63
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">PRINT_DEBUG(OK, <span class="stringliteral">&quot;TRACE&quot;</span>, TRACE_L, msg, __VA_ARGS__)</div>
+<b>Value:</b><div class="fragment"><div class="line">PRINT_DEBUG(<a class="code hl_define" href="#aba51915c87d64af47fb1cc59348961c9">OK</a>, <span class="stringliteral">&quot;TRACE&quot;</span>, TRACE_L, msg, __VA_ARGS__)</div>
+<div class="ttc" id="aerror_8h_html_aba51915c87d64af47fb1cc59348961c9"><div class="ttname"><a href="#aba51915c87d64af47fb1cc59348961c9">OK</a></div><div class="ttdeci">#define OK</div><div class="ttdoc">Symbole ✅.</div><div class="ttdef"><b>Definition</b> error.h:61</div></div>
 </div><!-- fragment -->
 <p>Prints a TRACE message. </p>
 
@@ -514,7 +519,7 @@ To change the debug level, you must define the <a class="el" href="#ac2d33ccaf63
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">PRINT_DEBUG(ATTENTION, <span class="stringliteral">&quot;WARNING&quot;</span>, WARNING_L, msg, __VA_ARGS__)</div>
+<b>Value:</b><div class="fragment"><div class="line">PRINT_DEBUG(<a class="code hl_define" href="#aff65d067caaba7ee69c6d5d8afdb2819">ATTENTION</a>, <span class="stringliteral">&quot;WARNING&quot;</span>, WARNING_L, msg, __VA_ARGS__)</div>
 </div><!-- fragment -->
 <p>Print a WARNING message. </p>
 

@@ -51,7 +51,7 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"alloc_012_8h_source.html",
+"alloc_8c.html",
 "main_8h.html#a8f3a3e38527b88c1a4fba0329d7b2df4",
 "regexp_8h.html#aa4c7ffc70fec6309a28b393380d505f0",
 "structdlist.html#a0191dd71227df552cd65b93c372e9054",
