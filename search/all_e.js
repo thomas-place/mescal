@@ -25,10 +25,8 @@ var searchData=
   ['or_5fbarray_5fmod_22',['or_barray_mod',['../type__boolarray_8h.html#a020f1e153aa5591cf1e2db038950291b',1,'type_boolarray.c']]],
   ['orbits_23',['orbits',['../structorbits.html',1,'orbits'],['../structorbits.html#a6595750bae492ffb4d2cca61b04e0625',1,'orbits::orbits()']]],
   ['orbs_24',['orbs',['../structob__morphism.html#a6499688aa2add9e8057c1e833afb3cd8',1,'ob_morphism']]],
-  ['order_25',['order',['../structmorphism.html#a762f8c7badba824e765f86b9752a9f89',1,'morphism::order'],['../structdfa.html#ab777efa654008e8bf7c8a3f9ae07edbe',1,'dfa::order'],['../structfilters__info.html#a6b53bd10eae6e71f5c5049e960450395',1,'filters_info::order']]],
-  ['order_5fsize_26',['order_size',['../structmorphism.html#a0a1d67c7c1de8af01e15c33cb90a799e',1,'morphism']]],
-  ['order_5fstorage_27',['order_storage',['../structmorphism.html#a6e51869e3b240f147f5d1fa992d8cf11',1,'morphism']]],
-  ['original_28',['original',['../structorbits.html#a2f9ad9b392be47df10a0cc50c45b74db',1,'orbits::original'],['../structsubsemi.html#aa49d90a8581597c192da117fbeead00b',1,'subsemi::original']]],
-  ['out_29',['out',['../structmulti__edge.html#afc4c10b85dfc7a9ec6d6a3f55b6f1dc5',1,'multi_edge']]],
-  ['outlabs_30',['outlabs',['../structdfa__enum.html#a3ae795c5b54e55d994013ba2059cb4fe',1,'dfa_enum']]]
+  ['order_25',['order',['../structmorphism.html#a2ac64323b41244b9fe9315905f57c4cd',1,'morphism::order'],['../structdfa.html#ab777efa654008e8bf7c8a3f9ae07edbe',1,'dfa::order'],['../structfilters__info.html#a6b53bd10eae6e71f5c5049e960450395',1,'filters_info::order']]],
+  ['order_5fstorage_26',['order_storage',['../structmorphism.html#a0eb98213b91a63f4c9f2ea3099277614',1,'morphism::order_storage'],['../structdfa.html#a0057fc1f11641cce9e25cb83b9d2b19d',1,'dfa::order_storage']]],
+  ['original_27',['original',['../structorbits.html#a2f9ad9b392be47df10a0cc50c45b74db',1,'orbits::original'],['../structsubsemi.html#aa49d90a8581597c192da117fbeead00b',1,'subsemi::original']]],
+  ['outlabs_28',['outlabs',['../structdfa__enum.html#a3ae795c5b54e55d994013ba2059cb4fe',1,'dfa_enum']]]
 ];

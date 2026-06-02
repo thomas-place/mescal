@@ -15,7 +15,7 @@ var searchData=
   ['used_5fboolean_12',['used_boolean',['../structfilters__info.html#ae6e1edddb803845a9ef90fb25ed348cc',1,'filters_info']]],
   ['used_5fnumerical_13',['used_numerical',['../structfilters__info.html#a2795ef7647de93a36ed079bc73c1e3b4',1,'filters_info']]],
   ['using_20morphisms_20variables_14',['Using morphisms variables',['../index.html#autotoc_md20',1,'']]],
-  ['using_20recurvive_20definition_20variables_15',['Using recurvive definition variables',['../index.html#autotoc_md14',1,'']]],
+  ['using_20recursive_20definition_20variables_15',['Using recursive definition variables',['../index.html#autotoc_md14',1,'']]],
   ['using_20regular_20expressions_20variables_16',['Using regular expressions variables',['../index.html#autotoc_md11',1,'']]],
   ['using_20variables_17',['Using variables',['../index.html#autotoc_md7',1,'']]],
   ['using_20variables_20representing_20automata_18',['Using variables representing automata',['../index.html#autotoc_md18',1,'']]]

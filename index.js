@@ -16,7 +16,7 @@ var index =
         [ "Definition of a regular expression", "index.html#autotoc_md12", null ],
         [ "Manipulation of a regular expression stored in a variable L", "index.html#autotoc_md13", null ]
       ] ],
-      [ "Using recurvive definition variables", "index.html#autotoc_md14", [
+      [ "Using recursive definition variables", "index.html#autotoc_md14", [
         [ "Initialization", "index.html#autotoc_md15", null ],
         [ "Setup of an initialized recursive definition variable R", "index.html#autotoc_md16", null ],
         [ "Usage of a recursive definition variable R", "index.html#autotoc_md17", null ]

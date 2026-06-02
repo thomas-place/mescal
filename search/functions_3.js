@@ -1,19 +1,7 @@
 var searchData=
 [
-  ['fcmp_5fint_0',['fcmp_int',['../type__binheap_8h.html#a25fc7725fa7432fd686d353356099178',1,'type_binheap.c']]],
-  ['fcmp_5fuint_1',['fcmp_uint',['../type__binheap_8h.html#a7da7633e5fc4b25e94c1b6605cd46e69',1,'type_binheap.c']]],
-  ['files_5fdfa_5fto_5fjson_2',['files_dfa_to_json',['../files_8h.html#a829447c9377610282776eae83863490e',1,'files.c']]],
-  ['files_5fjson_5fto_5fautomaton_3',['files_json_to_automaton',['../files_8h.html#a07a551202b41c7c1412aa1a6b45ba9df',1,'files.c']]],
-  ['files_5fload_5fsession_4',['files_load_session',['../files_8h.html#a233010a45e3f10ba7ece2c7226069be3',1,'files.c']]],
-  ['files_5fnfa_5fto_5fjson_5',['files_nfa_to_json',['../files_8h.html#a240628eb1a0a47d51e0ae00229488ec5',1,'files.c']]],
-  ['files_5fread_5fexall_6',['files_read_exall',['../files_8h.html#a0ab101914c4b364b169844ec0787f955',1,'files.c']]],
-  ['files_5fread_5fobject_7',['files_read_object',['../files_8h.html#ae852156774ee1a31e9dea70f946d3c4d',1,'files.c']]],
-  ['files_5fregexp_5fto_5fjson_8',['files_regexp_to_json',['../files_8h.html#ab80174fe5f2c6b11407ffc57d03d82c7',1,'files.c']]],
-  ['files_5fsave_5fexall_9',['files_save_exall',['../files_8h.html#a29bebf0d9db8013bcd63a7d61c971ef4',1,'files.c']]],
-  ['files_5fsave_5fobject_10',['files_save_object',['../files_8h.html#a029de89b7a1b4f1b23a9865148a5c4ca',1,'files.c']]],
-  ['files_5fsave_5fsession_11',['files_save_session',['../files_8h.html#aaa9ea6ebedab61d6729571f347185377',1,'files.c']]],
-  ['find_5fufind_12',['find_ufind',['../type__partitions_8h.html#a481203dffe281af516a68781db0fc014',1,'type_partitions.c']]],
-  ['fprint_5fletter_5fgviz_13',['fprint_letter_gviz',['../words_8h.html#acc35b232a0c3636bb8644397a7b3b59f',1,'words.c']]],
-  ['fprint_5fletter_5flatex_14',['fprint_letter_latex',['../words_8h.html#abe45c50ad190aafb8cb431c24220bc6c',1,'words.c']]],
-  ['fprint_5fletter_5futf8_15',['fprint_letter_utf8',['../words_8h.html#a385c2a53d1704920490e6328d5857b1a',1,'words.c']]]
+  ['edge_5flist_5fto_5fgraph_0',['edge_list_to_graph',['../graphs_8h.html#aa8758844f919def3a3fc1dbf89299122',1,'graphs.c']]],
+  ['edge_5flist_5fto_5flgraph_1',['edge_list_to_lgraph',['../graphs_8h.html#abcd97faf46f05d3f66e6b6712ad68732',1,'graphs.c']]],
+  ['edge_5fpair_5fsort_2',['edge_pair_sort',['../graphs_8h.html#a5e1a2a4e4915fe97f7411a071d98ce32',1,'graphs.c']]],
+  ['edge_5ftriple_5fsort_3',['edge_triple_sort',['../graphs_8h.html#ac58f4a8386c2ca394d796ef6b83d12c1',1,'graphs.c']]]
 ];

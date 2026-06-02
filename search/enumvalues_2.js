@@ -8,9 +8,11 @@ var searchData=
   ['filter_5flmaxsize_5',['FILTER_LMAXSIZE',['../shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52a4dc5771a0c084468006faa8898e100cd',1,'shell_filtering.h']]],
   ['filter_5flnum_6',['FILTER_LNUM',['../shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52ad892c06f51091f923971060eba9fa0cb',1,'shell_filtering.h']]],
   ['filter_5fmini_7',['FILTER_MINI',['../shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52a6b6dbdfc4fcdb79502b8d5d53b8fe05a',1,'shell_filtering.h']]],
-  ['filter_5fnosimc_8',['FILTER_NOSIMC',['../shell__filtering_8h.html#a77b1930a168e08c8f8d29b1e2f47f9f1a3ec32bdabe3e4b415c3a01f50c12c28b',1,'shell_filtering.h']]],
-  ['filter_5fnosmallcounter_9',['FILTER_NOSMALLCOUNTER',['../shell__filtering_8h.html#a77b1930a168e08c8f8d29b1e2f47f9f1a597eff145724e74dafa84201bd15c4f3',1,'shell_filtering.h']]],
-  ['filter_5frmaxsize_10',['FILTER_RMAXSIZE',['../shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52a52fe11a4f403dc3bf36e3f8858c298ef',1,'shell_filtering.h']]],
-  ['filter_5frnum_11',['FILTER_RNUM',['../shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52a6afb83478537cc2c1af80848565a8a97',1,'shell_filtering.h']]],
-  ['filter_5fsynt_12',['FILTER_SYNT',['../shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52a9abadd27e831bf27b7ec51bbc6d58ebd',1,'shell_filtering.h']]]
+  ['filter_5fnoselfloops_8',['FILTER_NOSELFLOOPS',['../shell__filtering_8h.html#a77b1930a168e08c8f8d29b1e2f47f9f1a8af1769538a9b4908d9cde7a2313afce',1,'shell_filtering.h']]],
+  ['filter_5fnosimc_9',['FILTER_NOSIMC',['../shell__filtering_8h.html#a77b1930a168e08c8f8d29b1e2f47f9f1a3ec32bdabe3e4b415c3a01f50c12c28b',1,'shell_filtering.h']]],
+  ['filter_5fnosink_10',['FILTER_NOSINK',['../shell__filtering_8h.html#a77b1930a168e08c8f8d29b1e2f47f9f1a7165e74065854660ec6180c88cf7f025',1,'shell_filtering.h']]],
+  ['filter_5fnosmallcounter_11',['FILTER_NOSMALLCOUNTER',['../shell__filtering_8h.html#a77b1930a168e08c8f8d29b1e2f47f9f1a597eff145724e74dafa84201bd15c4f3',1,'shell_filtering.h']]],
+  ['filter_5frmaxsize_12',['FILTER_RMAXSIZE',['../shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52a52fe11a4f403dc3bf36e3f8858c298ef',1,'shell_filtering.h']]],
+  ['filter_5frnum_13',['FILTER_RNUM',['../shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52a6afb83478537cc2c1af80848565a8a97',1,'shell_filtering.h']]],
+  ['filter_5fsynt_14',['FILTER_SYNT',['../shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52a9abadd27e831bf27b7ec51bbc6d58ebd',1,'shell_filtering.h']]]
 ];

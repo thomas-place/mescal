@@ -1,11 +1,6 @@
 var monoid__props_8h =
 [
-    [ "green_relation", "monoid__props_8h.html#aac883de93546a5ab139a747b0099bffb", [
-      [ "H_GREEN", "monoid__props_8h.html#aac883de93546a5ab139a747b0099bffba2cc227e89685bf8ba572968378decb9f", null ],
-      [ "L_GREEN", "monoid__props_8h.html#aac883de93546a5ab139a747b0099bffba6bb00304011fa5bc71466739790f8fd1", null ],
-      [ "R_GREEN", "monoid__props_8h.html#aac883de93546a5ab139a747b0099bffba9af5b00625bf06b41161bd86d8ad9672", null ],
-      [ "J_GREEN", "monoid__props_8h.html#aac883de93546a5ab139a747b0099bffba4fcf1498543676ec13be64082d20bff4", null ]
-    ] ],
+    [ "green_relation", "monoid__props_8h.html#aac883de93546a5ab139a747b0099bffb", null ],
     [ "is_blockg_mono", "monoid__props_8h.html#adb5be251485831e8eb4a050d4060f4c6", null ],
     [ "is_bpolamt_mono", "monoid__props_8h.html#afaa8e299d9fa7ba696183b8c3c9f1f19", null ],
     [ "is_bpolamtp_mono", "monoid__props_8h.html#ad25919bfc6592568d2a09d75677c8bf0", null ],
@@ -18,7 +13,7 @@ var monoid__props_8h =
     [ "is_da_mono", "monoid__props_8h.html#ac3de28c75e33a2cea875be78c0a5816b", null ],
     [ "is_da_orbmono", "monoid__props_8h.html#ae6d7308b7ad9543e967d41dcd6a17881", null ],
     [ "is_da_subsemi", "monoid__props_8h.html#a159d4dfaf59ef3e574130ce3889c58fa", null ],
-    [ "is_ejsat_mono", "monoid__props_8h.html#a988ceadc8ef09d199e18301065d6f2d7", null ],
+    [ "is_ejsat_mono", "monoid__props_8h.html#ad1457584193f172c7f37c28d0acbe121", null ],
     [ "is_group_mono", "monoid__props_8h.html#a432ee31ed3dc5a6772fbdbeed441253b", null ],
     [ "is_group_orbmono", "monoid__props_8h.html#a826feb57e42d92b1ca94ba398fe45dda", null ],
     [ "is_group_semigroup", "monoid__props_8h.html#a1ab432aa3024ddf04621d9e02af35322", null ],
@@ -30,9 +25,9 @@ var monoid__props_8h =
     [ "is_idem_mono", "monoid__props_8h.html#a7d35914f7836be3982414371d9cefb08", null ],
     [ "is_idem_orbmono", "monoid__props_8h.html#ad62f66b209b902e2399f353704b350ef", null ],
     [ "is_idem_subsemi", "monoid__props_8h.html#a359574c8bd11ebe72be7cf0b311a93a2", null ],
-    [ "is_jsat_mono", "monoid__props_8h.html#a63c5e2602978777cbbd07b4e2335b630", null ],
-    [ "is_jsat_orbmono", "monoid__props_8h.html#a2ea60e3c5c9f0f8787b91b858111e099", null ],
-    [ "is_jsat_subsemi", "monoid__props_8h.html#acc1e63c1d46eb9aef57ce7d9b87de678", null ],
+    [ "is_jsat_mono", "monoid__props_8h.html#a7af430f3b37ab461d05f0f994aba717c", null ],
+    [ "is_jsat_orbmono", "monoid__props_8h.html#a24ca8d93c7a4db54fd7ee6f325330b97", null ],
+    [ "is_jsat_subsemi", "monoid__props_8h.html#a43bf96765c51afc011c123ee33b5849a", null ],
     [ "is_knast_at_mono", "monoid__props_8h.html#a4650d751baae2e749f3fac88f95f1df0", null ],
     [ "is_knast_ker", "monoid__props_8h.html#a449a2862a160259ed6b5ff238bd1046e", null ],
     [ "is_knast_mono", "monoid__props_8h.html#a9cbf9cc80c0325e2c3ac4346c42dd331", null ],

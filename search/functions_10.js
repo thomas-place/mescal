@@ -1,10 +1,9 @@
 var searchData=
 [
-  ['ufind_5fto_5fparti_0',['ufind_to_parti',['../type__partitions_8h.html#a676b228cfebd09f5afb996ae8a10cea4',1,'type_partitions.c']]],
-  ['ufind_5fto_5fparti_5frefined_1',['ufind_to_parti_refined',['../type__partitions_8h.html#ab179c1ccd68adbbab62d1fb0d2641e73',1,'type_partitions.c']]],
-  ['uint_5favl_5finsert_2',['uint_avl_insert',['../type__abr_8h.html#a4513481aaddd0aad94b87b0f15dd230d',1,'type_abr.c']]],
-  ['uint_5favl_5fsearch_3',['uint_avl_search',['../type__abr_8h.html#ab8783b677eb9d8b1392a33ca97873d37',1,'type_abr.c']]],
-  ['uint_5favl_5fto_5fdequeue_4',['uint_avl_to_dequeue',['../type__abr_8h.html#a07e4dba4b4e07b98dfca05b8ac1464e0',1,'type_abr.c']]],
-  ['union_5fufind_5',['union_ufind',['../type__partitions_8h.html#a1de9d681c9616322c4d47173e3f81d91',1,'type_partitions.c']]],
-  ['usage_6',['usage',['../main_8h.html#acab820e45682cb2b906e71318c90446e',1,'main.h']]]
+  ['tarjan_0',['tarjan',['../graphs__tarjan_8h.html#a2f14392decced8ce9b6d234a4c0ddc23',1,'graphs_tarjan.c']]],
+  ['test_1',['test',['../shell__test_8h.html#a708a4c1a4d0c4acc4c447310dd4db27f',1,'shell_test.c']]],
+  ['topo_5fsort_5fdag_2',['topo_sort_dag',['../graphs__transclos_8h.html#a457cc6f3308d1a7a06aec3a7d6b1a4d7',1,'graphs_transclos.h']]],
+  ['topo_5fsort_5fdag_5fstart_3',['topo_sort_dag_start',['../graphs__transclos_8h.html#a5a6538c9f561f7d25366133eccdacaee',1,'graphs_transclos.h']]],
+  ['twin_5fdgraph_5fsearch_4',['twin_dgraph_search',['../graphs_8h.html#a71a9720e9ed9b7adc22d418205e9f7b4',1,'graphs.c']]],
+  ['twin_5fdgraph_5fsearch_5fupdate_5',['twin_dgraph_search_update',['../graphs_8h.html#a9ae94228232e6b8c7c271208c11808a1',1,'graphs.c']]]
 ];

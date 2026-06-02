@@ -25,7 +25,7 @@
 var NAVTREE =
 [
   [ "Mescal", "index.html", [
-    [ "🌵 <a href=\"https://github.com/thomas-place/mescal\" >MeSCaL</a> 🌵", "index.html", "index" ],
+    [ "🌵 <a href=\"https://github.com/thomas-place/mescal\">MeSCaL</a> 🌵", "index.html", "index" ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],
@@ -51,12 +51,13 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"alloc_8c.html",
-"monoid_8h.html#a38cb3a83ff90ced9738f6921601651dc",
-"regexp_8h.html#aaa3711cc9ec44c603335fdf2813edee1",
-"shell__keywords_8h.html#a5ca7de6e98ebfe5258cfd3973da2173f",
-"structob__recursion.html#aabf0f5bebf29653d681d9bea92550bc2"
+"alloc_012_8h_source.html",
+"main_8h.html#a8f3a3e38527b88c1a4fba0329d7b2df4",
+"regexp_8h.html#aa4c7ffc70fec6309a28b393380d505f0",
+"structdlist.html#a0191dd71227df552cd65b93c372e9054",
+"type__binheap_8h.html#a64b0ca346d078392d6737c1e6c1b68e2"
 ];
 
-var SYNCONMSG = 'click to disable panel synchronization';
-var SYNCOFFMSG = 'click to enable panel synchronization';
+const SYNCONMSG = 'click to disable panel synchronization';
+const SYNCOFFMSG = 'click to enable panel synchronization';
+const LISTOFALLMEMBERS = 'List of all members';

@@ -7,7 +7,7 @@ var searchData=
   ['realloc_4',['REALLOC',['../alloc_8h.html#a698d049d23598a7e3997ecca97ac7e54',1,'alloc.h']]],
   ['rec_5',['rec',['../structobject.html#acc959cbcf94c9e20a07c04ed6e04d301',1,'object']]],
   ['recursive_20definition_20variable_20r_6',['recursive definition variable R',['../index.html#autotoc_md16',1,'Setup of an initialized recursive definition variable R'],['../index.html#autotoc_md17',1,'Usage of a recursive definition variable R']]],
-  ['recurvive_20definition_20variables_7',['Using recurvive definition variables',['../index.html#autotoc_md14',1,'']]],
+  ['recursive_20definition_20variables_7',['Using recursive definition variables',['../index.html#autotoc_md14',1,'']]],
   ['reg_5fcomplement_8',['reg_complement',['../regexp_8h.html#a5db57665ab834362e57afb076bb9b55c',1,'regexp.c']]],
   ['reg_5fconcat_9',['reg_concat',['../regexp_8h.html#aaa3711cc9ec44c603335fdf2813edee1',1,'regexp.c']]],
   ['reg_5fcopy_10',['reg_copy',['../regexp_8h.html#a420113f0cc33a6dc7b6eb2abd3ac9a43',1,'regexp.c']]],
@@ -58,7 +58,7 @@ var searchData=
   ['rigread_5fdequeue_5fgen_55',['rigread_dequeue_gen',['../type__dequeue__gen_8h.html#a79b9198415048e3feb9c3f57ace42d9d',1,'type_dequeue_gen.c']]],
   ['rigread_5fword_56',['rigread_word',['../words_8h.html#abbff18a820bef38572d955de8500a07e',1,'words.c']]],
   ['rindex_57',['rindex',['../structhopcroft__partition.html#a591080ba73a61c52b76317b1d8dd1848',1,'hopcroft_partition']]],
-  ['root_58',['root',['../structnum__span__forest.html#a0b6c327d686b5223ad6f36a2197130b5',1,'num_span_forest']]],
+  ['root_58',['root',['../structfacto__forest.html#a80bf79a1737b84dc449408ac296c62d2',1,'facto_forest::root'],['../structnum__span__forest.html#a0b6c327d686b5223ad6f36a2197130b5',1,'num_span_forest::root']]],
   ['rsent_59',['rsent',['../structdlist.html#aabfcc54ef7eff42dbcc113592ae4779a',1,'dlist']]],
   ['run_60',['run',['../structdfa__enum.html#aac1fdb6639ad259811e8225ea02df89e',1,'dfa_enum']]]
 ];

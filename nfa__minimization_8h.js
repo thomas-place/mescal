@@ -8,5 +8,6 @@ var nfa__minimization_8h =
     [ "dfa_hopcroft_initial", "nfa__minimization_8h.html#a3bcda8764a319c5797c30dc4371944af", null ],
     [ "dfa_mini_canonical_copy", "nfa__minimization_8h.html#af9766f66bf3595c38c419c32b3338d0e", null ],
     [ "dfa_mini_canonical_ordering", "nfa__minimization_8h.html#af38f97b18e70a208fd56338ec60bdbda", null ],
+    [ "dfa_print_order", "nfa__minimization_8h.html#ac491f16fbda9a95839ac9ace28d3c243", null ],
     [ "nfa_brzozowski", "nfa__minimization_8h.html#af2e35882041c1e5d6d437d0b0f844b61", null ]
 ];

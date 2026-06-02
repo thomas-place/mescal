@@ -12,7 +12,5 @@ var searchData=
   ['hierarchies_20and_20future_20past_20hierarchies_9',['Available input classes 𝒞 for negation hierarchies and future/past hierarchies',['../index.html#autotoc_md26',1,'']]],
   ['high_10',['high',['../structfilters__info.html#a5ac3e7dcead63c5e2b9d54eca86505df',1,'filters_info::high'],['../structexall__profile.html#adbd4e7d336d1bafce7e78217cc8bbe4b',1,'exall_profile::high']]],
   ['hint_11',['HINT',['../error_8h.html#a1296c786529f6fae6847c40248dcbbf2',1,'error.h']]],
-  ['hopcroft_5fpartition_12',['hopcroft_partition',['../structhopcroft__partition.html',1,'']]],
-  ['href_20https_3a_20github_20com_20thomas_20place_20mescal_20mescal_20a_20🌵_13',['🌵 &lt;a href=&quot;https://github.com/thomas-place/mescal&quot; &gt;MeSCaL&lt;/a&gt; 🌵',['../index.html',1,'']]],
-  ['https_3a_20github_20com_20thomas_20place_20mescal_20mescal_20a_20🌵_14',['🌵 &lt;a href=&quot;https://github.com/thomas-place/mescal&quot; &gt;MeSCaL&lt;/a&gt; 🌵',['../index.html',1,'']]]
+  ['hopcroft_5fpartition_12',['hopcroft_partition',['../structhopcroft__partition.html',1,'']]]
 ];

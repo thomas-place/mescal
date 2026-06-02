@@ -5,7 +5,8 @@ var shell__filtering_8h =
     [ "bool_filter", "shell__filtering_8h.html#a77b1930a168e08c8f8d29b1e2f47f9f1", [
       [ "FILTER_NOSIMC", "shell__filtering_8h.html#a77b1930a168e08c8f8d29b1e2f47f9f1a3ec32bdabe3e4b415c3a01f50c12c28b", null ],
       [ "FILTER_NOSMALLCOUNTER", "shell__filtering_8h.html#a77b1930a168e08c8f8d29b1e2f47f9f1a597eff145724e74dafa84201bd15c4f3", null ],
-      [ "FILTER_BOOLSIZE", "shell__filtering_8h.html#a77b1930a168e08c8f8d29b1e2f47f9f1a6cf4a02010299dc7e8061b5851f20d77", null ]
+      [ "FILTER_NOSINK", "shell__filtering_8h.html#a77b1930a168e08c8f8d29b1e2f47f9f1a7165e74065854660ec6180c88cf7f025", null ],
+      [ "FILTER_NOSELFLOOPS", "shell__filtering_8h.html#a77b1930a168e08c8f8d29b1e2f47f9f1a8af1769538a9b4908d9cde7a2313afce", null ]
     ] ],
     [ "num_filter", "shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52", [
       [ "FILTER_MINI", "shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52a6b6dbdfc4fcdb79502b8d5d53b8fe05a", null ],
@@ -18,8 +19,7 @@ var shell__filtering_8h =
       [ "FILTER_RMAXSIZE", "shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52a52fe11a4f403dc3bf36e3f8858c298ef", null ],
       [ "FILTER_LMAXSIZE", "shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52a4dc5771a0c084468006faa8898e100cd", null ],
       [ "FILTER_JMAXSIZE", "shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52af2aa8c31a14a6af6c7a3117fb9594e1f", null ],
-      [ "FILTER_HMAXSIZE", "shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52aa513f0644c784bd3013f2159ab75559d", null ],
-      [ "FILTER_NUMSIZE", "shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52a3ab08e8e9f7b7e1739b3f7b56b2721f9", null ]
+      [ "FILTER_HMAXSIZE", "shell__filtering_8h.html#add14f7b44711479cdbd9ce0a81affa52aa513f0644c784bd3013f2159ab75559d", null ]
     ] ],
     [ "object_compare", "shell__filtering_8h.html#a15040ce938721fcbaca3610f2307ce1a", null ],
     [ "object_compare_numerical", "shell__filtering_8h.html#a9c4e7abdcf55a504f5a75bc15d21688b", null ],

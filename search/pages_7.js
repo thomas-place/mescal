@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['🌵_0',['🌵 &lt;a href=&quot;https://github.com/thomas-place/mescal&quot; &gt;MeSCaL&lt;/a&gt; 🌵',['../index.html',1,'']]],
-  ['🌵_20a_20href_20https_3a_20github_20com_20thomas_20place_20mescal_20mescal_20a_20🌵_1',['🌵 &lt;a href=&quot;https://github.com/thomas-place/mescal&quot; &gt;MeSCaL&lt;/a&gt; 🌵',['../index.html',1,'']]]
+  ['hierarchies_0',['Available input classes 𝒞 for negation hierarchies and future/past hierarchies',['../index.html#autotoc_md26',1,'']]],
+  ['hierarchies_20and_20future_20past_20hierarchies_1',['Available input classes 𝒞 for negation hierarchies and future/past hierarchies',['../index.html#autotoc_md26',1,'']]]
 ];

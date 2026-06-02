@@ -22,5 +22,6 @@ var words_8h =
     [ "rigpull_word", "words_8h.html#a0e1f57c5d58719fe17ae8bc69d8e4564", null ],
     [ "rigread_word", "words_8h.html#abbff18a820bef38572d955de8500a07e", null ],
     [ "size_word", "words_8h.html#ac7dc5ed212d448725cda10b7f1821c6b", null ],
-    [ "sprint_letter_utf8", "words_8h.html#a2b27cbaaad280ee89f7e8ef4c28e3284", null ]
+    [ "sprint_letter_utf8", "words_8h.html#a2b27cbaaad280ee89f7e8ef4c28e3284", null ],
+    [ "word_from_string", "words_8h.html#a9e81fa0eff4231d59fbb6aa207ebf55e", null ]
 ];
