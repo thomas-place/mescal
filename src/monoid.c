@@ -1460,7 +1460,11 @@ dgraph *mor_extract_rcl(morphism *M, uint rcl)
     return res;
 }
 
-facto_forest *mor_compute_facto_forest(morphism *M, word *w)
+/*******************/
+/*+ Facto Forests +*/
+/*******************/
+
+facto_forest *mor_compute_facto_forest(morphism *, word *)
 {
 
     return NULL;
