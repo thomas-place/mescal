@@ -1,7 +1,8 @@
 #include "nfa_enum.h"
 
-dfa_enum* dfa_enum_init(short states, short alpha) {
-    dfa_enum* A;
+dfa_enum *dfa_enum_init(short states, short alpha)
+{
+    dfa_enum *A;
     CALLOC(A, 1);
     A->states = states;
     A->alpha = alpha;
@@ -10,12 +11,14 @@ dfa_enum* dfa_enum_init(short states, short alpha) {
     MALLOC(A->outlabs, states);
     CALLOC(A->parti, states);
     CALLOC(A->parsize, states);
-    for (short q = 0; q < states; q++) {
+    for (short q = 0; q < states; q++)
+    {
         CALLOC(A->graph[q], alpha);
         CALLOC(A->parti[q], alpha);
         A->used[q] = 1;
         A->outlabs[q] = 0;
-        for (short a = 0; a < alpha; a++) {
+        for (short a = 0; a < alpha; a++)
+        {
             A->graph[q][a] = -1;
             A->parti[q][a] = 0;
         }
@@ -23,11 +26,14 @@ dfa_enum* dfa_enum_init(short states, short alpha) {
     A->final = 0;
     A->inisep = 0;
     A->run = true;
+    // A->count = 0;
     return A;
 }
 
-void dfa_enum_free(dfa_enum* A) {
-    for (short q = 0; q < A->states; q++) {
+void dfa_enum_free(dfa_enum *A)
+{
+    for (short q = 0; q < A->states; q++)
+    {
         free(A->graph[q]);
         free(A->parti[q]);
     }
@@ -39,7 +45,12 @@ void dfa_enum_free(dfa_enum* A) {
     free(A);
 }
 
-bool dfa_enum_next(dfa_enum* A) {
+bool dfa_enum_next(dfa_enum *A)
+{
+    // if (A->count == 97547)
+    // {
+    //     printf("Reached 97547\n");
+    // }
     // if (A->final < A->used[A->states - 1] - 1) {
     //     A->final++;
     //     return true;
@@ -47,25 +58,32 @@ bool dfa_enum_next(dfa_enum* A) {
     // else {
     //     A->final = 0;
     // }
+    // A->count++;
 
-    for (short i = A->states - 1; i > 0; i--) {
-        if (A->used[i] < i + 1) {
+    for (short i = A->states - 1; i > 0; i--)
+    {
+        if (A->used[i] < i + 1)
+        {
             continue;
         }
 
-        //printf("start %d\n", i);
-        // We first look at the edges that stay in the used state space
-        // If we did not enumerate all cases for them, we iterate and return.
-        // Otherwise, they are all reinitialized to the sink state and we look for another way to iterate.
-        for (short a = 0;a < A->alpha;a++) {
-            if (A->graph[i][a] >= A->used[i]) {
+        // printf("start %d\n", i);
+        //  We first look at the edges that stay in the used state space
+        //  If we did not enumerate all cases for them, we iterate and return.
+        //  Otherwise, they are all reinitialized to the sink state and we look for another way to iterate.
+        for (short a = 0; a < A->alpha; a++)
+        {
+            if (A->graph[i][a] >= A->used[i])
+            {
                 continue;
             }
 
-            if (A->graph[i][a] == i) {
+            if (A->graph[i][a] == i)
+            {
                 A->graph[i][a] = -1;
             }
-            else {
+            else
+            {
                 A->graph[i][a]++;
                 return true;
             }
@@ -73,39 +91,44 @@ bool dfa_enum_next(dfa_enum* A) {
 
         //  printf("mid1 %d\n", i);
 
-          // We try to modify the edges that go out of the used state space
-          // First, we try to iterate the integer partition that symbolizes these edges. 
-        if (A->outlabs[i] > 0 && A->parsize[i] < A->outlabs[i]) {
+        // We try to modify the edges that go out of the used state space
+        // First, we try to iterate the integer partition that symbolizes these edges.
+        if (A->outlabs[i] > 0 && A->parsize[i] < A->outlabs[i])
+        {
 
             // The number of available states for the outgoing edges.
             short avail = A->states - A->used[i];
 
             // We iterate the partition until we find a valid one or we reach the end.
             A->parsize[i] = iterate_integer_partition(A->parti[i], A->outlabs[i]);
-            while (A->parsize[i] > avail && A->parsize[i] < A->outlabs[i]) {
+            while (A->parsize[i] > avail && A->parsize[i] < A->outlabs[i])
+            {
                 A->parsize[i] = iterate_integer_partition(A->parti[i], A->outlabs[i]);
             }
 
             // If we found a valid partition we return.
-            if (A->parsize[i] <= avail) {
+            if (A->parsize[i] <= avail)
+            {
                 return true;
             }
         }
 
-
         // printf("mid %d\n", i);
 
-
-         // We now try to iterate on the partition between ingoing and outgoing edges.
-        if (i < A->states - 1 && A->outlabs[i] < A->alpha) {
-            //printf("old: %d\n", A->outlabs[i]);
-            for (short a = 0;a < A->alpha;a++) {
-                if (A->graph[i][a] >= A->used[i]) {
+        // We now try to iterate on the partition between ingoing and outgoing edges.
+        if (i < A->states - 1 && A->outlabs[i] < A->alpha)
+        {
+            // printf("old: %d\n", A->outlabs[i]);
+            for (short a = 0; a < A->alpha; a++)
+            {
+                if (A->graph[i][a] >= A->used[i])
+                {
                     A->graph[i][a] = -1;
                     A->outlabs[i]--;
                     continue;
                 }
-                if (A->graph[i][a] == -1) {
+                if (A->graph[i][a] == -1)
+                {
                     A->graph[i][a] = A->used[i];
                     A->outlabs[i]++;
                     break;
@@ -113,71 +136,81 @@ bool dfa_enum_next(dfa_enum* A) {
             }
             // printf("new: %d\n", A->outlabs[i]);
 
-
-             // We reinitialize the integer partition symbolizing the outgoing edges.
+            // We reinitialize the integer partition symbolizing the outgoing edges.
             A->parsize[i] = 1;
             A->parti[i][0] = A->outlabs[i];
-            for (short a = 1;a < A->outlabs[i];a++) {
+            for (short a = 1; a < A->outlabs[i]; a++)
+            {
                 A->parti[i][a] = 0;
             }
 
             // We reinitialize the used states for the states that follow.
-            for (short j = i + 1; j < A->states;j++) {
+            for (short j = i + 1; j < A->states; j++)
+            {
                 A->used[j] = A->used[i] + A->parsize[i];
             }
             return true;
         }
 
-
-        //printf("end %d\n", i);
-
-
+        // printf("end %d\n", i);
 
         // Finally, if we were on the last iteration for this state, we reinitialize and
-        // move to the previous state. 
-        for (short a = 0;a < A->alpha;a++) {
+        // move to the previous state.
+        for (short a = 0; a < A->alpha; a++)
+        {
             A->graph[i][a] = -1;
         }
         A->outlabs[i] = 0;
-        for (short j = i + 1; j < A->states;j++) {
+        for (short j = i + 1; j < A->states; j++)
+        {
             A->used[j] = A->used[i];
         }
     }
 
-
-
     // Special case for the initial state (can exploit symmtries between labels)
 
-    if (A->inisep < A->alpha - A->outlabs[0]) {
+    if (A->inisep < A->alpha - A->outlabs[0])
+    {
         A->inisep++;
         return true;
     }
 
     A->inisep = 0;
-    if (A->outlabs[0] > 0 && A->parsize[0] < A->outlabs[0]) {
+    if (A->outlabs[0] > 0 && A->parsize[0] < A->outlabs[0])
+    {
 
         // The number of available states for the outgoing edges.
         short avail = A->states - A->used[0];
 
         // We iterate the partition until we find a valid one or we reach the end.
         A->parsize[0] = iterate_integer_partition(A->parti[0], A->outlabs[0]);
-        while (A->parsize[0] > avail && A->parsize[0] < A->outlabs[0]) {
+        while (A->parsize[0] > avail && A->parsize[0] < A->outlabs[0])
+        {
             A->parsize[0] = iterate_integer_partition(A->parti[0], A->outlabs[0]);
         }
         // If we found a valid partition we return.
-        if (A->parsize[0] <= avail) {
+        if (A->parsize[0] <= avail)
+        {
             return true;
         }
     }
 
-    if (A->outlabs[0] < A->alpha && A->states > 1) {
+    // if (A->count == 97547)
+    // {
+    //     printf("Reached 97547\n");
+    // }
+
+    if (A->outlabs[0] < A->alpha && A->states > 1)
+    {
         A->outlabs[0]++;
         A->parsize[0] = 1;
         A->parti[0][0] = A->outlabs[0];
-        for (short a = 1;a < A->outlabs[0];a++) {
+        for (short a = 1; a < A->outlabs[0]; a++)
+        {
             A->parti[0][a] = 0;
         }
-        for (short j = 1; j < A->states;j++) {
+        for (short j = 1; j < A->states; j++)
+        {
             A->used[j] = A->used[0] + A->parsize[0];
         }
         return true;
@@ -186,50 +219,52 @@ bool dfa_enum_next(dfa_enum* A) {
     A->run = false;
 
     return false;
-
 }
 
-
-
-short iterate_integer_partition(short* part, short n) {
+short iterate_integer_partition(short *part, short n)
+{
     short i = 0;
-    while (i < n && part[i] > 1) {
+    while (i < n && part[i] > 1)
+    {
         i++;
     }
-    if (i == 0) {
+    if (i == 0)
+    {
         return n;
     }
     short k = i - 1;
     part[k]--;
     short N = 0;
-    while (i < n && part[i] == 1) {
+    while (i < n && part[i] == 1)
+    {
         N++;
         i++;
     }
     short q = (N + 1) / part[k];
     short r = (N + 1) % part[k];
     short end = k + q + 1;
-    for (short j = k + 1;j < end;j++) {
+    for (short j = k + 1; j < end; j++)
+    {
         part[j] = part[k];
     }
-    if (r != 0) {
+    if (r != 0)
+    {
         part[end] = r;
         end++;
     }
     short j = end;
-    while (j < n && part[j] != 0) {
+    while (j < n && part[j] != 0)
+    {
         part[j] = 0;
         j++;
     }
 
-
     return end;
 }
 
-
-
-dfa* dfa_enum_to_dfa(dfa_enum* E) {
-    dfa* A;
+dfa *dfa_enum_to_dfa(dfa_enum *E)
+{
+    dfa *A;
     CALLOC(A, 1);
     A->initial = 0;
     A->nb_finals = 1;
@@ -239,93 +274,112 @@ dfa* dfa_enum_to_dfa(dfa_enum* E) {
     A->trans = create_dgraph_noedges(E->states + 1, E->alpha);
 
     MALLOC(A->alphabet, E->alpha);
-    for (short a = 0; a < E->alpha; a++) {
+    for (short a = 0; a < E->alpha; a++)
+    {
         A->alphabet[a].lab = a + 'a';
         A->alphabet[a].num = -1;
     }
 
-    for (short a = 0; a < E->inisep; a++) {
+    for (short a = 0; a < E->inisep; a++)
+    {
         A->trans->edges[0][a] = 0;
     }
 
-    short b = E->inisep; //E->alpha - E->outlabs[0];
-    for (short i = 1; i <= E->parsize[0]; i++) {
-        for (short j = 0; j < E->parti[0][i - 1]; j++) {
+    short b = E->inisep; // E->alpha - E->outlabs[0];
+    for (short i = 1; i <= E->parsize[0]; i++)
+    {
+        for (short j = 0; j < E->parti[0][i - 1]; j++)
+        {
             A->trans->edges[0][b] = i;
             b++;
         }
     }
 
-    while (b < E->alpha) {
+    while (b < E->alpha)
+    {
         A->trans->edges[0][b] = E->states;
         b++;
     }
 
-    for (short q = 1; q < E->states; q++) {
-        //printf("State %d\n", q);
+    for (short q = 1; q < E->states; q++)
+    {
+        // printf("State %d\n", q);
         short ind = 0;
         short con = 0;
 
-        for (short a = 0; a < E->alpha; a++) {
+        for (short a = 0; a < E->alpha; a++)
+        {
             //  printf("Letter %d\n", a);
-            if (E->graph[q][a] == -1) {
-                A->trans->edges[q][a] = E->states;;
+            if (E->graph[q][a] == -1)
+            {
+                A->trans->edges[q][a] = E->states;
+                ;
                 continue;
             }
-            if (E->graph[q][a] < E->used[q]) {
+            if (E->graph[q][a] < E->used[q])
+            {
                 A->trans->edges[q][a] = E->graph[q][a];
                 continue;
             }
 
             //   printf("there\n");
 
-            if (con < E->parti[q][ind]) {
+            if (con < E->parti[q][ind])
+            {
                 A->trans->edges[q][a] = E->used[q] + ind;
                 con++;
             }
-            else {
+            else
+            {
                 con = 0;
                 ind++;
                 A->trans->edges[q][a] = E->used[q] + ind;
             }
-
         }
     }
-    for (short a = 0; a < E->alpha; a++) {
+    for (short a = 0; a < E->alpha; a++)
+    {
         A->trans->edges[E->states][a] = E->states;
     }
-    //printf("Done\n");
+    // printf("Done\n");
+
+    A->trans->size_edges = A->trans->size_alpha * A->trans->size_graph;
 
     return A;
-
 }
 
-
-void dfa_enum_print(dfa_enum* E) {
+void dfa_enum_print(dfa_enum *E)
+{
     printf("States: %d\n", E->states);
     printf("Alphabet: %d\n", E->alpha);
     printf("Graph:\n");
-    for (short q = 0; q < E->states; q++) {
+    for (short q = 0; q < E->states; q++)
+    {
         printf("State %d: ", q);
-        for (short a = 0; a < E->alpha; a++) {
+        for (short a = 0; a < E->alpha; a++)
+        {
             printf("%d ", E->graph[q][a]);
         }
         printf("\n");
     }
     printf("Used states: ");
-    for (short q = 0; q < E->states; q++) {
+    for (short q = 0; q < E->states; q++)
+    {
         printf("%d ", E->used[q]);
     }
     printf("\n");
     printf("Outgoing labels: ");
-    for (short q = 0; q < E->states; q++) {
+    for (short q = 0; q < E->states; q++)
+    {
         printf("%d ", E->outlabs[q]);
     }
     printf("\n");
     printf("Partition:\n");
-    for (short q = 0; q < E->states; q++) {
+    for (short q = 0; q < E->states; q++)
+    {
         printf("State %d: ", q);
-        for (short a = 0; a < E->parsize[q]; a++) {
+        for (short a = 0; a < E->parsize[q]; a++)
+        {
             printf("%d ", E->parti[q][a]);
         }
         printf("\n");

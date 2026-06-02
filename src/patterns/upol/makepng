@@ -1,0 +1,5 @@
+#!/bin/bash
+list="$(find . -name \*.pdf -type f)"
+for file in $list; do 
+   magick -density 300 -depth 8 -quality 85 "${file%.pdf}.pdf" "${file%.pdf}.png"
+done

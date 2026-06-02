@@ -1,99 +1,112 @@
 #ifndef PRINTING_H
 #define PRINTING_H
 
+#include "alloc.h"
+#include "monoid.h"
+#include "nfa.h"
+#include "nfa_props.h"
+#include "tools.h"
+#include "type_basic.h"
+#include "type_dequeue.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "tools.h"
-#include "monoid.h"
-#include "type_dequeue.h"
-#include "nfa.h"
-#include "alloc.h"
-#include "type_basic.h"
-#include "nfa_patterns.h"
-
-
-
-/********************************/
-/*+ Computation of multi-edges +*/
-/********************************/
-/**
- * @brief
- * Type used to represent a multi-edge in a graph.
- *
- * @remark
- * A multi-edge is an edge that can have multiple labels. This type is used for
- * display purposes: when two vertices are connected by multiple edges, we
- * simplify the presentation by drawing only one edge that carries all the
- * labels of the actual edges.
- */
-typedef struct {
-    uint in;                          //!< Initial state of the edge
-    bool eps;                         //!< Epsilon transition.
-    dequeue* lab;                     //!< Sorted list of labels.
-    dequeue* lab_i;                   //!< Sorted list of inverse labels.
-    uint out;                         //!< Final state of the edge
-} multi_edge;
-
-/**
- * @brief
- * Compute the multi-edges of a NFA.
- *
- * @return
- * The list of multi-edges of the NFA stored in a dequeue.
- */
-dequeue_gen* nfa_to_multi_edges(nfa* //!< The NFA.
-);
-
-
-/**
- * @brief
- * Compute the multi-edges of a deterministic graph (used for morphisms).
- *
- * @return
- * The list of multi-edges of the graph stored in a dequeue.
- */
-dequeue_gen* dgraph_to_multi_edges(dgraph* //!< The deterministic graph.
-);
 
 /***********************/
 /* Graphviz generation */
 /***********************/
 
-void named_lgedges_print(dequeue_gen* theedges, nfa* A, FILE* out);
+void named_nfaedges_print(nfa *A, FILE *out);
 
-void named_dfaedges_print(dequeue_gen* theedges, dfa* A, FILE* out);
+void named_dfaedges_print(dfa *A, FILE *out);
 
-void named_dedges_print(dequeue_gen* theedges, morphism* M, FILE* out);
+void named_moredges_print(morphism *M, bool left, FILE *out);
 
-void dgraphedges_print(dequeue_gen* theedges, FILE* out);
+void gedges_print(graph *g, FILE *out);
 
-void nfa_print(nfa* A, FILE* out);
+void dgedges_print(dgraph *g, FILE *out);
 
-void dfa_print(dfa* A, FILE* out);
+void lgedges_print(lgraph *g, FILE *out);
 
-void dgraph_print(dgraph* g, FILE* out);
+void nfa_print(nfa *A, FILE *out);
 
-void cayley_print(morphism* mor, FILE* out);
+void dfa_print(dfa *A, FILE *out);
 
-void cayley_left_print(morphism* mor, FILE* out);
+void graph_print(graph *g, FILE *out);
+
+void dgraph_print(dgraph *g, FILE *out);
+
+void lgraph_print(lgraph *g, FILE *out);
+
+void cayley_print(morphism *mor, bool left, FILE *out);
+
+void facto_forest_print(morphism *mor, facto_forest *forest, FILE *out);
+
+void mor_order_print(morphism *M, graph *G, FILE *out);
+
+void dfa_order_print(dfa *A, graph *G, FILE *out);
+
+/**************/
+/*+ Patterns +*/
+/**************/
+
+void sfc_pattern_print(dfa *A, uint *states, uint nb_states, uint *word, char var, FILE *out);
+
+void view_sfc_pattern(dfa *A, uint *states, uint nb_states, uint *word, char var);
+
+void dd_pattern_print(dfa *A, generic_pattern *pattern, FILE *out);
+
+void gr_pattern_print(dfa *A, generic_pattern *pattern, FILE *out);
+
+void grp1_pattern_print(dfa *A, generic_pattern *pattern, FILE *out);
+
+void grp2_pattern_print(dfa *A, generic_pattern *pattern, FILE *out);
+
+void com_pattern_print(dfa *A, generic_pattern *pattern, FILE *out);
+
+void lttcom_pattern_print(dfa *A, generic_pattern *pattern, FILE *out);
+
+void idem_pattern_print(dfa *A, generic_pattern *pattern, FILE *out);
+
+void rtriv_pattern_print(dfa *A, generic_pattern *pattern, FILE *out);
+
+void ltriv_pattern_print(dfa *A, generic_pattern *pattern, FILE *out);
+
+void ltriv_opti_pattern_print(dfa *A, generic_pattern *pattern, FILE *out);
+
+void da_pattern_print(dfa *A, generic_pattern *pattern, FILE *out);
+
+void pol_pattern_print(dfa *A, generic_pattern *pattern, FILE *out);
+
+void polgr_pattern_print(dfa *A, generic_pattern *pattern, FILE *out);
+
+void knast_pattern_print(dfa *A, generic_pattern *pattern, FILE *out);
+
+void view_pattern(dfa *A, generic_pattern *pattern, void (*pattern_print)(dfa *, generic_pattern *, FILE *));
 
 /****************/
 /* Shell output */
 /****************/
 
+void view_nfa(nfa *nfa);
 
-void view_nfa(nfa* nfa);
+void view_dfa(dfa *dfa);
 
-void view_dfa(dfa* dfa);
+void view_graph(graph *g);
 
-void view_dgraph(dgraph* g);
+void view_mor_order(morphism *M, graph *g);
 
-void view_cayley(morphism* mor);
+void view_dfa_order(dfa *A, graph *g);
 
-void view_left_cayley(morphism* mor);
+void view_dgraph(dgraph *g);
 
-void view_image(const char* filename);
+void view_lgraph(lgraph *g);
+
+void view_cayley(morphism *mor, bool left);
+
+void view_facto_forest(morphism *mor, facto_forest *forest);
+
+void view_image(const char *filename);
 
 /********************/
 /* Latex generation */
@@ -101,14 +114,12 @@ void view_image(const char* filename);
 
 void latex_init(void);
 
-void latex_print_nfa(nfa* A, FILE* out);
+void latex_print_nfa(nfa *A, FILE *out);
 
-void latex_print_dfa(dfa* A, FILE* out);
+void latex_print_dfa(dfa *A, FILE *out);
 
-void latex_print_cayley(morphism* M, FILE* out);
+void latex_print_cayley(morphism *M, FILE *out);
 
-void latex_print_lcayley(morphism* M, FILE* out);
-
-
+void latex_print_lcayley(morphism *M, FILE *out);
 
 #endif

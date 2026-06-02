@@ -10,12 +10,11 @@
 #ifndef MINIMIZATION_H
 #define MINIMIZATION_H
 
- /*  _   _ _____ _        __  __ _       _           _          _   _              */
- /* | \ | |  ___/ \   _  |  \/  (_)_ __ (_)_ __ ___ (_)______ _| |_(_) ___  _ __   */
- /* |  \| | |_ / _ \ (_) | |\/| | | '_ \| | '_ ` _ \| |_  / _` | __| |/ _ \| '_ \  */
- /* | |\  |  _/ ___ \ _  | |  | | | | | | | | | | | | |/ / (_| | |_| | (_) | | | | */
- /* |_| \_|_|/_/   \_(_) |_|  |_|_|_| |_|_|_| |_| |_|_/___\__,_|\__|_|\___/|_| |_| */
-
+/*  _   _ _____ _        __  __ _       _           _          _   _              */
+/* | \ | |  ___/ \   _  |  \/  (_)_ __ (_)_ __ ___ (_)______ _| |_(_) ___  _ __   */
+/* |  \| | |_ / _ \ (_) | |\/| | | '_ \| | '_ ` _ \| |_  / _` | __| |/ _ \| '_ \  */
+/* | |\  |  _/ ___ \ _  | |  | | | | | | | | | | | | |/ / (_| | |_| | (_) | | | | */
+/* |_| \_|_|/_/   \_(_) |_|  |_|_|_| |_|_|_| |_| |_|_/___\__,_|\__|_|\___/|_| |_| */
 
 #include "nfa_determi.h"
 #include "printing.h"
@@ -30,14 +29,13 @@
  * to make the copy canonical.
  *
  * @attention
- * The input DFA is assumed to be minimal. This is not checked.
+ * The input DFA is assumed to be minimal (and in particular complete). This is not checked.
  *
  * @return
  * The canonical copy of the input DFA.
  */
-dfa* dfa_mini_canonical_copy(dfa*  //!< The DFA to copy.
+dfa *dfa_mini_canonical_copy(dfa * //!< The DFA to copy.
 );
-
 
 /****************/
 /*+ Brzozowski +*/
@@ -50,9 +48,8 @@ dfa* dfa_mini_canonical_copy(dfa*  //!< The DFA to copy.
  * @return
  * The minimal automaton of the input language.
  */
-dfa* nfa_brzozowski(nfa* //!< The NFA.
+dfa *nfa_brzozowski(nfa * //!< The NFA.
 );
-
 
 /**
  * @brief
@@ -61,9 +58,8 @@ dfa* nfa_brzozowski(nfa* //!< The NFA.
  * @return
  * The minimal automaton of the input language.
  */
-dfa* dfa_brzozowski(dfa* //!< The DFA.
+dfa *dfa_brzozowski(dfa * //!< The DFA.
 );
-
 
 /**************/
 /*+ Hopcroft +*/
@@ -73,17 +69,16 @@ dfa* dfa_brzozowski(dfa* //!< The DFA.
  * @brief
  * Type used to represent the state partition used in the Hopcroft algorithm.
  */
-typedef struct {
-    uint size_set;      //!< The size of the partitioned set.
-    uint size_par;      //!< The size of the partition.
-    uint* classes;      //!< Array of classes: maps each element to its class.
-    uint* parray;       //!< Array containing all elements of the set grouped by classes (elements belonging to the same class are next to each other).
-    uint* parray_i;     //!< Inverse of the previous array: each element in the set is mapped to each index in parray.
-    uint* rindex;       //!< Array indexed by the classes: each class is mapped to the index following this class in parray.
-    uint* lindex;       //!< Array indexed by the classes: each class is mapped to the index at which this class starts in parray.
+typedef struct
+{
+    uint size_set;  //!< The size of the partitioned set.
+    uint size_par;  //!< The size of the partition.
+    uint *classes;  //!< Array of classes: maps each element to its class.
+    uint *parray;   //!< Array containing all elements of the set grouped by classes (elements belonging to the same class are next to each other).
+    uint *parray_i; //!< Inverse of the previous array: each element in the set is mapped to each index in parray.
+    uint *rindex;   //!< Array indexed by the classes: each class is mapped to the index following this class in parray.
+    uint *lindex;   //!< Array indexed by the classes: each class is mapped to the index at which this class starts in parray.
 } hopcroft_partition;
-
-
 
 /**
  * @brief
@@ -97,9 +92,9 @@ typedef struct {
  * @return
  * The initial partition.
  */
-hopcroft_partition* dfa_hopcroft_initial(uint, //!< The number of states in the automaton.
-    uint*,                                   //!< The list of final states (assumed to be non-trivial).
-    uint //!< The number of final states (assumed to be non-trivial).
+hopcroft_partition *dfa_hopcroft_initial(uint,   //!< The number of states in the automaton.
+                                         uint *, //!< The list of final states (assumed to be non-trivial).
+                                         uint    //!< The number of final states (assumed to be non-trivial).
 );
 
 /**
@@ -109,15 +104,15 @@ hopcroft_partition* dfa_hopcroft_initial(uint, //!< The number of states in the 
  * @return
  * The minimal automaton.
  */
-dfa* dfa_hopcroft_genauto(dfa*,  //!< The original complete DFA.
-    hopcroft_partition*          //!< The partition. 
+dfa *dfa_hopcroft_genauto(dfa *,               //!< The original complete DFA.
+                          hopcroft_partition * //!< The partition.
 );
 
 /**
  * @brief
  * Release of a Hopcroft's partition.
  */
-void dfa_hopcroft_free(hopcroft_partition*  //!< The partition.
+void dfa_hopcroft_free(hopcroft_partition * //!< The partition.
 );
 
 /**
@@ -127,9 +122,8 @@ void dfa_hopcroft_free(hopcroft_partition*  //!< The partition.
  * @return
  * The minimal automaton of the input DFA.
  */
-dfa* dfa_hopcroft(dfa*   //!< The DFA.
+dfa *dfa_hopcroft(dfa * //!< The DFA.
 );
-
 
 /************************/
 /** Canonical ordering **/
@@ -145,9 +139,15 @@ dfa* dfa_hopcroft(dfa*   //!< The DFA.
  * @attention
  * The input DFA is assumed to be minimal. This is not checked.
  */
-void dfa_mini_canonical_ordering(dfa*  //!< The DFA to order (must be minimal).
+void dfa_mini_canonical_ordering(dfa * //!< The DFA to order (must be minimal).
 );
 
-
+/**
+ * @brief
+ * Displays the ordering of a DFA on a given stream.
+ */
+void dfa_print_order(dfa *, //!< The DFA whose ordering is to be displayed.
+                     FILE * //!< The stream.
+);
 
 #endif

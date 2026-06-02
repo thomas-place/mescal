@@ -106,7 +106,7 @@ A Doxygen documentation of the source code is provided [here](https://thomas-pla
     - thomson(L)                   Uses the Thomson algorithm to compute a NFA.
     - glushkov(L)                  Uses the Glushkov algorithm to compute a NFA.
 
-## Using recurvive definition variables
+## Using recursive definition variables
 
 ### Initialization
 

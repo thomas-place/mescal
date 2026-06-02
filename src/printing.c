@@ -1,5 +1,6 @@
 #include "printing.h"
 #include "monoid_display.h"
+#include "type_dequeue.h"
 #include <json-c/json.h>
 #include <sys/utsname.h>
 
@@ -7,13 +8,17 @@
 // #define OSX_VIEW_COMMAND "| ./imgcat -W auto"
 #define OSX_VIEW_COMMAND "./imgcat -W auto"
 
-static char *view_command(void) {
+static char *view_command(void)
+{
 
     struct utsname name;
     uname(&name);
-    if (strcmp(name.sysname, "Darwin") == 0) {
+    if (strcmp(name.sysname, "Darwin") == 0)
+    {
         return OSX_VIEW_COMMAND;
-    } else {
+    }
+    else
+    {
         return LINUX_VIEW_COMMAND;
     }
 }
@@ -24,245 +29,242 @@ bool external_viewer = false;
 /* Printing functions */
 /**********************/
 
-/********************************************************/
-/*+ Récupération d'une liste d'arêtes pour l'affichage +*/
-/********************************************************/
-
-static int multi_edges_comp(void *s, void *t) {
-    if (((multi_edge *)s)->in < ((multi_edge *)t)->in) {
-        return 1;
-    } else if (((multi_edge *)s)->in > ((multi_edge *)t)->in) {
+static int edge_sort_ends(const void *a, const void *b)
+{
+    const edge_triple *ea = (const edge_triple *)a;
+    const edge_triple *eb = (const edge_triple *)b;
+    if (ea->from < eb->from)
+    {
         return -1;
-    } else {
-        if (((multi_edge *)s)->out < ((multi_edge *)t)->out) {
-            return 1;
-        } else if (((multi_edge *)s)->out > ((multi_edge *)t)->out) {
-            return -1;
-        } else {
-            return 0;
-        }
     }
+
+    if (ea->from > eb->from)
+    {
+        return 1;
+    }
+
+    if (ea->to < eb->to)
+    {
+        return -1;
+    }
+
+    if (ea->to > eb->to)
+    {
+        return 1;
+    }
+
+    return ea->lab - eb->lab;
 }
 
-static void tree_to_stack(avlnode *tree, dequeue_gen *the_stack) {
-    if (tree == NULL) {
-        return;
-    } else {
-        tree_to_stack(tree->left, the_stack);
-        rigins_dequeue_gen(tree->value, the_stack);
-        tree_to_stack(tree->right, the_stack);
-        free(tree);
-    }
-}
-
-dequeue_gen *nfa_to_multi_edges(nfa *A) {
-    if (!A) {
-        return NULL;
+static int edge_sort_ends_pairs(const void *a, const void *b)
+{
+    const edge_pair *ea = (const edge_pair *)a;
+    const edge_pair *eb = (const edge_pair *)b;
+    if (ea->from < eb->from)
+    {
+        return -1;
     }
 
-    lgraph *G = A->trans;
-    graph *GEPS = A->trans_e;
-    lgraph *GINV = A->trans_i;
-
-    dequeue_gen *thestack = create_dequeue_gen();
-    avlnode *thetree = NULL;
-    for (uint q = 0; q < G->size_graph; q++) {
-        if (GEPS != NULL) {
-            for (uint i = 0; i < size_dequeue(GEPS->edges[q]); i++) {
-                if (lefread_dequeue(GEPS->edges[q], i) != q) {
-                    multi_edge *new;
-                    MALLOC(new, 1);
-                    new->in = q;
-                    new->out = lefread_dequeue(GEPS->edges[q], i);
-                    avlnode *old = avl_search(new, thetree, &multi_edges_comp);
-                    if (old == NULL) {
-                        new->lab = create_dequeue();
-                        new->lab_i = create_dequeue();
-                        new->eps = true;
-                        thetree = avl_insert(new, thetree, &multi_edges_comp, NULL);
-                    } else {
-                        ((multi_edge *)old->value)->eps = true;
-                        free(new);
-                    }
-                }
-            }
-        }
-        for (uint a = 0; a < G->size_alpha; a++) {
-            for (uint i = 0; i < size_dequeue(G->edges[q][a]); i++) {
-                multi_edge *new;
-                MALLOC(new, 1);
-                new->in = q;
-                new->out = lefread_dequeue(G->edges[q][a], i);
-                avlnode *old = avl_search(new, thetree, &multi_edges_comp);
-                if (old == NULL) {
-                    new->lab = create_dequeue();
-                    new->lab_i = create_dequeue();
-                    new->eps = false;
-                    rigins_dequeue(a, new->lab);
-                    thetree = avl_insert(new, thetree, &multi_edges_comp, NULL);
-                } else {
-                    rigins_dequeue(a, ((multi_edge *)old->value)->lab);
-                    free(new);
-                }
-            }
-        }
-        if (GINV != NULL) {
-            for (uint a = 0; a < GINV->size_alpha; a++) {
-                for (uint i = 0; i < size_dequeue(GINV->edges[q][a]); i++) {
-                    multi_edge *new;
-                    MALLOC(new, 1);
-                    new->in = q;
-                    new->out = lefread_dequeue(GINV->edges[q][a], i);
-                    avlnode *old = avl_search(new, thetree, &multi_edges_comp);
-                    if (old == NULL) {
-                        new->lab = create_dequeue();
-                        new->lab_i = create_dequeue();
-                        new->eps = false;
-                        rigins_dequeue(a, new->lab_i);
-                        thetree = avl_insert(new, thetree, &multi_edges_comp, NULL);
-                    } else {
-                        rigins_dequeue(a, ((multi_edge *)old->value)->lab_i);
-                        free(new);
-                    }
-                }
-            }
-        }
+    if (ea->from > eb->from)
+    {
+        return 1;
     }
 
-    tree_to_stack(thetree, thestack);
-    return thestack;
-}
-
-dequeue_gen *dgraph_to_multi_edges(dgraph *G) {
-    dequeue_gen *thestack = create_dequeue_gen();
-    avlnode *thetree = NULL;
-    for (uint q = 0; q < G->size_graph; q++) {
-        for (uint a = 0; a < G->size_alpha; a++) {
-            if (G->edges[q][a] == UINT_MAX) {
-                continue; // No edge for this letter
-            }
-            multi_edge *new;
-            MALLOC(new, 1);
-            new->in = q;
-            // printf("test: %d\n", G->edges[q][a]);
-            new->out = G->edges[q][a];
-            avlnode *old = avl_search(new, thetree, &multi_edges_comp);
-            if (old == NULL) {
-                new->lab = create_dequeue();
-                rigins_dequeue(a, new->lab);
-                thetree = avl_insert(new, thetree, &multi_edges_comp, NULL);
-            } else {
-                rigins_dequeue(a, ((multi_edge *)old->value)->lab);
-                free(new);
-            }
-        }
-    }
-
-    tree_to_stack(thetree, thestack);
-    return thestack;
+    return ea->to - eb->to;
 }
 
 /********************************/
 /* Print des arêtes d'un graphe */
 /********************************/
 
-void named_lgedges_print(dequeue_gen *theedges, nfa *A, FILE *out) {
-    for (uint i = 0; i < size_dequeue_gen(theedges); i++) { // Boucle sur les états de départ
+void named_nfaedges_print(nfa *A, FILE *out)
+{
 
-        multi_edge *oneedge = lefread_dequeue_gen(theedges, i);
-        fprintf(out, "%d -> %d [label = <", oneedge->in, oneedge->out);
+    edge_triple *trans = lgraph_to_edge_list(A->trans, false);
+    qsort(trans, A->trans->size_edges, sizeof(edge_triple), edge_sort_ends);
 
-        if (oneedge->eps) {
-            fprintf(out, "ε");
-            if (!isempty_dequeue(oneedge->lab) || !isempty_dequeue(oneedge->lab_i)) {
+    uint i = 0;
+    while (i < A->trans->size_edges)
+    {
+        uint q = trans[i].from;
+        uint r = trans[i].to;
+        fprintf(out, "%d -> %d [label = <", q, r);
+        while (i < A->trans->size_edges && trans[i].from == q && trans[i].to == r)
+        {
+            uint a = trans[i].lab;
+            if (a < A->nb_letters)
+            {
+                fprint_letter_gviz(A->alphabet[a], out, false);
+            }
+            else if (A->inverse && a < (A->nb_letters << 1))
+            {
+                fprint_letter_gviz(A->alphabet[a - A->nb_letters], out, true);
+            }
+            else if (A->epsilon && a == A->trans->size_alpha - 1)
+            {
+                fprintf(out, "ε");
+            }
+            else
+            {
+                fprintf(out, "?");
+            }
+            i++;
+            if (i < A->trans->size_edges && trans[i].from == q && trans[i].to == r)
+            {
+                fprintf(out, ",");
+            }
+        }
+        fprintf(out, ">]\n");
+    }
+    free(trans);
+}
+
+void named_dfaedges_print(dfa *A, FILE *out)
+{
+    edge_triple *trans = dgraph_to_edge_list(A->trans, false);
+    qsort(trans, A->trans->size_edges, sizeof(edge_triple), edge_sort_ends);
+
+    uint i = 0;
+    while (i < A->trans->size_edges)
+    {
+        uint q = trans[i].from;
+        uint r = trans[i].to;
+        fprintf(out, "%d -> %d [label = <", q, r);
+        while (i < A->trans->size_edges && trans[i].from == q && trans[i].to == r)
+        {
+            uint a = trans[i].lab;
+            if (a < A->trans->size_alpha)
+            {
+                fprint_letter_gviz(A->alphabet[a], out, false);
+            }
+            else
+            {
+                fprintf(out, "?");
+            }
+            i++;
+            if (i < A->trans->size_edges && trans[i].from == q && trans[i].to == r)
+            {
+                fprintf(out, ",");
+            }
+        }
+        fprintf(out, ">]\n");
+    }
+    free(trans);
+}
+
+void named_moredges_print(morphism *M, bool left, FILE *out)
+{
+    dgraph *g = left ? M->l_cayley : M->r_cayley;
+    edge_triple *trans = dgraph_to_edge_list(g, false);
+    qsort(trans, g->size_edges, sizeof(edge_triple), edge_sort_ends);
+
+    uint i = 0;
+
+    while (i < g->size_edges)
+    { // Boucle sur les états de départ
+
+        fprintf(out, "%d -> %d [label = <", trans[i].from, trans[i].to);
+        uint q = trans[i].from;
+        uint r = trans[i].to;
+
+        while (i < g->size_edges && trans[i].from == q && trans[i].to == r)
+        {
+            uint a = trans[i].lab;
+            fprint_letter_gviz(M->alphabet[a], out, false);
+            i++;
+            if (i < g->size_edges && trans[i].from == q && trans[i].to == r)
+            {
                 fprintf(out, ",");
             }
         }
 
-        if (!isempty_dequeue(oneedge->lab)) {
-            for (uint j = 0; j < size_dequeue(oneedge->lab); j++) {
-                fprint_letter_gviz(A->alphabet[lefread_dequeue(oneedge->lab, j)], out, false);
-                if (j < size_dequeue(oneedge->lab) - 1 || !isempty_dequeue(oneedge->lab_i)) {
-                    fprintf(out, ",");
-                }
-            }
-        }
-
-        if (!isempty_dequeue(oneedge->lab_i)) {
-            for (uint j = 0; j < size_dequeue(oneedge->lab_i); j++) {
-                fprint_letter_gviz(A->alphabet[lefread_dequeue(oneedge->lab_i, j)], out, true);
-                if (j < size_dequeue(oneedge->lab_i) - 1) {
-                    fprintf(out, ",");
-                }
-            }
-        }
-
         fprintf(out, ">]\n");
     }
+    free(trans);
 }
 
-void named_dfaedges_print(dequeue_gen *theedges, dfa *A, FILE *out) {
-    for (uint i = 0; i < size_dequeue_gen(theedges); i++) { // Boucle sur les états de départ
+void gedges_print(graph *g, FILE *out)
+{
+    edge_pair *trans = graph_to_edge_list(g, false);
+    qsort(trans, g->size_edges, sizeof(edge_pair), edge_sort_ends_pairs);
 
-        multi_edge *oneedge = lefread_dequeue_gen(theedges, i);
-        fprintf(out, "%d -> %d [label = <", oneedge->in, oneedge->out);
+    uint i = 0;
 
-        if (!isempty_dequeue(oneedge->lab)) {
-            for (uint j = 0; j < size_dequeue(oneedge->lab); j++) {
-                fprint_letter_gviz(A->alphabet[lefread_dequeue(oneedge->lab, j)], out, false);
-                if (j < size_dequeue(oneedge->lab) - 1) {
-                    fprintf(out, ",");
-                }
-            }
-        }
+    while (i < g->size_edges)
+    { // Boucle sur les états de départ
 
-        fprintf(out, ">]\n");
+        fprintf(out, "%d -> %d\n", trans[i].from, trans[i].to);
+        i++;
     }
+    free(trans);
 }
 
-void named_dedges_print(dequeue_gen *theedges, morphism *M, FILE *out) {
-    for (uint i = 0; i < size_dequeue_gen(theedges); i++) { // Boucle sur les états de départ
+void dgedges_print(dgraph *g, FILE *out)
+{
+    edge_triple *trans = dgraph_to_edge_list(g, false);
+    qsort(trans, g->size_edges, sizeof(edge_triple), edge_sort_ends);
 
-        multi_edge *oneedge = lefread_dequeue_gen(theedges, i);
-        fprintf(out, "%d -> %d [label = <", oneedge->in, oneedge->out);
+    uint i = 0;
 
-        if (!isempty_dequeue(oneedge->lab)) {
-            for (uint j = 0; j < size_dequeue(oneedge->lab); j++) {
-                fprint_letter_gviz(M->alphabet[lefread_dequeue(oneedge->lab, j)], out, false);
-                if (j < size_dequeue(oneedge->lab) - 1) {
-                    fprintf(out, ",");
-                }
+    while (i < g->size_edges)
+    { // Boucle sur les états de départ
+
+        fprintf(out, "%d -> %d [label = <", trans[i].from, trans[i].to);
+        uint q = trans[i].from;
+        uint r = trans[i].to;
+
+        while (i < g->size_edges && trans[i].from == q && trans[i].to == r)
+        {
+            uint a = trans[i].lab;
+            fprintf(out, "%c", a + 'a');
+            i++;
+            if (i < g->size_edges && trans[i].from == q && trans[i].to == r)
+            {
+                fprintf(out, ",");
             }
         }
 
         fprintf(out, ">]\n");
     }
+    free(trans);
 }
 
-void dgraphedges_print(dequeue_gen *theedges, FILE *out) {
-    for (uint i = 0; i < size_dequeue_gen(theedges); i++) { // Boucle sur les états de départ
+void lgedges_print(lgraph *g, FILE *out)
+{
+    edge_triple *trans = lgraph_to_edge_list(g, false);
+    qsort(trans, g->size_edges, sizeof(edge_triple), edge_sort_ends);
 
-        multi_edge *oneedge = lefread_dequeue_gen(theedges, i);
-        fprintf(out, "%d -> %d [label = <", oneedge->in, oneedge->out);
+    uint i = 0;
 
-        if (!isempty_dequeue(oneedge->lab)) {
-            for (uint j = 0; j < size_dequeue(oneedge->lab); j++) {
-                fprintf(out, "%c", lefread_dequeue(oneedge->lab, j) + 'a');
-                if (j < size_dequeue(oneedge->lab) - 1) {
-                    fprintf(out, ",");
-                }
+    while (i < g->size_edges)
+    { // Boucle sur les états de départ
+
+        fprintf(out, "%d -> %d [label = <", trans[i].from, trans[i].to);
+        uint q = trans[i].from;
+        uint r = trans[i].to;
+
+        while (i < g->size_edges && trans[i].from == q && trans[i].to == r)
+        {
+            uint a = trans[i].lab;
+            fprintf(out, "%c", a + 'a');
+            i++;
+            if (i < g->size_edges && trans[i].from == q && trans[i].to == r)
+            {
+                fprintf(out, ",");
             }
         }
 
         fprintf(out, ">]\n");
     }
+    free(trans);
 }
 
 /******************/
 /* Print d'un NFA */
 /******************/
 
-void nfa_print(nfa *A, FILE *out) {
+void nfa_print(nfa *A, FILE *out)
+{
     fprintf(out, "digraph {\n");
     fprintf(out, "gradientangle=90\n");
     fprintf(out, "fontname=\"Helvetica,Arial,sans-serif\"\n");
@@ -275,26 +277,31 @@ void nfa_print(nfa *A, FILE *out) {
     uint i = 0;
     uint f = 0;
 
-    for (uint k = 0; k < A->trans->size_graph; k++) {
+    for (uint k = 0; k < A->trans->size_graph; k++)
+    {
         fprintf(out, "%d [style=solid", k);
 
-        if (A->state_names) {
+        if (A->state_names)
+        {
             fprintf(out, ",label=\"%s\"", A->state_names[k]);
         }
-        if ((i < size_dequeue(A->initials) && lefread_dequeue(A->initials, i) == k) && (f < size_dequeue(A->finals) && lefread_dequeue(A->finals, f) == k)) {
+        if ((i < A->nb_initials && A->initials[i] == k) && (f < A->nb_finals && A->finals[f] == k))
+        {
             fprintf(out, ",fillcolor=\"blue:green\",style=filled,shape = doublecircle];\n");
             i++;
             f++;
             continue;
         }
 
-        if (i < size_dequeue(A->initials) && lefread_dequeue(A->initials, i) == k) {
+        if (i < A->nb_initials && A->initials[i] == k)
+        {
             fprintf(out, ",fillcolor=\"blue:green\",style=filled,shape = circle];\n");
             i++;
             continue;
         }
 
-        if (f < size_dequeue(A->finals) && lefread_dequeue(A->finals, f) == k) {
+        if (f < A->nb_finals && A->finals[f] == k)
+        {
             fprintf(out, ",shape = doublecircle];\n");
             f++;
             continue;
@@ -302,24 +309,14 @@ void nfa_print(nfa *A, FILE *out) {
         fprintf(out, ",shape = circle];\n");
     }
 
-    dequeue_gen *theedges;
-
     // Calcul de l'ensemble de transitions
-    theedges = nfa_to_multi_edges(A);
 
-    named_lgedges_print(theedges, A, out);
-
-    while (!isempty_dequeue_gen(theedges)) {
-        multi_edge *new = rigpull_dequeue_gen(theedges);
-        delete_dequeue(new->lab);
-        free(new);
-    }
-    delete_dequeue_gen(theedges);
-
+    named_nfaedges_print(A, out);
     fprintf(out, "}\n");
 }
 
-void dfa_print(dfa *A, FILE *out) {
+void dfa_print(dfa *A, FILE *out)
+{
     fprintf(out, "digraph {\n");
     fprintf(out, "gradientangle=90\n");
     fprintf(out, "fontname=\"Helvetica,Arial,sans-serif\"\n");
@@ -331,24 +328,29 @@ void dfa_print(dfa *A, FILE *out) {
 
     uint f = 0;
 
-    for (uint k = 0; k < A->trans->size_graph; k++) {
+    for (uint k = 0; k < A->trans->size_graph; k++)
+    {
         fprintf(out, "%d [style=solid", k);
 
-        if (A->state_names) {
+        if (A->state_names)
+        {
             fprintf(out, ",label=\"%s\"", A->state_names[k]);
         }
-        if ((A->initial == k) && (f < A->nb_finals && A->finals[f] == k)) {
+        if ((A->initial == k) && (f < A->nb_finals && A->finals[f] == k))
+        {
             fprintf(out, ",fillcolor=\"blue:green\",style=filled,shape = doublecircle];\n");
             f++;
             continue;
         }
 
-        if (A->initial == k) {
+        if (A->initial == k)
+        {
             fprintf(out, ",fillcolor=\"blue:green\",style=filled,shape = circle];\n");
             continue;
         }
 
-        if (f < A->nb_finals && A->finals[f] == k) {
+        if (f < A->nb_finals && A->finals[f] == k)
+        {
             fprintf(out, ",shape = doublecircle];\n");
             f++;
             continue;
@@ -356,24 +358,13 @@ void dfa_print(dfa *A, FILE *out) {
         fprintf(out, ",shape = circle];\n");
     }
 
-    dequeue_gen *theedges;
-
-    // Calcul de l'ensemble de transitions
-    theedges = dgraph_to_multi_edges(A->trans);
-
-    named_dfaedges_print(theedges, A, out);
-
-    while (!isempty_dequeue_gen(theedges)) {
-        multi_edge *new = rigpull_dequeue_gen(theedges);
-        delete_dequeue(new->lab);
-        free(new);
-    }
-    delete_dequeue_gen(theedges);
+    named_dfaedges_print(A, out);
 
     fprintf(out, "}\n");
 }
 
-void dgraph_print(dgraph *g, FILE *out) {
+void graph_print(graph *g, FILE *out)
+{
     fprintf(out, "digraph {\n");
     fprintf(out, "gradientangle=90\n");
     fprintf(out, "fontname=\"Helvetica,Arial,sans-serif\"\n");
@@ -383,27 +374,60 @@ void dgraph_print(dgraph *g, FILE *out) {
     fprintf(out, "rankdir=LR;\n\n");
     fprintf(out, "splines=true;\n\n");
 
-    for (uint k = 0; k < g->size_graph; k++) {
+    for (uint k = 0; k < g->size; k++)
+    {
         fprintf(out, "%d [style=solid,shape = circle];\n", k);
     }
 
-    dequeue_gen *theedges;
-    // Calcul de l'ensemble de transitions
-    theedges = dgraph_to_multi_edges(g);
-
-    dgraphedges_print(theedges, out);
-
-    while (!isempty_dequeue_gen(theedges)) {
-        multi_edge *new = rigpull_dequeue_gen(theedges);
-        delete_dequeue(new->lab);
-        free(new);
-    }
-    delete_dequeue_gen(theedges);
+    gedges_print(g, out);
 
     fprintf(out, "}\n");
 }
 
-void cayley_print(morphism *M, FILE *out) {
+void dgraph_print(dgraph *g, FILE *out)
+{
+    fprintf(out, "digraph {\n");
+    fprintf(out, "gradientangle=90\n");
+    fprintf(out, "fontname=\"Helvetica,Arial,sans-serif\"\n");
+    fprintf(out, "resolution= \"200.0,0.0\"\n");
+    fprintf(out, "node [fontname=\"Helvetica,Arial,sans-serif\"]\n");
+    fprintf(out, "edge [fontname=\"Helvetica,Arial,sans-serif\"]\n");
+    fprintf(out, "rankdir=LR;\n\n");
+    fprintf(out, "splines=true;\n\n");
+
+    for (uint k = 0; k < g->size_graph; k++)
+    {
+        fprintf(out, "%d [style=solid,shape = circle];\n", k);
+    }
+
+    dgedges_print(g, out);
+
+    fprintf(out, "}\n");
+}
+
+void lgraph_print(lgraph *g, FILE *out)
+{
+    fprintf(out, "digraph {\n");
+    fprintf(out, "gradientangle=90\n");
+    fprintf(out, "fontname=\"Helvetica,Arial,sans-serif\"\n");
+    fprintf(out, "resolution= \"200.0,0.0\"\n");
+    fprintf(out, "node [fontname=\"Helvetica,Arial,sans-serif\"]\n");
+    fprintf(out, "edge [fontname=\"Helvetica,Arial,sans-serif\"]\n");
+    fprintf(out, "rankdir=LR;\n\n");
+    fprintf(out, "splines=true;\n\n");
+
+    for (uint k = 0; k < g->size_graph; k++)
+    {
+        fprintf(out, "%d [style=solid,shape = circle];\n", k);
+    }
+
+    lgedges_print(g, out);
+
+    fprintf(out, "}\n");
+}
+
+void cayley_print(morphism *M, bool left, FILE *out)
+{
     fprintf(out, "digraph {\n");
     fprintf(out, "gradientangle=90\n");
     fprintf(out, "fontname=\"Helvetica,Arial,sans-serif\"\n");
@@ -414,11 +438,13 @@ void cayley_print(morphism *M, FILE *out) {
 
     uint f = 0;
     // Print des sommets
-    for (uint k = 0; k < M->r_cayley->size_graph; k++) {
+    for (uint k = 0; k < M->r_cayley->size_graph; k++)
+    {
         fprintf(out, "%d [style=solid,label=<", k);
         mor_print_name_gviz(M, k, out);
 
-        if (f < M->nb_accept && M->accept_list[f] == k) {
+        if (f < M->nb_accept && M->accept_list[f] == k)
+        {
             fprintf(out, ">,shape = doublecircle];\n");
             f++;
             continue;
@@ -426,21 +452,127 @@ void cayley_print(morphism *M, FILE *out) {
         fprintf(out, ">,shape = circle];\n");
     }
 
-    dequeue_gen *theedges = dgraph_to_multi_edges(M->r_cayley);
-    named_dedges_print(theedges, M, out);
-    while (!isempty_dequeue_gen(theedges)) {
-        multi_edge *new = rigpull_dequeue_gen(theedges);
-        delete_dequeue(new->lab);
-        free(new);
-    }
-
-    delete_dequeue_gen(theedges);
+    named_moredges_print(M, left, out);
 
     fprintf(out, "}\n");
 }
 
-void cayley_left_print(morphism *M, FILE *out) {
+void facto_forest_print(morphism *M, facto_forest *forest, FILE *out)
+{
+    fprintf(out, "graph {\n");
+    fprintf(out, "gradientangle=90\n");
+    fprintf(out, "fontname=\"Helvetica,Arial,sans-serif\"\n");
+    fprintf(out, "resolution= \"200.0,0.0\"");
+    fprintf(out, "node [fontname=\"Helvetica,Arial,sans-serif\"]\n");
+    fprintf(out, "edge [fontname=\"Helvetica,Arial,sans-serif\"]\n");
+    fprintf(out, "ordering=out;\n");
+    fprintf(out, "rankdir=TD;\n");
 
+    // Root node
+    // fprintf(out, "subgraph cluster_%d\n", nbc++);
+    // fprintf(out, "{\n");
+    fprintf(out, "%d [style=solid,label=<", forest->root);
+    mor_print_name_gviz(M, forest->nodes[forest->root].elem, out);
+    switch (forest->nodes[forest->root].type)
+    {
+    case FACTO_LEAF:
+        fprintf(out, ">,shape = square];\n");
+        break;
+    case FACTO_BINARY:
+        fprintf(out, ">,shape = circle];\n");
+        break;
+    case FACTO_IDEM:
+        fprintf(out, ">,shape = diamond];\n");
+        break;
+    default:
+        fprintf(out, ">,shape = circle];\n");
+        break;
+    }
+    // fprintf(out, "}\n");
+
+    dequeue *q = create_dequeue();
+    rigins_dequeue((uint)forest->root, q);
+    while (!isempty_dequeue(q))
+    {
+        int n = (int)lefpull_dequeue(q);
+        if (forest->nodes[n].type == FACTO_LEAF)
+        {
+            continue;
+        }
+        // fprintf(out, "subgraph cluster_%d\n", nbc++);
+        // fprintf(out, "{\n");
+        // fprintf(out, "rank = same\n");
+        for (int i = 0; i < forest->nodes[n].nb_children; i++)
+        {
+            uint child = (uint)forest->childrens[forest->nodes[n].st_children + i];
+            fprintf(out, "%d [style=solid,label=<", child);
+            mor_print_name_gviz(M, forest->nodes[child].elem, out);
+            switch (forest->nodes[child].type)
+            {
+            case FACTO_LEAF:
+                fprintf(out, ">,shape = square];\n");
+                break;
+            case FACTO_BINARY:
+                fprintf(out, ">,shape = circle];\n");
+                break;
+            case FACTO_IDEM:
+                fprintf(out, ">,shape = diamond];\n");
+                break;
+            default:
+                fprintf(out, ">,shape = circle];\n");
+                break;
+            }
+            fprintf(out, "%d -- %d [style=dashed];\n", n, child);
+            rigins_dequeue((uint)child, q);
+        }
+        // fprintf(out, "}\n");
+        // for (int i = 0; i < forest->nodes[n].nb_children; i++)
+        // {
+        //     fprintf(out, "%d -> %d [style=dashed];\n", n, forest->childrens[forest->nodes[n].st_children + i]);
+        //     if (i > 0)
+        //     {
+        //         fprintf(out, "%d -> %d [style=invis];\n", forest->childrens[forest->nodes[n].st_children + i - 1], forest->childrens[forest->nodes[n].st_children + i]);
+        //     }
+        // }
+    }
+    delete_dequeue(q);
+    fprintf(out, "}\n");
+}
+
+// subgraph cluster_0
+// {
+//     style = filled;
+//     color = lightgrey;
+//     node[style = filled, color = white];
+//     a0->a1->a2->a3;
+//     label = "process #1";
+// }
+
+// // Print des sommets
+// for (int k = 0; k < forest->nb_nodes; k++)
+// {
+//     fprintf(out, "%d [style=solid,label=<", k);
+//     mor_print_name_gviz(M, forest->nodes[k].elem, out);
+//     fprintf(out, ">,shape = circle];\n");
+// }
+
+// for (int k = 0; k < forest->nb_nodes; k++)
+// { // Boucle sur les états de départ
+//     for (int i = 0; i < forest->nodes[k].nb_children; i++)
+//     {
+//         fprintf(out, "%d -> %d [style=dashed];\n", k, forest->childrens[forest->nodes[k].st_children + i]);
+//         if (i > 0)
+//         {
+//             fprintf(out, "%d -> %d [style=invis];\n", forest->childrens[forest->nodes[k].st_children + i - 1], forest->childrens[forest->nodes[k].st_children + i]);
+//         }
+//     }
+// }
+
+// fprintf(out, "}\n");
+// }
+
+void mor_order_print(morphism *M, graph *G, FILE *out)
+{
     fprintf(out, "digraph {\n");
     fprintf(out, "gradientangle=90\n");
     fprintf(out, "fontname=\"Helvetica,Arial,sans-serif\"\n");
@@ -448,31 +580,589 @@ void cayley_left_print(morphism *M, FILE *out) {
     fprintf(out, "node [fontname=\"Helvetica,Arial,sans-serif\"]\n");
     fprintf(out, "edge [fontname=\"Helvetica,Arial,sans-serif\"]\n");
     fprintf(out, "rankdir=LR;\n");
-    uint f = 0;
+
     // Print des sommets
-    for (uint k = 0; k < M->l_cayley->size_graph; k++) {
+    for (uint k = 0; k < M->r_cayley->size_graph; k++)
+    {
         fprintf(out, "%d [style=solid,label=<", k);
         mor_print_name_gviz(M, k, out);
-
-        if (f < M->nb_accept && M->accept_list[f] == k) {
-            fprintf(out, ">,shape = doublecircle];\n");
-            f++;
-            continue;
-        }
         fprintf(out, ">,shape = circle];\n");
     }
+    gedges_print(G, out);
+    fprintf(out, "}\n");
+}
 
-    dequeue_gen *theedges = dgraph_to_multi_edges(M->l_cayley);
-    named_dedges_print(theedges, M, out);
+void dfa_order_print(dfa *A, graph *G, FILE *out)
+{
+    fprintf(out, "digraph {\n");
+    fprintf(out, "gradientangle=90\n");
+    fprintf(out, "fontname=\"Helvetica,Arial,sans-serif\"\n");
+    fprintf(out, "resolution= \"200.0,0.0\"");
+    fprintf(out, "node [fontname=\"Helvetica,Arial,sans-serif\"]\n");
+    fprintf(out, "edge [fontname=\"Helvetica,Arial,sans-serif\"]\n");
+    fprintf(out, "rankdir=LR;\n");
 
-    while (!isempty_dequeue_gen(theedges)) {
-        multi_edge *new = rigpull_dequeue_gen(theedges);
-        delete_dequeue(new->lab);
-        free(new);
+    // Print des sommets
+    for (uint k = 0; k < A->trans->size_graph; k++)
+    {
+        fprintf(out, "%d [style=solid,label=<", k);
+        dfa_print_state(A, k, out);
+        fprintf(out, ">,shape = circle];\n");
     }
-    delete_dequeue_gen(theedges);
+    gedges_print(G, out);
+    fprintf(out, "}\n");
+}
+
+/**************/
+/*+ Patterns +*/
+/**************/
+
+static void pattern_word_print_gviz(dfa *A, uint *word, FILE *out)
+{
+    uint i = 0;
+    if (word[i] == UINT_MAX)
+    {
+        fprintf(out, "ε");
+        return;
+    }
+
+    while (word[i] != UINT_MAX)
+    {
+        uint a = word[i];
+        fprint_letter_gviz(A->alphabet[a], out, false);
+        i++;
+    }
+}
+
+static void pattern_word_print_utf8(dfa *A, uint *word, FILE *out)
+{
+    uint i = 0;
+    if (word[i] == UINT_MAX)
+    {
+        fprintf(out, "ε");
+        return;
+    }
+
+    while (word[i] != UINT_MAX)
+    {
+        uint a = word[i];
+        fprint_letter_utf8(A->alphabet[a], out);
+        i++;
+    }
+}
+
+static void pattern_states_print(dfa *A, uint *states, uint nb_states, FILE *out)
+{
+    fprintf(out, "digraph {\n");
+    fprintf(out, "gradientangle=90\n");
+    fprintf(out, "fontname=\"Helvetica,Arial,sans-serif\"\n");
+    fprintf(out, "resolution= \"200.0,0.0\"");
+    fprintf(out, "node [fontname=\"Helvetica,Arial,sans-serif\"]\n");
+    fprintf(out, "edge [fontname=\"Helvetica,Arial,sans-serif\"]\n");
+    fprintf(out, "rankdir=LR;\n");
+    fprintf(out, "nodesep=0.5;\n");
+    for (uint k = 0; k < nb_states; k++)
+    {
+        if (A->state_names)
+        {
+            fprintf(out, "%d [style=\"dashed,filled\",color=darkorange,fillcolor=\"orange:white\",shape = circle,label=\"%s\",xlabel=<x<SUB>%d</SUB>>];\n", k, A->state_names[states[k]], k);
+        }
+        else
+        {
+            fprintf(out, "%d [style=\"dashed,filled\",color=darkorange,fillcolor=\"orange:white\",shape = circle,label=\"%d\",xlabel=<x<SUB>%d</SUB>>];\n", k, states[k], k);
+        }
+    }
+}
+
+static void pattern_edge_print(dfa *A, uint from, uint to, pattern_vartype type, uint *word, char var, FILE *out)
+{
+    switch (type)
+    {
+    case PAT_SING:
+        fprintf(out, "%d -> %d [label = <{", from, to);
+        pattern_word_print_gviz(A, word, out);
+        fprintf(out, "}>,style=solid];\n");
+        break;
+    case PAT_WORD:
+        fprintf(out, "%d -> %d [label = <", from, to);
+        pattern_word_print_gviz(A, word, out);
+        fprintf(out, ">,style=solid];\n");
+        break;
+    case PAT_LANG:
+        fprintf(out, "%d -> %d [label = <%c>,style=solid];\n", from, to, var);
+        break;
+    default:
+        break;
+    }
+}
+
+void sfc_pattern_print(dfa *A, uint *states, uint nb_states, uint *word, char var, FILE *out)
+{
+    if (!states || !out)
+    {
+        return;
+    }
+
+    pattern_states_print(A, states, nb_states, out);
+
+    if (word)
+    {
+        for (uint k = 0; k < nb_states; k++)
+        {
+            pattern_edge_print(A, k, (k + 1) % nb_states, PAT_WORD, word, var, out);
+        }
+    }
+    else
+    {
+        for (uint k = 0; k < nb_states; k++)
+        {
+            pattern_edge_print(A, k, (k + 1) % nb_states, PAT_LANG, NULL, var, out);
+        }
+    }
+    fprintf(out, "}\n");
+}
+
+void view_sfc_pattern(dfa *A, uint *states, uint nb_states, uint *word, char var)
+{
+    // Printing the state variable assignements in the pattern.
+    fprintf(stdout, "#### The pattern equation fails for n = %d", nb_states - 1);
+    for (uint i = 0; i < nb_states; i++)
+    {
+        if (i == nb_states - 1 && !word)
+        {
+            fprintf(stdout, " and ");
+        }
+        else
+        {
+            fprintf(stdout, ", ");
+        }
+        fprintf(stdout, "x");
+        fprint_subsc_utf8(i, stdout);
+        fprintf(stdout, " = ");
+        dfa_print_state(A, states[i], stdout);
+    }
+
+    if (word)
+    {
+        fprintf(stdout, " and ");
+        fprintf(stdout, "%c = ", var);
+        pattern_word_print_utf8(A, word, stdout);
+    }
+    fprintf(stdout, ".\n");
+
+    char tmp_filename[] = "/tmp/pat-XXXXXX.dot";
+    int d = mkostemps(tmp_filename, 4, O_APPEND);
+    char png_filename[1 + strlen(tmp_filename)];
+
+    strcpy(png_filename, tmp_filename);
+    strcpy(png_filename + strlen(tmp_filename) - 3, "pdf");
+
+    FILE *f_tmp = fdopen(d, "w");
+
+    if (!f_tmp)
+    {
+        CRITICAL("Unable to open temporary file");
+    }
+    sfc_pattern_print(A, states, nb_states, word, var, f_tmp);
+    // nfa_print(thenfa, stdout);
+    fclose(f_tmp);
+
+    char *command;
+
+    if (!external_viewer)
+    {
+        command = multiple_strcat("dot -Tpng -Gsize=20,25 ", tmp_filename, "| ", view_command(), NULL);
+        // fprintf(stderr, "%s\n", command);
+    }
+    else
+    {
+        command = multiple_strcat("dot -Tpng ", tmp_filename, " -o ", png_filename, "&& open ", png_filename, NULL);
+    }
+    TRACE("%s", command);
+    system(command);
+
+    free(command);
+}
+
+void dd_pattern_print(dfa *A, generic_pattern *pattern, FILE *out)
+{
+    if (!pattern || !out)
+    {
+        return;
+    }
+
+    pattern_states_print(A, pattern->states, 4, out);
+
+    pattern_edge_print(A, 0, 1, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+    pattern_edge_print(A, 2, 3, pattern->types[1], pattern->words[1], pattern->vars[1], out);
 
     fprintf(out, "}\n");
+}
+
+void gr_pattern_print(dfa *A, generic_pattern *pattern, FILE *out)
+{
+    if (!pattern || !out)
+    {
+        return;
+    }
+
+    pattern_states_print(A, pattern->states, 3, out);
+
+    pattern_edge_print(A, 1, 0, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+    pattern_edge_print(A, 2, 0, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+
+    fprintf(out, "}\n");
+}
+
+void grp1_pattern_print(dfa *A, generic_pattern *pattern, FILE *out)
+{
+    if (!pattern || !out)
+    {
+        return;
+    }
+
+    pattern_states_print(A, pattern->states, 5, out);
+
+    pattern_edge_print(A, 1, 0, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+    pattern_edge_print(A, 2, 0, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+    pattern_edge_print(A, 3, 1, pattern->types[1], pattern->words[1], pattern->vars[1], out);
+    pattern_edge_print(A, 4, 2, pattern->types[2], pattern->words[2], pattern->vars[2], out);
+
+    fprintf(out, "}\n");
+}
+
+void grp2_pattern_print(dfa *A, generic_pattern *pattern, FILE *out)
+{
+    if (!pattern || !out)
+    {
+        return;
+    }
+
+    pattern_states_print(A, pattern->states, 5, out);
+
+    pattern_edge_print(A, 1, 0, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+    pattern_edge_print(A, 2, 0, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+    pattern_edge_print(A, 1, 3, pattern->types[1], pattern->words[1], pattern->vars[1], out);
+    pattern_edge_print(A, 2, 4, pattern->types[1], pattern->words[1], pattern->vars[1], out);
+
+    fprintf(out, "}\n");
+}
+
+void com_pattern_print(dfa *A, generic_pattern *pattern, FILE *out)
+{
+    if (!pattern || !out)
+    {
+        return;
+    }
+
+    pattern_states_print(A, pattern->states, 5, out);
+
+    pattern_edge_print(A, 0, 1, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+    pattern_edge_print(A, 3, 4, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+    pattern_edge_print(A, 0, 3, pattern->types[1], pattern->words[1], pattern->vars[1], out);
+    pattern_edge_print(A, 1, 2, pattern->types[1], pattern->words[1], pattern->vars[1], out);
+
+    for (int i = 0; i < 5; i++)
+    {
+        pattern_edge_print(A, i, i, pattern->types[2], pattern->words[2], pattern->vars[2], out);
+    }
+
+    fprintf(out, "}\n");
+}
+
+void lttcom_pattern_print(dfa *A, generic_pattern *pattern, FILE *out)
+{
+    if (!pattern || !out)
+    {
+        return;
+    }
+
+    pattern_states_print(A, pattern->states, 7, out);
+
+    pattern_edge_print(A, 0, 1, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+    pattern_edge_print(A, 5, 6, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+    pattern_edge_print(A, 0, 4, pattern->types[1], pattern->words[1], pattern->vars[1], out);
+    pattern_edge_print(A, 2, 3, pattern->types[1], pattern->words[1], pattern->vars[1], out);
+    pattern_edge_print(A, 1, 2, pattern->types[2], pattern->words[2], pattern->vars[2], out);
+    pattern_edge_print(A, 4, 5, pattern->types[2], pattern->words[2], pattern->vars[2], out);
+
+    pattern_edge_print(A, 0, 0, pattern->types[3], pattern->words[3], pattern->vars[3], out);
+    pattern_edge_print(A, 2, 2, pattern->types[3], pattern->words[3], pattern->vars[3], out);
+    pattern_edge_print(A, 5, 5, pattern->types[3], pattern->words[3], pattern->vars[3], out);
+
+    pattern_edge_print(A, 1, 1, pattern->types[4], pattern->words[4], pattern->vars[4], out);
+    pattern_edge_print(A, 3, 3, pattern->types[4], pattern->words[4], pattern->vars[4], out);
+    pattern_edge_print(A, 4, 4, pattern->types[4], pattern->words[4], pattern->vars[4], out);
+    pattern_edge_print(A, 6, 6, pattern->types[4], pattern->words[4], pattern->vars[4], out);
+
+    fprintf(out, "}\n");
+}
+
+void idem_pattern_print(dfa *A, generic_pattern *pattern, FILE *out)
+{
+    if (!pattern || !out)
+    {
+        return;
+    }
+
+    pattern_states_print(A, pattern->states, 3, out);
+
+    pattern_edge_print(A, 0, 1, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+    pattern_edge_print(A, 1, 2, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+
+    for (int i = 0; i < 3; i++)
+    {
+        pattern_edge_print(A, i, i, pattern->types[1], pattern->words[1], pattern->vars[1], out);
+    }
+
+    fprintf(out, "}\n");
+}
+
+void rtriv_pattern_print(dfa *A, generic_pattern *pattern, FILE *out)
+{
+    if (!pattern || !out)
+    {
+        return;
+    }
+
+    pattern_states_print(A, pattern->states, 2, out);
+
+    pattern_edge_print(A, 0, 1, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+    pattern_edge_print(A, 1, 0, pattern->types[1], pattern->words[1], pattern->vars[1], out);
+
+    for (uint i = 0; i < 2; i++)
+    {
+        pattern_edge_print(A, i, i, pattern->types[2], pattern->words[2], pattern->vars[2], out);
+    }
+
+    fprintf(out, "}\n");
+}
+
+void ltriv_pattern_print(dfa *A, generic_pattern *pattern, FILE *out)
+{
+    if (!pattern || !out)
+    {
+        return;
+    }
+
+    pattern_states_print(A, pattern->states, 5, out);
+
+    pattern_edge_print(A, 0, 1, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+    pattern_edge_print(A, 2, 1, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+    pattern_edge_print(A, 3, 4, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+    pattern_edge_print(A, 0, 3, pattern->types[1], pattern->words[1], pattern->vars[1], out);
+    pattern_edge_print(A, 1, 2, pattern->types[1], pattern->words[1], pattern->vars[1], out);
+    pattern_edge_print(A, 4, 3, pattern->types[1], pattern->words[1], pattern->vars[1], out);
+
+    for (uint i = 0; i < 5; i++)
+    {
+        pattern_edge_print(A, i, i, pattern->types[2], pattern->words[2], pattern->vars[2], out);
+    }
+
+    fprintf(out, "}\n");
+}
+
+void ltriv_opti_pattern_print(dfa *A, generic_pattern *pattern, FILE *out)
+{
+    if (!pattern || !out)
+    {
+        return;
+    }
+
+    pattern_states_print(A, pattern->states, 3, out);
+
+    pattern_edge_print(A, 0, 1, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+    pattern_edge_print(A, 0, 2, pattern->types[1], pattern->words[1], pattern->vars[1], out);
+    pattern_edge_print(A, 1, 1, pattern->types[2], pattern->words[2], pattern->vars[2], out);
+    pattern_edge_print(A, 2, 2, pattern->types[2], pattern->words[2], pattern->vars[2], out);
+
+    fprintf(out, "}\n");
+}
+
+void da_pattern_print(dfa *A, generic_pattern *pattern, FILE *out)
+{
+    if (!pattern || !out)
+    {
+        return;
+    }
+
+    pattern_states_print(A, pattern->states, 4, out);
+
+    pattern_edge_print(A, 0, 1, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+    pattern_edge_print(A, 2, 3, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+    pattern_edge_print(A, 1, 0, pattern->types[1], pattern->words[1], pattern->vars[1], out);
+    pattern_edge_print(A, 3, 2, pattern->types[1], pattern->words[1], pattern->vars[1], out);
+    pattern_edge_print(A, 0, 2, pattern->types[1], pattern->words[1], pattern->vars[1], out);
+
+    for (uint i = 0; i < 4; i++)
+    {
+        pattern_edge_print(A, i, i, pattern->types[2], pattern->words[2], pattern->vars[2], out);
+    }
+
+    fprintf(out, "}\n");
+}
+
+void pol_pattern_print(dfa *A, generic_pattern *pattern, FILE *out)
+{
+    if (!pattern || !out)
+    {
+        return;
+    }
+
+    pattern_states_print(A, pattern->states, 2, out);
+
+    pattern_edge_print(A, 0, 1, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+    pattern_edge_print(A, 0, 0, pattern->types[1], pattern->words[1], pattern->vars[1], out);
+    pattern_edge_print(A, 1, 1, pattern->types[1], pattern->words[1], pattern->vars[1], out);
+    fprintf(out, "}\n");
+}
+
+void polgr_pattern_print(dfa *A, generic_pattern *pattern, FILE *out)
+{
+    if (!pattern || !out)
+    {
+        return;
+    }
+
+    pattern_states_print(A, pattern->states, 2, out);
+
+    pattern_edge_print(A, 0, 1, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+    pattern_edge_print(A, 1, 1, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+    fprintf(out, "}\n");
+}
+
+void knast_pattern_print(dfa *A, generic_pattern *pattern, FILE *out)
+{
+    if (!pattern || !out)
+    {
+        return;
+    }
+
+    pattern_states_print(A, pattern->states, 6, out);
+
+    pattern_edge_print(A, 0, 1, pattern->types[0], pattern->words[0], pattern->vars[0], out);
+    pattern_edge_print(A, 1, 0, pattern->types[1], pattern->words[1], pattern->vars[1], out);
+    pattern_edge_print(A, 0, 2, pattern->types[2], pattern->words[2], pattern->vars[2], out);
+    pattern_edge_print(A, 3, 2, pattern->types[2], pattern->words[2], pattern->vars[2], out);
+    pattern_edge_print(A, 4, 5, pattern->types[2], pattern->words[2], pattern->vars[2], out);
+    pattern_edge_print(A, 2, 3, pattern->types[3], pattern->words[3], pattern->vars[3], out);
+    pattern_edge_print(A, 1, 4, pattern->types[3], pattern->words[3], pattern->vars[3], out);
+    pattern_edge_print(A, 5, 4, pattern->types[3], pattern->words[3], pattern->vars[3], out);
+
+    pattern_edge_print(A, 3, 3, pattern->types[4], pattern->words[4], pattern->vars[4], out);
+    pattern_edge_print(A, 0, 0, pattern->types[4], pattern->words[4], pattern->vars[4], out);
+    pattern_edge_print(A, 4, 4, pattern->types[4], pattern->words[4], pattern->vars[4], out);
+
+    pattern_edge_print(A, 2, 2, pattern->types[5], pattern->words[5], pattern->vars[5], out);
+    pattern_edge_print(A, 1, 1, pattern->types[5], pattern->words[5], pattern->vars[5], out);
+    pattern_edge_print(A, 5, 5, pattern->types[5], pattern->words[5], pattern->vars[5], out);
+
+    fprintf(out, "}\n");
+}
+
+void view_pattern(dfa *A, generic_pattern *pattern, void (*pattern_print)(dfa *, generic_pattern *, FILE *))
+{
+    // Counting the number of variables assignements to display.
+    uint countvar = 0;
+    uint countstate = 0;
+    for (uint i = 0; i < PATTERN_MAXSIZE && pattern->states[i] != UINT_MAX; i++)
+    {
+        if (pattern->types[i] == PAT_WORD || pattern->types[i] == PAT_SING)
+        {
+            countvar++;
+        }
+        countstate++;
+    }
+
+    // Printing the state variable assignements in the pattern.
+    fprintf(stdout, "#### The pattern equation fails for");
+    for (uint i = 0; i < PATTERN_MAXSIZE && pattern->states[i] != UINT_MAX; i++)
+    {
+        if (i > 0)
+        {
+            if (i == countstate - 1 && countvar == 0)
+            {
+                fprintf(stdout, " and ");
+            }
+            else
+            {
+                fprintf(stdout, ", ");
+            }
+        }
+        else
+        {
+            fprintf(stdout, " ");
+        }
+        fprintf(stdout, "x");
+        fprint_subsc_utf8(i, stdout);
+        fprintf(stdout, " = ");
+        dfa_print_state(A, pattern->states[i], stdout);
+    }
+
+    // Printing the variable assignements in the pattern.
+    uint j = 0;
+    for (uint i = 0; i < PATTERN_MAXSIZE && j < countvar; i++)
+    {
+        // If the variable does not have a printable assignement, we skip
+        if ((pattern->types[i] != PAT_WORD && pattern->types[i] != PAT_SING) || !pattern->words[i])
+        {
+            continue;
+        }
+
+        // Printing the separator.
+        fprintf(stdout, j == countvar - 1 ? " and " : ", ");
+        j++;
+        fprintf(stdout, "%c = ", pattern->vars[i]);
+        if (pattern->types[i] == PAT_SING)
+        {
+            fprintf(stdout, "{");
+            pattern_word_print_utf8(A, pattern->words[i], stdout);
+            fprintf(stdout, "}");
+        }
+        else
+        {
+            pattern_word_print_utf8(A, pattern->words[i], stdout);
+        }
+    }
+    fprintf(stdout, ".\n");
+
+    if (!pattern_print)
+    {
+        return;
+    }
+
+    char tmp_filename[] = "/tmp/pat-XXXXXX.dot";
+    int d = mkostemps(tmp_filename, 4, O_APPEND);
+    char png_filename[1 + strlen(tmp_filename)];
+
+    strcpy(png_filename, tmp_filename);
+    strcpy(png_filename + strlen(tmp_filename) - 3, "pdf");
+
+    FILE *f_tmp = fdopen(d, "w");
+
+    if (!f_tmp)
+    {
+        CRITICAL("Unable to open temporary file");
+    }
+    pattern_print(A, pattern, f_tmp);
+    // nfa_print(thenfa, stdout);
+    fclose(f_tmp);
+
+    char *command;
+
+    if (!external_viewer)
+    {
+        command = multiple_strcat("dot -Tpng -Gsize=20,25 ", tmp_filename, "| ", view_command(), NULL);
+        // fprintf(stderr, "%s\n", command);
+    }
+    else
+    {
+        command = multiple_strcat("dot -Tpng ", tmp_filename, " -o ", png_filename, "&& open ", png_filename, NULL);
+    }
+    TRACE("%s", command);
+    system(command);
+
+    free(command);
 }
 
 /**************************/
@@ -480,7 +1170,8 @@ void cayley_left_print(morphism *M, FILE *out) {
 /**************************/
 
 // Affichage d'un NFA
-void view_nfa(nfa *thenfa) {
+void view_nfa(nfa *thenfa)
+{
     char tmp_filename[] = "/tmp/nfa-XXXXXX.dot";
     int d = mkostemps(tmp_filename, 4, O_APPEND);
     char png_filename[1 + strlen(tmp_filename)];
@@ -490,7 +1181,8 @@ void view_nfa(nfa *thenfa) {
 
     FILE *f_tmp = fdopen(d, "w");
 
-    if (!f_tmp) {
+    if (!f_tmp)
+    {
         CRITICAL("Unable to open temporary file");
     }
 
@@ -500,10 +1192,13 @@ void view_nfa(nfa *thenfa) {
 
     char *command;
 
-    if (!external_viewer) {
+    if (!external_viewer)
+    {
         command = multiple_strcat("dot -Tpng -Gsize=20,25 ", tmp_filename, "| ", view_command(), NULL);
-        fprintf(stderr, "%s\n", command);
-    } else {
+        // fprintf(stderr, "%s\n", command);
+    }
+    else
+    {
         command = multiple_strcat("dot -Tpng ", tmp_filename, " -o ", png_filename, "&& open ", png_filename, NULL);
     }
     TRACE("%s", command);
@@ -512,7 +1207,8 @@ void view_nfa(nfa *thenfa) {
     free(command);
 }
 
-void view_dfa(dfa *thedfa) {
+void view_dfa(dfa *thedfa)
+{
     char tmp_filename[] = "/tmp/dfa-XXXXXX.dot";
     int d = mkostemps(tmp_filename, 4, O_APPEND);
     char png_filename[1 + strlen(tmp_filename)];
@@ -522,7 +1218,8 @@ void view_dfa(dfa *thedfa) {
 
     FILE *f_tmp = fdopen(d, "w");
 
-    if (!f_tmp) {
+    if (!f_tmp)
+    {
         CRITICAL("Unable to open temporary file");
     }
 
@@ -532,10 +1229,13 @@ void view_dfa(dfa *thedfa) {
 
     char *command;
 
-    if (!external_viewer) {
+    if (!external_viewer)
+    {
         command = multiple_strcat("dot -Tpng -Gsize=20,25 ", tmp_filename, "| ", view_command(), NULL);
-        fprintf(stderr, "%s\n", command);
-    } else {
+        // fprintf(stderr, "%s\n", command);
+    }
+    else
+    {
         command = multiple_strcat("dot -Tpng ", tmp_filename, " -o ", png_filename, "&& open ", png_filename, NULL);
     }
     TRACE("%s", command);
@@ -544,7 +1244,119 @@ void view_dfa(dfa *thedfa) {
     free(command);
 }
 
-void view_dgraph(dgraph *g) {
+void view_graph(graph *g)
+{
+    char tmp_filename[] = "/tmp/graph-XXXXXX.dot";
+    int d = mkostemps(tmp_filename, 4, O_APPEND);
+    char png_filename[1 + strlen(tmp_filename)];
+
+    strcpy(png_filename, tmp_filename);
+    strcpy(png_filename + strlen(tmp_filename) - 3, "pdf");
+
+    FILE *f_tmp = fdopen(d, "w");
+
+    if (!f_tmp)
+    {
+        CRITICAL("Unable to open temporary file");
+    }
+
+    graph_print(g, f_tmp);
+    // dfa_print(thedfa, stdout);
+    fclose(f_tmp);
+
+    char *command;
+
+    if (!external_viewer)
+    {
+        command = multiple_strcat("dot -Tpng -Gsize=20,25 ", tmp_filename, "| ", view_command(), NULL);
+        // fprintf(stderr, "%s\n", command);
+    }
+    else
+    {
+        command = multiple_strcat("dot -Tpng ", tmp_filename, " -o ", png_filename, "&& open ", png_filename, NULL);
+    }
+    TRACE("%s", command);
+    system(command);
+
+    free(command);
+}
+
+void view_mor_order(morphism *M, graph *g)
+{
+    char tmp_filename[] = "/tmp/graph-XXXXXX.dot";
+    int d = mkostemps(tmp_filename, 4, O_APPEND);
+    char png_filename[1 + strlen(tmp_filename)];
+
+    strcpy(png_filename, tmp_filename);
+    strcpy(png_filename + strlen(tmp_filename) - 3, "pdf");
+
+    FILE *f_tmp = fdopen(d, "w");
+
+    if (!f_tmp)
+    {
+        CRITICAL("Unable to open temporary file");
+    }
+
+    mor_order_print(M, g, f_tmp);
+    // dfa_print(thedfa, stdout);
+    fclose(f_tmp);
+
+    char *command;
+
+    if (!external_viewer)
+    {
+        command = multiple_strcat("dot -Tpng -Gsize=20,25 ", tmp_filename, "| ", view_command(), NULL);
+        // fprintf(stderr, "%s\n", command);
+    }
+    else
+    {
+        command = multiple_strcat("dot -Tpng ", tmp_filename, " -o ", png_filename, "&& open ", png_filename, NULL);
+    }
+    TRACE("%s", command);
+    system(command);
+
+    free(command);
+}
+
+void view_dfa_order(dfa *A, graph *g)
+{
+    char tmp_filename[] = "/tmp/graph-XXXXXX.dot";
+    int d = mkostemps(tmp_filename, 4, O_APPEND);
+    char png_filename[1 + strlen(tmp_filename)];
+
+    strcpy(png_filename, tmp_filename);
+    strcpy(png_filename + strlen(tmp_filename) - 3, "pdf");
+
+    FILE *f_tmp = fdopen(d, "w");
+
+    if (!f_tmp)
+    {
+        CRITICAL("Unable to open temporary file");
+    }
+
+    dfa_order_print(A, g, f_tmp);
+    // dfa_print(thedfa, stdout);
+    fclose(f_tmp);
+
+    char *command;
+
+    if (!external_viewer)
+    {
+        command = multiple_strcat("dot -Tpng -Gsize=20,25 ", tmp_filename, "| ", view_command(), NULL);
+        // fprintf(stderr, "%s\n", command);
+    }
+    else
+    {
+        command = multiple_strcat("dot -Tpng ", tmp_filename, " -o ", png_filename, "&& open ", png_filename, NULL);
+    }
+    TRACE("%s", command);
+    system(command);
+
+    free(command);
+}
+
+void view_dgraph(dgraph *g)
+{
     char tmp_filename[] = "/tmp/dgraph-XXXXXX.dot";
     int d = mkostemps(tmp_filename, 4, O_APPEND);
     char png_filename[1 + strlen(tmp_filename)];
@@ -554,7 +1366,8 @@ void view_dgraph(dgraph *g) {
 
     FILE *f_tmp = fdopen(d, "w");
 
-    if (!f_tmp) {
+    if (!f_tmp)
+    {
         CRITICAL("Unable to open temporary file");
     }
 
@@ -564,10 +1377,13 @@ void view_dgraph(dgraph *g) {
 
     char *command;
 
-    if (!external_viewer) {
+    if (!external_viewer)
+    {
         command = multiple_strcat("dot -Tpng -Gsize=20,25 ", tmp_filename, "| ", view_command(), NULL);
-        fprintf(stderr, "%s\n", command);
-    } else {
+        // fprintf(stderr, "%s\n", command);
+    }
+    else
+    {
         command = multiple_strcat("dot -Tpng ", tmp_filename, " -o ", png_filename, "&& open ", png_filename, NULL);
     }
     TRACE("%s", command);
@@ -576,7 +1392,45 @@ void view_dgraph(dgraph *g) {
     free(command);
 }
 
-void view_cayley(morphism *thecayley) {
+void view_lgraph(lgraph *g)
+{
+    char tmp_filename[] = "/tmp/lgraph-XXXXXX.dot";
+    int d = mkostemps(tmp_filename, 4, O_APPEND);
+    char png_filename[1 + strlen(tmp_filename)];
+
+    strcpy(png_filename, tmp_filename);
+    strcpy(png_filename + strlen(tmp_filename) - 3, "pdf");
+
+    FILE *f_tmp = fdopen(d, "w");
+
+    if (!f_tmp)
+    {
+        CRITICAL("Unable to open temporary file");
+    }
+
+    lgraph_print(g, f_tmp);
+    // dfa_print(thedfa, stdout);
+    fclose(f_tmp);
+
+    char *command;
+
+    if (!external_viewer)
+    {
+        command = multiple_strcat("dot -Tpng -Gsize=20,25 ", tmp_filename, "| ", view_command(), NULL);
+        // fprintf(stderr, "%s\n", command);
+    }
+    else
+    {
+        command = multiple_strcat("dot -Tpng ", tmp_filename, " -o ", png_filename, "&& open ", png_filename, NULL);
+    }
+    TRACE("%s", command);
+    system(command);
+
+    free(command);
+}
+
+void view_cayley(morphism *thecayley, bool left)
+{
     char tmp_filename[] = "/tmp/cay-XXX.dot";
     int d = mkostemps(tmp_filename, 4, O_APPEND);
     // char png_filename[1 + strlen(tmp_filename)];
@@ -586,7 +1440,7 @@ void view_cayley(morphism *thecayley) {
 
     FILE *f_tmp = fdopen(d, "w");
 
-    cayley_print(thecayley, f_tmp);
+    cayley_print(thecayley, left, f_tmp);
 
     fclose(f_tmp);
 
@@ -597,8 +1451,9 @@ void view_cayley(morphism *thecayley) {
     free(command);
 }
 
-void view_left_cayley(morphism *thecayley) {
-    char tmp_filename[] = "/tmp/cay-XXX.dot";
+void view_facto_forest(morphism *mor, facto_forest *forest)
+{
+    char tmp_filename[] = "/tmp/facto_forest-XXX.dot";
     int d = mkostemps(tmp_filename, 4, O_APPEND);
     // char png_filename[1 + strlen(tmp_filename)];
 
@@ -607,18 +1462,19 @@ void view_left_cayley(morphism *thecayley) {
 
     FILE *f_tmp = fdopen(d, "w");
 
-    cayley_left_print(thecayley, f_tmp);
+    facto_forest_print(mor, forest, f_tmp);
 
     fclose(f_tmp);
 
     char *command = multiple_strcat("dot -Tpng ", tmp_filename, "| ", view_command(), NULL);
-
-    // " -o ", png_filename, " && open ", png_filename,
+    // " -o ", png_filename,
+    // " && open ", png_filename, NULL);
     system(command);
     free(command);
 }
 
-void view_image(const char *filename) {
+void view_image(const char *filename)
+{
     char *command = multiple_strcat(view_command(), filename, NULL);
     system(command);
     free(command);
@@ -628,7 +1484,8 @@ void view_image(const char *filename) {
 /* Latex generation */
 /********************/
 
-enum {
+enum
+{
     TIKZ_CAYN,
     TIKZ_CAYT,
     TIKZ_AUTN,
@@ -644,23 +1501,29 @@ char *tikz_types_names[4] = {
     "AUTOMATON_TRANS",
 };
 
-void latex_init(void) {
+void latex_init(void)
+{
     json_object *root = json_object_from_file("tikz_params.json");
-    if (!root) {
-        for (int i = 0; i < TIKZ_SIZE; i++) {
+    if (!root)
+    {
+        for (int i = 0; i < TIKZ_SIZE; i++)
+        {
             tikz_types[i][0] = '\0';
         }
         return;
     }
 
-    for (int i = 0; i < TIKZ_SIZE; i++) {
+    for (int i = 0; i < TIKZ_SIZE; i++)
+    {
         json_object *obj;
-        if (!json_object_object_get_ex(root, tikz_types_names[i], &obj) || json_object_get_type(obj) != json_type_string) {
+        if (!json_object_object_get_ex(root, tikz_types_names[i], &obj) || json_object_get_type(obj) != json_type_string)
+        {
             tikz_types[i][0] = '\0';
             return;
         }
         const char *str = json_object_get_string(obj);
-        if (strlen(str) >= 40) {
+        if (strlen(str) >= 40)
+        {
             tikz_types[i][0] = '\0';
             return;
         }
@@ -670,51 +1533,64 @@ void latex_init(void) {
     json_object_put(root);
 }
 
-static void latex_print_mono_elem(morphism *M, uint q, FILE *out) {
+static void latex_print_mono_elem(morphism *M, uint q, FILE *out)
+{
     dequeue *name = mor_name(M, q);
-    if (isempty_dequeue(name)) {
+    if (isempty_dequeue(name))
+    {
         fprintf(out, "1");
         delete_dequeue(name);
         return;
     }
     uint n = 1;
     fprint_letter_latex(M->alphabet[lefread_dequeue(name, 0)], out, false);
-    for (uint i = 1; i < size_dequeue(name); i++) {
-        if (lefread_dequeue(name, i) != lefread_dequeue(name, i - 1)) {
-            if (n > 1) {
+    for (uint i = 1; i < size_dequeue(name); i++)
+    {
+        if (lefread_dequeue(name, i) != lefread_dequeue(name, i - 1))
+        {
+            if (n > 1)
+            {
                 fprintf(out, "^{%d}", n);
             }
             n = 1;
             fprint_letter_latex(M->alphabet[lefread_dequeue(name, i)], out, false);
-        } else {
+        }
+        else
+        {
             n++;
         }
     }
-    if (n > 1) {
+    if (n > 1)
+    {
         fprintf(out, "^{%d}", n);
     }
     delete_dequeue(name);
 }
 
-static void latex_print_expanded_mono_elem(morphism *M, uint q, FILE *out) {
+static void latex_print_expanded_mono_elem(morphism *M, uint q, FILE *out)
+{
     dequeue *name = mor_name(M, q);
-    if (isempty_dequeue(name)) {
+    if (isempty_dequeue(name))
+    {
         fprintf(out, "1");
         delete_dequeue(name);
         return;
     }
 
-    for (uint i = 0; i < size_dequeue(name); i++) {
+    for (uint i = 0; i < size_dequeue(name); i++)
+    {
         fprint_letter_latex(M->alphabet[lefread_dequeue(name, i)], out, false);
     }
     delete_dequeue(name);
 }
 
-static void latex_print_aux(morphism *M, dgraph *G, FILE *out) {
+static void latex_print_aux(morphism *M, dgraph *G, FILE *out)
+{
     latex_init();
     fprintf(out, "\\begin{tikzpicture}\n");
 
-    for (uint i = 0; i < G->size_graph; i++) {
+    for (uint i = 0; i < G->size_graph; i++)
+    {
         fprintf(out, "\\node[%s] (", tikz_types[TIKZ_CAYN]);
         latex_print_expanded_mono_elem(M, i, out);
         fprintf(out, ") at (%d,0) {$", 2 * i);
@@ -722,36 +1598,48 @@ static void latex_print_aux(morphism *M, dgraph *G, FILE *out) {
         fprintf(out, "$};\n");
     }
 
-    dequeue_gen *theedges = dgraph_to_multi_edges(M->r_cayley);
-    while (!isempty_dequeue_gen(theedges)) {
-        multi_edge *new = lefpull_dequeue_gen(theedges);
+    edge_triple *trans = dgraph_to_edge_list(G, false);
+    qsort(trans, G->size_edges, sizeof(edge_triple), edge_sort_ends);
 
-        // fprintf(out, "\\draw[%s] (n%d) to ", tikz_types[TIKZ_CAYT], new->in);
+    uint i = 0;
+
+    while (i < G->size_edges)
+    { // Boucle sur les états de départ
+        uint s = trans[i].from;
+        uint t = trans[i].to;
+
         fprintf(out, "\\draw[%s](", tikz_types[TIKZ_CAYT]);
-        latex_print_expanded_mono_elem(M, new->in, out);
+        latex_print_expanded_mono_elem(M, s, out);
         fprintf(out, ") to ");
 
-        if (new->in == new->out) {
+        if (s == t)
+        {
             fprintf(out, "[loop above] node[above] {$");
-        } else if (new->in < new->out) {
-            fprintf(out, "[bend left=15] node[above] {$");
-        } else {
+        }
+        else if (s < t)
+        {
             fprintf(out, "[bend left=15] node[above] {$");
         }
-        for (uint j = 0; j < size_dequeue(new->lab); j++) {
-            if (j > 0) {
+        else
+        {
+            fprintf(out, "[bend left=15] node[below] {$");
+        }
+
+        while (i < G->size_edges && trans[i].from == s && trans[i].to == t)
+        {
+            uint a = trans[i].lab;
+            fprint_letter_latex(M->alphabet[a], out, false);
+            i++;
+            if (i < G->size_edges && trans[i].from == s && trans[i].to == t)
+            {
                 fprintf(out, ",");
             }
-            fprint_letter_latex(M->alphabet[lefread_dequeue(new->lab, j)], out, false);
         }
         fprintf(out, "$} (");
-        latex_print_expanded_mono_elem(M, new->out, out);
+        latex_print_expanded_mono_elem(M, t, out);
         fprintf(out, ");\n");
-
-        delete_dequeue(new->lab);
-        free(new);
     }
-    delete_dequeue_gen(theedges);
+    free(trans);
     fprintf(out, "\\end{tikzpicture}\n");
 }
 
@@ -759,101 +1647,136 @@ void latex_print_cayley(morphism *M, FILE *out) { latex_print_aux(M, M->r_cayley
 
 void latex_print_lcayley(morphism *M, FILE *out) { latex_print_aux(M, M->l_cayley, out); }
 
-void latex_print_nfa(nfa *A, FILE *out) {
+void latex_print_nfa(nfa *A, FILE *out)
+{
     latex_init();
     fprintf(out, "\\begin{tikzpicture}\n");
 
-    for (uint i = 0; i < A->trans->size_graph; i++) {
+    for (uint i = 0; i < A->trans->size_graph; i++)
+    {
         fprintf(out, "\\node[%s", tikz_types[TIKZ_AUTN]);
-        if (mem_dequeue_sorted(i, A->initials, NULL)) {
+        if (bsearch(&i, A->initials, A->nb_initials, sizeof(uint), &compare_uint))
+        {
             fprintf(out, ",initial below");
         }
-        if (mem_dequeue_sorted(i, A->finals, NULL)) {
+        if (bsearch(&i, A->finals, A->nb_finals, sizeof(uint), &compare_uint))
+        {
             fprintf(out, ",accepting below");
         }
         fprintf(out, "] (n%d) at (%d,0) {$q_%d$};\n", i, 2 * i, i);
     }
 
-    dequeue_gen *theedges = nfa_to_multi_edges(A);
-    while (!isempty_dequeue_gen(theedges)) {
-        multi_edge *new = lefpull_dequeue_gen(theedges);
+    edge_triple *trans = lgraph_to_edge_list(A->trans, false);
+    qsort(trans, A->trans->size_edges, sizeof(edge_triple), edge_sort_ends);
 
-        fprintf(out, "\\draw[%s] (n%d) to ", tikz_types[TIKZ_CAYT], new->in);
+    uint i = 0;
+    while (i < A->trans->size_edges)
+    {
 
-        if (new->in == new->out) {
+        fprintf(out, "\\draw[%s] (n%d) to ", tikz_types[TIKZ_CAYT], trans[i].from);
+
+        if (trans[i].from == trans[i].to)
+        {
             fprintf(out, "[loop above] node[above] {$");
-        } else if (new->in < new->out) {
+        }
+        else if (trans[i].from < trans[i].to)
+        {
             fprintf(out, "[bend left=15] node[above] {$");
-        } else {
-            fprintf(out, "[bend left=15] node[above] {$");
+        }
+        else
+        {
+            fprintf(out, "[bend left=15] node[below] {$");
         }
 
-        if (new->eps) {
-            fprintf(out, "\\varepsilon");
-            if (!isempty_dequeue(new->lab) || !isempty_dequeue(new->lab_i)) {
+        uint q = trans[i].from;
+        uint r = trans[i].to;
+
+        while (i < A->trans->size_edges && trans[i].from == q && trans[i].to == r)
+        {
+            uint a = trans[i].lab;
+            if (a < A->nb_letters)
+            {
+                fprint_letter_latex(A->alphabet[a], out, false);
+            }
+            else if (A->inverse && a < (A->nb_letters << 1))
+            {
+                fprint_letter_latex(A->alphabet[a - A->nb_letters], out, true);
+            }
+            else if (A->epsilon && a == A->trans->size_alpha - 1)
+            {
+                fprintf(out, "\\varepsilon");
+            }
+            else
+            {
+                fprintf(out, "?");
+            }
+            i++;
+            if (i < A->trans->size_edges && trans[i].from == q && trans[i].to == r)
+            {
                 fprintf(out, ",");
             }
-        }
-        for (uint j = 0; j < size_dequeue(new->lab); j++) {
-            if (j > 0 || !isempty_dequeue(new->lab_i)) {
-                fprintf(out, ",");
-            }
-            fprint_letter_latex(A->alphabet[lefread_dequeue(new->lab, j)], out, false);
-        }
-        for (uint j = 0; j < size_dequeue(new->lab_i); j++) {
-            if (j > 0) {
-                fprintf(out, ",");
-            }
-            fprint_letter_latex(A->alphabet[lefread_dequeue(new->lab, j)], out, true);
         }
 
-        fprintf(out, "$} (n%d);\n", new->out);
-        delete_dequeue(new->lab);
-        free(new);
+        fprintf(out, "$} (n%d);\n", r);
     }
-    delete_dequeue_gen(theedges);
+    free(trans);
     fprintf(out, "\\end{tikzpicture}\n");
 }
 
-void latex_print_dfa(dfa *A, FILE *out) {
+void latex_print_dfa(dfa *A, FILE *out)
+{
     latex_init();
     fprintf(out, "\\begin{tikzpicture}\n");
 
-    for (uint i = 0; i < A->trans->size_graph; i++) {
+    for (uint i = 0; i < A->trans->size_graph; i++)
+    {
         fprintf(out, "\\node[%s", tikz_types[TIKZ_AUTN]);
-        if (A->initial == i) {
+        if (A->initial == i)
+        {
             fprintf(out, ",initial below");
         }
-        if (bsearch(&i, A->finals, A->nb_finals, sizeof(uint), &compare_uint)) {
+        if (bsearch(&i, A->finals, A->nb_finals, sizeof(uint), &compare_uint))
+        {
             fprintf(out, ",accepting below");
         }
         fprintf(out, "] (n%d) at (%d,0) {$q_%d$};\n", i, 2 * i, i);
     }
+    edge_triple *trans = dgraph_to_edge_list(A->trans, false);
+    qsort(trans, A->trans->size_edges, sizeof(edge_triple), edge_sort_ends);
 
-    dequeue_gen *theedges = dgraph_to_multi_edges(A->trans);
-    while (!isempty_dequeue_gen(theedges)) {
-        multi_edge *new = lefpull_dequeue_gen(theedges);
+    uint i = 0;
+    while (i < A->trans->size_edges)
+    {
+        uint q = trans[i].from;
+        uint r = trans[i].to;
 
-        fprintf(out, "\\draw[%s] (n%d) to ", tikz_types[TIKZ_CAYT], new->in);
+        fprintf(out, "\\draw[%s] (n%d) to ", tikz_types[TIKZ_CAYT], q);
 
-        if (new->in == new->out) {
+        if (q == r)
+        {
             fprintf(out, "[loop above] node[above] {$");
-        } else if (new->in < new->out) {
-            fprintf(out, "[bend left=15] node[above] {$");
-        } else {
+        }
+        else if (q < r)
+        {
             fprintf(out, "[bend left=15] node[above] {$");
         }
+        else
+        {
+            fprintf(out, "[bend left=15] node[below] {$");
+        }
 
-        for (uint j = 0; j < size_dequeue(new->lab); j++) {
-            if (j > 0) {
+        while (i < A->trans->size_edges && trans[i].from == q && trans[i].to == r)
+        {
+            uint a = trans[i].lab;
+            fprint_letter_latex(A->alphabet[a], out, false);
+            i++;
+            if (i < A->trans->size_edges && trans[i].from == q && trans[i].to == r)
+            {
                 fprintf(out, ",");
             }
-            fprint_letter_latex(A->alphabet[lefread_dequeue(new->lab, j)], out, false);
         }
-        fprintf(out, "$} (n%d);\n", new->out);
-        delete_dequeue(new->lab);
-        free(new);
+        fprintf(out, "$} (n%d);\n", r);
     }
-    delete_dequeue_gen(theedges);
+    free(trans);
     fprintf(out, "\\end{tikzpicture}\n");
 }

@@ -26,93 +26,87 @@
 #endif
 
 #include "graphs.h"
+#include "graphs_tarjan.h"
 #include "nfa.h"
 #include "tools.h"
-#include "type_abr.h"
 #include "type_basic.h"
-#include "type_binheap.h"
 #include "type_dequeue.h"
 #include "type_dequeue_gen.h"
-#include "graphs_tarjan.h"
+#include <limits.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
 
- /*  __  __                   _     _                       _  */
- /* |  \/  | ___  _ __   ___ (_) __| |___    __ _ _ __   __| | */
- /* | |\/| |/ _ \| '_ \ / _ \| |/ _` / __|  / _` | '_ \ / _` | */
- /* | |  | | (_) | | | | (_) | | (_| \__ \ | (_| | | | | (_| | */
- /* |_|  |_|\___/|_| |_|\___/|_|\__,_|___/  \__,_|_| |_|\__,_| */
- /*  _ __ ___   ___  _ __ _ __ | |__ (_)___ _ __ ___  ___      */
- /* | '_ ` _ \ / _ \| '__| '_ \| '_ \| / __| '_ ` _ \/ __|     */
- /* | | | | | | (_) | |  | |_) | | | | \__ \ | | | | \__ \     */
- /* |_| |_| |_|\___/|_|  | .__/|_| |_|_|___/_| |_| |_|___/     */
- /*                      |_|                                   */
+/*  __  __                   _     _                       _  */
+/* |  \/  | ___  _ __   ___ (_) __| |___    __ _ _ __   __| | */
+/* | |\/| |/ _ \| '_ \ / _ \| |/ _` / __|  / _` | '_ \ / _` | */
+/* | |  | | (_) | | | | (_) | | (_| \__ \ | (_| | | | | (_| | */
+/* |_|  |_|\___/|_| |_|\___/|_|\__,_|___/  \__,_|_| |_|\__,_| */
+/*  _ __ ___   ___  _ __ _ __ | |__ (_)___ _ __ ___  ___      */
+/* | '_ ` _ \ / _ \| '__| '_ \| '_ \| / __| '_ ` _ \/ __|     */
+/* | | | | | | (_) | |  | |_) | | | | \__ \ | | | | \__ \     */
+/* |_| |_| |_|\___/|_|  | .__/|_| |_|_|___/_| |_| |_|___/     */
+/*                      |_|                                   */
 
+// #define DEBUG_MONO
 
-
-//#define DEBUG_MONO
-
-
- /**
-  * @brief
-  * In every monoid, the neutral element is at index 0.
-  */
+/**
+ * @brief
+ * In every monoid, the neutral element is at index 0.
+ */
 #define ONE 0
 
-  /**
-    * @brief
-    * Type used to represent the Green relations of a finite monoid.
-    */
-typedef struct {
+/**
+ * @brief
+ * Type used to represent the Green relations of a finite monoid.
+ */
+typedef struct
+{
 
     /* Partitions */
-    parti* JCL;            //!< J-classes.
-    parti* LCL;            //!< L-classes.
-    parti* RCL;            //!< R-classes.
-    parti* HCL;            //!< H-classes.
+    parti *JCL; //!< J-classes.
+    parti *LCL; //!< L-classes.
+    parti *RCL; //!< R-classes.
+    parti *HCL; //!< H-classes.
 
     /* Informations on regular elements */
-    uint nb_regular_elems; //!< Number of regular elements. 
-    bool* regular_array;     //!< Array of Booleans indexed by the elements of the monoid. Marks the regular elements.
+    uint nb_regular_elems; //!< Number of regular elements.
+    bool *regular_array;   //!< Array of Booleans indexed by the elements of the monoid. Marks the regular elements.
 
     /* Information on groups */
-    bool* group_array;     //!< Array of Booleans indexed by the elements of the monoid. Marks the ones that belong to a group.
+    bool *group_array; //!< Array of Booleans indexed by the elements of the monoid. Marks the ones that belong to a group.
 } green;
-
-
 
 /**
  * @brief
  * The type used to represent a morphism into a finite monoid.
  */
-typedef struct {
+typedef struct
+{
     /* Mandatory fields */
-    letter* alphabet;     //!< An array indexed by the letters indices (generators). Assigns its letter to each index.
-    uint* pred_ele;       //!< Array of preceding elements (for the naming as a product of generators).
-    uint* pred_lab;       //!< Array of preceding letters (for the naming as a product of generators).
-    dgraph* r_cayley;     //!< The right Cayley graph of the morphism (stores the number of elements and the numbers of letters).
-    dgraph* l_cayley;     //!< The left Cayley graph of the morphism.
+    letter *alphabet; //!< An array indexed by the letters indices (generators). Assigns its letter to each index.
+    uint *pred_ele;   //!< Array of preceding elements (for the naming as a product of generators).
+    uint *pred_lab;   //!< Array of preceding letters (for the naming as a product of generators).
+    dgraph *r_cayley; //!< The right Cayley graph of the morphism (stores the number of elements and the numbers of letters).
+    dgraph *l_cayley; //!< The left Cayley graph of the morphism.
 
-    uint nb_idems;        //!< Number of idempotents in the morphism.
-    uint* idem_list;      //!< The list of all idempotents, sorted in increasing order.
-    bool* idem_array;     //!< An array of Booleans indexed by the elements. Marks the idempotents.
-    uint nb_accept;       //!< Number of accepting elements in the morphism.
-    uint* accept_list;    //!< The list of all accepting elements, sorted in increasing order.
-    bool* accept_array;   //!< An array of Booleans indexed by the elements. Marks the accepting elements.
-    green* rels;          //!< The Green relations of the monoid.
+    uint nb_idems;      //!< Number of idempotents in the morphism.
+    uint *idem_list;    //!< The list of all idempotents, sorted in increasing order.
+    bool *idem_array;   //!< An array of Booleans indexed by the elements. Marks the idempotents.
+    uint nb_accept;     //!< Number of accepting elements in the morphism.
+    uint *accept_list;  //!< The list of all accepting elements, sorted in increasing order.
+    bool *accept_array; //!< An array of Booleans indexed by the elements. Marks the accepting elements.
+    green *rels;        //!< The Green relations of the monoid.
 
-    uint nb_regular_jcl;   //!< Number of regular J-classes.
+    uint nb_regular_jcl;     //!< Number of regular J-classes.
     uint nb_min_regular_jcl; //!< The number of "strict minimal" J-classes (no smaller regular J-class has a nonempty antecedent).
-    uint* regular_idems;   //!< Array indexed by the regular J-classes (sorted in topological order). Associates a member idempotent to each of them (the one with the least index). The minimal J-classes are at the beginning.
+    uint *regular_idems;     //!< Array indexed by the regular J-classes (sorted in topological order). Associates a member idempotent to each of them (the one with the least index). The minimal J-classes are at the beginning.
 
     /* Optional fields (NULL if not computed) */
-    uint* mult; //!< The multiplication table size r_cayley->size_graph * r_cayley->size_graph (`NULL` if not computed).
-    uint** order; //!< Partial information on the ordering on the monoid. Array of size nb_regular_jcl, Each representative idempotent is mapped to the list of larger elements sorted in increasing order (`NULL` if not computed).
-    uint* order_size; //!< The size of the ordering for each element (the number of larger elements).
-    uint* order_storage; //!< The storage of the ordering (one dimension array).
+    uint *mult;          //!< The multiplication table size r_cayley->size_graph * r_cayley->size_graph (`NULL` if not computed).
+    bool **order;        //!< The ordering of the monoid (NULL if not computed). order[i][j] is true if the element i is smaller than the element j in the syntactic order.
+    bool *order_storage; //!< Storage for the previous table (one dimension array of size r_cayley->size_graph * r_cayley->size_graph).
 } morphism;
 
 /*******************/
@@ -123,14 +117,14 @@ typedef struct {
  * @brief
  * Release of the Green relations.
  */
-void delete_green(green* //!< The Green relations.
+void delete_green(green * //!< The Green relations.
 );
 
 /**
  * @brief
  * Release of a morphism.
  */
-void delete_morphism(morphism* //!< The morphism.
+void delete_morphism(morphism * //!< The morphism.
 );
 
 /**
@@ -140,7 +134,7 @@ void delete_morphism(morphism* //!< The morphism.
  * @return
  * A copy of the alphabet array.
  */
-letter* mor_duplicate_alpha(const morphism* //!< The morphism.
+letter *mor_duplicate_alpha(const morphism * //!< The morphism.
 );
 
 /**
@@ -154,8 +148,8 @@ letter* mor_duplicate_alpha(const morphism* //!< The morphism.
  * @return
  * The index of the letter.
  */
-uint mor_letter_index(const morphism*, //!< The morphism.
-    letter            //!< The letter.
+uint mor_letter_index(const morphism *, //!< The morphism.
+                      letter            //!< The letter.
 );
 
 /**
@@ -163,10 +157,9 @@ uint mor_letter_index(const morphism*, //!< The morphism.
  * Given as input a regular element, retrieves the index of the
  */
 
-uint mor_regular_jclass(const morphism*, //!< The morphism.
-    uint              //!< The element.
+uint mor_regular_jclass(const morphism *, //!< The morphism.
+                        uint              //!< The element.
 );
-
 
 /**********************************************/
 /* Preliminary functions for the construction */
@@ -179,7 +172,7 @@ uint mor_regular_jclass(const morphism*, //!< The morphism.
  * @remark
  * The right Cayley graph of the morphism must be computed.
  */
-void mor_compute_leftcayley(morphism* //!< The morphism.
+void mor_compute_leftcayley(morphism * //!< The morphism.
 );
 
 /**
@@ -190,15 +183,15 @@ void mor_compute_leftcayley(morphism* //!< The morphism.
  * @return
  * The sorted array.
  */
-uint* green_sorted_jclass(green*, //!< The Green relations.
-    uint //!< The index of the J-class.
+uint *green_sorted_jclass(green *, //!< The Green relations.
+                          uint     //!< The index of the J-class.
 );
 
 /**
  * @brief
  * Computation of the relation H from J, L and R (which must be already computed).
  */
-void h_green_compute(green* //!< The Green relations (J, R et L must be computed).
+void h_green_compute(green * //!< The Green relations (J, R et L must be computed).
 );
 
 /**
@@ -208,11 +201,10 @@ void h_green_compute(green* //!< The Green relations (J, R et L must be computed
  * @remark
  * The computation requires the list of idempotent elements.
  */
-void gr_green_compute(uint*,    //!< The list of idempotents.
-    uint,       //!< The number of idempotents.
-    green* //!< The Green relations.
+void gr_green_compute(uint *, //!< The list of idempotents.
+                      uint,   //!< The number of idempotents.
+                      green * //!< The Green relations.
 );
-
 
 /**
  * @brief
@@ -221,9 +213,7 @@ void gr_green_compute(uint*,    //!< The list of idempotents.
  * @remark
  * The computation requires the full computation of the Green relations.
  */
-void mor_compute_rep(morphism*
-);
-
+void mor_compute_rep(morphism *);
 
 /**
  * @brief
@@ -232,7 +222,7 @@ void mor_compute_rep(morphism*
  * @remark
  * All other mandatorty fields of the morphism must have been computed.
  */
-void mor_compute_green(morphism* //!< The morphism.
+void mor_compute_green(morphism * //!< The morphism.
 );
 
 /**
@@ -242,35 +232,24 @@ void mor_compute_green(morphism* //!< The morphism.
  * @remark
  * The Green relations must have been computed.
  */
-void mor_compute_min_regular_jcl(morphism* //!< The morphism.
+void mor_compute_min_regular_jcl(morphism * //!< The morphism.
 );
-
 
 /************************************/
 /* Construction from a complete DFA */
 /************************************/
 
-
 /**
  * @brief
  * Computation of the transition morphism associated to a complete DFA.
  *
- * @remark
- * The ordering on the elements of the DFA is used to compute partial information
- * on the corresponding ordering on the elements of the morphism. For each J-class,
- * if e is the idempotent representing this J-class, then all elements larger than
- * e for the ordering and for the H-order are computed (this is enough for all the
- * membership tests). If the ordering is NULL, nothing is computed for the morphism.
- *
  * @return
  * The transition morphism.
  */
-morphism* dfa_to_morphism(dfa*, //!< The complete DFA.
-    bool, //!< Should the ordering on the elements of the morphism be computed ? (only works for minimal input DFAs)
-    int*,  //!< Error code to be filled if not NULL.
-    uint** //!< A pointer to return function table used to construct the monoid (NULL if not used).
+morphism *dfa_to_morphism(dfa *,  //!< The complete DFA.
+                          int *,  //!< Error code to be filled if not NULL.
+                          uint ** //!< A pointer to return function table used to construct the monoid (NULL if not used).
 );
-
 
 /**
  * @brief
@@ -280,7 +259,7 @@ morphism* dfa_to_morphism(dfa*, //!< The complete DFA.
  * @return
  * The size of the morphism.
  */
-uint dfa_to_morphism_size(dfa* A //!< The complete DFA.
+uint dfa_to_morphism_size(dfa *A //!< The complete DFA.
 );
 
 /**
@@ -290,7 +269,7 @@ uint dfa_to_morphism_size(dfa* A //!< The complete DFA.
  * @return
  * The complete DFA.
  */
-dfa* morphism_to_dfa(morphism* //!< The morphism.
+dfa *morphism_to_dfa(morphism * //!< The morphism.
 );
 
 /**
@@ -300,17 +279,12 @@ dfa* morphism_to_dfa(morphism* //!< The morphism.
  * @return
  * The complete DFA.
  */
-dfa* left_morphism_to_dfa(morphism* //!< The morphism.
+dfa *left_morphism_to_dfa(morphism * //!< The morphism.
 );
-
-
-
 
 /***************************************/
 /* Computing information on a morphism */
 /***************************************/
-
-
 
 /**
  * @brief
@@ -319,7 +293,7 @@ dfa* left_morphism_to_dfa(morphism* //!< The morphism.
  * @remark
  * The computation is only made if the multiplication table has not already been computed.
  */
-void mor_compute_mult(morphism* //!< The morphism.
+void mor_compute_mult(morphism * //!< The morphism.
 );
 
 /**
@@ -329,7 +303,7 @@ void mor_compute_mult(morphism* //!< The morphism.
  * @return
  * The mirror.
  */
-lgraph* mor_rmirror(morphism* //!< The morphism.
+lgraph *mor_rmirror(morphism * //!< The morphism.
 );
 
 /**
@@ -339,7 +313,7 @@ lgraph* mor_rmirror(morphism* //!< The morphism.
  * @return
  * The mirror.
  */
-lgraph* mor_lmirror(morphism* //!< The morphism.
+lgraph *mor_lmirror(morphism * //!< The morphism.
 );
 
 /**
@@ -352,9 +326,8 @@ lgraph* mor_lmirror(morphism* //!< The morphism.
  * @remark
  * The computation is only made if the syntactic order has not already been computed.
  */
-dequeue** mor_compute_order(morphism* //!< The morphism.
+void mor_compute_order(morphism * //!< The morphism.
 );
-
 
 /***************************/
 /* Operations on morphisms */
@@ -367,10 +340,9 @@ dequeue** mor_compute_order(morphism* //!< The morphism.
  * @return
  * The name of the element.
  */
-dequeue* mor_name(morphism*, //!< The morphism.
-    uint              //!< The element.
+dequeue *mor_name(morphism *, //!< The morphism.
+                  uint        //!< The element.
 );
-
 
 /**
  * @brief
@@ -382,9 +354,9 @@ dequeue* mor_name(morphism*, //!< The morphism.
  * @return
  * The resulting element.
  */
-uint mor_mult(morphism*, //!< The morphism.
-    uint,       //!< First element.
-    uint        //!< Second element.
+uint mor_mult(morphism *, //!< The morphism.
+              uint,       //!< First element.
+              uint        //!< Second element.
 );
 
 /**
@@ -397,9 +369,9 @@ uint mor_mult(morphism*, //!< The morphism.
  * @return
  * The resulting element.
  */
-uint mor_mult_gen(morphism*, //!< The morphism.
-    uint,       //!< The number of elements to multiply.
-    ...         //!< The elements.
+uint mor_mult_gen(morphism *, //!< The morphism.
+                  uint,       //!< The number of elements to multiply.
+                  ...         //!< The elements.
 );
 
 /**
@@ -409,8 +381,8 @@ uint mor_mult_gen(morphism*, //!< The morphism.
  * @return
  * The omega power.
  */
-uint mor_omega(morphism*, //!< The morphism.
-    uint        //!< The element.
+uint mor_omega(morphism *, //!< The morphism.
+               uint        //!< The element.
 );
 
 /**
@@ -424,14 +396,10 @@ uint mor_omega(morphism*, //!< The morphism.
  * @return
  * A Boolean indicating if the element is an idempotent.
  */
-bool mor_num_idem(morphism*, //!< The morphism.
-    uint,       //!< The element.
-    uint*      //!< A pointer used to return the index of the idempotent.
+bool mor_num_idem(morphism *, //!< The morphism.
+                  uint,       //!< The element.
+                  uint *      //!< A pointer used to return the index of the idempotent.
 );
-
-
-
-
 
 /**************/
 /* Properties */
@@ -447,8 +415,8 @@ bool mor_num_idem(morphism*, //!< The morphism.
  * @return
  * A Boolean indicating whether there exists a letter mapped to the neutral element.
  */
-bool mor_neutral_letter(morphism*, //!< The morphism.
-    FILE*      //!< The stream (NULL if no display is desired).
+bool mor_neutral_letter(morphism *, //!< The morphism.
+                        FILE *      //!< The stream (NULL if no display is desired).
 );
 
 /**
@@ -458,7 +426,7 @@ bool mor_neutral_letter(morphism*, //!< The morphism.
  * @return
  * A Boolean indicating whether there exists a nonempty antecedent of the neutral element.
  */
-bool mor_nonempty_neutral(morphism* //!< The morphism.
+bool mor_nonempty_neutral(morphism * //!< The morphism.
 );
 
 /**
@@ -468,10 +436,8 @@ bool mor_nonempty_neutral(morphism* //!< The morphism.
  * @return
  * A Boolean indicating whether all elements are regular.
  */
-bool mor_all_regular(morphism* //!< The morphism.
+bool mor_all_regular(morphism * //!< The morphism.
 );
-
-
 
 /**
  * @brief
@@ -484,11 +450,9 @@ bool mor_all_regular(morphism* //!< The morphism.
  * @return
  * The image
  */
-uint mor_compute_image(morphism*, //!< The morphism.
-    word*      //!< The word.
+uint mor_compute_image(morphism *, //!< The morphism.
+                       word *      //!< The word.
 );
-
-
 
 /**
  * @brief
@@ -500,9 +464,40 @@ uint mor_compute_image(morphism*, //!< The morphism.
  * @return
  * The graph of the R-class.
  */
-dgraph* mor_extract_rcl(morphism* M, //!< The morphism.
-    uint rcl //!< The index of the R-class.
+dgraph *mor_extract_rcl(morphism *M, //!< The morphism.
+                        uint rcl     //!< The index of the R-class.
 );
+
+typedef enum
+{
+    FACTO_LEAF,
+    FACTO_BINARY,
+    FACTO_IDEM,
+} facto_type;
+
+typedef struct
+{
+    facto_type type; //!< The type of the node.
+    uint elem;       //!< The value of the node.
+    uint letter;     //!< The letter associated to the node (only for leaf nodes).
+    int st_children; //!< First index of the children in the array of children (only for binary nodes).
+    int nb_children; //!< The number of children.
+} facto_node;
+
+typedef struct
+{
+    facto_node *nodes; //!< Array of nodes of the forest.
+    int size_nodes;    //!< Size of the array of nodes.
+    int nb_nodes;      //!< Number of nodes in the forest.
+
+    int *childrens;     //!< Array storing the lists of children.
+    int nb_childrens;   //!< Number of children in the forest.
+    int size_childrens; //!< Size of the array storing the lists of children.
+
+    int root; //!< The root of the forest (index of the node in the array of nodes).
+} facto_forest;
+
+facto_forest *mor_compute_facto_forest(morphism *M, word *w);
 
 /*
 

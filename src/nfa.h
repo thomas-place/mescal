@@ -7,17 +7,15 @@
 #ifndef NFA_H_
 #define NFA_H_
 
- /*  _   _ _____ _     */
- /* | \ | |  ___/ \    */
- /* |  \| | |_ / _ \   */
- /* | |\  |  _/ ___ \  */
- /* |_| \_|_|/_/   \_\ */
+/*  _   _ _____ _     */
+/* | \ | |  ___/ \    */
+/* |  \| | |_ / _ \   */
+/* | |\  |  _/ ___ \  */
+/* |_| \_|_|/_/   \_\ */
 
 #include "graphs.h"
 #include "graphs_transclos.h"
-#include "type_abr.h"
 #include "type_basic.h"
-#include "type_binheap.h"
 #include "type_boolarray.h"
 #include "type_dequeue.h"
 #include "words.h"
@@ -25,8 +23,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-
 
 /**
  * @brief
@@ -40,35 +36,43 @@
  * The array of state names is not mandatory. If it is set to a NULL pointer,
  * each set will be named by its index when displaying the NFA.
  */
-typedef struct {
+typedef struct
+{
     /* Mandatory */
-    lgraph* trans; //!< Graph of transitions (also stores the number of states and the size of the alphabet).
-    dequeue* initials; //!< The list of initial states (sorted in increasing order).
-    dequeue* finals; //!< The list of final states (sorted in increasing order).
-    letter* alphabet; //!< Array indexed by the indices of letters. Maps each index to its actual letter (NULL if the alphabet is empty).
+    lgraph *trans;    //!< Graph of transitions (also stores the number of states and the size of the alphabet).
+    uint nb_letters;  //!< Number of letters in the alphabet.
+    uint nb_initials; //!< Number of initial states.
+    uint *initials;   //!< The list of initial states (sorted in increasing order).
+    uint nb_finals;   //!< Number of final states.
+    uint *finals;     //!< The list of final states (sorted in increasing order).
+    letter *alphabet; //!< Array indexed by the indices of letters. Maps each index to its actual letter (NULL if the alphabet is empty).
+    bool epsilon;     //!< Indicates whether the NFA contains epsilon transitions.
+    bool inverse;     //!< Indicates whether the NFA contains inverse transitions.
 
     /* Optional */
-    graph* trans_e; //!< Graph of espilon transitions (NULL if there are no such transitions).
-    lgraph* trans_i;    //!< Graph of inverse transitions (NULL if there are no such transitions).
-    char** state_names; //!< Array of state names (only utilized when displaying the NFA). Each state is mapped to its name (NULL if unused).
+    char **state_names; //!< Array of state names (only utilized when displaying the NFA). Each state is mapped to its name (NULL if unused).
 } nfa;
-
 
 /**
  * @brief
  * Type used to represent a complete DFA.
  */
-typedef struct {
+typedef struct
+{
     /* Mandatory */
-    dgraph* trans; //!< Graph of transitions (also stores the number of states and the size of the alphabet). Undefined transitions are mapped to UINT_MAX.
-    uint initial; //!< The index of the initial state.
-    uint nb_finals; //!< Number of final states.
-    uint* finals; //!< Array of final states (sorted in increasing order).
-    letter* alphabet; //!< Array indexed by the indices of letters. Maps each index to its actual letter (NULL if the alphabet is empty).
+    dgraph *trans;    //!< Graph of transitions (also stores the number of states and the size of the alphabet). Undefined transitions are mapped to UINT_MAX.
+    uint initial;     //!< The index of the initial state.
+    uint nb_finals;   //!< Number of final states.
+    uint *finals;     //!< Array of final states (sorted in increasing order).
+    letter *alphabet; //!< Array indexed by the indices of letters. Maps each index to its actual letter (NULL if the alphabet is empty).
 
     /* Optional */
-    char** state_names; //!< Array of state names (only utilized when displaying the DFA). Each state is mapped to its name (NULL if unused).
-    bool** order; //!< The canonical order of the states (NULL if not used). The order is defined by the indices of the states in the DFA.
+    char **state_names;  //!< Array of state names (only utilized when displaying the DFA). Each state is mapped to its name (NULL if unused).
+    bool **order;        //!< The canonical order of the states (NULL if not used). The order is defined by the indices of the states in the DFA.
+    bool *order_storage; //!< Storage of the order (only used if the order is not NULL). The order is stored as a boolean array of size (number of states)^2. The order of states q and r is stored at index q * (number of states) + r.
+    parti *sccs;         //!< The sccs of the DFA
+    uint *sccs_inv;      //!< The inverse mapping of the sccs of the DFA (maps each state to its index in the SCC it belongs to).
+    graph *tclos;        //!< Transitive closure of the DFA (states of the graph are the SCCs of the DFA which must be computed). Includes self-loops.
 } dfa;
 
 /*****************/
@@ -82,9 +86,9 @@ typedef struct {
  * @remark
  * If no names are defined for the states, each state is named by its index.
  */
-void nfa_print_state(const nfa*, //!< The NFA.
-    uint,        //!< Index of the state.
-    FILE*       //!< The stream.
+void nfa_print_state(const nfa *, //!< The NFA.
+                     uint,        //!< Index of the state.
+                     FILE *       //!< The stream.
 );
 
 /**
@@ -94,23 +98,23 @@ void nfa_print_state(const nfa*, //!< The NFA.
  * @remark
  * If no names are defined for the states, each state is named by its index.
  */
-void dfa_print_state(const dfa*, //!< The DFA.
-    uint,        //!< Index of the state.
-    FILE*       //!< The stream.
+void dfa_print_state(const dfa *, //!< The DFA.
+                     uint,        //!< Index of the state.
+                     FILE *       //!< The stream.
 );
 
 /**
  * @brief
  * Release the state names in a NFA (if there are states names).
  */
-void nfa_reset_state_names(nfa* // The NFA.
+void nfa_reset_state_names(nfa * // The NFA.
 );
 
 /**
  * @brief
  * Release the state names in a DFA (if there are states names).
  */
-void dfa_reset_state_names(dfa* A //!< The DFA.
+void dfa_reset_state_names(dfa *A //!< The DFA.
 );
 
 /**
@@ -121,9 +125,11 @@ void dfa_reset_state_names(dfa* A //!< The DFA.
  * @return
  * A copy of the array of state names.
  */
-char** copy_all_names(char** names, //!< The array of state names. 
-    uint size //!< Size of the array of state names.
+char **copy_all_names(char **names, //!< The array of state names.
+                      uint size     //!< Size of the array of state names.
 );
+
+char **names_from_partition(char **state_names, parti *P);
 
 /**********************/
 /*+ Copy and release +*/
@@ -133,16 +139,15 @@ char** copy_all_names(char** names, //!< The array of state names.
  * @brief
  * Release of a NFA.
  */
-void nfa_delete(nfa* //!< The NFA.
+void nfa_delete(nfa * //!< The NFA.
 );
 
 /**
  * @brief
  * Deletes a DFA.
  */
-void dfa_delete(dfa* A //!< The DFA.
+void dfa_delete(dfa *A //!< The DFA.
 );
-
 
 /**
  * @brief
@@ -151,7 +156,7 @@ void dfa_delete(dfa* A //!< The DFA.
  * @return
  * The copy
  */
-nfa* nfa_copy(nfa* //!< The NFA.
+nfa *nfa_copy(nfa * //!< The NFA.
 );
 
 /**
@@ -161,52 +166,12 @@ nfa* nfa_copy(nfa* //!< The NFA.
  * @return
  * A copy of the DFA.
  */
-dfa* dfa_copy(dfa* A //!< The DFA.
+dfa *dfa_copy(dfa *A //!< The DFA.
 );
 
-/**
- * @brief
- * Copies an NFA with an extended alphabet.
- *
- * @remark
- * The input array contains the letters that should be added to the alphabet. It
- * may contain letters which are already in the alphabet.  The new alphabet is
- * the union between the old one and the set of letters contains in this array.
- *
- * @attention
- * The array containing the new letter must be sorted in increasing order.
- *
- * @return
- * A copy of the original NFA with its alphabet extended.
- */
-nfa* nfa_copy_exalpha(nfa*,    //!< The NFA.
-    letter*, //!< Array containing the new letters (sorted in increasing order).
-    uint      //!< Size of the array.
-);
+void union_alphabet(letter *alpha1, uint size1, uint *indmap1, letter *alpha2, uint size2, uint *indmap2, uint *newsize, letter **newalpha);
 
-/**
- * @brief
- * Copies a DFA with an extended alphabet.
- *
- * @remark
- * If there indeed new letters in the alphabet, the new DFA is ectended with a new sink
- * state.
- *
- * @return
- * A copy of the DFA with an extended alphabet.
- */
-dfa* dfa_copy_exalpha(dfa* A, //!< The DFA.
-    letter* alpha, //!< Array containing the new letters (sorted in increasing order).
-    uint size //!< Size of the array.
-);
-
-/**
- * @brief
- * Overwrites a NFA by copying another NFA and releasing this other NFA.
- */
-void nfa_overwrite(nfa*, //!< The NFA that is being overwritten (its original fields are released).
-    nfa*  //!< The NFA being copied (it is completely released).
-);
+void inter_alphabet(letter *alpha1, uint size1, letter *alpha2, uint size2, uint *newsize, letter **newalpha, uint **revmap1, uint **revmap2);
 
 /**************************************************************/
 /*+ Computation of basic NFAs (used in Thompson's algorithm) +*/
@@ -222,7 +187,7 @@ void nfa_overwrite(nfa*, //!< The NFA that is being overwritten (its original fi
  * @return
  * The NFA.
  */
-nfa* create_emptylang(void);
+nfa *create_emptylang(void);
 
 /**
  * @brief
@@ -234,7 +199,7 @@ nfa* create_emptylang(void);
  * @return
  * The NFA.
  */
-nfa* create_sing_epsilon(void);
+nfa *create_sing_epsilon(void);
 
 /**
  * @brief
@@ -247,7 +212,7 @@ nfa* create_sing_epsilon(void);
  * @return
  * The NFA.
  */
-nfa* create_sing_letter(letter //!< The letter.
+nfa *create_sing_letter(letter //!< The letter.
 );
 
 /**
@@ -261,13 +226,12 @@ nfa* create_sing_letter(letter //!< The letter.
  * @return
  * The NFA.
  */
-nfa* create_sing_word(word* //!< The word.
+nfa *create_sing_word(word * //!< The word.
 );
 
 /*******************************/
 /*+ Simple operations on NFAs +*/
 /*******************************/
-
 
 /**
  * @brief
@@ -280,10 +244,10 @@ nfa* create_sing_word(word* //!< The word.
  * @return
  * A NFA recognizing the union of the two input languages.
  */
-nfa* nfa_union(void* I1, //!< First NFA or DFA.
-    bool is_dfa_I1, //!< True if the first input is a DFA, false if it is a NFA.
-    void* I2, //!< Second NFA or DFA.
-    bool is_dfa_I2 //!< True if the second input is a DFA, false if it is a NFA.
+nfa *nfa_union(void *I1,       //!< First NFA or DFA.
+               bool is_dfa_I1, //!< True if the first input is a DFA, false if it is a NFA.
+               void *I2,       //!< Second NFA or DFA.
+               bool is_dfa_I2  //!< True if the second input is a DFA, false if it is a NFA.
 );
 
 /**
@@ -297,10 +261,10 @@ nfa* nfa_union(void* I1, //!< First NFA or DFA.
  * @return
  * A NFA recognizing the concatenation of the two input languages.
  */
-nfa* nfa_concat(void* I1, //!< First NFA or DFA.
-    bool is_dfa_I1, //!< True if the first input is a DFA, false if it is a NFA.
-    void* I2, //!< Second NFA or DFA.
-    bool is_dfa_I2 //!< True if the second input is a DFA, false if it is a NFA.
+nfa *nfa_concat(void *I1,       //!< First NFA or DFA.
+                bool is_dfa_I1, //!< True if the first input is a DFA, false if it is a NFA.
+                void *I2,       //!< Second NFA or DFA.
+                bool is_dfa_I2  //!< True if the second input is a DFA, false if it is a NFA.
 );
 
 /**
@@ -310,9 +274,8 @@ nfa* nfa_concat(void* I1, //!< First NFA or DFA.
  * @return
  * A NFA recognizing the Kleene star of the input language.
  */
-nfa* nfa_star(nfa* //!< The NFA.
+nfa *nfa_star(nfa * //!< The NFA.
 );
-
 
 /**
  * @brief
@@ -321,7 +284,7 @@ nfa* nfa_star(nfa* //!< The NFA.
  * @return
  * A NFA recognizing the Kleene star of the input language.
  */
-nfa* dfa_star(dfa* //!< The DFA.
+nfa *dfa_star(dfa * //!< The DFA.
 );
 
 /**
@@ -331,7 +294,7 @@ nfa* dfa_star(dfa* //!< The DFA.
  * @return
  * A NFA recognizing the Kleene plus of the input language.
  */
-nfa* nfa_plus(nfa* //!< The NFA.
+nfa *nfa_plus(nfa * //!< The NFA.
 );
 
 /**
@@ -341,7 +304,7 @@ nfa* nfa_plus(nfa* //!< The NFA.
  * @return
  * A NFA recognizing the mirror of the input language.
  */
-nfa* nfa_mirror(nfa* //!< The NFA.
+nfa *nfa_mirror(nfa * //!< The NFA.
 );
 
 /**
@@ -351,7 +314,7 @@ nfa* nfa_mirror(nfa* //!< The NFA.
  * @return
  * A NFA recognizing the mirror of the input language.
  */
-nfa* dfa_mirror(dfa* //!< The NFA.
+nfa *dfa_mirror(dfa * //!< The NFA.
 );
 
 /**
@@ -361,14 +324,7 @@ nfa* dfa_mirror(dfa* //!< The NFA.
  * @return
  * A copy of the input NFA with its epsilon transitions eliminated.
  */
-nfa* nfa_elimeps(nfa* //!< The NFA.
-);
-
-/**
- * @brief
- * Elimination of the epsilon transitions in a NFA. Overwrites the input NFA.
- */
-void nfa_elimeps_mod(nfa* //!< The NFA.
+nfa *nfa_elimeps(nfa * //!< The NFA.
 );
 
 /**
@@ -379,30 +335,47 @@ void nfa_elimeps_mod(nfa* //!< The NFA.
  * @return
  * A copy of the input NFA with its useless states eliminated.
  */
-nfa* nfa_trim(nfa* //!< The NFA.
-);
-
-/**
- * @brief
- * Removes all non-accessible states from a DFA.
- *
- * @return
- * The trimmed DFA.
- */
-dfa* dfa_trim(dfa* A //!< The DFA.
+nfa *nfa_trim(nfa *A,    //!< The NFA.
+              bool names //!< Indicates whether state names should be preserved.
 );
 
 /**
  * @brief
  * Elimination of all states that are not simultaneously reachable from an
- * initial state and co-reachable from a final state. Overwrites the input NFA.
+ * initial state and co-reachable from a final state. Adds a sink state (if
+ * needed) to ensure the resulting DFA is complete.
+ *
+ * @return
+ * The trimmed DFA.
  */
-void nfa_trim_mod(nfa* //!< The NFA.
+dfa *dfa_trim(dfa *A,       //!< The DFA.
+              bool names,   //!< Indicates whether state names should be preserved.
+              bool add_sink //!< Indicates whether a sink state should be added (if needed) to ensure completeness.
 );
 
+/**
+ * @brief
+ * Computes the direct product of two DFAs.
+ *
+ * @return
+ * The direct product DFA.
+ */
+dfa *dfa_direct_product(dfa *A, //!< The first DFA.
+                        dfa *B  //!< The second DFA.
+);
 
-dfa* dfa_direct_product(dfa* A, //!< The first DFA.
-    dfa* B //!< The second DFA.
+/**
+ * @brief
+ * Computes the SCCs of a DFA and stores them in the appropriate field of the structure.
+ */
+void dfa_compute_sccs(dfa *A //!< The DFA.
+);
+
+/**
+ * @brief
+ * Computes the transitive closure of a DFA and stores it in the appropriate field of the structure.
+ */
+void dfa_compute_tclos(dfa *A //!< The DFA.
 );
 
 /***********************************/
@@ -416,9 +389,9 @@ dfa* dfa_direct_product(dfa* A, //!< The first DFA.
  * @return
  * The random NFA.
  */
-nfa* nfa_random(uint, //!< Size of the alphabet.
-    uint, //!< Minimum number of states.
-    uint  //!< Maximum number of states.
+nfa *nfa_random(uint, //!< Size of the alphabet.
+                uint, //!< Minimum number of states.
+                uint  //!< Maximum number of states.
 );
 
 /**
@@ -428,11 +401,10 @@ nfa* nfa_random(uint, //!< Size of the alphabet.
  * @return
  * The random DFA.
  */
-dfa* dfa_random(uint, //!< Size of the alphabet.
-    uint, //!< Minimum number of states.
-    uint  //!< Maximum number of states.
+dfa *dfa_random(uint, //!< Size of the alphabet.
+                uint, //!< Minimum number of states.
+                uint  //!< Maximum number of states.
 );
-
 
 /*****************/
 /*+ Information +*/
@@ -445,7 +417,7 @@ dfa* dfa_random(uint, //!< Size of the alphabet.
  * @return
  * The number of transitions.
  */
-int nfa_nb_trans(nfa* //!< The NFA.
+int nfa_nb_trans(nfa * //!< The NFA.
 );
 
 /**
@@ -455,7 +427,7 @@ int nfa_nb_trans(nfa* //!< The NFA.
  * @return
  * A Boolean indicating whether the NFA is deterministic.
  */
-bool nfa_is_det(nfa* //!< The NFA.
+bool nfa_is_det(nfa * //!< The NFA.
 );
 
 /**
@@ -465,7 +437,17 @@ bool nfa_is_det(nfa* //!< The NFA.
  * @return
  * A Boolean indicating whether the NFA is complete.
  */
-bool nfa_is_comp(nfa* //!< The NFA.
+bool nfa_is_comp(nfa * //!< The NFA.
+);
+
+/**
+ * @brief
+ * Tests if a DFA is complete.
+ *
+ * @return
+ * A Boolean indicating whether the DFA is complete.
+ */
+bool dfa_is_comp(dfa *A //!< The DFA.
 );
 
 /**
@@ -475,7 +457,7 @@ bool nfa_is_comp(nfa* //!< The NFA.
  * @return
  * A Boolean indicating whether the NFA recognizes the empty language.
  */
-bool nfa_is_empty(nfa* //!< The NFA.
+bool nfa_is_empty(nfa * //!< The NFA.
 );
 
 /**
@@ -485,8 +467,8 @@ bool nfa_is_empty(nfa* //!< The NFA.
  * @return
  * A Boolean indicating whether the word is accepted.
  */
-bool nfa_accepts(nfa*, //!< The NFA.
-    word* //!< The word.
+bool nfa_accepts(nfa *, //!< The NFA.
+                 word * //!< The word.
 );
 
 /**
@@ -494,27 +476,10 @@ bool nfa_accepts(nfa*, //!< The NFA.
  * Computes the set of states reached by a word in a NFA.
  *
  * @return
- * The list of states reached by the word.
+ * The list of states reached by the word given as a Boolean array.
  */
-dequeue* nfa_compute_runs(nfa*, //!< The NFA.
-    word* //!< The word.
-);
-
-
-/**
- * @brief
- * Checks if there exists a path between two states in a DFA.
- *
- * @attention
- * The function does not check whether the input is indeed a DFA.
- *
- * @return
- * A Boolean indicating whether there exists a path.
- */
-bool dfa_exists_path(dfa*, //!< The DFA.
-    uint,   //!< The source state.
-    uint,   //!< The target state.
-    bool* //!< The restriction of the alphabet (NULL if no restriction).
+uint *nfa_compute_runs(nfa *, //!< The NFA.
+                       word * //!< The word.
 );
 
 /**
@@ -525,16 +490,45 @@ bool dfa_exists_path(dfa*, //!< The DFA.
  * The final state reached by the DFA after reading the word.
  * If the word contains an invalid letter, UINT_MAX is returned.
  */
-uint dfa_compute_run(dfa* A, //!< The DFA.
-    word* w //!< The word.
+uint dfa_compute_run(dfa *A, //!< The DFA.
+                     word *w //!< The word.
 );
 
+/**
+ * @brief
+ * Computes the left quotient of a NFA by a word.
+ *
+ * @return
+ * The left quotient NFA.
+ */
+nfa *nfa_left_quotient(nfa *A, word *w);
 
+/**
+ * @brief
+ * Computes the right quotient of a NFA by a word.
+ *
+ * @return
+ * The right quotient NFA.
+ */
+nfa *nfa_right_quotient(nfa *A, word *w);
 
+/**
+ * @brief
+ * Computes the left quotient of a DFA by a word.
+ *
+ * @return
+ * The left quotient DFA.
+ */
+dfa *dfa_left_quotient(dfa *A, word *w);
 
-
-
-
+/**
+ * @brief
+ * Computes the right quotient of a DFA by a word.
+ *
+ * @return
+ * The right quotient DFA.
+ */
+dfa *dfa_right_quotient(dfa *A, word *w);
 
 /************************/
 /* Partitions of states */
@@ -554,11 +548,9 @@ uint dfa_compute_run(dfa* A, //!< The DFA.
  * @return
  * The merged NFA.
  */
-nfa* nfa_merge_states(nfa*,  //!< The NFA.
-    parti* //!< Partition of the states.
+nfa *nfa_merge_states(nfa *,  //!< The NFA.
+                      parti * //!< Partition of the states.
 );
-
-
 
 /****************/
 /*+ Conversion +*/
@@ -577,7 +569,7 @@ nfa* nfa_merge_states(nfa*,  //!< The NFA.
  * @return
  * The complete DFA.
  */
-dfa* detnfa_to_dfa(nfa* A//!< The NFA.
+dfa *detnfa_to_dfa(nfa *A //!< The NFA.
 );
 
 /**
@@ -587,29 +579,7 @@ dfa* detnfa_to_dfa(nfa* A//!< The NFA.
  * @return
  * The NFA.
  */
-nfa* dfa_to_nfa(dfa* A //!< The DFA.
+nfa *dfa_to_nfa(dfa *A //!< The DFA.
 );
-
-/**
- * @brief
- * Converts a DFA into a NFA with an extended alphabet.
- *
- * @return
- * The NFA.
- */
-nfa* dfa_to_nfa_exalpha(dfa* A, letter* alpha, uint size);
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #endif // NFA_H_

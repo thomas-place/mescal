@@ -12,11 +12,12 @@
 #include <stdbool.h>
 #include <string.h>
 
- /**
-  * @brief
-  * The keywords.
-  */
-typedef enum {
+/**
+ * @brief
+ * The keywords.
+ */
+typedef enum
+{
 
     // Interface
     KY_INTERFACE,
@@ -53,7 +54,6 @@ typedef enum {
     KY_TIMESTATS,
     KY_LATEX,
 
-
     // Automata commands
     KY_MINI,
     KY_THOMPSON,
@@ -84,6 +84,8 @@ typedef enum {
     KY_NOSIMC,
     KY_FOLDING,
     KY_DIRECTPRODUCT,
+    KY_LQUOTIENT,
+    KY_RQUOTIENT,
 
     // Morphisms commands
     KY_SYNT,
@@ -93,6 +95,7 @@ typedef enum {
     KY_IDEMS,
     KY_ORDER,
     KY_IMAGE,
+    KY_FACTO,
     KY_GKER,
     KY_MKER,
     KY_AKER,
@@ -113,7 +116,7 @@ typedef enum {
     KY_NHIERA,
     KY_FPHIERA,
 
-    //Filtering
+    // Filtering
     KY_RSIZE,
     KY_LSIZE,
     KY_JSIZE,
@@ -129,6 +132,8 @@ typedef enum {
     KY_NOT,
     KY_FILTER,
     KY_NOSMALLCOUNTER,
+    KY_NOSINK,
+    KY_NOSELFLOOPS,
 
     // End of commands
     KY_COMEND,
@@ -141,6 +146,7 @@ typedef enum {
     KY_UL,
     KY_TLX,
     KY_PPT,
+    KY_COPPT,
     KY_PT,
     KY_LT,
     KY_LTT,
@@ -159,6 +165,8 @@ typedef enum {
 
     KY_POL,
     KY_POL2,
+    KY_COPOL,
+    KY_COPOL2,
     KY_BPOL,
     KY_BPOL2,
     KY_UBPOL,
@@ -180,16 +188,12 @@ typedef enum {
     KY_NULL
 } com_keyword;
 
-
-
-
-
-
 /**
  * @brief
  * The two kinds of commands.
  */
-typedef enum {
+typedef enum
+{
     CMT_RAW, //!< Raw text command (no parameters, no chain)
     CMT_IND, //!< Indexed command (no parameters, with chain).
     CMT_KEY, //!< Standard command (with parameters, with chain).
@@ -199,30 +203,33 @@ typedef enum {
  * @brief
  * Chain of strings in a command.
  */
-typedef struct string_chain {
-    char* string;              //!< The string.
-    struct string_chain* next; //!< The next link in the chain.
+typedef struct string_chain
+{
+    char *string;              //!< The string.
+    struct string_chain *next; //!< The next link in the chain.
 } string_chain;
 
 /**
  * @brief
  * Parameters of a command.
  */
-typedef struct com_parameters {
+typedef struct com_parameters
+{
     uchar count;                 //!< Number of parameters.
-    struct com_command* param;   //!< The first parameter.
-    struct com_parameters* next; //!< The next parameters.
+    struct com_command *param;   //!< The first parameter.
+    struct com_parameters *next; //!< The next parameters.
 } com_parameters;
 
 /**
  * @brief
  * A command.
  */
-typedef struct com_command {
+typedef struct com_command
+{
     com_type thetype;       //!< The type of the command.
-    string_chain* main;     //!< The string chain of the command.
+    string_chain *main;     //!< The string chain of the command.
     uint ind;               //!< The index of the command (when it is of indexed type).
-    com_parameters* params; //!< The parameters of the command.
+    com_parameters *params; //!< The parameters of the command.
 } com_command;
 
 /***************************/
@@ -234,7 +241,7 @@ typedef struct com_command {
  * Initialization of a single keyword.
  */
 void keywords_add_key(com_keyword key, //!< The keyword.
-    const char* str//!< The string corresponding to the keyword.
+                      const char *str  //!< The string corresponding to the keyword.
 );
 
 /**
@@ -251,16 +258,16 @@ void keywords_add_all_keys(void);
  * @brief
  * Display a string chain.
  */
-void print_string_chain(const string_chain* stchain, //!< The string chain.
-    FILE* out                //!< The output stream.
+void print_string_chain(const string_chain *stchain, //!< The string chain.
+                        FILE *out                    //!< The output stream.
 );
 
 /**
  * @brief
  * Display a command.
  */
-void print_command(com_command* com, //!< The command.
-    FILE* out //!< The output stream.
+void print_command(com_command *com, //!< The command.
+                   FILE *out         //!< The output stream.
 );
 
 /**************************************/
@@ -274,7 +281,7 @@ void print_command(com_command* com, //!< The command.
  * @return
  * The string corresponding to the keyword.
  */
-const char* keywordtostring(com_keyword key //!< The keyword.
+const char *keywordtostring(com_keyword key //!< The keyword.
 );
 
 /**
@@ -288,7 +295,7 @@ const char* keywordtostring(com_keyword key //!< The keyword.
  * @return
  * The keyword corresponding to the string.
  */
-com_keyword string_to_keyword(const char* str //!< The string.
+com_keyword string_to_keyword(const char *str //!< The string.
 );
 
 /**
@@ -298,7 +305,7 @@ com_keyword string_to_keyword(const char* str //!< The string.
  * @return
  * True if the variable name is valid, false otherwise.
  */
-bool check_varname(const char* str //!< The variable name.
+bool check_varname(const char *str //!< The variable name.
 );
 
 /*******************************/
@@ -312,11 +319,8 @@ bool check_varname(const char* str //!< The variable name.
  * @return
  * True if the command is a class, false otherwise.
  */
-bool com_isclass(com_command* com //!< The command.
+bool com_isclass(com_command *com //!< The command.
 );
-
-
-
 
 /**
  * @brief
@@ -325,7 +329,7 @@ bool com_isclass(com_command* com //!< The command.
  * @return
  * True if the command is raw text, false otherwise.
  */
-bool com_israw(const com_command* com //!< The command.
+bool com_israw(const com_command *com //!< The command.
 );
 
 /**
@@ -335,7 +339,7 @@ bool com_israw(const com_command* com //!< The command.
  * @return
  * True if the command is a single link without parameters, false otherwise.
  */
-bool com_single(const com_command* com //!< The command.
+bool com_single(const com_command *com //!< The command.
 );
 
 /**
@@ -345,7 +349,7 @@ bool com_single(const com_command* com //!< The command.
  * @return
  * True if the command is a single link with or without parameters, false otherwise.
  */
-bool com_single_par(const com_command* com //!< The command.
+bool com_single_par(const com_command *com //!< The command.
 );
 
 /**
@@ -355,7 +359,7 @@ bool com_single_par(const com_command* com //!< The command.
  * @return
  * The number of parameters of the command.
  */
-int com_nbparams(const com_parameters* pars //!< The parameters of the command.
+int com_nbparams(const com_parameters *pars //!< The parameters of the command.
 );
 
 /**
@@ -365,14 +369,9 @@ int com_nbparams(const com_parameters* pars //!< The parameters of the command.
  * @return
  * The n-th parameter of the command.
  */
-com_command* com_getparam(const com_parameters* com, //!< The parameters of the command.
-    int i              //!< The index of the parameter.
+com_command *com_getparam(const com_parameters *com, //!< The parameters of the command.
+                          int i                      //!< The index of the parameter.
 );
-
-
-
-
-
 
 /**
  * @brief
@@ -381,7 +380,7 @@ com_command* com_getparam(const com_parameters* com, //!< The parameters of the 
  * @return
  *  The keyword associated with the first link in a string chain.
  */
-com_keyword key_from_string_chain(const string_chain* strchain //!< The string chain.
+com_keyword key_from_string_chain(const string_chain *strchain //!< The string chain.
 );
 
 /**
@@ -394,13 +393,8 @@ com_keyword key_from_string_chain(const string_chain* strchain //!< The string c
  * @return
  *  The keyword associated with the single link string chain.
  */
-com_keyword key_from_string_chain_single(const string_chain* strchain //!< The string chain.
+com_keyword key_from_string_chain_single(const string_chain *strchain //!< The string chain.
 );
-
-
-
-
-
 
 /*****************************/
 /* Construction of a command */
@@ -413,8 +407,8 @@ com_keyword key_from_string_chain_single(const string_chain* strchain //!< The s
  * @return
  * The new string chain.
  */
-string_chain* com_make_string_chain(char*,        //!< The string.
-    string_chain* //!< The original string chain.
+string_chain *com_make_string_chain(char *,        //!< The string.
+                                    string_chain * //!< The original string chain.
 );
 
 /**
@@ -424,8 +418,8 @@ string_chain* com_make_string_chain(char*,        //!< The string.
  * @return
  * The updated parameters.
  */
-com_parameters* com_make_parameters(com_command*,   //!< The parameter.
-    com_parameters* //!< The original parameters.
+com_parameters *com_make_parameters(com_command *,   //!< The parameter.
+                                    com_parameters * //!< The original parameters.
 );
 
 /**
@@ -435,8 +429,8 @@ com_parameters* com_make_parameters(com_command*,   //!< The parameter.
  * @return
  * The updated command.
  */
-com_command* com_make_command(char*,       //!< The string of the link.
-    com_command* //!< The original command.
+com_command *com_make_command(char *,       //!< The string of the link.
+                              com_command * //!< The original command.
 );
 
 /**
@@ -446,8 +440,8 @@ com_command* com_make_command(char*,       //!< The string of the link.
  * @return
  * The initialized command.
  */
-com_command* com_init_command(char*,          //!< The string of the link.
-    com_parameters* //!< The parameters of the command.
+com_command *com_init_command(char *,          //!< The string of the link.
+                              com_parameters * //!< The parameters of the command.
 );
 
 /**
@@ -457,7 +451,7 @@ com_command* com_init_command(char*,          //!< The string of the link.
  * @return
  * The initialized command.
  */
-com_command* com_init_rawcommand(char* //!< The raw text.
+com_command *com_init_rawcommand(char * //!< The raw text.
 );
 
 /**
@@ -467,29 +461,29 @@ com_command* com_init_rawcommand(char* //!< The raw text.
  * @return
  * The initialized command.
  */
-com_command* com_init_indexing(char*, //!< The string of the link.
-    char*  //!< The index of the command (must be a number).
+com_command *com_init_indexing(char *, //!< The string of the link.
+                               char *  //!< The index of the command (must be a number).
 );
 
 /**
  * @brief
  * Frees a string chain.
  */
-void com_free_string_chain(string_chain* //!< The string chain.
+void com_free_string_chain(string_chain * //!< The string chain.
 );
 
 /**
  * @brief
  * Frees a command.
  */
-void com_free_command(com_command* //!< The command.
+void com_free_command(com_command * //!< The command.
 );
 
 /**
  * @brief
  * Frees the parameters of a command.
  */
-void com_free_parameters(com_parameters* //!< The parameters.
+void com_free_parameters(com_parameters * //!< The parameters.
 );
 
 #endif

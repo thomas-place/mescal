@@ -1,26 +1,27 @@
 #include "monoid.h"
-#include "monoid_display.h"
 #include "interrupt.h"
-#include "shell_errors.h"
+#include "monoid_display.h"
 #include "monoid_ideals.h"
+#include "shell_errors.h"
 #include "type_hash.h"
 #include <time.h>
-
-
 
 /*******************/
 /* Basic functions */
 /*******************/
 
-
-void delete_green(green* G) {
-    if (G == NULL) {
+void delete_green(green *G)
+{
+    if (G == NULL)
+    {
         return;
     }
-    if (G->regular_array) {
+    if (G->regular_array)
+    {
         free(G->regular_array);
     }
-    if (G->group_array) {
+    if (G->group_array)
+    {
         free(G->group_array);
     }
     delete_parti(G->HCL);
@@ -28,20 +29,21 @@ void delete_green(green* G) {
     delete_parti(G->LCL);
     delete_parti(G->JCL);
     free(G);
-
 }
 
-void delete_morphism(morphism* M) {
-    if (!M) {
+void delete_morphism(morphism *M)
+{
+    if (!M)
+    {
         return;
     }
     /* Mandatory fields */
 
     // Free all names.
-    //for (uint i = 0; i < M->r_cayley->size_graph; i++) {
+    // for (uint i = 0; i < M->r_cayley->size_graph; i++) {
     //    delete_dequeue(M->names[i]);
     //}
-    //free(M->names);
+    // free(M->names);
 
     free(M->pred_ele);
     free(M->pred_lab);
@@ -61,13 +63,12 @@ void delete_morphism(morphism* M) {
     delete_green(M->rels);
 
     // Free jord
-    //delete_lgraph(M->j_order);
+    // delete_lgraph(M->j_order);
 
     // Free the representatives
     free(M->regular_idems);
 
     /* Optional fields */
-
 
     // Free Cayley graphs
     delete_dgraph(M->l_cayley);
@@ -76,30 +77,35 @@ void delete_morphism(morphism* M) {
     // Free optionnal fields.
     free(M->mult);
     free(M->order);
-    free(M->order_size);
     free(M->order_storage);
 
     free(M);
 }
 
-letter* mor_duplicate_alpha(const morphism* M) {
-    if (!M) {
+letter *mor_duplicate_alpha(const morphism *M)
+{
+    if (!M)
+    {
         return NULL;
     }
-    letter* alphabet;
+    letter *alphabet;
     MALLOC(alphabet, M->r_cayley->size_alpha);
-    for (uint i = 0; i < M->r_cayley->size_alpha; i++) {
+    for (uint i = 0; i < M->r_cayley->size_alpha; i++)
+    {
         alphabet[i] = M->alphabet[i];
     }
     return alphabet;
 }
 
-uint mor_letter_index(const morphism* M, letter l) {
-    const letter* p = bsearch(&l, M->alphabet, M->r_cayley->size_alpha, sizeof(letter), compare_letters);
-    if (p) {
+uint mor_letter_index(const morphism *M, letter l)
+{
+    const letter *p = bsearch(&l, M->alphabet, M->r_cayley->size_alpha, sizeof(letter), compare_letters);
+    if (p)
+    {
         return p - M->alphabet;
     }
-    else {
+    else
+    {
         return UINT_MAX;
     }
 }
@@ -108,41 +114,46 @@ uint mor_letter_index(const morphism* M, letter l) {
 /* Preliminary functions for the construction */
 /**********************************************/
 
-
-void mor_compute_leftcayley(morphism* M) {
+void mor_compute_leftcayley(morphism *M)
+{
 
     // As a precaution, we delete the left Cayley graph if it already exists.
-    if (M->l_cayley) {
+    if (M->l_cayley)
+    {
         delete_dgraph(M->l_cayley);
     }
 
-
     // Création du graphe.
     M->l_cayley = create_dgraph_noedges(M->r_cayley->size_graph, M->r_cayley->size_alpha);
-    dequeue* fromlet = create_dequeue();
-    dequeue* fromone = create_dequeue();
-    bool* visited;
+    dequeue *fromlet = create_dequeue();
+    dequeue *fromone = create_dequeue();
+    bool *visited;
     MALLOC(visited, M->r_cayley->size_graph);
 
     // For each letter in the alphabet.
-    for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
+    for (uint a = 0; a < M->r_cayley->size_alpha; a++)
+    {
 
         // Initialize the queues and the visited array.
         makeempty_dequeue(fromlet);
         makeempty_dequeue(fromone);
-        for (uint s = 0; s < M->r_cayley->size_graph; s++) {
+        for (uint s = 0; s < M->r_cayley->size_graph; s++)
+        {
             visited[s] = false;
         }
         rigins_dequeue(ONE, fromone);
         rigins_dequeue(M->r_cayley->edges[ONE][a], fromlet);
         visited[ONE] = true;
 
-        while (!isempty_dequeue(fromone)) {
+        while (!isempty_dequeue(fromone))
+        {
             uint s = rigpull_dequeue(fromone);
             uint as = rigpull_dequeue(fromlet);
             M->l_cayley->edges[s][a] = as;
-            for (uint b = 0; b < M->r_cayley->size_alpha; b++) {
-                if (!visited[M->r_cayley->edges[s][b]]) {
+            for (uint b = 0; b < M->r_cayley->size_alpha; b++)
+            {
+                if (!visited[M->r_cayley->edges[s][b]])
+                {
                     rigins_dequeue(M->r_cayley->edges[s][b], fromone);
                     rigins_dequeue(M->r_cayley->edges[as][b], fromlet);
                     visited[M->r_cayley->edges[s][b]] = true;
@@ -150,26 +161,29 @@ void mor_compute_leftcayley(morphism* M) {
             }
         }
     }
+    M->l_cayley->size_edges = M->r_cayley->size_edges;
     free(visited);
     delete_dequeue(fromlet);
     delete_dequeue(fromone);
 }
 
-
-
 // Quick sort algorithm between the indices i and j - 1 (inclusive)
-static void aux_quick_sort_green(uint* array, uint i, uint j, uint* rnums, uint* lnums) {
+static void aux_quick_sort_green(uint *array, uint i, uint j, uint *rnums, uint *lnums)
+{
 
     if (i + 1 >= j)
     {
         return;
     }
-    else {
+    else
+    {
         uint pivot = array[i];
         uint l = j;
 
-        for (uint k = j - 1; i < k; k--) {
-            if (rnums[pivot] < rnums[array[k]] || (rnums[pivot] == rnums[array[k]] && lnums[pivot] < lnums[array[k]])) {
+        for (uint k = j - 1; i < k; k--)
+        {
+            if (rnums[pivot] < rnums[array[k]] || (rnums[pivot] == rnums[array[k]] && lnums[pivot] < lnums[array[k]]))
+            {
                 l--;
                 uint temp = array[l];
                 array[l] = array[k];
@@ -185,27 +199,30 @@ static void aux_quick_sort_green(uint* array, uint i, uint j, uint* rnums, uint*
     }
 }
 
-
-uint* green_sorted_jclass(green* G, uint i) {
-    uint* sorted_jclass;
+uint *green_sorted_jclass(green *G, uint i)
+{
+    uint *sorted_jclass;
     MALLOC(sorted_jclass, G->JCL->cl_size[i]);
-    for (uint j = 0; j < G->JCL->cl_size[i]; j++) {
+    for (uint j = 0; j < G->JCL->cl_size[i]; j++)
+    {
         sorted_jclass[j] = G->JCL->cl_elems[i][j];
     }
     aux_quick_sort_green(sorted_jclass, 0, G->JCL->cl_size[i], G->RCL->numcl, G->LCL->numcl);
     return sorted_jclass;
 }
 
-
-void h_green_compute(green* GREL) {
-    if (GREL->RCL == NULL || GREL->LCL == NULL || GREL->JCL == NULL) {
+void h_green_compute(green *GREL)
+{
+    if (GREL->RCL == NULL || GREL->LCL == NULL || GREL->JCL == NULL)
+    {
         fprintf(stderr, "Error. Cannot compute the H-classes without the J-classes, the "
-            "L-classes and the R-classes\n");
+                        "L-classes and the R-classes\n");
         return;
     }
 
     // If the H-classes already exist, we delete them (should not happen).
-    if (GREL->HCL) {
+    if (GREL->HCL)
+    {
         delete_parti(GREL->HCL);
         return;
     }
@@ -216,33 +233,34 @@ void h_green_compute(green* GREL) {
     // MALLOC(GREL->HCL, 1);
     // GREL->HCL->size_set = GREL->JCL->size_set;
     // MALLOC(GREL->HCL->numcl, GREL->HCL->size_set);
-    uint* hnumcl;
+    uint *hnumcl;
     MALLOC(hnumcl, GREL->JCL->size_set);
 
-
     // For each J-class.
-    for (uint cr = 0; cr < GREL->JCL->size_par; cr++) {
+    for (uint cr = 0; cr < GREL->JCL->size_par; cr++)
+    {
         // We store the elements of the J-class in an array.
         // We sort these elements according to their index in the R-class and then in the L-class.
         // This is done to ensure that the elements of the same H-class are contiguous in the array.
-        uint* thejclass = green_sorted_jclass(GREL, cr);
-
+        uint *thejclass = green_sorted_jclass(GREL, cr);
 
         uint elem = thejclass[0];
         hnumcl[elem] = num;
         num++;
-        for (uint i = 1; i < GREL->JCL->cl_size[cr]; i++) {
-            if (GREL->LCL->numcl[thejclass[i]] == GREL->LCL->numcl[elem] && GREL->RCL->numcl[thejclass[i]] == GREL->RCL->numcl[elem]) {
+        for (uint i = 1; i < GREL->JCL->cl_size[cr]; i++)
+        {
+            if (GREL->LCL->numcl[thejclass[i]] == GREL->LCL->numcl[elem] && GREL->RCL->numcl[thejclass[i]] == GREL->RCL->numcl[elem])
+            {
                 hnumcl[thejclass[i]] = hnumcl[elem];
             }
-            else {
+            else
+            {
                 hnumcl[thejclass[i]] = num;
                 num++;
                 elem = thejclass[i];
             }
         }
         free(thejclass);
-
     }
 
     // We now know the number of H-classes.
@@ -259,13 +277,10 @@ void h_green_compute(green* GREL) {
     // for (uint v = 0; v < GREL->HCL->size_set; v++) {
     //     rigins_dequeue(v, GREL->HCL->cl[GREL->HCL->numcl[v]]);
     // }
-
 }
 
-
-
-
-void gr_green_compute(uint* idem_list, uint nb_idems, green* G) {
+void gr_green_compute(uint *idem_list, uint nb_idems, green *G)
+{
 
     // First, we compute the regular elements.
     CALLOC(G->regular_array, G->JCL->size_set);
@@ -274,12 +289,15 @@ void gr_green_compute(uint* idem_list, uint nb_idems, green* G) {
     // For each idempotent, we mark all elements of its J-class has regular. We
     // skip an idempotent whose J-class has already been marked as regular.
 
-    for (uint i = 0; i < nb_idems; i++) {
+    for (uint i = 0; i < nb_idems; i++)
+    {
         uint c = G->JCL->numcl[idem_list[i]];
-        if (G->regular_array[G->JCL->cl_elems[c][0]]) {
+        if (G->regular_array[G->JCL->cl_elems[c][0]])
+        {
             continue;
         }
-        for (uint j = 0; j < G->JCL->cl_size[c]; j++) {
+        for (uint j = 0; j < G->JCL->cl_size[c]; j++)
+        {
             G->regular_array[G->JCL->cl_elems[c][j]] = true;
         }
         G->nb_regular_elems += G->JCL->cl_size[c];
@@ -287,18 +305,20 @@ void gr_green_compute(uint* idem_list, uint nb_idems, green* G) {
 
     // Building information on groups.
     CALLOC(G->group_array, G->HCL->size_set);
-    for (uint i = 0; i < nb_idems; i++) {
+    for (uint i = 0; i < nb_idems; i++)
+    {
         uint j = G->HCL->numcl[idem_list[i]];
-        for (uint k = 0; k < G->HCL->cl_size[j]; k++) {
+        for (uint k = 0; k < G->HCL->cl_size[j]; k++)
+        {
             G->group_array[G->HCL->cl_elems[j][k]] = true;
         }
     }
 }
 
-
-
-void mor_compute_green(morphism* M) {
-    if (M->rels) {
+void mor_compute_green(morphism *M)
+{
+    if (M->rels)
+    {
         delete_green(M->rels);
     }
 #ifdef DEBUG_MONO
@@ -308,13 +328,11 @@ void mor_compute_green(morphism* M) {
     // Initialization of the structure.
     CALLOC(M->rels, 1);
 
-
     // Computing the R equivalence (strongly connected components of the right cayley graph).
     M->rels->RCL = dtarjan(M->r_cayley, NULL, true);
 #ifdef DEBUG_MONO
     printf("R done. Time: %f\n", difftime(time(NULL), thetime));
 #endif
-
 
     // Computing the L equivalence (strongly connected components of the left cayley graph).
     M->rels->LCL = dtarjan(M->l_cayley, NULL, true);
@@ -323,20 +341,15 @@ void mor_compute_green(morphism* M) {
     printf("L done. Time: %f\n", difftime(time(NULL), thetime));
 #endif
 
-
     // Computing the J equivalence (strongly connected components of the J order).
-    //graph* j_order = ldgraphs_to_graph(0, 0, 2, 2, M->r_cayley, M->l_cayley); // Compute the J-order.
-
 
     M->rels->JCL = dualdtarjan(M->r_cayley, M->l_cayley, NULL, true);
-    //M->rels->JCL = tarjan(j_order);
-    //printf("J done. Time: %f\n", difftime(time(NULL), thetime));
-    //delete_graph(j_order);
+    // M->rels->JCL = tarjan(j_order);
+    // printf("J done. Time: %f\n", difftime(time(NULL), thetime));
+    // delete_graph(j_order);
 #ifdef DEBUG_MONO
     printf("J done. Time: %f\n", difftime(time(NULL), thetime));
 #endif
-
-
 
     // Computing the relation H.
     h_green_compute(M->rels);
@@ -352,9 +365,10 @@ void mor_compute_green(morphism* M) {
 #endif
 }
 
-
-void mor_compute_rep(morphism* M) {
-    if (!M || !M->rels) {
+void mor_compute_rep(morphism *M)
+{
+    if (!M || !M->rels)
+    {
         fprintf(stderr, "Error in mor_compute_min_regular_jcl.\n");
         exit(EXIT_FAILURE);
     }
@@ -362,15 +376,18 @@ void mor_compute_rep(morphism* M) {
     // We first count the number of regular J-classes. Moreover, for each regular J-class,
     // we compute a member idempotent e in regular_jcls_idems[i](the one with the least index).
     // If the J-class is not regular, we store UINT_MAX.
-    uint* regular_jcls_idems;
+    uint *regular_jcls_idems;
     M->nb_regular_jcl = 0;
     MALLOC(regular_jcls_idems, M->rels->JCL->size_par);
-    for (uint i = 0; i < M->rels->JCL->size_par; i++) {
+    for (uint i = 0; i < M->rels->JCL->size_par; i++)
+    {
         regular_jcls_idems[i] = UINT_MAX;
     }
-    for (uint i = 0; i < M->nb_idems;i++) {
+    for (uint i = 0; i < M->nb_idems; i++)
+    {
         uint e = M->idem_list[i];
-        if (regular_jcls_idems[M->rels->JCL->numcl[e]] == UINT_MAX) {
+        if (regular_jcls_idems[M->rels->JCL->numcl[e]] == UINT_MAX)
+        {
             M->nb_regular_jcl++;
         }
         regular_jcls_idems[M->rels->JCL->numcl[e]] = e;
@@ -382,15 +399,17 @@ void mor_compute_rep(morphism* M) {
     // We may now compute the representatives. We have to put the ones of minimal
     // strict regular J-classes first. There are two cases.
 
-
     // We first handle the case when 1 has a nonempty antecedent.
     // In this case, the only minimal strict regular J-class is the one of 1.
-    if (mor_nonempty_neutral(M)) {
+    if (mor_nonempty_neutral(M))
+    {
         M->nb_min_regular_jcl = 1;
         M->regular_idems[0] = ONE;
         uint j = 1;
-        for (uint i = 1; i < M->rels->JCL->size_par; i++) {
-            if (regular_jcls_idems[i] != UINT_MAX) {
+        for (uint i = 1; i < M->rels->JCL->size_par; i++)
+        {
+            if (regular_jcls_idems[i] != UINT_MAX)
+            {
                 M->regular_idems[j] = regular_jcls_idems[i];
                 j++;
             }
@@ -404,22 +423,28 @@ void mor_compute_rep(morphism* M) {
     // These are the ones reachable from a regular J-class (which is not the one of 1).
 
     // The queue for the BFS
-    dequeue* queue = create_dequeue();
+    dequeue *queue = create_dequeue();
 
     // Array that will mark the visited elements in the BFS.
-    bool* visited;
+    bool *visited;
     CALLOC(visited, M->r_cayley->size_graph);
 
     // We start from the elements that follow a regular J-class (which is not the one of 1)
-    for (uint i = 1; i < M->rels->JCL->size_par; i++) {
-        if (regular_jcls_idems[i] != UINT_MAX) {
-            for (uint j = 0; j < M->rels->JCL->cl_size[i]; j++) {
+    for (uint i = 1; i < M->rels->JCL->size_par; i++)
+    {
+        if (regular_jcls_idems[i] != UINT_MAX)
+        {
+            for (uint j = 0; j < M->rels->JCL->cl_size[i]; j++)
+            {
                 uint s = M->rels->JCL->cl_elems[i][j];
-                for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
-                    if (M->rels->JCL->numcl[s] != M->rels->JCL->numcl[M->r_cayley->edges[s][a]]) {
+                for (uint a = 0; a < M->r_cayley->size_alpha; a++)
+                {
+                    if (M->rels->JCL->numcl[s] != M->rels->JCL->numcl[M->r_cayley->edges[s][a]])
+                    {
                         rigins_dequeue(M->r_cayley->edges[s][a], queue);
                     }
-                    if (M->rels->JCL->numcl[s] != M->rels->JCL->numcl[M->l_cayley->edges[s][a]]) {
+                    if (M->rels->JCL->numcl[s] != M->rels->JCL->numcl[M->l_cayley->edges[s][a]])
+                    {
                         rigins_dequeue(M->l_cayley->edges[s][a], queue);
                     }
                 }
@@ -427,31 +452,38 @@ void mor_compute_rep(morphism* M) {
         }
     }
 
-    while (!isempty_dequeue(queue)) {
+    while (!isempty_dequeue(queue))
+    {
         uint s = lefpull_dequeue(queue);
-        if (visited[s]) {
+        if (visited[s])
+        {
             continue;
         }
         visited[s] = true;
-        for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
+        for (uint a = 0; a < M->r_cayley->size_alpha; a++)
+        {
             rigins_dequeue(M->r_cayley->edges[s][a], queue);
             rigins_dequeue(M->l_cayley->edges[s][a], queue);
         }
     }
 
     M->nb_min_regular_jcl = 0;
-    for (uint i = 0; i < M->rels->JCL->size_par; i++) {
+    for (uint i = 0; i < M->rels->JCL->size_par; i++)
+    {
         uint s = M->rels->JCL->cl_elems[i][0];
-        if (regular_jcls_idems[i] != UINT_MAX && !visited[s]) {
+        if (regular_jcls_idems[i] != UINT_MAX && !visited[s])
+        {
             M->regular_idems[M->nb_min_regular_jcl] = regular_jcls_idems[i];
             M->nb_min_regular_jcl++;
         }
     }
 
     uint j = M->nb_min_regular_jcl;
-    for (uint i = 0; i < M->rels->JCL->size_par; i++) {
+    for (uint i = 0; i < M->rels->JCL->size_par; i++)
+    {
         uint s = M->rels->JCL->cl_elems[i][0];
-        if (regular_jcls_idems[i] != UINT_MAX && visited[s]) {
+        if (regular_jcls_idems[i] != UINT_MAX && visited[s])
+        {
             M->regular_idems[j] = regular_jcls_idems[i];
             j++;
         }
@@ -460,11 +492,6 @@ void mor_compute_rep(morphism* M) {
     delete_dequeue(queue);
     free(regular_jcls_idems);
 }
-
-
-
-
-
 
 /*
 void mor_compute_min_regular_jcl(morphism* M) {
@@ -537,29 +564,23 @@ void mor_compute_min_regular_jcl(morphism* M) {
     free(min_regjcl);
 }*/
 
-
-
-
 /************************************/
 /* Construction from a complete DFA */
 /************************************/
 
-
-
-
-
 // Storage of the permutations of DFA states
-static ulong mor_cons_size = 0; // Size of the mor_perms array.
-static ulong mor_cons_elem = 0; // Number of permutations in the mor_perms array.
-static uint mor_cons_states = 0; // Number of states in the DFA.
-static uint mor_cons_letters = 0; // Number of letters in the DFA (size of the alphabet).
-static uint* mor_cons_perms = NULL; // Array of permutations (a single permutation takes mor_cons_states cells). Size: mor_cons_size * mor_cons_states.
-static uint* mor_cons_next = NULL;  // Array of transitions (a single transition takes mor_cons_letters cells). Size: mor_cons_size * mor_cons_letters.
-static uint* mor_cons_prede = NULL; // Array of predecessor elements. Size: mor_cons_size.       
-static uint* mor_cons_predl = NULL; // Array of predecessor letters. Size: mor_cons_size.
+static ulong mor_cons_size = 0;     // Size of the mor_perms array.
+static ulong mor_cons_elem = 0;     // Number of permutations in the mor_perms array.
+static uint mor_cons_states = 0;    // Number of states in the DFA.
+static uint mor_cons_letters = 0;   // Number of letters in the DFA (size of the alphabet).
+static uint *mor_cons_perms = NULL; // Array of permutations (a single permutation takes mor_cons_states cells). Size: mor_cons_size * mor_cons_states.
+static uint *mor_cons_next = NULL;  // Array of transitions (a single transition takes mor_cons_letters cells). Size: mor_cons_size * mor_cons_letters.
+static uint *mor_cons_prede = NULL; // Array of predecessor elements. Size: mor_cons_size.
+static uint *mor_cons_predl = NULL; // Array of predecessor letters. Size: mor_cons_size.
 
 // Initialization of the arrays used in the construction of the morphism.
-static void mor_cons_init(uint size, uint states, uint letters) {
+static void mor_cons_init(uint size, uint states, uint letters)
+{
     size = max(size, 2); // Ensure that the size is at least 2.
     mor_cons_size = size;
     mor_cons_elem = 0;
@@ -572,7 +593,8 @@ static void mor_cons_init(uint size, uint states, uint letters) {
 }
 
 // Initialization of the arrays used in the construction of the morphism (weak version: skips prede and predl).
-static void mor_cons_init_weak(uint size, uint states, uint letters) {
+static void mor_cons_init_weak(uint size, uint states, uint letters)
+{
     size = max(size, 2); // Ensure that the size is at least 2.
     mor_cons_size = size;
     mor_cons_elem = 0;
@@ -583,7 +605,8 @@ static void mor_cons_init_weak(uint size, uint states, uint letters) {
 }
 
 // Deletes the arrays used in the construction of the morphism and resets the variables.
-static void mor_cons_delete() {
+static void mor_cons_delete()
+{
     free(mor_cons_perms);
     mor_cons_perms = NULL;
     free(mor_cons_next);
@@ -599,8 +622,10 @@ static void mor_cons_delete() {
 }
 
 // Doubles the size of the arrays used in the construction of the morphism if they are full.
-static void mor_cons_grow() {
-    if (mor_cons_elem < mor_cons_size) {
+static void mor_cons_grow()
+{
+    if (mor_cons_elem < mor_cons_size)
+    {
         return; // If the arrays are not full, we do nothing.
     }
 
@@ -621,8 +646,10 @@ static void mor_cons_grow() {
 }
 
 // Doubles the size of the arrays used in the construction of the morphism if they are full (weak version: skips prede and predl).
-static void mor_cons_grow_weak() {
-    if (mor_cons_elem < mor_cons_size) {
+static void mor_cons_grow_weak()
+{
+    if (mor_cons_elem < mor_cons_size)
+    {
         return; // If the arrays are not full, we do nothing.
     }
 
@@ -640,13 +667,15 @@ static void mor_cons_grow_weak() {
     REALLOC(mor_cons_next, mor_cons_size * mor_cons_letters);
 }
 
-
 // Checks if two permutations stored in the array are equal.
-static bool mor_cons_equal(uint i, uint j) {
+static bool mor_cons_equal(uint i, uint j)
+{
     ulong zi = i * mor_cons_states; // The index of the first element in the mor_perms array.
     ulong zj = j * mor_cons_states; // The index of the second element in the mor_perms array.
-    for (uint h = 0; h < mor_cons_states; h++) {
-        if (mor_cons_perms[zi + h] != mor_cons_perms[zj + h]) {
+    for (uint h = 0; h < mor_cons_states; h++)
+    {
+        if (mor_cons_perms[zi + h] != mor_cons_perms[zj + h])
+        {
             return false; // If any element is different, the two permutations are not equal.
         }
     }
@@ -654,132 +683,145 @@ static bool mor_cons_equal(uint i, uint j) {
 }
 
 // Hashing function for the morphism construction.
-static uint mor_cons_hash(uint i, uint size_hash) {
+static uint mor_cons_hash(uint i, uint size_hash)
+{
     ulong e = i * mor_cons_states; // The index of the element in the mor_perms array.
     uint hash = 0;
     uint a = 0x9e3779b9; // fractional bits of the golden ratio
-    for (uint j = 0; j < mor_cons_states; j++) {
+    for (uint j = 0; j < mor_cons_states; j++)
+    {
         hash = (hash * (mor_cons_states + 1) + mor_cons_perms[e + j] * a) % size_hash;
     }
     return hash;
 }
 
-
 // Computes (partial information on) the syntactic ordering from the array of permutations and the ordering on the input DFA.
-static void mor_cons_order(morphism* M, bool** order) {
+// static void mor_cons_order(morphism *M, bool **order)
+// {
 
-#ifdef DEBUG_MONO
-    printf("Computing the syntactic ordering of the morphism.\n");
-#endif
+// #ifdef DEBUG_MONO
+//     printf("Computing the syntactic ordering of the morphism.\n");
+// #endif
 
-    MALLOC(M->order, M->nb_regular_jcl);
-    MALLOC(M->order_size, M->nb_regular_jcl);
-    uint size_storage = 0;
-    dequeue** order_temp;
-    MALLOC(order_temp, M->nb_regular_jcl);
+//     MALLOC(M->order, M->nb_regular_jcl);
+//     MALLOC(M->order_size, M->nb_regular_jcl);
+//     uint size_storage = 0;
+//     dequeue **order_temp;
+//     MALLOC(order_temp, M->nb_regular_jcl);
 
-#ifdef DEBUG_MONO
-    printf("Finished allocation.\n");
-#endif
+// #ifdef DEBUG_MONO
+//     printf("Finished allocation.\n");
+// #endif
 
-    for (uint i = 0; i < M->nb_regular_jcl; i++) {
-        order_temp[i] = create_dequeue();
-        uint e = M->regular_idems[i];
-        dequeue* eM = compute_r_ideal(M, e, NULL);
-        dequeue* Me = compute_l_ideal(M, e, NULL);
-        dequeue* eMe = make_inter_sorted_dequeue(eM, Me);
-        delete_dequeue(eM);
-        delete_dequeue(Me);
+//     for (uint i = 0; i < M->nb_regular_jcl; i++)
+//     {
+//         order_temp[i] = create_dequeue();
+//         uint e = M->regular_idems[i];
+//         dequeue *eM = compute_r_ideal(M, e, NULL);
+//         dequeue *Me = compute_l_ideal(M, e, NULL);
+//         dequeue *eMe = make_inter_sorted_dequeue(eM, Me);
+//         delete_dequeue(eM);
+//         delete_dequeue(Me);
 
+//         for (uint j = 0; j < size_dequeue(eMe); j++)
+//         {
+//             ulong q = lefread_dequeue(eMe, j) * (ulong)mor_cons_states;
+//             ulong eq = e * (ulong)mor_cons_states;
+//             bool found = true;
+//             for (uint k = 0; k < mor_cons_states; k++)
+//             {
+//                 if (!order[mor_cons_perms[eq + k]][mor_cons_perms[q + k]])
+//                 {
+//                     found = false;
+//                     break;
+//                 }
+//             }
+//             if (found)
+//             {
+//                 rigins_dequeue(lefread_dequeue(eMe, j), order_temp[i]);
+//             }
+//         }
+//         delete_dequeue(eMe);
+//         M->order_size[i] = size_dequeue(order_temp[i]);
+//         size_storage += M->order_size[i];
+//     }
 
-        for (uint j = 0; j < size_dequeue(eMe); j++) {
-            ulong q = lefread_dequeue(eMe, j) * (ulong)mor_cons_states;
-            ulong eq = e * (ulong)mor_cons_states;
-            bool found = true;
-            for (uint k = 0; k < mor_cons_states; k++) {
-                if (!order[mor_cons_perms[eq + k]][mor_cons_perms[q + k]]) {
-                    found = false;
-                    break;
-                }
-            }
-            if (found) {
-                rigins_dequeue(lefread_dequeue(eMe, j), order_temp[i]);
-            }
-        }
-        delete_dequeue(eMe);
-        M->order_size[i] = size_dequeue(order_temp[i]);
-        size_storage += M->order_size[i];
-    }
+// #ifdef DEBUG_MONO
+//     printf("Finished computation.\n");
+// #endif
 
-#ifdef DEBUG_MONO
-    printf("Finished computation.\n");
-#endif
+//     MALLOC(M->order_storage, size_storage);
+//     uint pos = 0;
+//     for (uint i = 0; i < M->nb_regular_jcl; i++)
+//     {
+//         M->order[i] = M->order_storage + pos;
+//         pos += M->order_size[i];
+//         for (uint j = 0; j < size_dequeue(order_temp[i]); j++)
+//         {
+//             M->order[i][j] = lefread_dequeue(order_temp[i], j);
+//         }
+//         delete_dequeue(order_temp[i]);
+//     }
+//     free(order_temp);
 
-    MALLOC(M->order_storage, size_storage);
-    uint pos = 0;
-    for (uint i = 0; i < M->nb_regular_jcl; i++) {
-        M->order[i] = M->order_storage + pos;
-        pos += M->order_size[i];
-        for (uint j = 0; j < size_dequeue(order_temp[i]); j++) {
-            M->order[i][j] = lefread_dequeue(order_temp[i], j);
-        }
-        delete_dequeue(order_temp[i]);
-    }
-    free(order_temp);
+// #ifdef DEBUG_MONO
+//     printf("All finished.\n");
+// #endif
+// }
 
-#ifdef DEBUG_MONO
-    printf("All finished.\n");
-#endif
-}
-
-
-morphism* dfa_to_morphism(dfa* A, bool order, int*, uint** funs) {
+morphism *dfa_to_morphism(dfa *A, int *, uint **funs)
+{
 
 #ifdef DEBUG_MONO
     ulong thetime = time(NULL);
 #endif
 
     uchar power = get_uint_lbinary(A->trans->size_graph) + 2; // We add 2 to ensure that the hash table is large enough.
-    uint thesize = 1U << power; // The size of the hash table is 2^power.
+    uint thesize = 1U << power;                               // The size of the hash table is 2^power.
 
     // Initialization of the arrays used in the construction of the morphism.
     mor_cons_init(thesize, A->trans->size_graph, A->trans->size_alpha);
 
     // Initialize the hash table.
-    hash_table* thehash = create_hash_table(power, &mor_cons_hash, &mor_cons_equal);
+    hash_table *thehash = create_hash_table(power, &mor_cons_hash, &mor_cons_equal);
 
     // Queue containing the elements to be processed.
-    dequeue* thequeue = create_dequeue();
+    dequeue *thequeue = create_dequeue();
 
     // Create the first element: the identity (which has number 0).
-    for (uint i = 0; i < A->trans->size_graph; i++) {
+    for (uint i = 0; i < A->trans->size_graph; i++)
+    {
         mor_cons_perms[i] = i; // The identity is the permutation of the states.
     }
     mor_cons_elem++;
     hash_table_insert(thehash, 0); // Insert the identity in the hash table.
-    rigins_dequeue(0, thequeue); // Add the identity to the queue.
+    rigins_dequeue(0, thequeue);   // Add the identity to the queue.
 
 #ifdef DEBUG_MONO
     printf("Size automaton: %d, size hash table: %d, initial power: %d\n", A->trans->size_graph, thesize, power);
 #endif
 
-    while (!isempty_dequeue(thequeue)) {
+    while (!isempty_dequeue(thequeue))
+    {
 
         uint s = lefpull_dequeue(thequeue); // Get the element to be processed.
 
         // Computes the transitions from this element.
-        for (uint a = 0; a < A->trans->size_alpha; a++) {
+        for (uint a = 0; a < A->trans->size_alpha; a++)
+        {
 
             // Create the (potential) new permutation in the next cell of the table.
             ulong i = mor_cons_elem * mor_cons_states; // Position of the next element in the mor_perms array.
-            ulong j = s * mor_cons_states; // Position of the current element in the mor_perms array.
-            for (uint q = 0; q < A->trans->size_graph; q++) {
+            ulong j = s * mor_cons_states;             // Position of the current element in the mor_perms array.
+            for (uint q = 0; q < A->trans->size_graph; q++)
+            {
                 mor_cons_perms[i + q] = A->trans->edges[mor_cons_perms[j + q]][a];
             }
 
             // Try to insert the new element in the hash table.
             uint h = hash_table_insert(thehash, mor_cons_elem);
-            if (h == mor_cons_elem) {
+            if (h == mor_cons_elem)
+            {
 
                 // The element was not already constructed.
                 rigins_dequeue(mor_cons_elem, thequeue); // We add it to the queue for future processing.
@@ -799,7 +841,7 @@ morphism* dfa_to_morphism(dfa* A, bool order, int*, uint** funs) {
         }
     }
 
-    delete_dequeue(thequeue); // Free the queue.
+    delete_dequeue(thequeue);   // Free the queue.
     delete_hash_table(thehash); // Free the hash table.
 
 #ifdef DEBUG_MONO
@@ -807,7 +849,7 @@ morphism* dfa_to_morphism(dfa* A, bool order, int*, uint** funs) {
 #endif
 
     // Initialization of the morphism.
-    morphism* M;
+    morphism *M;
     CALLOC(M, 1);
     M->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha);  // Copy letter names.
     M->r_cayley = create_dgraph_noedges(mor_cons_elem, mor_cons_letters); // Create the graph.
@@ -818,15 +860,17 @@ morphism* dfa_to_morphism(dfa* A, bool order, int*, uint** funs) {
     M->order = NULL;                                                      // The ordering is not computed yet.
 
     // Computation of the right Cayley graph, predecessors, the idempotents and the accepting elements.
-    M->nb_idems = 0; // Number of idempotents.
+    M->nb_idems = 0;  // Number of idempotents.
     M->nb_accept = 0; // Number of accepting elements.
 
     // For all elements
-    for (uint i = 0; i < mor_cons_elem; i++) {
+    for (uint i = 0; i < mor_cons_elem; i++)
+    {
 
         // Right Cayley graph.
         ulong j = i * (ulong)mor_cons_letters; // The index of the element in the table.
-        for (uint a = 0; a < A->trans->size_alpha; a++) {
+        for (uint a = 0; a < A->trans->size_alpha; a++)
+        {
             M->r_cayley->edges[i][a] = mor_cons_next[j + a]; // Assign the transitions.
         }
 
@@ -836,40 +880,49 @@ morphism* dfa_to_morphism(dfa* A, bool order, int*, uint** funs) {
 
         // Is the element an accepting one ?
         ulong d = i * (ulong)mor_cons_states;
-        if (bsearch(&mor_cons_perms[d + A->initial], A->finals, A->nb_finals, sizeof(uint), &compare_uint)) {
+        if (bsearch(&mor_cons_perms[d + A->initial], A->finals, A->nb_finals, sizeof(uint), &compare_uint))
+        {
             M->accept_array[i] = true; // If the element is accepting, we set it to true.
-            M->nb_accept++; // Increment the number of accepting elements.
+            M->nb_accept++;            // Increment the number of accepting elements.
         }
-        else {
+        else
+        {
             M->accept_array[i] = false; // Otherwise, we set it to false.
         }
 
         // Is the element an idempotent one?
         M->idem_array[i] = true; // We assume it is idempotent.
         uint q = 0;
-        while (q < A->trans->size_graph) {
-            if (mor_cons_perms[d + q] != mor_cons_perms[d + mor_cons_perms[d + q]]) {
+        while (q < A->trans->size_graph)
+        {
+            if (mor_cons_perms[d + q] != mor_cons_perms[d + mor_cons_perms[d + q]])
+            {
                 M->idem_array[i] = false;
                 break;
             }
             q++;
         }
-        if (M->idem_array[i]) {
+        if (M->idem_array[i])
+        {
             M->nb_idems++; // If the element is idempotent, we increment the number of idempotents.
         }
     }
+    M->r_cayley->size_edges = M->r_cayley->size_graph * M->r_cayley->size_alpha;
 
     // Creation of the lists of idempotents and accepting elements.
     MALLOC(M->idem_list, M->nb_idems);
     MALLOC(M->accept_list, M->nb_accept);
     uint j = 0;
     uint h = 0;
-    for (uint i = 0; i < mor_cons_elem; i++) {
-        if (M->idem_array[i]) {
+    for (uint i = 0; i < mor_cons_elem; i++)
+    {
+        if (M->idem_array[i])
+        {
             M->idem_list[j] = i;
             j++;
         }
-        if (M->accept_array[i]) {
+        if (M->accept_array[i])
+        {
             M->accept_list[h] = i;
             h++;
         }
@@ -898,17 +951,9 @@ morphism* dfa_to_morphism(dfa* A, bool order, int*, uint** funs) {
     printf("Representatives idempotents for the J-classes done. Time: %f\n", difftime(time(NULL), thetime));
 #endif
 
-    // If we need to compute the ordering, we do it now.
-    if (order) {
-        dfa_mini_canonical_ordering(A);
-        mor_cons_order(M, A->order);
-#ifdef DEBUG_MONO
-        printf("Ordering done. Time: %f\n", difftime(time(NULL), thetime));
-#endif
-    }
-
     // We free the arrays used in the construction of the morphism.
-    if (funs) {
+    if (funs)
+    {
         *funs = mor_cons_perms;
         mor_cons_perms = NULL; // We do not free the mor_cons_perms array, as it is used in the morphism.
     }
@@ -916,56 +961,59 @@ morphism* dfa_to_morphism(dfa* A, bool order, int*, uint** funs) {
     mor_cons_delete();
 
     return M;
-
 }
 
-uint dfa_to_morphism_size(dfa* A) {
+uint dfa_to_morphism_size(dfa *A)
+{
 
     uchar power = get_uint_lbinary(A->trans->size_graph) + 2; // We add 2 to ensure that the hash table is large enough.
-    uint thesize = 1U << power; // The size of the hash table is 2^power.
+    uint thesize = 1U << power;                               // The size of the hash table is 2^power.
 
     // Initialization of the arrays used in the construction of the morphism.
     mor_cons_init_weak(thesize, A->trans->size_graph, A->trans->size_alpha);
 
     // Initialize the hash table.
-    hash_table* thehash = create_hash_table(power, &mor_cons_hash, &mor_cons_equal);
+    hash_table *thehash = create_hash_table(power, &mor_cons_hash, &mor_cons_equal);
 
     // Queue containing the elements to be processed.
-    dequeue* thequeue = create_dequeue();
+    dequeue *thequeue = create_dequeue();
 
     // Create the first element: the identity (which has number 0).
-    for (uint i = 0; i < A->trans->size_graph; i++) {
+    for (uint i = 0; i < A->trans->size_graph; i++)
+    {
         mor_cons_perms[i] = i; // The identity is the permutation of the states.
     }
     mor_cons_elem++;
     hash_table_insert(thehash, 0); // Insert the identity in the hash table.
-    rigins_dequeue(0, thequeue); // Add the identity to the queue.
+    rigins_dequeue(0, thequeue);   // Add the identity to the queue.
 
-
-    while (!isempty_dequeue(thequeue)) {
+    while (!isempty_dequeue(thequeue))
+    {
 
         uint s = lefpull_dequeue(thequeue); // Get the element to be processed.
 
         // Computes the transitions from this element.
-        for (uint a = 0; a < A->trans->size_alpha; a++) {
+        for (uint a = 0; a < A->trans->size_alpha; a++)
+        {
 
             // Create the (potential) new permutation in the next cell of the table.
             ulong i = mor_cons_elem * mor_cons_states; // Position of the next element in the mor_perms array.
-            ulong j = s * mor_cons_states; // Position of the current element in the mor_perms array.
-            for (uint q = 0; q < A->trans->size_graph; q++) {
+            ulong j = s * mor_cons_states;             // Position of the current element in the mor_perms array.
+            for (uint q = 0; q < A->trans->size_graph; q++)
+            {
                 mor_cons_perms[i + q] = A->trans->edges[mor_cons_perms[j + q]][a];
             }
 
             // Try to insert the new element in the hash table.
             uint h = hash_table_insert(thehash, mor_cons_elem);
-            if (h == mor_cons_elem) {
+            if (h == mor_cons_elem)
+            {
 
                 // The element was not already constructed.
                 rigins_dequeue(mor_cons_elem, thequeue); // We add it to the queue for future processing.
 
-
                 // Prepare the next element in the table.
-                mor_cons_elem++; // Increment the number of elements constructed.
+                mor_cons_elem++;      // Increment the number of elements constructed.
                 mor_cons_grow_weak(); // If the number of elements constructed is larger than the size of the table, we double the size.
             }
 
@@ -975,7 +1023,7 @@ uint dfa_to_morphism_size(dfa* A) {
         }
     }
 
-    delete_dequeue(thequeue); // Free the queue.
+    delete_dequeue(thequeue);   // Free the queue.
     delete_hash_table(thehash); // Free the hash table.
 
     uint num = (uint)mor_cons_elem;
@@ -984,68 +1032,78 @@ uint dfa_to_morphism_size(dfa* A) {
     return num;
 }
 
-dfa* morphism_to_dfa(morphism* M) {
-    dfa* D;
+dfa *morphism_to_dfa(morphism *M)
+{
+    dfa *D;
     CALLOC(D, 1);
-    D->alphabet = duplicate_alphabet(M->alphabet, M->r_cayley->size_alpha); // Copy letter names
+    D->alphabet = duplicate_alphabet(M->alphabet, M->r_cayley->size_alpha);             // Copy letter names
     D->trans = create_dgraph_noedges(M->r_cayley->size_graph, M->r_cayley->size_alpha); // Create the graph.
-    for (uint i = 0; i < M->r_cayley->size_graph; i++) {
-        for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
+    for (uint i = 0; i < M->r_cayley->size_graph; i++)
+    {
+        for (uint a = 0; a < M->r_cayley->size_alpha; a++)
+        {
             D->trans->edges[i][a] = M->r_cayley->edges[i][a];
         }
     }
+    D->trans->size_edges = D->trans->size_graph * D->trans->size_alpha;
     D->initial = ONE;
     MALLOC(D->finals, M->nb_accept); // Allocate the finals array.
-    for (uint i = 0; i < M->nb_accept; i++) {
+    for (uint i = 0; i < M->nb_accept; i++)
+    {
         D->finals[i] = M->accept_list[i];
     }
     return D;
 }
 
-dfa* left_morphism_to_dfa(morphism* M) {
-    dfa* D;
+dfa *left_morphism_to_dfa(morphism *M)
+{
+    dfa *D;
     CALLOC(D, 1);
-    D->alphabet = duplicate_alphabet(M->alphabet, M->l_cayley->size_alpha); // Copy letter names
+    D->alphabet = duplicate_alphabet(M->alphabet, M->l_cayley->size_alpha);             // Copy letter names
     D->trans = create_dgraph_noedges(M->l_cayley->size_graph, M->l_cayley->size_alpha); // Create the graph.
-    for (uint i = 0; i < M->l_cayley->size_graph; i++) {
-        for (uint a = 0; a < M->l_cayley->size_alpha; a++) {
+    for (uint i = 0; i < M->l_cayley->size_graph; i++)
+    {
+        for (uint a = 0; a < M->l_cayley->size_alpha; a++)
+        {
             D->trans->edges[i][a] = M->l_cayley->edges[i][a];
         }
     }
+    D->trans->size_edges = D->trans->size_graph * D->trans->size_alpha;
     D->initial = ONE;
     MALLOC(D->finals, M->nb_accept); // Allocate the finals array.
-    for (uint i = 0; i < M->nb_accept; i++) {
+    for (uint i = 0; i < M->nb_accept; i++)
+    {
         D->finals[i] = M->accept_list[i];
     }
     return D;
 }
-
 
 /************************************************/
 /* Calculs des informations sur un morphism graph */
 /************************************************/
 
-
-
-void mor_compute_mult(morphism* M) {
+void mor_compute_mult(morphism *M)
+{
     if (M->mult != NULL) // Si la table a déjà été calculée
     {
         return;
     }
     // Création du tableau
-    MALLOC(M->mult, M->r_cayley->size_graph);
-    dequeue* fromcur = create_dequeue();
-    dequeue* fromone = create_dequeue();
-    bool visited[M->r_cayley->size_graph];
+    bool *visited;
+    MALLOC(visited, M->r_cayley->size_graph);
+    dequeue *fromcur = create_dequeue();
+    dequeue *fromone = create_dequeue();
+    MALLOC(M->mult, M->r_cayley->size_graph * M->r_cayley->size_graph);
     // Pour chaque élément
-    for (uint q = 0; q < M->r_cayley->size_graph; q++) {
+    for (uint q = 0; q < M->r_cayley->size_graph; q++)
+    {
         // Création du tableau des multiplications de q
-        MALLOC(M->mult, M->r_cayley->size_graph * M->r_cayley->size_graph);
 
         // Initialisation des strucutures
         makeempty_dequeue(fromcur);
         makeempty_dequeue(fromone);
-        for (uint s = 0; s < M->r_cayley->size_graph; s++) {
+        for (uint s = 0; s < M->r_cayley->size_graph; s++)
+        {
             visited[s] = false;
         }
 
@@ -1053,12 +1111,15 @@ void mor_compute_mult(morphism* M) {
         rigins_dequeue(q, fromcur);
         visited[ONE] = true;
 
-        while (!isempty_dequeue(fromone)) {
+        while (!isempty_dequeue(fromone))
+        {
             uint s = rigpull_dequeue(fromone);
             uint qs = rigpull_dequeue(fromcur);
             M->mult[q * M->r_cayley->size_graph + s] = qs;
-            for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
-                if (!visited[M->r_cayley->edges[s][a]]) {
+            for (uint a = 0; a < M->r_cayley->size_alpha; a++)
+            {
+                if (!visited[M->r_cayley->edges[s][a]])
+                {
                     rigins_dequeue(M->r_cayley->edges[s][a], fromone);
                     rigins_dequeue(M->r_cayley->edges[qs][a], fromcur);
                     visited[M->r_cayley->edges[s][a]] = true;
@@ -1066,41 +1127,51 @@ void mor_compute_mult(morphism* M) {
             }
         }
     }
+    free(visited);
     delete_dequeue(fromcur);
     delete_dequeue(fromone);
 }
 
-lgraph* mor_rmirror(morphism* M) {
+lgraph *mor_rmirror(morphism *M)
+{
     return dgraph_mirror(M->r_cayley);
 }
 
-lgraph* mor_lmirror(morphism* M) {
+lgraph *mor_lmirror(morphism *M)
+{
     return dgraph_mirror(M->l_cayley);
 }
 
-
-dequeue** mor_compute_order(morphism* M) {
+void mor_compute_order(morphism *M)
+{
+    if (M->order)
+    {
+        return;
+    }
     uint thesize = M->r_cayley->size_graph;
 
     // Array that marks the visited pairs.
-    bool** visited;
+    bool **visited;
     MALLOC(visited, thesize);
-    for (uint i = 0; i < thesize; i++) {
+    for (uint i = 0; i < thesize; i++)
+    {
         CALLOC(visited[i], thesize);
     }
 
     // Stacks for the DFS which computes all pairs incomparable of elements.
     // A pair (q, r) is incomparable if q is NOT smaller than r for the syntactic order.
     // First stack stores element 1 in the pair, second stack stores element 2 in the pair.
-    dequeue* stack_one = create_dequeue();
-    dequeue* stack_two = create_dequeue();
+    dequeue *stack_one = create_dequeue();
+    dequeue *stack_two = create_dequeue();
 
     // We push the starting pairs (accepting, non-accepting) which are clearly incomparable.
     for (uint i = 0; i < M->nb_accept; i++)
     {
-        for (uint q = 0; q < thesize; q++) {
+        for (uint q = 0; q < thesize; q++)
+        {
             // We skip q if it is an accepting element.
-            if (M->accept_array[q]) {
+            if (M->accept_array[q])
+            {
                 continue;
             }
             // We loop over the accepting elements.
@@ -1111,54 +1182,67 @@ dequeue** mor_compute_order(morphism* M) {
     }
 
     // Computation of the mirror graphs (used in the DFS).
-    lgraph* rmirror = mor_rmirror(M);
-    lgraph* lmirror = mor_lmirror(M);
+    lgraph *rmirror = mor_rmirror(M);
+    lgraph *lmirror = mor_lmirror(M);
 
     // The DFS
-    while (!isempty_dequeue(stack_one)) {
+    while (!isempty_dequeue(stack_one))
+    {
 
         // We pop a pair (q, r) from the stacks.
         uint q = rigpull_dequeue(stack_one);
         uint r = rigpull_dequeue(stack_two);
 
         // We skip the pair if it has already been visited.
-        if (visited[q][r]) {
+        if (visited[q][r])
+        {
             continue;
         }
 
         // We mark the pair as visited.
         visited[q][r] = true;
 
-
         // We push all pairs from which we can reach (q, r) in either the left or right Cayley graph
         // These pairs are also incomparable.
-        for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
-            for (uint i = 0; i < size_dequeue(rmirror->edges[q][a]); i++) {
-                for (uint j = 0; j < size_dequeue(rmirror->edges[r][a]); j++) {
-                    rigins_dequeue(lefread_dequeue(rmirror->edges[q][a], i), stack_one);
-                    rigins_dequeue(lefread_dequeue(rmirror->edges[r][a], j), stack_two);
+        for (uint a = 0; a < M->r_cayley->size_alpha; a++)
+        {
+            uint qstart = rmirror->intervals[rmirror->size_alpha * q + a];
+            uint qend = rmirror->intervals[rmirror->size_alpha * q + a + 1];
+            uint rstart = rmirror->intervals[rmirror->size_alpha * r + a];
+            uint rend = rmirror->intervals[rmirror->size_alpha * r + a + 1];
+            for (uint i = qstart; i < qend; i++)
+            {
+                for (uint j = rstart; j < rend; j++)
+                {
+                    rigins_dequeue(rmirror->storage[i], stack_one);
+                    rigins_dequeue(rmirror->storage[j], stack_two);
                 }
             }
 
-            for (uint i = 0; i < size_dequeue(lmirror->edges[q][a]); i++) {
-                for (uint j = 0; j < size_dequeue(lmirror->edges[r][a]); j++) {
-                    rigins_dequeue(lefread_dequeue(lmirror->edges[q][a], i), stack_one);
-                    rigins_dequeue(lefread_dequeue(lmirror->edges[r][a], j), stack_two);
-
+            qstart = lmirror->intervals[lmirror->size_alpha * q + a];
+            qend = lmirror->intervals[lmirror->size_alpha * q + a + 1];
+            rstart = lmirror->intervals[lmirror->size_alpha * r + a];
+            rend = lmirror->intervals[lmirror->size_alpha * r + a + 1];
+            for (uint i = qstart; i < qend; i++)
+            {
+                for (uint j = rstart; j < rend; j++)
+                {
+                    rigins_dequeue(lmirror->storage[i], stack_one);
+                    rigins_dequeue(lmirror->storage[j], stack_two);
                 }
             }
         }
     }
 
-    dequeue** order;
     // We may now compute the syntactic order on the elements.
-    MALLOC(order, M->r_cayley->size_graph);
-    for (uint q = 0; q < M->r_cayley->size_graph; q++) {
-        order[q] = create_dequeue();
-        for (uint r = 0; r < M->r_cayley->size_graph; r++) {
-            if (!visited[q][r]) {
-                rigins_dequeue(r, order[q]);
-            }
+    MALLOC(M->order, M->r_cayley->size_graph);
+    MALLOC(M->order_storage, M->r_cayley->size_graph * M->r_cayley->size_graph);
+    for (uint q = 0; q < M->r_cayley->size_graph; q++)
+    {
+        M->order[q] = M->order_storage + q * M->r_cayley->size_graph;
+        for (uint r = 0; r < M->r_cayley->size_graph; r++)
+        {
+            M->order[q][r] = !visited[q][r];
         }
         free(visited[q]);
     }
@@ -1168,49 +1252,52 @@ dequeue** mor_compute_order(morphism* M) {
     delete_dequeue(stack_two);
     delete_lgraph(rmirror);
     delete_lgraph(lmirror);
-    return order;
 }
-
 
 /*********************************/
 /* Opérations sur les morphismes */
 /*********************************/
 
-dequeue* mor_name(morphism* M, uint  q) {
-    dequeue* res = create_dequeue();
-    while (q != ONE) {
+dequeue *mor_name(morphism *M, uint q)
+{
+    dequeue *res = create_dequeue();
+    while (q != ONE)
+    {
         lefins_dequeue(M->pred_lab[q], res);
         q = M->pred_ele[q];
     }
     return res;
 }
 
-
-uint mor_mult(morphism* M, uint s, uint t) {
-    if (s >= M->r_cayley->size_graph || t >= M->r_cayley->size_graph) {
+uint mor_mult(morphism *M, uint s, uint t)
+{
+    if (s >= M->r_cayley->size_graph || t >= M->r_cayley->size_graph)
+    {
         fprintf(stderr, "Error, these are not elements of the monoid\n");
         return M->r_cayley->size_graph;
     }
-    if (M->mult != NULL) {
+    if (M->mult != NULL)
+    {
         return M->mult[M->r_cayley->size_graph * s + t];
     }
-    while (s != ONE) {
+    while (s != ONE)
+    {
         t = M->l_cayley->edges[t][M->pred_lab[s]];
         s = M->pred_ele[s];
     }
     return t;
-
-
 }
 
-uint mor_mult_gen(morphism* M, uint n, ...) {
+uint mor_mult_gen(morphism *M, uint n, ...)
+{
     va_list liste;
     va_start(liste, n);
 
     uint elem = ONE;
 
     // Calcul
-    for (uint i = 0; i < n; i++) {
+    for (uint i = 0; i < n; i++)
+    {
         elem = mor_mult(M, elem, va_arg(liste, uint));
     }
 
@@ -1218,15 +1305,18 @@ uint mor_mult_gen(morphism* M, uint n, ...) {
     return elem;
 }
 
-uint mor_omega(morphism* M, uint s) {
-    if (s >= M->r_cayley->size_graph) {
+uint mor_omega(morphism *M, uint s)
+{
+    if (s >= M->r_cayley->size_graph)
+    {
         fprintf(stderr, "Error, these are not elements of the monoid\n");
         return M->r_cayley->size_graph;
     }
     uint s2 = mor_mult(M, s, s);
     uint q = s;
     uint r = s2;
-    while (q != r) {
+    while (q != r)
+    {
         q = mor_mult(M, q, s);
         r = mor_mult(M, r, s2);
     }
@@ -1234,18 +1324,18 @@ uint mor_omega(morphism* M, uint s) {
 }
 
 //
-bool mor_num_idem(morphism* M, uint s, uint* res) {
-    for (uint i = 0; i < M->nb_idems; i++) {
-        if (M->idem_list[i] == s) {
+bool mor_num_idem(morphism *M, uint s, uint *res)
+{
+    for (uint i = 0; i < M->nb_idems; i++)
+    {
+        if (M->idem_list[i] == s)
+        {
             *res = i;
             return true;
         }
     }
     return false;
 }
-
-
-
 
 /*
 bool morphism_elem_from_string(morphism* M, char* w, uint* res)
@@ -1288,10 +1378,14 @@ void morphism_print_image(morphism* M, char* w, FILE* out)
 /* Tests de propriétés classiques */
 /**********************************/
 
-bool mor_neutral_letter(morphism* M, FILE* out) {
-    for (uint b = 0; b < M->r_cayley->size_alpha; b++) {
-        if (M->r_cayley->edges[ONE][b] == ONE) {
-            if (out) {
+bool mor_neutral_letter(morphism *M, FILE *out)
+{
+    for (uint b = 0; b < M->r_cayley->size_alpha; b++)
+    {
+        if (M->r_cayley->edges[ONE][b] == ONE)
+        {
+            if (out)
+            {
                 fprintf(out, "#### The letter ");
                 fprint_letter_utf8(M->alphabet[b], out);
                 fprintf(out, " is neutral.\n");
@@ -1299,36 +1393,41 @@ bool mor_neutral_letter(morphism* M, FILE* out) {
             return true;
         }
     }
-    if (out) {
+    if (out)
+    {
         fprintf(out, "#### No neutral letter.\n");
     }
     return false;
 }
 
-
-bool mor_nonempty_neutral(morphism* M) {
-    green* G = M->rels;
-    for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
-        if (G->HCL->numcl[M->r_cayley->edges[ONE][a]] == G->HCL->numcl[ONE]) {
+bool mor_nonempty_neutral(morphism *M)
+{
+    green *G = M->rels;
+    for (uint a = 0; a < M->r_cayley->size_alpha; a++)
+    {
+        if (G->HCL->numcl[M->r_cayley->edges[ONE][a]] == G->HCL->numcl[ONE])
+        {
             return true;
         }
     }
     return false;
 }
 
-bool mor_all_regular(morphism* M) {
+bool mor_all_regular(morphism *M)
+{
     return M->rels->nb_regular_elems == M->r_cayley->size_graph;
 }
 
-
-
 // Calcule l'image d'un mot par un morphisme.
-uint mor_compute_image(morphism* M, word* w) {
+uint mor_compute_image(morphism *M, word *w)
+{
 
     uint temp = ONE;
-    for (uint i = 0; i < size_word(w); i++) {
+    for (uint i = 0; i < size_word(w); i++)
+    {
         uint letter_index = mor_letter_index(M, lefread_word(w, i));
-        if (letter_index == M->r_cayley->size_alpha) {
+        if (letter_index == M->r_cayley->size_alpha)
+        {
             return M->r_cayley->size_graph;
         }
         temp = M->r_cayley->edges[temp][letter_index];
@@ -1336,27 +1435,30 @@ uint mor_compute_image(morphism* M, word* w) {
     return temp;
 }
 
-
-dgraph* mor_extract_rcl(morphism* M, uint rcl) {
+dgraph *mor_extract_rcl(morphism *M, uint rcl)
+{
     // Création du graphe
-    dgraph* res = create_dgraph_noedges(M->rels->RCL->cl_size[rcl], M->r_cayley->size_alpha);
+    dgraph *res = create_dgraph_noedges(M->rels->RCL->cl_size[rcl], M->r_cayley->size_alpha);
     // Pour chaque élément du morphisme
-    for (uint i = 0; i < M->rels->RCL->cl_size[rcl]; i++) {
+    for (uint i = 0; i < M->rels->RCL->cl_size[rcl]; i++)
+    {
         uint q = M->rels->RCL->cl_elems[rcl][i];
-        for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
+        for (uint a = 0; a < M->r_cayley->size_alpha; a++)
+        {
             uint r = M->r_cayley->edges[q][a];
-            if (M->rels->RCL->numcl[r] == rcl) {
+            if (M->rels->RCL->numcl[r] == rcl)
+            {
                 mem_array_sorted(r, M->rels->RCL->cl_elems[rcl], M->rels->RCL->cl_size[rcl], &res->edges[i][a]);
+                res->size_edges++;
             }
-            else {
+            else
+            {
                 res->edges[i][a] = UINT_MAX; // Si l'élément n'est pas dans la classe rcl, on met la taille du graphe
             }
         }
     }
     return res;
 }
-
-
 
 /*
 // Structure pout stocker les paires rencontrée dans le DFA à l'intérieur d'un AVL
@@ -1553,3 +1655,386 @@ void print_at_table(morphism* M, dequeue** table, FILE* out)
     print_bot_line(max_length, out);
 }
  */
+
+// Creating a leaf node corresponding to the given letter (the image of the new node is the image of this letter by the morphism).
+static int mor_forest_add_leaf(morphism *M, facto_forest *forest, uint letter)
+{
+    if (forest->nb_nodes == forest->size_nodes)
+    {
+        forest->size_nodes <<= 1;
+        REALLOC(forest->nodes, forest->size_nodes);
+    }
+    int res = forest->nb_nodes;
+    forest->nb_nodes++;
+    forest->nodes[res].type = FACTO_LEAF;
+    forest->nodes[res].elem = M->r_cayley->edges[ONE][letter];
+    forest->nodes[res].letter = letter;
+    forest->nodes[res].nb_children = 0;
+    forest->nodes[res].st_children = -1;
+    return res;
+}
+
+// Creating a binary node with the given children (the image of the new node is the product of the images of the children).
+static int mor_forest_add_binary(morphism *M, facto_forest *forest, int left, int right)
+{
+    if (forest->nb_nodes == forest->size_nodes)
+    {
+        forest->size_nodes <<= 1;
+        REALLOC(forest->nodes, forest->size_nodes);
+    }
+    int res = forest->nb_nodes;
+    forest->nb_nodes++;
+    forest->nodes[res].type = FACTO_BINARY;
+    forest->nodes[res].elem = mor_mult(M, forest->nodes[left].elem, forest->nodes[right].elem);
+    forest->nodes[res].nb_children = 2;
+    forest->nodes[res].st_children = forest->nb_childrens;
+
+    if (forest->nb_childrens == forest->size_childrens)
+    {
+        forest->size_childrens <<= 1;
+        REALLOC(forest->childrens, forest->size_childrens);
+    }
+
+    forest->childrens[forest->nb_childrens] = left;
+    forest->nb_childrens++;
+
+    if (forest->nb_childrens == forest->size_childrens)
+    {
+        forest->size_childrens <<= 1;
+        REALLOC(forest->childrens, forest->size_childrens);
+    }
+
+    forest->childrens[forest->nb_childrens] = right;
+    forest->nb_childrens++;
+    return res;
+}
+
+// Creating an idempotent node with the given children (which must all have the same image, and the image of the new node is this common image, this is not checked).
+static int mor_forest_add_idem(facto_forest *forest, int *childrens, int nb_children)
+{
+    if (forest->nb_nodes == forest->size_nodes)
+    {
+        forest->size_nodes <<= 1;
+        REALLOC(forest->nodes, forest->size_nodes);
+    }
+    int res = forest->nb_nodes;
+    forest->nb_nodes++;
+    forest->nodes[res].type = FACTO_IDEM;
+    forest->nodes[res].elem = forest->nodes[childrens[0]].elem;
+    forest->nodes[res].nb_children = nb_children;
+    forest->nodes[res].st_children = forest->nb_childrens;
+    for (int i = 0; i < nb_children; i++)
+    {
+        if (forest->nb_childrens == forest->size_childrens)
+        {
+            forest->size_childrens <<= 1;
+            REALLOC(forest->childrens, forest->size_childrens);
+        }
+
+        forest->childrens[forest->nb_childrens] = childrens[i];
+        forest->nb_childrens++;
+    }
+    return res;
+}
+
+// Construction of a factorization forest from an H-smooth concatenation (and a bonus left factor if it exists).
+static int mor_compute_facto_hcl(morphism *M, facto_forest *forest, int bonus, int *indices, int size_indices)
+{
+
+    // If there is no element, we return -1 (error case)
+    if (!M || !forest || size_indices == 0)
+    {
+        return -1;
+    }
+
+    // Computing the image of the concatenation of the elements at the indices.
+    uint image = ONE;
+    for (int i = 0; i < size_indices; i++)
+    {
+        image = mor_mult(M, image, forest->nodes[indices[i]].elem);
+    }
+
+    // Computing the list of indices giving rise to an idempotent decomposition.
+    // We seek all prefixes having the same image as the whole concatenation.
+    int *pos;
+    MALLOC(pos, size_indices);
+    int count = 0;
+    uint elem = ONE;
+    for (int i = 0; i < size_indices; i++)
+    {
+        elem = mor_mult(M, elem, forest->nodes[indices[i]].elem);
+        if (elem == image)
+        {
+            pos[count] = i;
+            count++;
+        }
+    }
+
+    // Computing the trees corresponding to the factors in the idempotent decomposition (or taking them directly if they are singletons).
+    int *new_indices;
+    MALLOC(new_indices, count);
+    for (int i = 0; i < count; i++)
+    {
+        int start = (i == 0) ? 0 : pos[i - 1] + 1;
+        if (pos[i] == start)
+        {
+            new_indices[i] = indices[pos[i]];
+        }
+        else
+        {
+            int sub = mor_compute_facto_hcl(M, forest, -1, indices + start, pos[i] - start);
+            new_indices[i] = mor_forest_add_binary(M, forest, sub, indices[pos[i]]);
+        }
+    }
+
+    // If there is only one element, we return it (or we create a binary node with the bonus if it is not -1)
+    if (count == 1)
+    {
+        int root = bonus == -1 ? new_indices[0] : mor_forest_add_binary(M, forest, bonus, new_indices[0]);
+        free(pos);
+        free(new_indices);
+        return root;
+    }
+
+    if (forest->nodes[new_indices[0]].elem == forest->nodes[new_indices[1]].elem)
+    {
+        int root = bonus == -1 ? mor_forest_add_idem(forest, new_indices, count) : mor_forest_add_binary(M, forest, bonus, mor_forest_add_idem(forest, new_indices, count));
+        free(pos);
+        free(new_indices);
+        return root;
+    }
+
+    int sbin = bonus == -1 ? new_indices[0] : mor_forest_add_binary(M, forest, bonus, new_indices[0]);
+    int root = mor_forest_add_binary(M, forest, sbin, count == 2 ? new_indices[1] : mor_forest_add_idem(forest, new_indices + 1, count - 1));
+
+    free(pos);
+    free(new_indices);
+    return root;
+}
+
+// Construction of a factorization forest from an R-smooth concatenation (and a bonus left factor if it exists).
+static int mor_compute_facto_rcl(morphism *M, facto_forest *forest, int bonus, int *indices, int size_indices)
+{
+    // If there is no element, we return -1 (error case)
+    if (!M || !forest || size_indices == 0)
+    {
+        return -1;
+    }
+
+    // Computing the list of indices giving rise to an H-smooth decomposition.
+    // These are the indices such that the element at this index is in the same H-class as the last element of the word.
+    int *pos;
+    MALLOC(pos, size_indices);
+    int count = 0;
+    uint elem = forest->nodes[indices[size_indices - 1]].elem;
+    for (int i = 0; i < size_indices; i++)
+    {
+        if (M->rels->HCL->numcl[elem] == M->rels->HCL->numcl[forest->nodes[indices[i]].elem])
+        {
+            pos[count] = i;
+            count++;
+        }
+    }
+
+    // Computing the trees corresponding to the factors in the H-smooth decomposition (or taking them directly if they are singletons).
+    int *new_indices;
+    MALLOC(new_indices, count);
+    for (int i = 0; i < count; i++)
+    {
+        int start = (i == 0) ? 0 : pos[i - 1] + 1;
+        if (pos[i] == start)
+        {
+            new_indices[i] = indices[pos[i]];
+        }
+        else
+        {
+            int sub = mor_compute_facto_rcl(M, forest, -1, indices + start, pos[i] - start);
+            new_indices[i] = mor_forest_add_binary(M, forest, sub, indices[pos[i]]);
+        }
+    }
+
+    // Computing the final factorization from the H-smooth decomposition (and the left factor if it exists).
+    int root = mor_compute_facto_hcl(M, forest, bonus, new_indices, count);
+
+    // Clean-up
+    free(pos);
+    free(new_indices);
+
+    return root;
+}
+
+// Construction of a factorization forest from a J-smooth concatenation (and a bonus left factor if it exists).
+static int mor_compute_facto_jcl(morphism *M, facto_forest *forest, int bonus, int *indices, int size_indices)
+{
+
+    // If there is no element, we return -1 (error case)
+    if (!M || !forest || size_indices == 0)
+    {
+        return -1;
+    }
+
+    // Computing the list of indices giving rise to an R-smooth decomposition.
+    // These are the indices such that the element at this index is in the same R-class as the first element of the word.
+    int *pos;
+    MALLOC(pos, size_indices);
+    int count = 0;
+    uint elem = forest->nodes[indices[0]].elem;
+    for (int i = 0; i < size_indices; i++)
+    {
+        if (M->rels->RCL->numcl[elem] == M->rels->RCL->numcl[forest->nodes[indices[i]].elem])
+        {
+            pos[count] = i;
+            count++;
+        }
+    }
+
+    // Computing the trees corresponding to the factors in the R-smooth decomposition (or taking them directly if they are singletons).
+    int *new_indices;
+    MALLOC(new_indices, count);
+    for (int i = 0; i < count; i++)
+    {
+        int next = (i == count - 1) ? size_indices : pos[i + 1];
+        if (pos[i] + 1 == next)
+        {
+            new_indices[i] = indices[pos[i]];
+        }
+        else
+        {
+            int sub = mor_compute_facto_jcl(M, forest, -1, indices + pos[i] + 1, next - pos[i] - 1);
+            new_indices[i] = mor_forest_add_binary(M, forest, indices[pos[i]], sub);
+        }
+    }
+
+    // Computing the final factorization from the R-smooth decomposition (and the left factor if it exists).
+    int root = mor_compute_facto_rcl(M, forest, bonus, new_indices, count);
+
+    // Clean-up
+    free(pos);
+    free(new_indices);
+
+    return root;
+}
+
+// Construction of a factorization forest, general case
+// Returns the index of the created forest in the nodes array of the forest.
+static int mor_compute_facto_general(morphism *M, facto_forest *forest, int *indices, int size_indices)
+{
+    // If there is no element, we return -1 (error case)
+    if (!M || !forest || size_indices == 0)
+    {
+        return -1;
+    }
+
+    // If there is only one element, we return it (nothing to do)
+    if (size_indices == 1)
+    {
+        return indices[0];
+    }
+
+    // Computing the image of the word represented by the indices in the morphism.
+    uint image = ONE;
+    for (int i = 0; i < size_indices; i++)
+    {
+        image = mor_mult(M, image, forest->nodes[indices[i]].elem);
+    }
+
+    // Computing the list of indices that decompose the word into a J-smooth concatenation (plus potentially a left factor).
+    // Decomposition from right to left (indices are written at the end of the pos array).
+    int *pos;
+    MALLOC(pos, size_indices);
+    int count = 0;
+    uint elem = ONE;
+    for (int i = size_indices - 1; i >= 0; i--)
+    {
+        elem = mor_mult(M, forest->nodes[indices[i]].elem, elem);
+        if (M->rels->JCL->numcl[elem] == M->rels->JCL->numcl[image])
+        {
+            pos[size_indices - 1 - count] = i;
+            count++;
+            elem = ONE;
+        }
+    }
+
+    // Slide pos to the beginning of the array (so that pos[0] is the first index of the decomposition).
+    int *new_pos = pos + size_indices - count;
+
+    // Checking if there is a final left factor (not part of the J-smooth decomposition). If so comuting its
+    // factorization forest (which will be the bonus for the next step).
+    int bonus = -1;
+    if (new_pos[0] != 0)
+    {
+        bonus = mor_compute_facto_general(M, forest, indices, new_pos[0]);
+    }
+
+    // Computing the sub-forest for the factors in the J-smooth decomposition.
+    int *new_indices;
+    MALLOC(new_indices, count);
+    for (int i = 0; i < count; i++)
+    {
+        // Next index (or end if the array if we are already at the last one).
+        int next = (i == count - 1) ? size_indices : new_pos[i + 1];
+
+        // If the factor is composed of a single forest, we just take it.
+        // Otherwise we compute the factorization forest for this factor.
+        if (new_pos[i] + 1 == next)
+        {
+            new_indices[i] = indices[new_pos[i]];
+        }
+        else
+        {
+            int sub = mor_compute_facto_general(M, forest, indices + new_pos[i] + 1, next - new_pos[i] - 1);
+            new_indices[i] = mor_forest_add_binary(M, forest, indices[new_pos[i]], sub);
+        }
+    }
+
+    // Computing the final factorization from the J-smooth decomposition (and the left factor if it exists).
+    int root = mor_compute_facto_jcl(M, forest, bonus, new_indices, count);
+
+    // Clean-up
+    free(pos);
+    free(new_indices);
+
+    return root;
+}
+
+facto_forest *mor_compute_facto_forest(morphism *M, word *w)
+{
+
+    // No factorization forest for the empty word.
+    if (!M || size_word(w) == 0)
+    {
+        return NULL;
+    }
+
+    // Initialize the new factorization forest.
+    facto_forest *res;
+    CALLOC(res, 1);
+    CALLOC(res->nodes, 1);
+    res->size_nodes = 1;
+    res->nb_nodes = 0;
+    CALLOC(res->childrens, 1);
+    res->size_childrens = 1;
+    res->nb_childrens = 0;
+
+    // Initializing the leaves of the forest with the letters of the word.
+    int *indices;
+    MALLOC(indices, size_word(w));
+    for (uint i = 0; i < size_word(w); i++)
+    {
+
+        uint letter_index = mor_letter_index(M, lefread_word(w, i));
+        if (letter_index >= M->r_cayley->size_alpha)
+        {
+            free(res->childrens);
+            free(res->nodes);
+            free(res);
+            return NULL;
+        }
+        indices[i] = mor_forest_add_leaf(M, res, letter_index);
+    }
+
+    // Construction of the factorization forest and memorization of the root index in the result structure.
+    res->root = mor_compute_facto_general(M, res, indices, size_word(w));
+    free(indices);
+    return res;
+}

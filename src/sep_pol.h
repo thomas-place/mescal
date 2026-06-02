@@ -7,25 +7,23 @@
 #ifndef SEP_POL_H
 #define SEP_POL_H
 
+#include "graphs_tarjan.h"
+#include "nfa.h"
+#include "nfa_intersec.h"
+#include "printing.h"
+#include "sep_group.h"
 #include <stdbool.h>
 #include <stdlib.h>
-#include "nfa.h"
-#include "sep_group.h"
-#include "printing.h"
-#include "graphs_tarjan.h"
-#include "nfa_intersec.h"
 
- /*  ____                             _   _                 ____       _                             _       _  */
- /* / ___|  ___ _ __   __ _ _ __ __ _| |_(_) ___  _ __  _  |  _ \ ___ | |_   _ _ __   ___  _ __ ___ (_) __ _| | */
- /* \___ \ / _ \ '_ \ / _` | '__/ _` | __| |/ _ \| '_ \(_) | |_) / _ \| | | | | '_ \ / _ \| '_ ` _ \| |/ _` | | */
- /*  ___) |  __/ |_) | (_| | | | (_| | |_| | (_) | | | |_  |  __/ (_) | | |_| | | | | (_) | | | | | | | (_| | | */
- /* |____/_\___| .__/ \__,_|_|  \__,_|\__|_|\___/|_| |_(_) |_|   \___/|_|\__, |_| |_|\___/|_| |_| |_|_|\__,_|_| */
- /*   ___| | __|_|___ _   _ _ __ ___                                     |___/                                  */
- /*  / __| |/ _ \/ __| | | | '__/ _ \                                                                           */
- /* | (__| | (_) \__ \ |_| | | |  __/                                                                           */
- /*  \___|_|\___/|___/\__,_|_|  \___|                                                                           */
-
-
+/*  ____                             _   _                 ____       _                             _       _  */
+/* / ___|  ___ _ __   __ _ _ __ __ _| |_(_) ___  _ __  _  |  _ \ ___ | |_   _ _ __   ___  _ __ ___ (_) __ _| | */
+/* \___ \ / _ \ '_ \ / _` | '__/ _` | __| |/ _ \| '_ \(_) | |_) / _ \| | | | | '_ \ / _ \| '_ ` _ \| |/ _` | | */
+/*  ___) |  __/ |_) | (_| | | | (_| | |_| | (_) | | | |_  |  __/ (_) | | |_| | | | | (_) | | | | | | | (_| | | */
+/* |____/_\___| .__/ \__,_|_|  \__,_|\__|_|\___/|_| |_(_) |_|   \___/|_|\__, |_| |_|\___/|_| |_| |_|_|\__,_|_| */
+/*   ___| | __|_|___ _   _ _ __ ___                                     |___/                                  */
+/*  / __| |/ _ \/ __| | | | '__/ _ \                                                                           */
+/* | (__| | (_) \__ \ |_| | | |  __/                                                                           */
+/*  \___|_|\___/|___/\__,_|_|  \___|                                                                           */
 
 /**
  * @brief
@@ -39,10 +37,10 @@
  * @return
  * A Boolean indicating whether the two input languages are Pol(ST)-separable.
  */
-bool decid_polst_sep(nfa*, //!< First NFA.
-    nfa*, //!< Second NFA.
-    bool,//!< Should further details be displayed?
-    FILE*               //!< The stream.
+bool decid_polst_sep(nfa *, //!< First NFA.
+                     nfa *, //!< Second NFA.
+                     bool,  //!< Should further details be displayed?
+                     FILE * //!< The stream.
 );
 
 /**
@@ -57,10 +55,10 @@ bool decid_polst_sep(nfa*, //!< First NFA.
  * @return
  * A Boolean indicating whether the two input languages are Pol(MOD)-separable.
  */
-bool decid_polmod_sep(nfa*, //!< First NFA.
-    nfa*,  //!< Second NFA.
-    bool,  //!< Should further details be displayed?
-    FILE*                //!< The stream.
+bool decid_polmod_sep(nfa *, //!< First NFA.
+                      nfa *, //!< Second NFA.
+                      bool,  //!< Should further details be displayed?
+                      FILE * //!< The stream.
 );
 
 /**
@@ -75,10 +73,12 @@ bool decid_polmod_sep(nfa*, //!< First NFA.
  * @return
  * A Boolean indicating whether the two input languages are Pol(GR)-separable.
  */
-bool decid_polgr_sep(nfa*, //!< First NFA.
-    nfa*, //!< Second NFA.
-    bool, //!< Should further details be displayed?
-    FILE*               //!< The stream.
+bool decid_polgr_sep(nfa *, //!< First NFA.
+                     nfa *, //!< Second NFA.
+                     bool,  //!< Should further details be displayed?
+                     FILE * //!< The stream.
 );
+
+// void temp_fun(dgraph *, dgraph *, basis mode, uint, uint, bool, FILE *);
 
 #endif

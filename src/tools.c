@@ -1,22 +1,27 @@
 #include "tools.h"
 
-
-int compare_uint(const void* p1, const void* p2) {
-    uint a = *(const uint*)p1;
-    uint b = *(const uint*)p2;
-    if (a < b) {
+int compare_uint(const void *p1, const void *p2)
+{
+    uint a = *(const uint *)p1;
+    uint b = *(const uint *)p2;
+    if (a < b)
+    {
         return -1;
     }
-    if (a > b) {
+    if (a > b)
+    {
         return 1;
     }
     return 0;
 }
 
-bool mem_array_sorted(uint e, uint* array, uint size, uint* ind) {
-    uint* p = bsearch(&e, array, size, sizeof(uint), compare_uint);
-    if (p) {
-        if (ind) {
+bool mem_array_sorted(uint e, uint *array, uint size, uint *ind)
+{
+    uint *p = bsearch(&e, array, size, sizeof(uint), compare_uint);
+    if (p)
+    {
+        if (ind)
+        {
             *ind = p - array;
         }
         return true; // The element was found
@@ -24,11 +29,14 @@ bool mem_array_sorted(uint e, uint* array, uint size, uint* ind) {
     return false;
 }
 
-uint array_sort_norepeat_uint(uint* array, uint size) {
-    if (size == 0) {
+uint array_sort_norepeat_uint(uint *array, uint size)
+{
+    if (size == 0)
+    {
         return 0; // No elements to sort
     }
-    if (size == 1) {
+    if (size == 1)
+    {
         return 1; // Only one element, no need to sort
     }
 
@@ -36,51 +44,75 @@ uint array_sort_norepeat_uint(uint* array, uint size) {
 
     // Eliminate duplicates
     uint new_size = 1; // At least one element will remain
-    for (uint i = 1; i < size; i++) {
-        if (array[i] != array[new_size - 1]) {
+    for (uint i = 1; i < size; i++)
+    {
+        if (array[i] != array[new_size - 1])
+        {
             array[new_size++] = array[i];
         }
     }
     return new_size;
 }
 
-uint get_uint_length(uint n) {
-    if (n == 0) {
+char *uint_to_string(uint n)
+{
+    uint length = get_uint_length(n);
+    char *str;
+    MALLOC(str, length + 1); // +1 for null terminator
+    str[length] = '\0';      // Null-terminate the string
+
+    for (int i = length - 1; i >= 0; i--)
+    {
+        str[i] = (n % 10) + '0'; // Convert digit to character
+        n /= 10;
+    }
+    return str;
+}
+
+uint get_uint_length(uint n)
+{
+    if (n == 0)
+    {
         return 1;
     }
     uint l = 0;
-    while (n != 0) {
+    while (n != 0)
+    {
         n /= 10;
         l++;
     }
     return l;
 }
 
-uchar get_uint_lbinary(uint n) {
-    if (n == 0) {
+uchar get_uint_lbinary(uint n)
+{
+    if (n == 0)
+    {
         return 1;
     }
     uint l = 0;
-    while (n != 0) {
+    while (n != 0)
+    {
         n >>= 1; // Shift right by 1 bit
         l++;
     }
     return l;
 }
 
-char* multiple_strcat(char* s, ...) {
+char *multiple_strcat(char *s, ...)
+{
     va_list ap;
-    char* t = s;
-    size_t  len = 0;
+    char *t = s;
+    size_t len = 0;
 
     va_start(ap, s);
     do
     {
         len += strlen(t);
-    } while ((t = va_arg(ap, char*)));
+    } while ((t = va_arg(ap, char *)));
     va_end(ap);
 
-    char* ret;
+    char *ret;
     CALLOC(ret, len + 1);
 
     t = s;
@@ -88,82 +120,99 @@ char* multiple_strcat(char* s, ...) {
     do
     {
         strcat(ret, t);
-    } while ((t = va_arg(ap, char*)));
+    } while ((t = va_arg(ap, char *)));
     va_end(ap);
 
     return ret;
 }
 
-void print_top_line(uint length, FILE* out) {
+void print_top_line(uint length, FILE *out)
+{
     fprintf(out, "┌");
-    for (uint i = 0; i < length; i++) {
+    for (uint i = 0; i < length; i++)
+    {
         fprintf(out, "─");
     }
     fprintf(out, "┐\n");
 }
 
-
-
-void print_mid_line(uint length, FILE* out) {
+void print_mid_line(uint length, FILE *out)
+{
     fprintf(out, "├");
-    for (uint i = 0; i < length; i++) {
+    for (uint i = 0; i < length; i++)
+    {
         fprintf(out, "─");
     }
     fprintf(out, "┤\n");
 }
 
-void print_bot_line(uint length, FILE* out) {
+void print_bot_line(uint length, FILE *out)
+{
     fprintf(out, "└");
-    for (uint i = 0; i < length; i++) {
+    for (uint i = 0; i < length; i++)
+    {
         fprintf(out, "─");
     }
     fprintf(out, "┘\n");
 }
 
-void print_sep_line(uint length, FILE* out) {
+void print_sep_line(uint length, FILE *out)
+{
     print_top_line(length, out);
     print_bot_line(length, out);
 }
 
-void print_dtop_line(uint length, FILE* out) {
+void print_dtop_line(uint length, FILE *out)
+{
     fprintf(out, "╔");
-    for (uint i = 0; i < length; i++) {
+    for (uint i = 0; i < length; i++)
+    {
         fprintf(out, "═");
     }
     fprintf(out, "╗\n");
 }
 
-void print_dmid_line(uint length, FILE* out) {
+void print_dmid_line(uint length, FILE *out)
+{
     fprintf(out, "╠");
-    for (uint i = 0; i < length; i++) {
+    for (uint i = 0; i < length; i++)
+    {
         fprintf(out, "═");
     }
     fprintf(out, "╣\n");
 }
 
-void print_dbot_line(uint length, FILE* out) {
+void print_dbot_line(uint length, FILE *out)
+{
     fprintf(out, "╚");
-    for (uint i = 0; i < length; i++) {
+    for (uint i = 0; i < length; i++)
+    {
         fprintf(out, "═");
     }
     fprintf(out, "╝\n");
 }
 
-void print_spaces(uint number, FILE* out) {
-    for (uint i = 0; i < number; i++) {
+void print_spaces(uint number, FILE *out)
+{
+    for (uint i = 0; i < number; i++)
+    {
         fprintf(out, " ");
     }
 }
 
-void print_copies_string(uint number, char* s, FILE* out) {
-    for (uint i = 0; i < number; i++) {
+void print_copies_string(uint number, char *s, FILE *out)
+{
+    for (uint i = 0; i < number; i++)
+    {
         fprintf(out, "%s", s);
     }
 }
 
-uint count_utf8_code_points(const char* s) {
+uint count_utf8_code_points(const char *s)
+{
     uint count = 0;
-    while (*s) {
+    while (*s)
+    {
         count += (*s++ & 0xC0) != 0x80;
     }
     return count;
@@ -171,21 +220,25 @@ uint count_utf8_code_points(const char* s) {
 
 // Affichage d'un titre dans une boite.
 // La taille minimale autorisée est 100 (le max de length et 100 est utilisé)
-void print_title_box(uint length, bool closed, FILE* out, uint nlines, ...) {
+void print_title_box(uint length, bool closed, FILE *out, uint nlines, ...)
+{
     // La taille minimale est 100
     length = max(length, 100);
 
     // Récupération des lignes à écrire
     va_list list;
     va_start(list, nlines);
-    char* input[nlines];
-    for (uint i = 0; i < nlines; i++) {
-        input[i] = va_arg(list, char*);
-        if (count_utf8_code_points(input[i]) > length) {
+    char *input[nlines];
+    for (uint i = 0; i < nlines; i++)
+    {
+        input[i] = va_arg(list, char *);
+        if (count_utf8_code_points(input[i]) > length)
+        {
             printf("Printing error, the title is too long for the chosen length\n");
             return;
         }
-        if (strchr(input[i], '\n') != NULL) {
+        if (strchr(input[i], '\n') != NULL)
+        {
             printf("Printing error, the title should not contain \"newline\"\n");
             return;
         }
@@ -193,7 +246,8 @@ void print_title_box(uint length, bool closed, FILE* out, uint nlines, ...) {
     // Si tout s'est bien passé, on passe à la phase d'écriture
     print_top_line(length, out);
 
-    for (uint i = 0; i < nlines; i++) {
+    for (uint i = 0; i < nlines; i++)
+    {
         uint titlelen = count_utf8_code_points(input[i]);
         fprintf(out, "│");
         uint pad = length - titlelen;
@@ -203,31 +257,35 @@ void print_title_box(uint length, bool closed, FILE* out, uint nlines, ...) {
         fprintf(out, "│\n");
     }
 
-    if (closed) {
+    if (closed)
+    {
         print_bot_line(length, out);
     }
-    else {
+    else
+    {
         print_mid_line(length, out);
     }
 }
 
-
-
-void print_dtitle_box(uint length, bool closed, FILE* out, uint nlines, ...) {
+void print_dtitle_box(uint length, bool closed, FILE *out, uint nlines, ...)
+{
     // La taille minimale est 100
     length = max(length, 100);
 
     // Récupération des lignes à écrire
     va_list list;
     va_start(list, nlines);
-    char* input[nlines];
-    for (uint i = 0; i < nlines; i++) {
-        input[i] = va_arg(list, char*);
-        if (count_utf8_code_points(input[i]) > length) {
+    char *input[nlines];
+    for (uint i = 0; i < nlines; i++)
+    {
+        input[i] = va_arg(list, char *);
+        if (count_utf8_code_points(input[i]) > length)
+        {
             printf("Printing error, the title is too long for the chosen length\n");
             return;
         }
-        if (strchr(input[i], '\n') != NULL) {
+        if (strchr(input[i], '\n') != NULL)
+        {
             printf("Printing error, the title should not contain \"newline\"\n");
             return;
         }
@@ -236,7 +294,8 @@ void print_dtitle_box(uint length, bool closed, FILE* out, uint nlines, ...) {
     // Si tout s'est bien passé, on passe à la phase d'écriture
     print_dtop_line(length, out);
 
-    for (uint i = 0; i < nlines; i++) {
+    for (uint i = 0; i < nlines; i++)
+    {
         uint titlelen = count_utf8_code_points(input[i]);
         fprintf(out, "║");
         uint pad = length - titlelen;
@@ -246,24 +305,29 @@ void print_dtitle_box(uint length, bool closed, FILE* out, uint nlines, ...) {
         fprintf(out, "║\n");
     }
 
-    if (closed) {
+    if (closed)
+    {
         print_dbot_line(length, out);
     }
-    else {
+    else
+    {
         print_dmid_line(length, out);
     }
 }
 
-void print_line_box(uint length, FILE* out, char* s) {
+void print_line_box(uint length, FILE *out, char *s)
+{
     // La taille minimale est 100
     length = max(length, 100);
     uint linelen = count_utf8_code_points(s);
     // Récupération des lignes à écrire
-    if (linelen > length) {
+    if (linelen > length)
+    {
         printf("Printing error, the line is too long for the chosen length\n");
         return;
     }
-    if (strchr(s, '\n') != NULL) {
+    if (strchr(s, '\n') != NULL)
+    {
         printf("Printing error, the line should not contain \"newline\"\n");
         return;
     }
@@ -276,16 +340,19 @@ void print_line_box(uint length, FILE* out, char* s) {
     fprintf(out, "│\n");
 }
 
-void print_dline_box(uint length, FILE* out, char* s) {
+void print_dline_box(uint length, FILE *out, char *s)
+{
     // La taille minimale est 100
     length = max(length, 100);
     uint linelen = count_utf8_code_points(s);
     // Récupération des lignes à écrire
-    if (linelen > length) {
+    if (linelen > length)
+    {
         printf("Printing error, the line is too long for the chosen length\n");
         return;
     }
-    if (strchr(s, '\n') != NULL) {
+    if (strchr(s, '\n') != NULL)
+    {
         printf("Printing error, the line should not contain \"newline\"\n");
         return;
     }
@@ -298,21 +365,24 @@ void print_dline_box(uint length, FILE* out, char* s) {
     fprintf(out, "║\n");
 }
 
-
-
-uint fprint_power_utf8(uint n, FILE* out) {
-    if (n == 0) {
+uint fprint_power_utf8(uint n, FILE *out)
+{
+    if (n == 0)
+    {
         fprintf(out, "⁰");
         return 1;
     }
-    else {
+    else
+    {
         uint d = n % 10;
         uint q = n / 10;
         uint ret = 0;
-        if (q > 0) {
+        if (q > 0)
+        {
             ret = fprint_power_utf8(q, out);
         }
-        switch (d) {
+        switch (d)
+        {
         case 0:
             fprintf(out, "⁰");
             break;
@@ -350,19 +420,23 @@ uint fprint_power_utf8(uint n, FILE* out) {
     }
 }
 
-
-int sprint_power_utf8(uint n, char* out) {
-    if (n == 0) {
+int sprint_power_utf8(uint n, char *out)
+{
+    if (n == 0)
+    {
         return sprintf(out, "⁰");
     }
-    else {
+    else
+    {
         uint d = n % 10;
         uint q = n / 10;
         uint ret = 0;
-        if (q > 0) {
+        if (q > 0)
+        {
             ret = sprint_power_utf8(q, out);
         }
-        switch (d) {
+        switch (d)
+        {
         case 0:
             return ret + sprintf(out + ret, "⁰");
             break;
@@ -400,18 +474,20 @@ int sprint_power_utf8(uint n, char* out) {
     }
 }
 
-
-
-uint fprint_subsc_utf8(uint n, FILE* out) {
-    if (n == 0) {
+uint fprint_subsc_utf8(uint n, FILE *out)
+{
+    if (n == 0)
+    {
         fprintf(out, "₀");
         return 1;
     }
-    else {
+    else
+    {
         uint d = n % 10;
         uint q = n / 10;
         uint ret = 0;
-        if (q > 0) {
+        if (q > 0)
+        {
             ret = fprint_subsc_utf8(q, out);
         }
         switch (d)
@@ -453,16 +529,19 @@ uint fprint_subsc_utf8(uint n, FILE* out) {
     }
 }
 
-
-int sprint_subsc_utf8(uint n, char* out) {
-    if (n == 0) {
+int sprint_subsc_utf8(uint n, char *out)
+{
+    if (n == 0)
+    {
         return sprintf(out, "₀");
     }
-    else {
+    else
+    {
         uint d = n % 10;
         uint q = n / 10;
         uint ret = 0;
-        if (q > 0) {
+        if (q > 0)
+        {
             ret = sprint_subsc_utf8(q, out);
         }
         switch (d)
@@ -504,10 +583,10 @@ int sprint_subsc_utf8(uint n, char* out) {
     }
 }
 
-
-
-void print_color(char* s, color col, FILE* out) {
-    switch (col) {
+void print_color(char *s, color col, FILE *out)
+{
+    switch (col)
+    {
     case RED:
         fprintf(out, "\033[0;31m%s\033[0m", s);
         break;
@@ -531,4 +610,3 @@ void print_color(char* s, color col, FILE* out) {
         break;
     }
 }
-

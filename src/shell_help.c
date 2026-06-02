@@ -5,7 +5,8 @@
 #define PAD3 70
 #define PADC 8
 
-void help(void) {
+void help(void)
+{
     // FILE *p = popen("less", "w");
     // if (p == NULL)
     FILE *p = stdout;
@@ -147,6 +148,7 @@ void help(void) {
     fprintf(p, "%4s%-*sDisplays the 𝒞-orbits for the morphism (implemented for 𝒞 = DD, MOD⁺, AT).\n", "", PAD2, "orbit(𝒞,M)");
     fprintf(p, "%4s%-*sDisplays the 𝒞-orbit of the idempotent e for the morphism (implemented for 𝒞 = DD, MOD⁺, AT).\n", "", PAD2, "orbit(𝒞,M,e)");
     fprintf(p, "%4s%-*sComputes the image of an input word.\n", "", PAD1, "image(M,\"<word>\")");
+    fprintf(p, "%4s%-*sComputes a factorization forest associated to an input morphism and an input word.\n", "", PAD1, "facto(M,\"<word>\")");
 
     fprintf(p, "\n");
 
@@ -252,27 +254,37 @@ void help(void) {
     // fclose(p);
 }
 
-static void print_class_info_status(classes class, FILE *out) {
-    if (class_infos[class]) {
+static void print_class_info_status(classes class, FILE *out)
+{
+    if (class_infos[class])
+    {
         class_infos[class](out);
 
         print_dmid_line(100, out);
-        if (class_membership[class]) {
+        if (class_membership[class])
+        {
             print_dline_box(109, out, " Membership : " ANSI_COLOR_GREEN "Implemented.   " ANSI_COLOR_RESET);
-        } else {
+        }
+        else
+        {
             print_dline_box(109, out, " Membership : " ANSI_COLOR_RED "Not implemented." ANSI_COLOR_RESET);
         }
-        if (class_separation[class]) {
+        if (class_separation[class])
+        {
             print_dline_box(109, out, " Separation : " ANSI_COLOR_GREEN "Implemented." ANSI_COLOR_RESET);
-        } else {
+        }
+        else
+        {
             print_dline_box(109, out, " Separation : " ANSI_COLOR_RED "Not implemented." ANSI_COLOR_RESET);
         }
         print_dbot_line(100, out);
     }
 }
 
-void print_classes(void) {
-    for (uint i = 0; i < CL_END; i++) {
+void print_classes(void)
+{
+    for (uint i = 0; i < CL_END; i++)
+    {
         print_class_info_status(i, stdout);
     }
 }

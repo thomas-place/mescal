@@ -7,20 +7,20 @@
 #ifndef MONO_PROPS_H
 #define MONO_PROPS_H
 
+#include "monoid.h"
+#include "monoid_kernels.h"
+#include "monoid_orbits.h"
+#include "nfa.h"
+#include "sep_group.h"
 #include <stdbool.h>
 #include <stdlib.h>
-#include "nfa.h"
-#include "monoid.h"
-#include "monoid_orbits.h"
-#include "monoid_kernels.h"
-#include "sep_group.h"
 
- /*  __  __                   _     _         ____                            _   _            */
- /* |  \/  | ___  _ __   ___ (_) __| |___ _  |  _ \ _ __ ___  _ __   ___ _ __| |_(_) ___  ___  */
- /* | |\/| |/ _ \| '_ \ / _ \| |/ _` / __(_) | |_) | '__/ _ \| '_ \ / _ \ '__| __| |/ _ \/ __| */
- /* | |  | | (_) | | | | (_) | | (_| \__ \_  |  __/| | | (_) | |_) |  __/ |  | |_| |  __/\__ \ */
- /* |_|  |_|\___/|_| |_|\___/|_|\__,_|___(_) |_|   |_|  \___/| .__/ \___|_|   \__|_|\___||___/ */
- /*                                                          |_|                               */
+/*  __  __                   _     _         ____                            _   _            */
+/* |  \/  | ___  _ __   ___ (_) __| |___ _  |  _ \ _ __ ___  _ __   ___ _ __| |_(_) ___  ___  */
+/* | |\/| |/ _ \| '_ \ / _ \| |/ _` / __(_) | |_) | '__/ _ \| '_ \ / _ \ '__| __| |/ _ \/ __| */
+/* | |  | | (_) | | | | (_) | | (_| \__ \_  |  __/| | | (_) | |_) |  __/ |  | |_| |  __/\__ \ */
+/* |_|  |_|\___/|_| |_|\___/|_|\__,_|___(_) |_|   |_|  \___/| .__/ \___|_|   \__|_|\___||___/ */
+/*                                                          |_|                               */
 
 /**
  * @brief
@@ -35,7 +35,6 @@ typedef enum
 } green_relation;
 
 extern char green_rel_array[4];
-
 
 /***********/
 /* Trivial */
@@ -52,23 +51,23 @@ extern char green_rel_array[4];
  * @return
  * A Boolean indicating whether the monoid is trivial.
  */
-bool is_trivial_monoid(morphism*,    //!< The morphism.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_trivial_monoid(morphism *, //!< The morphism.
+                       uint *      //!< Pointer on a uint array to return a counterexample.
 );
 
 /**
  * @brief
  * Tests if a semigroup (image of A⁺) is trivial.
  *
-* @remark
+ * @remark
  * If the test fails and the second parameter is not NULL, it will be set to a
  * counterexample: two distinct elements in the semigroup.
  *
  * @return
  * A Boolean indicating whether the syntactic semigroup is trivial.
  */
-bool is_trivial_semigroup(morphism*, //!< The morphism.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_trivial_semigroup(morphism *, //!< The morphism.
+                          uint *      //!< Pointer on a uint array to return a counterexample.
 );
 
 /**
@@ -82,8 +81,8 @@ bool is_trivial_semigroup(morphism*, //!< The morphism.
  * @return
  * A Boolean indicating whether the subsemigroup is trivial.
  */
-bool is_trivial_subsemi(subsemi*, //!< The subsemigroup.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_trivial_subsemi(subsemi *, //!< The subsemigroup.
+                        uint *     //!< Pointer on a uint array to return a counterexample.
 );
 
 /**
@@ -97,12 +96,9 @@ bool is_trivial_subsemi(subsemi*, //!< The subsemigroup.
  * @return
  * A Boolean indicating whether all orbits are trivial.
  */
-bool is_trivial_orbmono(orbits*,   //!< The orbits.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_trivial_orbmono(orbits *, //!< The orbits.
+                        uint *    //!< Pointer on a uint array to return a counterexample.
 );
-
-
-
 
 /**********/
 /* Groups */
@@ -119,8 +115,8 @@ bool is_trivial_orbmono(orbits*,   //!< The orbits.
  * @return
  * A Boolean indicating whether the monoid is a group.
  */
-bool is_group_mono(morphism*, //!< The morphism.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_group_mono(morphism *, //!< The morphism.
+                   uint *      //!< Pointer on a uint array to return a counterexample.
 );
 
 /**
@@ -134,8 +130,8 @@ bool is_group_mono(morphism*, //!< The morphism.
  * @return
  * A Boolean indicating whether the syntactic semigroup is a group.
  */
-bool is_group_semigroup(morphism*, //!< The morphism.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_group_semigroup(morphism *, //!< The morphism.
+                        uint *      //!< Pointer on a uint array to return a counterexample.
 );
 
 /**
@@ -149,8 +145,8 @@ bool is_group_semigroup(morphism*, //!< The morphism.
  * @return
  * A Boolean indicating whether the subsemigroup is a group.
  */
-bool is_group_subsemi(subsemi*, //!< The subsemigroup.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_group_subsemi(subsemi *, //!< The subsemigroup.
+                      uint *     //!< Pointer on a uint array to return a counterexample.
 );
 
 /**
@@ -164,10 +160,9 @@ bool is_group_subsemi(subsemi*, //!< The subsemigroup.
  * @return
  * A Boolean indicating whether all orbits are groups.
  */
-bool is_group_orbmono(orbits*,    //!< The orbits.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_group_orbmono(orbits *, //!< The orbits.
+                      uint *    //!< Pointer on a uint array to return a counterexample.
 );
-
 
 /**
  * @brief
@@ -180,11 +175,9 @@ bool is_group_orbmono(orbits*,    //!< The orbits.
  * @return
  * A Boolean indicating whether the morphism maps all letters to the same element.
  */
-bool is_letterind_mono(morphism*,    //!< The morphism.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_letterind_mono(morphism *, //!< The morphism.
+                       uint *      //!< Pointer on a uint array to return a counterexample.
 );
-
-
 
 /*****************/
 /* Commutativity */
@@ -201,10 +194,9 @@ bool is_letterind_mono(morphism*,    //!< The morphism.
  * @return
  * A Boolean indicating whether the monoid is commutative.
  */
-bool is_comm_mono(morphism*, //!< The morphism.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_comm_mono(morphism *, //!< The morphism.
+                  uint *      //!< Pointer on a uint array to return a counterexample.
 );
-
 
 /**
  * @brief
@@ -217,8 +209,8 @@ bool is_comm_mono(morphism*, //!< The morphism.
  * @return
  * A Boolean indicating whether the subsemigroup is commutative.
  */
-bool is_comm_subsemi(subsemi*, //!< The subsemigroup.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_comm_subsemi(subsemi *, //!< The subsemigroup.
+                     uint *     //!< Pointer on a uint array to return a counterexample.
 );
 
 /**
@@ -232,8 +224,8 @@ bool is_comm_subsemi(subsemi*, //!< The subsemigroup.
  * @return
  * A Boolean indicating whether the orbits are commuatative.
  */
-bool is_com_orbmono(orbits*,        //!< The orbits.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_com_orbmono(orbits *, //!< The orbits.
+                    uint *    //!< Pointer on a uint array to return a counterexample.
 );
 
 /**
@@ -248,10 +240,9 @@ bool is_com_orbmono(orbits*,        //!< The orbits.
  * @return
  * A Boolean indicating whether the equation is satisfied.
  */
-bool is_comm_ltt_mono(orbits*,     //!< The DD-orbits.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_comm_ltt_mono(orbits *, //!< The DD-orbits.
+                      uint *    //!< Pointer on a uint array to return a counterexample.
 );
-
 
 /***************/
 /* Idempotence */
@@ -268,8 +259,8 @@ bool is_comm_ltt_mono(orbits*,     //!< The DD-orbits.
  * @return
  * A Boolean indicating whether the monoid is idempotent.
  */
-bool is_idem_mono(morphism*, //!< The morphism.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_idem_mono(morphism *, //!< The morphism.
+                  uint *      //!< Pointer on a uint array to return a counterexample.
 );
 
 /**
@@ -283,10 +274,9 @@ bool is_idem_mono(morphism*, //!< The morphism.
  * @return
  * A Boolean indicating whether the subsemigroup is idempotent.
  */
-bool is_idem_subsemi(subsemi*, //!< The subsemigroup.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_idem_subsemi(subsemi *, //!< The subsemigroup.
+                     uint *     //!< Pointer on a uint array to return a counterexample.
 );
-
 
 /**
  * @brief
@@ -299,14 +289,14 @@ bool is_idem_subsemi(subsemi*, //!< The subsemigroup.
  * @return
  * A Boolean indicating whether the orbits are simultaneously commutative and idempotent.
  */
-bool is_idem_orbmono(orbits*,    //!< The orbits.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_idem_orbmono(orbits *, //!< The orbits.
+                     uint *    //!< Pointer on a uint array to return a counterexample.
 );
 
 /*******************/
 /* H,R,L,J-trivial */
 /*******************/
-parti* grel_to_parti(green* G, green_relation P);
+parti *grel_to_parti(green *G, green_relation P);
 
 /**
  * @brief
@@ -319,9 +309,9 @@ parti* grel_to_parti(green* G, green_relation P);
  * @return
  * A Boolean indicating whether the monoide is P-trivial.
  */
-bool is_gtrivial_mono(morphism*, //!< The morphism.
-    green_relation,            //!< The relation to test (H,R,L or J).
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_gtrivial_mono(morphism *,     //!< The morphism.
+                      green_relation, //!< The relation to test (H,R,L or J).
+                      uint *          //!< Pointer on a uint array to return a counterexample.
 );
 
 /**
@@ -335,9 +325,9 @@ bool is_gtrivial_mono(morphism*, //!< The morphism.
  * @return
  * A Boolean indicating whether the subsemigroupe is P-trivial.
  */
-bool is_gtrivial_subsemi(subsemi*, //!< Le subsemigroup.   
-    green_relation,                //!< The relation to test (H,R,L or J).
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_gtrivial_subsemi(subsemi *,      //!< Le subsemigroup.
+                         green_relation, //!< The relation to test (H,R,L or J).
+                         uint *          //!< Pointer on a uint array to return a counterexample.
 );
 
 /**
@@ -352,11 +342,10 @@ bool is_gtrivial_subsemi(subsemi*, //!< Le subsemigroup.
  * @return
  * A Boolean indicating whether all orbits are P-trivial.
  */
-bool is_gtrivial_orbmono(orbits*,    //!< The orbits.
-    green_relation,                //!< The relation to test (H,R,L or J).
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_gtrivial_orbmono(orbits *,       //!< The orbits.
+                         green_relation, //!< The relation to test (H,R,L or J).
+                         uint *          //!< Pointer on a uint array to return a counterexample.
 );
-
 
 /**
  * @brief
@@ -369,15 +358,13 @@ bool is_gtrivial_orbmono(orbits*,    //!< The orbits.
  * @return
  * A Boolean indicating whether the H-classes of 1 and all generators are trivial.
  */
-bool is_htrivial_generators(morphism*, //!< The morphism.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_htrivial_generators(morphism *, //!< The morphism.
+                            uint *      //!< Pointer on a uint array to return a counterexample.
 );
-
 
 /******/
 /* DA */
 /******/
-
 
 /**
  * @brief
@@ -390,8 +377,8 @@ bool is_htrivial_generators(morphism*, //!< The morphism.
  * @return
  * A Boolean indicating whether the monoide is in DA.
  */
-bool is_da_mono(morphism*,       //!< The morphism.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_da_mono(morphism *, //!< The morphism.
+                uint *      //!< Pointer on a uint array to return a counterexample.
 );
 
 /**
@@ -405,8 +392,8 @@ bool is_da_mono(morphism*,       //!< The morphism.
  * @return
  * A Boolean indicating whether the subsemigroupe is in DA.
  */
-bool is_da_subsemi(subsemi*,      //!< The subsemigroup.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_da_subsemi(subsemi *, //!< The subsemigroup.
+                   uint *     //!< Pointer on a uint array to return a counterexample.
 );
 
 /**
@@ -421,8 +408,8 @@ bool is_da_subsemi(subsemi*,      //!< The subsemigroup.
  * @return
  * A Boolean indicating whether all orbits are in DA.
  */
-bool is_da_orbmono(orbits*,    //!< The orbits.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_da_orbmono(orbits *, //!< The orbits.
+                   uint *    //!< Pointer on a uint array to return a counterexample.
 );
 
 /****************/
@@ -443,8 +430,9 @@ bool is_da_orbmono(orbits*,    //!< The orbits.
  * @return
  * A Boolean indicating whether si the morphism satisfies the equation 1 ≤ s.
  */
-bool is_jsat_mono(morphism*, //!< The morphism.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_jsat_mono(morphism *M, //!< The morphism.
+                  bool co,
+                  uint * //!< Pointer on a uint array to return a counterexample.
 );
 
 /**
@@ -461,8 +449,9 @@ bool is_jsat_mono(morphism*, //!< The morphism.
  * @return
  * A Boolean indicating whether the morphisme satisfies the equation 1 ≤ e (for every idempotent e).
  */
-bool is_ejsat_mono(morphism*, //!< The morphism.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_ejsat_mono(morphism *M, //!< The morphism.
+                   bool co,
+                   uint * //!< Pointer on a uint array to return a counterexample.
 );
 
 /**
@@ -479,11 +468,11 @@ bool is_ejsat_mono(morphism*, //!< The morphism.
  * @return
  * A Boolean indicating whether the subsemigroup satisfies the equation 1 ≤ s.
  */
-bool is_jsat_subsemi(subsemi*,  //!< The subsemigroup.
-    uint, //!< The index of the neutral element in the list of representative idempotents.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_jsat_subsemi(subsemi *S, //!< The subsemigroup.
+                     uint ind,   //!< The index of the neutral element in the list of representative idempotents.
+                     bool co,
+                     uint * //!< Pointer on a uint array to return a counterexample.
 );
-
 
 /**
  * @brief
@@ -500,13 +489,10 @@ bool is_jsat_subsemi(subsemi*,  //!< The subsemigroup.
  * @return
  * A Boolean indicating whether all orbits satisfy the equation 1 ≤ s.
  */
-bool is_jsat_orbmono(orbits*,   //!< The orbits.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_jsat_orbmono(orbits *L, //!< The orbits.
+                     bool co,
+                     uint * //!< Pointer on a uint array to return a counterexample.
 );
-
-
-
-
 
 /*********/
 /* Knast */
@@ -523,8 +509,8 @@ bool is_jsat_orbmono(orbits*,   //!< The orbits.
  * @return
  * A Boolean indicating whether the monoide is a block group.
  */
-bool is_blockg_mono(morphism*,   //!< The morphism.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_blockg_mono(morphism *, //!< The morphism.
+                    uint *      //!< Pointer on a uint array to return a counterexample.
 );
 
 /**
@@ -542,10 +528,9 @@ bool is_blockg_mono(morphism*,   //!< The morphism.
  * @return
  * A Boolean indicating whether the morphisme satisfies the BPol(MOD) equation.
  */
-bool is_bpolmod_mono(morphism*,  //!< The MOD-kernel.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_bpolmod_mono(morphism *, //!< The MOD-kernel.
+                     uint *      //!< Pointer on a uint array to return a counterexample.
 );
-
 
 /**
  * @brief
@@ -562,8 +547,8 @@ bool is_bpolmod_mono(morphism*,  //!< The MOD-kernel.
  * @return
  * A Boolean indicating whether the morphisme satisfies the BPol(AMT) equation.
  */
-bool is_bpolamt_mono(morphism*,  //!< The morphism. 
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_bpolamt_mono(morphism *, //!< The morphism.
+                     uint *      //!< Pointer on a uint array to return a counterexample.
 );
 
 /**
@@ -577,8 +562,8 @@ bool is_bpolamt_mono(morphism*,  //!< The morphism.
  * @return
  * A Boolean indicating whether the morphism satisfies Knast's equation.
  */
-bool is_knast_mono(orbits*, //!< The DD-orbits of the morphism.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_knast_mono(orbits *, //!< The DD-orbits of the morphism.
+                   uint *    //!< Pointer on a uint array to return a counterexample.
 );
 
 /**
@@ -595,11 +580,10 @@ bool is_knast_mono(orbits*, //!< The DD-orbits of the morphism.
  * @return
  * A Boolean indicating whether the MOD-kernel satisfies Knast's equation.
  */
-bool is_knast_ker(orbits*, //!< The G⁺-orbits.
-    subsemi*,          //!< The G-kernel.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_knast_ker(orbits *,  //!< The G⁺-orbits.
+                  subsemi *, //!< The G-kernel.
+                  uint *     //!< Pointer on a uint array to return a counterexample.
 );
-
 
 /**
  * @brief
@@ -616,8 +600,8 @@ bool is_knast_ker(orbits*, //!< The G⁺-orbits.
  * @return
  * A Boolean indicating whether the morphisme satisfies the BPol(AMT⁺) equation.
  */
-bool is_bpolamtp_mono(orbits*, //!< The AMT⁺-orbits.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_bpolamtp_mono(orbits *, //!< The AMT⁺-orbits.
+                      uint *    //!< Pointer on a uint array to return a counterexample.
 );
 
 /**
@@ -634,12 +618,9 @@ bool is_bpolamtp_mono(orbits*, //!< The AMT⁺-orbits.
  * @return
  * A Boolean indicating whether the morphisme satisfies the BPol(GR⁺) equation.
  */
-bool is_bpolgrp_mono(orbits*, //!< The GR⁺-orbits.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_bpolgrp_mono(orbits *, //!< The GR⁺-orbits.
+                     uint *    //!< Pointer on a uint array to return a counterexample.
 );
-
-
-
 
 /**
  * @brief
@@ -652,10 +633,9 @@ bool is_bpolgrp_mono(orbits*, //!< The GR⁺-orbits.
  * @return
  * A Boolean indicating whether si the morphism satisfies the AT-variant of Knast's equation.
  */
-bool is_knast_at_mono(morphism* M,   //!< The morphism.
-    uint* cexa //!< Pointer on a uint array to return a counterexample.
+bool is_knast_at_mono(morphism *M, //!< The morphism.
+                      uint *cexa   //!< Pointer on a uint array to return a counterexample.
 );
-
 
 /*********************/
 /* UPolBPol Equation */
@@ -673,9 +653,8 @@ bool is_knast_at_mono(morphism* M,   //!< The morphism.
  * @return
  * A Boolean indicating whether si the morphism satisfies the UPol(BPol(C)) equation.
  */
-bool is_upbp_mono(orbits*, //!< The C-orbits of the morphism.
-    uint* //!< Pointer on a uint array to return a counterexample.
+bool is_upbp_mono(orbits *, //!< The C-orbits of the morphism.
+                  uint *    //!< Pointer on a uint array to return a counterexample.
 );
-
 
 #endif

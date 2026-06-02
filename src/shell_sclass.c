@@ -2,14 +2,14 @@
 #include "monoid_display.h"
 #define MESSAGESIZE 200
 
-
-void (*class_infos[CL_END]) (FILE*) = { NULL };
-const char* class_names[CL_END] = { NULL };
+void (*class_infos[CL_END])(FILE *) = {NULL};
+const char *class_names[CL_END] = {NULL};
 /*********************/
 /* General functions */
 /*********************/
 
-void init_class_info(void) {
+void init_class_info(void)
+{
 
     class_infos[CL_HTGEN] = info_htgen;
     class_names[CL_HTGEN] = "HTGEN";
@@ -23,10 +23,6 @@ void init_class_info(void) {
     class_names[CL_SFAMT] = "SF(AMT)";
     class_infos[CL_SFGR] = info_sf_gr;
     class_names[CL_SFGR] = "SF(GR)";
-
-
-
-
 
     // Polynomial closure
     class_infos[CL_PPT] = info_ppt;
@@ -46,6 +42,23 @@ void init_class_info(void) {
     class_infos[CL_POL2AMTP] = info_pol2_amtp;
     class_infos[CL_POL2GRP] = info_pol2_grp;
 
+    class_infos[CL_COPPT] = info_ppt;
+    class_infos[CL_COPOLMOD] = info_pol_mod;
+    class_infos[CL_COPOLAMT] = info_pol_amt;
+    class_infos[CL_COPOLGR] = info_pol_gr;
+    class_infos[CL_COPOLDD] = info_pol_dd;
+    class_infos[CL_COPOLMODP] = info_pol_modp;
+    class_infos[CL_COPOLAMTP] = info_pol_amtp;
+    class_infos[CL_COPOLGRP] = info_pol_grp;
+    class_infos[CL_COPOL2ST] = info_pol2_st;
+    class_infos[CL_COPOL2MOD] = info_pol2_mod;
+    class_infos[CL_COPOL2AMT] = info_pol2_amt;
+    class_infos[CL_COPOL2GR] = info_pol2_gr;
+    class_infos[CL_COPOL2DD] = info_pol2_dd;
+    class_infos[CL_COPOL2MODP] = info_pol2_modp;
+    class_infos[CL_COPOL2AMTP] = info_pol2_amtp;
+    class_infos[CL_COPOL2GRP] = info_pol2_grp;
+
     class_names[CL_PPT] = "PPT";
     class_names[CL_POLMOD] = "Pol(MOD)";
     class_names[CL_POLAMT] = "Pol(AMT)";
@@ -62,6 +75,23 @@ void init_class_info(void) {
     class_names[CL_POL2MODP] = "Pol₂(MOD⁺)";
     class_names[CL_POL2AMTP] = "Pol₂(AMT⁺)";
     class_names[CL_POL2GRP] = "Pol₂(GR⁺)";
+
+    class_names[CL_COPPT] = "co-PPT";
+    class_names[CL_COPOLMOD] = "co-Pol(MOD)";
+    class_names[CL_COPOLAMT] = "co-Pol(AMT)";
+    class_names[CL_COPOLGR] = "co-Pol(GR)";
+    class_names[CL_COPOLDD] = "co-Pol(DD)";
+    class_names[CL_COPOLMODP] = "co-Pol(MOD⁺)";
+    class_names[CL_COPOLAMTP] = "co-Pol(AMT⁺)";
+    class_names[CL_COPOLGRP] = "co-Pol(GR⁺)";
+    class_names[CL_COPOL2ST] = "co-Pol₂(ST)";
+    class_names[CL_COPOL2MOD] = "co-Pol₂(MOD)";
+    class_names[CL_COPOL2AMT] = "co-Pol₂(AMT)";
+    class_names[CL_COPOL2GR] = "co-Pol₂(GR)";
+    class_names[CL_COPOL2DD] = "co-Pol₂(DD)";
+    class_names[CL_COPOL2MODP] = "co-Pol₂(MOD⁺)";
+    class_names[CL_COPOL2AMTP] = "co-Pol₂(AMT⁺)";
+    class_names[CL_COPOL2GRP] = "co-Pol₂(GR⁺)";
 
     // Boolean Polynomial closure
     class_infos[CL_PT] = info_pt;
@@ -286,22 +316,25 @@ void init_class_info(void) {
     class_names[CL_GRP] = "GR⁺";
     class_names[CL_REG] = "REG";
     class_names[CL_EMPTY] = "EMPTY";
-
 }
 
-typedef struct keylist {
+typedef struct keylist
+{
     com_keyword key;
-    struct keylist* next;
-}keylist;
+    struct keylist *next;
+} keylist;
 
-static keylist* make_keylist_class(com_command* thecom) {
-    if (!thecom || !thecom->main || thecom->thetype != CMT_KEY || com_nbparams(thecom->params) > 1) {
+static keylist *make_keylist_class(com_command *thecom)
+{
+    if (!thecom || !thecom->main || thecom->thetype != CMT_KEY || com_nbparams(thecom->params) > 1)
+    {
         return NULL;
     }
 
     com_keyword key = key_from_string_chain_single(thecom->main);
-    keylist* ret;
-    if (com_nbparams(thecom->params) == 0) {
+    keylist *ret;
+    if (com_nbparams(thecom->params) == 0)
+    {
         switch (key)
         {
         case KY_HTGEN:
@@ -312,6 +345,7 @@ static keylist* make_keylist_class(com_command* thecom) {
         case KY_TLC:
         case KY_TLX:
         case KY_PPT:
+        case KY_COPPT:
         case KY_PT:
         case KY_LT:
         case KY_LTT:
@@ -335,9 +369,11 @@ static keylist* make_keylist_class(com_command* thecom) {
             break;
         }
     }
-    else {
-        keylist* sub = make_keylist_class(thecom->params->param);
-        if (!sub) {
+    else
+    {
+        keylist *sub = make_keylist_class(thecom->params->param);
+        if (!sub)
+        {
             return NULL;
         }
         switch (key)
@@ -345,6 +381,7 @@ static keylist* make_keylist_class(com_command* thecom) {
         case KY_JORB:
         case KY_SF:
         case KY_POL:
+        case KY_COPOL:
         case KY_BPOL:
         case KY_UPOL:
         case KY_TLC:
@@ -359,6 +396,13 @@ static keylist* make_keylist_class(com_command* thecom) {
         case KY_POL2:
             MALLOC(ret, 1);
             ret->key = KY_POL;
+            MALLOC(ret->next, 1);
+            ret->next->key = KY_BPOL;
+            ret->next->next = sub;
+            return ret;
+        case KY_COPOL2:
+            MALLOC(ret, 1);
+            ret->key = KY_COPOL;
             MALLOC(ret->next, 1);
             ret->next->key = KY_BPOL;
             ret->next->next = sub;
@@ -411,26 +455,29 @@ static keylist* make_keylist_class(com_command* thecom) {
             return NULL;
             break;
         }
-
-
     }
     return NULL;
 }
 
-static void del_keylist(keylist* list) {
-    if (!list) {
+static void del_keylist(keylist *list)
+{
+    if (!list)
+    {
         return;
     }
     del_keylist(list->next);
     free(list);
 }
 
-static classes command_to_class_aux(keylist* list) {
-    if (!list) {
+static classes command_to_class_aux(keylist *list)
+{
+    if (!list)
+    {
         return CL_END;
     }
 
-    if (!list->next) {
+    if (!list->next)
+    {
         switch (list->key)
         {
         case KY_HTGEN:
@@ -453,6 +500,9 @@ static classes command_to_class_aux(keylist* list) {
             break;
         case KY_TLX:
             return CL_TLDD;
+            break;
+        case KY_COPPT:
+            return CL_COPPT;
             break;
         case KY_PPT:
             return CL_PPT;
@@ -502,25 +552,24 @@ static classes command_to_class_aux(keylist* list) {
         }
     }
 
-
-
-
-
-
     classes subcl = command_to_class_aux(list->next);
-    if (subcl == CL_END) {
+    if (subcl == CL_END)
+    {
         return CL_END;
     }
 
-    if (subcl == CL_REG) {
+    if (subcl == CL_REG)
+    {
         return CL_REG;
     }
 
-    if (subcl == CL_EMPTY) {
+    if (subcl == CL_EMPTY)
+    {
         return CL_EMPTY;
     }
 
-    if (list->key == KY_SF) {
+    if (list->key == KY_SF)
+    {
         switch (subcl)
         {
         case CL_AT:
@@ -530,10 +579,14 @@ static classes command_to_class_aux(keylist* list) {
         case CL_ST:
         case CL_DD:
         case CL_PPT:
+        case CL_COPPT:
         case CL_UPOLDD:
         case CL_POLDD:
+        case CL_COPOLDD:
         case CL_POL2ST:
+        case CL_COPOL2ST:
         case CL_POL2DD:
+        case CL_COPOL2DD:
         case CL_PT:
         case CL_BPOLDD:
         case CL_BPOL2ST:
@@ -558,10 +611,14 @@ static classes command_to_class_aux(keylist* list) {
         case CL_MOD:
         case CL_MODP:
         case CL_POLMOD:
+        case CL_COPOLMOD:
         case CL_UPOLMODP:
         case CL_POLMODP:
+        case CL_COPOLMODP:
         case CL_POL2MOD:
+        case CL_COPOL2MOD:
         case CL_POL2MODP:
+        case CL_COPOL2MODP:
         case CL_BPOLMOD:
         case CL_BPOLMODP:
         case CL_BPOL2MOD:
@@ -587,9 +644,13 @@ static classes command_to_class_aux(keylist* list) {
         case CL_AMTP:
         case CL_UPOLAMTP:
         case CL_POLAMT:
+        case CL_COPOLAMT:
         case CL_POLAMTP:
+        case CL_COPOLAMTP:
         case CL_POL2AMT:
+        case CL_COPOL2AMT:
         case CL_POL2AMTP:
+        case CL_COPOL2AMTP:
         case CL_BPOLAMT:
         case CL_BPOLAMTP:
         case CL_BPOL2AMT:
@@ -614,10 +675,14 @@ static classes command_to_class_aux(keylist* list) {
         case CL_GR:
         case CL_GRP:
         case CL_POLGR:
+        case CL_COPOLGR:
         case CL_UPOLGRP:
         case CL_POLGRP:
+        case CL_COPOLGRP:
         case CL_POL2GR:
+        case CL_COPOL2GR:
         case CL_POL2GRP:
+        case CL_COPOL2GRP:
         case CL_BPOLGR:
         case CL_BPOLGRP:
         case CL_BPOL2GR:
@@ -643,10 +708,10 @@ static classes command_to_class_aux(keylist* list) {
             return CL_END;
             break;
         }
-
     }
 
-    if (list->key == KY_POL) {
+    if (list->key == KY_POL)
+    {
         switch (subcl)
         {
         case CL_ST:
@@ -660,7 +725,9 @@ static classes command_to_class_aux(keylist* list) {
             break;
         case CL_AT:
         case CL_ATT:
+        case CL_COPPT:
         case CL_PT:
+        case CL_COPOL2ST:
         case CL_POL2ST:
         case CL_UL:
         case CL_FLST:
@@ -669,7 +736,9 @@ static classes command_to_class_aux(keylist* list) {
             break;
         case CL_LT:
         case CL_LTT:
+        case CL_COPOLDD:
         case CL_BPOLDD:
+        case CL_COPOL2DD:
         case CL_POL2DD:
         case CL_TLDD:
         case CL_FLDD:
@@ -689,6 +758,8 @@ static classes command_to_class_aux(keylist* list) {
             return CL_POLMODP;
             break;
         case CL_POL2MOD:
+        case CL_COPOL2MOD:
+        case CL_COPOLMOD:
         case CL_BPOLMOD:
         case CL_TLMOD:
         case CL_FLMOD:
@@ -696,6 +767,8 @@ static classes command_to_class_aux(keylist* list) {
             return CL_POL2MOD;
             break;
         case CL_POL2MODP:
+        case CL_COPOL2MODP:
+        case CL_COPOLMODP:
         case CL_BPOLMODP:
         case CL_TLMODP:
         case CL_FLMODP:
@@ -715,6 +788,8 @@ static classes command_to_class_aux(keylist* list) {
             return CL_POLAMTP;
             break;
         case CL_POL2AMT:
+        case CL_COPOL2AMT:
+        case CL_COPOLAMT:
         case CL_BPOLAMT:
         case CL_TLAMT:
         case CL_FLAMT:
@@ -722,6 +797,8 @@ static classes command_to_class_aux(keylist* list) {
             return CL_POL2AMT;
             break;
         case CL_POL2AMTP:
+        case CL_COPOL2AMTP:
+        case CL_COPOLAMTP:
         case CL_BPOLAMTP:
         case CL_TLAMTP:
         case CL_FLAMTP:
@@ -741,6 +818,8 @@ static classes command_to_class_aux(keylist* list) {
             return CL_POLGRP;
             break;
         case CL_POL2GR:
+        case CL_COPOL2GR:
+        case CL_COPOLGR:
         case CL_BPOLGR:
         case CL_TLGR:
         case CL_FLGR:
@@ -748,6 +827,8 @@ static classes command_to_class_aux(keylist* list) {
             return CL_POL2GR;
             break;
         case CL_POL2GRP:
+        case CL_COPOL2GRP:
+        case CL_COPOLGRP:
         case CL_BPOLGRP:
         case CL_TLGRP:
         case CL_FLGRP:
@@ -762,12 +843,137 @@ static classes command_to_class_aux(keylist* list) {
             return CL_END;
             break;
         }
-
     }
 
+    if (list->key == KY_COPOL)
+    {
+        switch (subcl)
+        {
+        case CL_ST:
+        case CL_PPT:
+            return CL_COPPT;
+            break;
+        case CL_DD:
+        case CL_UPOLDD:
+        case CL_POLDD:
+            return CL_COPOLDD;
+            break;
+        case CL_AT:
+        case CL_ATT:
+        case CL_COPPT:
+        case CL_PT:
+        case CL_POL2ST:
+        case CL_UL:
+        case CL_FLST:
+        case CL_PLST:
+            return CL_COPOL2ST;
+            break;
+        case CL_LT:
+        case CL_LTT:
+        case CL_COPOLDD:
+        case CL_BPOLDD:
+        case CL_POL2DD:
+        case CL_TLDD:
+        case CL_FLDD:
+        case CL_PLDD:
+            return CL_COPOL2DD;
+            break;
+        case CL_SF:
+            return CL_SF;
+            break;
+        case CL_MOD:
+        case CL_POLMOD:
+            return CL_COPOLMOD;
+            break;
+        case CL_MODP:
+        case CL_UPOLMODP:
+        case CL_POLMODP:
+            return CL_COPOLMODP;
+            break;
+        case CL_POL2MOD:
+        case CL_COPOLMOD:
+        case CL_BPOLMOD:
+        case CL_TLMOD:
+        case CL_FLMOD:
+        case CL_PLMOD:
+            return CL_COPOL2MOD;
+            break;
+        case CL_POL2MODP:
+        case CL_COPOLMODP:
+        case CL_BPOLMODP:
+        case CL_TLMODP:
+        case CL_FLMODP:
+        case CL_PLMODP:
+            return CL_COPOL2MODP;
+            break;
+        case CL_SFMOD:
+            return CL_SFMOD;
+            break;
+        case CL_AMT:
+        case CL_POLAMT:
+            return CL_COPOLAMT;
+            break;
+        case CL_AMTP:
+        case CL_UPOLAMTP:
+        case CL_POLAMTP:
+            return CL_COPOLAMTP;
+            break;
+        case CL_POL2AMT:
+        case CL_COPOLAMT:
+        case CL_BPOLAMT:
+        case CL_TLAMT:
+        case CL_FLAMT:
+        case CL_PLAMT:
+            return CL_COPOL2AMT;
+            break;
+        case CL_POL2AMTP:
+        case CL_COPOLAMTP:
+        case CL_BPOLAMTP:
+        case CL_TLAMTP:
+        case CL_FLAMTP:
+        case CL_PLAMTP:
+            return CL_COPOL2AMTP;
+            break;
+        case CL_SFAMT:
+            return CL_SFAMT;
+            break;
+        case CL_GR:
+        case CL_POLGR:
+            return CL_COPOLGR;
+            break;
+        case CL_GRP:
+        case CL_UPOLGRP:
+        case CL_POLGRP:
+            return CL_COPOLGRP;
+            break;
+        case CL_POL2GR:
+        case CL_COPOLGR:
+        case CL_BPOLGR:
+        case CL_TLGR:
+        case CL_FLGR:
+        case CL_PLGR:
+            return CL_COPOL2GR;
+            break;
+        case CL_POL2GRP:
+        case CL_COPOLGRP:
+        case CL_BPOLGRP:
+        case CL_TLGRP:
+        case CL_FLGRP:
+        case CL_PLGRP:
+            return CL_COPOL2GRP;
+            break;
+        case CL_SFGR:
+            return CL_SFGR;
+            break;
 
+        default:
+            return CL_END;
+            break;
+        }
+    }
 
-    if (list->key == KY_BPOL) {
+    if (list->key == KY_BPOL)
+    {
         switch (subcl)
         {
         case CL_ST:
@@ -783,6 +989,7 @@ static classes command_to_class_aux(keylist* list) {
         case CL_ATT:
         case CL_PT:
         case CL_UL:
+        case CL_COPPT:
         case CL_POL2ST:
         case CL_FLST:
         case CL_PLST:
@@ -790,6 +997,7 @@ static classes command_to_class_aux(keylist* list) {
             break;
         case CL_LT:
         case CL_LTT:
+        case CL_COPOLDD:
         case CL_BPOLDD:
         case CL_POL2DD:
         case CL_TLDD:
@@ -883,13 +1091,10 @@ static classes command_to_class_aux(keylist* list) {
             return CL_END;
             break;
         }
-
     }
 
-
-
-
-    if (list->key == KY_UPOL) {
+    if (list->key == KY_UPOL)
+    {
         switch (subcl)
         {
         case CL_ST:
@@ -1068,10 +1273,10 @@ static classes command_to_class_aux(keylist* list) {
             return CL_END;
             break;
         }
-
     }
 
-    if (list->key == KY_KNAST) {
+    if (list->key == KY_KNAST)
+    {
         switch (subcl)
         {
         case CL_ST:
@@ -1127,14 +1332,14 @@ static classes command_to_class_aux(keylist* list) {
         case CL_SFGR:
             return CL_SFGR;
             break;
-        default: return CL_END;
+        default:
+            return CL_END;
             break;
         }
     }
 
-
-
-    if (list->key == KY_TLC) {
+    if (list->key == KY_TLC)
+    {
         switch (subcl)
         {
         case CL_ST:
@@ -1249,14 +1454,10 @@ static classes command_to_class_aux(keylist* list) {
             return CL_END;
             break;
         }
-
     }
 
-
-
-
-
-    if (list->key == KY_FLC) {
+    if (list->key == KY_FLC)
+    {
         switch (subcl)
         {
         case CL_ST:
@@ -1371,11 +1572,10 @@ static classes command_to_class_aux(keylist* list) {
             return CL_END;
             break;
         }
-
     }
 
-
-    if (list->key == KY_PLC) {
+    if (list->key == KY_PLC)
+    {
         switch (subcl)
         {
         case CL_ST:
@@ -1490,11 +1690,10 @@ static classes command_to_class_aux(keylist* list) {
             return CL_END;
             break;
         }
-
     }
 
-
-    if (list->key == KY_JORB) {
+    if (list->key == KY_JORB)
+    {
         switch (subcl)
         {
         case CL_ST:
@@ -1549,35 +1748,31 @@ static classes command_to_class_aux(keylist* list) {
             return CL_END;
             break;
         }
-
     }
 
-
     return CL_END;
-
-
 }
 
+classes command_to_class(com_command *thecom)
+{
 
-classes command_to_class(com_command* thecom) {
-
-    keylist* list = make_keylist_class(thecom);
+    keylist *list = make_keylist_class(thecom);
     classes ret = command_to_class_aux(list);
     del_keylist(list);
     return ret;
 }
 
-
-
-
-void print_class_info(classes class, FILE* out) {
-    if (class_infos[class]) {
+void print_class_info(classes class, FILE *out)
+{
+    if (class_infos[class])
+    {
         class_infos[class](out);
         print_dbot_line(100, out);
     }
 }
 
-bool class_is_basis(classes cl) {
+bool class_is_basis(classes cl)
+{
     switch (cl)
     {
     case CL_ST:
@@ -1596,20 +1791,18 @@ bool class_is_basis(classes cl) {
     }
 }
 
-
-void info_htgen(FILE* out) {
+void info_htgen(FILE *out)
+{
 
     print_dtitle_box(10, false, out, 1, "Languages with a syntactic morphism where 1 and the generators have trivial H-classes : HTGEN.");
-
 }
 
 /*************/
 /* Star-free */
 /*************/
 
-
-
-void info_sf(FILE* out) {
+void info_sf(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Star-free languages : SF.");
     print_dline_box(0, out, " Definition: Languages defined by a star-free expression.");
     print_dline_box(0, out, " Characterizations :");
@@ -1617,10 +1810,10 @@ void info_sf(FILE* out) {
     print_dline_box(0, out, "  - Linear temporal logic (LTL).");
     print_dline_box(0, out, "  - Languages with an aperiodic syntactic monoid.");
     print_dline_box(0, out, "  - Languages with a counter-free minimal automaton.");
-
 }
 
-void info_sf_mod(FILE* out) {
+void info_sf_mod(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Star-free closure of MOD : SF(MOD).");
     print_dline_box(0, out, " Definition: Least class containing MOD closed under concatenation and Boolean operations.");
     print_dline_box(0, out, " Characterizations :");
@@ -1628,10 +1821,10 @@ void info_sf_mod(FILE* out) {
     print_dline_box(0, out, "  - Linear temporal logic with modular modalities (LTL(MOD)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose MOD-kernel is aperiodic.");
     print_dline_box(0, out, "  - Languages with a minimal automaton whose MOD-kernel is counter-free.");
-
 }
 
-void info_sf_amt(FILE* out) {
+void info_sf_amt(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Star-free closure of AMT : SF(AMT).");
     print_dline_box(0, out, " Definition: Least class containing AMT closed under concatenation and Boolean operations.");
     print_dline_box(0, out, " Characterizations :");
@@ -1639,10 +1832,10 @@ void info_sf_amt(FILE* out) {
     print_dline_box(0, out, "  - Linear temporal logic with alphabetic modular modalities (LTL(AMOD)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose AMT-kernel is aperiodic.");
     print_dline_box(0, out, "  - Languages with a minimal automaton whose AMT-kernel is counter-free.");
-
 }
 
-void info_sf_gr(FILE* out) {
+void info_sf_gr(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Star-free closure of GR : SF(GR).");
     print_dline_box(0, out, " Definition: Least class containing GR closed under concatenation and Boolean operations.");
     print_dline_box(0, out, " Characterizations :");
@@ -1650,25 +1843,23 @@ void info_sf_gr(FILE* out) {
     print_dline_box(0, out, "  - Linear temporal logic with group modalities (LTL(GR)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose GR-kernel is aperiodic.");
     print_dline_box(0, out, "  - Languages with a minimal automaton whose GR-kernel is counter-free.");
-
 }
-
-
 
 /**********************/
 /* Polynomial closure */
 /**********************/
 
-void info_ppt(FILE* out) {
+void info_ppt(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Positive piecewise testable languages : PPT.");
     print_dline_box(0, out, " Definition : Contains all finite unions of ST-monomials.");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level 1/2 in the Straubing-Thérien hierarchy (Pol(ST)).");
     print_dline_box(0, out, "  - Level Σ₁(<) in the alternation hierarchy of first-order logic with the linear order.");
     print_dline_box(0, out, "  - Languages with an syntactic ordered monoid M satisfying 1 ≤ s for all s ∊ M.");
-
 }
-void info_pol_mod(FILE* out) {
+void info_pol_mod(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Polynomial closure of MOD : Pol(MOD).");
     print_dline_box(0, out, " Definition : Contains all finite unions of MOD-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1676,9 +1867,9 @@ void info_pol_mod(FILE* out) {
     print_dline_box(0, out, "  - Level Σ₁(<,MOD) in the alternation hierarchy of first-order logic with the linear order and the");
     print_dline_box(0, out, "    modular predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose MOD-kernel satisfies 1 ≤ s for all s.");
-
 }
-void info_pol_amt(FILE* out) {
+void info_pol_amt(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Polynomial closure of AMT : Pol(AMT).");
     print_dline_box(0, out, " Definition : Contains all finite unions of AMT-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1686,9 +1877,9 @@ void info_pol_amt(FILE* out) {
     print_dline_box(0, out, "  - Level Σ₁(<,AMOD) in the alternation hierarchy of first-order logic with the linear order and the");
     print_dline_box(0, out, "    alphabetic modular predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose AMT-kernel satisfies 1 ≤ s for all s.");
-
 }
-void info_pol_gr(FILE* out) {
+void info_pol_gr(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Polynomial closure of GR : Pol(GR).");
     print_dline_box(0, out, " Definition : Contains all finite unions of GR-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1696,9 +1887,9 @@ void info_pol_gr(FILE* out) {
     print_dline_box(0, out, "  - Level Σ₁(<,GR) in the alternation hierarchy of first-order logic with the linear order and the");
     print_dline_box(0, out, "    group predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic monoid M which satisfies 1 ≤ e for all e ∊ E(M).");
-
 }
-void info_pol_dd(FILE* out) {
+void info_pol_dd(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Polynomial closure of DD : Pol(DD).");
     print_dline_box(0, out, " Definition : Contains all finite unions of DD-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1706,9 +1897,9 @@ void info_pol_dd(FILE* out) {
     print_dline_box(0, out, "  - Level Σ₁(<,+1) in the alternation hierarchy of first-order logic with the linear order and the");
     print_dline_box(0, out, "    successor.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose DD-orbits satisfy 1 ≤ s for all s.");
-
 }
-void info_pol_modp(FILE* out) {
+void info_pol_modp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Polynomial closure of MOD⁺ : Pol(MOD⁺).");
     print_dline_box(0, out, " Definition : Contains all finite unions of MOD⁺-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1716,9 +1907,9 @@ void info_pol_modp(FILE* out) {
     print_dline_box(0, out, "  - Level Σ₁(<,+1,MOD) in the alternation hierarchy of first-order logic with the linear order, the");
     print_dline_box(0, out, "    successor and the modular predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose MOD⁺-orbits satisfy 1 ≤ s for all s.");
-
 }
-void info_pol_amtp(FILE* out) {
+void info_pol_amtp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Polynomial closure of AMT⁺ : Pol(AMT⁺).");
     print_dline_box(0, out, " Definition : Contains all finite unions of AMT⁺-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1726,9 +1917,9 @@ void info_pol_amtp(FILE* out) {
     print_dline_box(0, out, "  - Level Σ₁(<,+1,AMOD) in the alternation hierarchy of first-order logic with the linear order, the");
     print_dline_box(0, out, "    successor and the alphabetic modular predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose AMT⁺-orbits satisfy 1 ≤ s for all s.");
-
 }
-void info_pol_grp(FILE* out) {
+void info_pol_grp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Polynomial closure of GR⁺ : Pol(GR⁺).");
     print_dline_box(0, out, " Definition : Contains all finite unions of GR⁺-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1736,9 +1927,9 @@ void info_pol_grp(FILE* out) {
     print_dline_box(0, out, "  - Level Σ₁(<,+1,GR) in the alternation hierarchy of first-order logic with the linear order, the");
     print_dline_box(0, out, "    successor and the group predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose GR⁺-orbits satisfy 1 ≤ s for all s.");
-
 }
-void info_pol2_st(FILE* out) {
+void info_pol2_st(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Polynomial closure of BPol(ST) : Pol₂(ST).");
     print_dline_box(0, out, " Definition : Contains all finite unions of BPol(ST)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1747,9 +1938,9 @@ void info_pol2_st(FILE* out) {
     print_dline_box(0, out, "  - Level Σ₂(<) in the alternation hierarchy of first-order logic with the linear order.");
     print_dline_box(0, out, "  - Level Σ₁(AT) in the alternation hierarchy of first-order logic with alphabetic predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(ST)-orbits satisfy 1 ≤ s for all s.");
-
 }
-void info_pol2_mod(FILE* out) {
+void info_pol2_mod(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Polynomial closure of BPol(MOD) : Pol₂(MOD).");
     print_dline_box(0, out, " Definition : Contains all finite unions of BPol(MOD)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1757,9 +1948,9 @@ void info_pol2_mod(FILE* out) {
     print_dline_box(0, out, "  - Level Σ₂(<,MOD) in the alternation hierarchy of first-order logic with the linear order and");
     print_dline_box(0, out, "    the modular predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(MOD)-orbits satisfy 1 ≤ s for all s.");
-
 }
-void info_pol2_amt(FILE* out) {
+void info_pol2_amt(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Polynomial closure of BPol(AMT) : Pol₂(AMT).");
     print_dline_box(0, out, " Definition : Contains all finite unions of BPol(AMT)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1767,9 +1958,9 @@ void info_pol2_amt(FILE* out) {
     print_dline_box(0, out, "  - Level Σ₂(<,AMOD) in the alternation hierarchy of first-order logic with the linear order and");
     print_dline_box(0, out, "    the alphabetic modular predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(AMT)-orbits satisfy 1 ≤ s for all s.");
-
 }
-void info_pol2_gr(FILE* out) {
+void info_pol2_gr(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Polynomial closure of BPol(GR) : Pol₂(GR).");
     print_dline_box(0, out, " Definition : Contains all finite unions of BPol(GR)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1777,9 +1968,9 @@ void info_pol2_gr(FILE* out) {
     print_dline_box(0, out, "  - Level Σ₂(<,GR) in the alternation hierarchy of first-order logic with the linear order and the");
     print_dline_box(0, out, "    group predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(GR)-orbits satisfy 1 ≤ s for all s.");
-
 }
-void info_pol2_dd(FILE* out) {
+void info_pol2_dd(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Polynomial closure of BPol(DD) : Pol₂(DD).");
     print_dline_box(0, out, " Definition : Contains all finite unions of BPol(DD)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1787,9 +1978,9 @@ void info_pol2_dd(FILE* out) {
     print_dline_box(0, out, "  - Level Σ₂(<,+1) in the alternation hierarchy of first-order logic with the linear order and");
     print_dline_box(0, out, "    the successor.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(DD)-orbits satisfy 1 ≤ s for all s.");
-
 }
-void info_pol2_modp(FILE* out) {
+void info_pol2_modp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Polynomial closure of BPol(MOD⁺) : Pol₂(MOD⁺).");
     print_dline_box(0, out, " Definition : Contains all finite unions of BPol(MOD⁺)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1797,9 +1988,9 @@ void info_pol2_modp(FILE* out) {
     print_dline_box(0, out, "  - Level Σ₂(<,+1,MOD) in the alternation hierarchy of first-order logic with the linear order, the");
     print_dline_box(0, out, "    successor and the modular predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(MOD⁺)-orbits satisfy 1 ≤ s for all s.");
-
 }
-void info_pol2_amtp(FILE* out) {
+void info_pol2_amtp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Polynomial closure of BPol(AMT⁺) : Pol₂(AMT⁺).");
     print_dline_box(0, out, " Definition : Contains all finite unions of BPol(AMT⁺)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1807,9 +1998,9 @@ void info_pol2_amtp(FILE* out) {
     print_dline_box(0, out, "  - Level Σ₂(<,+1,AMOD) in the alternation hierarchy of first-order logic with the linear order, the");
     print_dline_box(0, out, "    successor and the alphabetic modular predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(AMT⁺)-orbits satisfy 1 ≤ s for all s.");
-
 }
-void info_pol2_grp(FILE* out) {
+void info_pol2_grp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Polynomial closure of BPol(GR⁺) : Pol₂(GR⁺).");
     print_dline_box(0, out, " Definition : Contains all finite unions of BPol(GR⁺)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1817,25 +2008,23 @@ void info_pol2_grp(FILE* out) {
     print_dline_box(0, out, "  - Level Σ₂(<,+1,GR) in the alternation hierarchy of first-order logic with the linear order, the");
     print_dline_box(0, out, "    successor and the group predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(GR⁺)-orbits satisfy 1 ≤ s for all s.");
-
 }
-
 
 /******************************/
 /* Boolean Polynomial closure */
 /******************************/
 
-
-void info_pt(FILE* out) {
+void info_pt(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Piecewise testable languages : PT.");
     print_dline_box(0, out, " Definition : Contains all finite Boolean combinations of ST-monomials.");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the Straubing-Thérien hierarchy (BPol(ST)).");
     print_dline_box(0, out, "  - Level BΣ₁(<) in the alternation hierarchy of first-order logic with the linear order.");
     print_dline_box(0, out, "  - Languages with a J-trivial syntactic monoid.");
-
 }
-void info_bpol_mod(FILE* out) {
+void info_bpol_mod(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Boolean polynomial closure of MOD : BPol(MOD).");
     print_dline_box(0, out, " Definition : Contains all finite Boolean combinations of MOD-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1844,10 +2033,10 @@ void info_bpol_mod(FILE* out) {
     print_dline_box(0, out, "    modular predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism which satisfies (qr)ʷst(st)ʷ = (qr)ʷqt(st)ʷ for all q,r,s,t");
     print_dline_box(0, out, "    such that (q,s) is a MOD-pair.");
-
 }
 
-void info_bpol_amt(FILE* out) {
+void info_bpol_amt(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Boolean polynomial closure of AMT : BPol(AMT).");
     print_dline_box(0, out, " Definition : Contains all finite Boolean combinations of AMT-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1856,9 +2045,9 @@ void info_bpol_amt(FILE* out) {
     print_dline_box(0, out, "    the alphabetic modular predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism which satisfies (qr)ʷst(st)ʷ = (qr)ʷqt(st)ʷ for all q,r,s,t");
     print_dline_box(0, out, "    such that (q,s) is an AMT-pair.");
-
 }
-void info_bpol_gr(FILE* out) {
+void info_bpol_gr(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Boolean polynomial closure of GR : BPol(GR).");
     print_dline_box(0, out, " Definition : Contains all finite Boolean combinations of GR-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1866,9 +2055,9 @@ void info_bpol_gr(FILE* out) {
     print_dline_box(0, out, "  - Level BΣ₁(<,GR) in the alternation hierarchy of first-order logic with the linear order and the");
     print_dline_box(0, out, "    group predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic monoid which is a block group.");
-
 }
-void info_bpol_dd(FILE* out) {
+void info_bpol_dd(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Boolean polynomial closure of DD : BPol(DD).");
     print_dline_box(0, out, " Definition : Contains all finite Boolean combinations of DD-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1877,9 +2066,9 @@ void info_bpol_dd(FILE* out) {
     print_dline_box(0, out, "    successor.");
     print_dline_box(0, out, "  - Languages with a syntactic semigroup S which satisfies Knast's equation: for every q,r,s,t ∊ S");
     print_dline_box(0, out, "    and every e,f ∊ E(S), we have (eqfre)ʷ(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ.");
-
 }
-void info_bpol_modp(FILE* out) {
+void info_bpol_modp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Boolean polynomial closure of MOD⁺ : BPol(MOD⁺).");
     print_dline_box(0, out, " Definition : Contains all finite Boolean combinations of MOD⁺-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1888,9 +2077,9 @@ void info_bpol_modp(FILE* out) {
     print_dline_box(0, out, "    successor and the modular predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose strict MOD-kernel S satisfies Knast's equation:");
     print_dline_box(0, out, "    for all q,r,s,t ∊ S and all e,f ∊ E(S), we have (eqfre)ʷ(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ.");
-
 }
-void info_bpol_amtp(FILE* out) {
+void info_bpol_amtp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Boolean polynomial closure of AMT⁺ : BPol(AMT⁺).");
     print_dline_box(0, out, " Definition : Contains all finite Boolean combinations of AMT⁺-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1899,9 +2088,9 @@ void info_bpol_amtp(FILE* out) {
     print_dline_box(0, out, "    the successor and the alphabetic modular predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism which satisfies (eqfre)ʷsft(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ");
     print_dline_box(0, out, "    for all q,r,s,t and all strict idempotents e,f such (q,s) is an AMT-pair.");
-
 }
-void info_bpol_grp(FILE* out) {
+void info_bpol_grp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Boolean polynomial closure of GR⁺ : BPol(GR⁺).");
     print_dline_box(0, out, " Definition : Contains all finite Boolean combinations of GR⁺-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1910,9 +2099,9 @@ void info_bpol_grp(FILE* out) {
     print_dline_box(0, out, "    successor and the group predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism which satisfies (eqfre)ʷsft(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ");
     print_dline_box(0, out, "    for all q,r,s,t and all strict idempotents e,f such (q,s) is a GR-pair.");
-
 }
-void info_bpol2_st(FILE* out) {
+void info_bpol2_st(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Boolean polynomial closure of BPol(ST) : BPol₂(ST).");
     print_dline_box(0, out, " Definition : Contains all finite Boolean combinations of BPol(ST)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1924,9 +2113,9 @@ void info_bpol2_st(FILE* out) {
     print_dline_box(0, out, "     • (eqfre)ʷ(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ for all q,r,s,t ∊ M and e,f ∊ E(M) such that {q,e,f},");
     print_dline_box(0, out, "       {r,e,f}, {s,e,f} and {t,e,f} are BPol(ST)-sets.");
     print_dline_box(0, out, "     • (esete)ʷ⁺¹ = (esete)ʷt(esete)ʷ for all s,t ∊ M and e ∊ E(M) where (e,s) is a BPol(ST)-pair.");
-
 }
-void info_bpol2_mod(FILE* out) {
+void info_bpol2_mod(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Boolean polynomial closure of BPol(MOD) : BPol₂(MOD).");
     print_dline_box(0, out, " Definition : Contains all finite Boolean combinations of BPol(MOD)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1937,9 +2126,9 @@ void info_bpol2_mod(FILE* out) {
     print_dline_box(0, out, "     • (eqfre)ʷ(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ for all q,r,s,t ∊ M and e,f ∊ E(M) such that {q,e,f},");
     print_dline_box(0, out, "       {r,e,f}, {s,e,f} and {t,e,f} are BPol(MOD)-sets.");
     print_dline_box(0, out, "     • (esete)ʷ⁺¹ = (esete)ʷt(esete)ʷ for all s,t ∊ M and e ∊ E(M) where (e,s) is a BPol(MOD)-pair.");
-
 }
-void info_bpol2_amt(FILE* out) {
+void info_bpol2_amt(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Boolean polynomial closure of BPol(AMT) : BPol₂(AMT).");
     print_dline_box(0, out, " Definition : Contains all finite Boolean combinations of BPol(AMT)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1950,9 +2139,9 @@ void info_bpol2_amt(FILE* out) {
     print_dline_box(0, out, "     • (eqfre)ʷ(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ for all q,r,s,t ∊ M and e,f ∊ E(M) such that {q,e,f},");
     print_dline_box(0, out, "       {r,e,f}, {s,e,f} and {t,e,f} are BPol(AMT)-sets.");
     print_dline_box(0, out, "     • (esete)ʷ⁺¹ = (esete)ʷt(esete)ʷ for all s,t ∊ M and e ∊ E(M) where (e,s) is a BPol(AMT)-pair.");
-
 }
-void info_bpol2_gr(FILE* out) {
+void info_bpol2_gr(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Boolean polynomial closure of BPol(GR) : BPol₂(GR).");
     print_dline_box(0, out, " Definition : Contains all finite Boolean combinations of BPol(GR)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1963,9 +2152,9 @@ void info_bpol2_gr(FILE* out) {
     print_dline_box(0, out, "     • (eqfre)ʷ(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ for all q,r,s,t ∊ M and e,f ∊ E(M) such that {q,e,f},");
     print_dline_box(0, out, "       {r,e,f}, {s,e,f} and {t,e,f} are BPol(GR)-sets.");
     print_dline_box(0, out, "     • (esete)ʷ⁺¹ = (esete)ʷt(esete)ʷ for all s,t ∊ M and e ∊ E(M) where (e,s) is a BPol(GR)-pair.");
-
 }
-void info_bpol2_dd(FILE* out) {
+void info_bpol2_dd(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Boolean polynomial closure of BPol(DD) : BPol₂(DD).");
     print_dline_box(0, out, " Definition : Contains all finite Boolean combinations of BPol(DD)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1976,9 +2165,9 @@ void info_bpol2_dd(FILE* out) {
     print_dline_box(0, out, "     • (eqfre)ʷ(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ for all q,r,s,t ∊ M and e,f ∊ E(M) such that {q,e,f},");
     print_dline_box(0, out, "       {r,e,f}, {s,e,f} and {t,e,f} are BPol(DD)-sets.");
     print_dline_box(0, out, "     • (esete)ʷ⁺¹ = (esete)ʷt(esete)ʷ for all s,t ∊ M and e ∊ E(M) where (e,s) is a BPol(DD)-pair.");
-
 }
-void info_bpol2_modp(FILE* out) {
+void info_bpol2_modp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Boolean polynomial closure of BPol(MOD⁺) : BPol₂(MOD⁺).");
     print_dline_box(0, out, " Definition : Contains all finite Boolean combinations of BPol(MOD⁺)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -1989,9 +2178,9 @@ void info_bpol2_modp(FILE* out) {
     print_dline_box(0, out, "     • (eqfre)ʷ(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ for all q,r,s,t ∊ M and e,f ∊ E(M) such that {q,e,f},");
     print_dline_box(0, out, "       {r,e,f}, {s,e,f} and {t,e,f} are BPol(MOD⁺)-sets.");
     print_dline_box(0, out, "     • (esete)ʷ⁺¹ = (esete)ʷt(esete)ʷ for all s,t ∊ M and e ∊ E(M) where (e,s) is a BPol(MOD⁺)-pair.");
-
 }
-void info_bpol2_amtp(FILE* out) {
+void info_bpol2_amtp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Boolean polynomial closure of BPol(AMT⁺) : BPol₂(AMT⁺).");
     print_dline_box(0, out, " Definition : Contains all finite Boolean combinations of BPol(AMT⁺)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -2002,9 +2191,9 @@ void info_bpol2_amtp(FILE* out) {
     print_dline_box(0, out, "     • (eqfre)ʷ(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ for all q,r,s,t ∊ M and e,f ∊ E(M) such that {q,e,f},");
     print_dline_box(0, out, "       {r,e,f}, {s,e,f} and {t,e,f} are BPol(AMT⁺)-sets.");
     print_dline_box(0, out, "     • (esete)ʷ⁺¹ = (esete)ʷt(esete)ʷ for all s,t ∊ M and e ∊ E(M) where (e,s) is a BPol(AMT⁺)-pair.");
-
 }
-void info_bpol2_grp(FILE* out) {
+void info_bpol2_grp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Boolean polynomial closure of BPol(GR⁺) : BPol₂(GR⁺).");
     print_dline_box(0, out, " Definition : Contains all finite Boolean combinations of BPol(GR⁺)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -2015,55 +2204,64 @@ void info_bpol2_grp(FILE* out) {
     print_dline_box(0, out, "     • (eqfre)ʷ(esfte)ʷ = (eqfre)ʷqft(esfte)ʷ for all q,r,s,t ∊ M and e,f ∊ E(M) such that {q,e,f},");
     print_dline_box(0, out, "       {r,e,f}, {s,e,f} and {t,e,f} are BPol(GR⁺)-sets.");
     print_dline_box(0, out, "     • (esete)ʷ⁺¹ = (esete)ʷt(esete)ʷ for all s,t ∊ M and e ∊ E(M) where (e,s) is a BPol(GR⁺)-pair.");
-
 }
 
-void info_jorb_dd(FILE* out) {
+void info_jorb_dd(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Languages with a syntactic morphism whose DD-orbits are J-trivial : JORB(DD).");
 }
 
-void info_jorb_mod(FILE* out) {
+void info_jorb_mod(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Languages with a syntactic morphism whose MOD-kernel is J-trivial : JORB(MOD).");
 }
 
-void info_jorb_amt(FILE* out) {
+void info_jorb_amt(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Languages with a syntactic morphism whose AMT-kernel is J-trivial : JORB(AMT).");
 }
 
-void info_jorb_modp(FILE* out) {
+void info_jorb_modp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Languages with a syntactic morphism whose MOD⁺-orbits are J-trivial : JORB(MOD⁺).");
 }
 
-void info_jorb_amtp(FILE* out) {
+void info_jorb_amtp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Languages with a syntactic morphism whose AMT⁺-orbits are J-trivial : JORB(AMT⁺).");
 }
 
-void info_jorb_grp(FILE* out) {
+void info_jorb_grp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Languages with a syntactic morphism whose GR⁺-orbits are J-trivial : JORB(GR).");
 }
 
-void info_jorb_at(FILE* out) {
+void info_jorb_at(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Languages with a syntactic morphism whose AT-orbits are J-trivial : JORB(AT).");
 }
 
-void info_knastamtp(FILE* out) {
+void info_knastamtp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Languages with a syntactic morphism satisfying that AMT⁺-variant of Knast's equation : KNAST(AMT⁺).");
 }
 
-void info_knastgrp(FILE* out) {
+void info_knastgrp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Languages with a syntactic morphism satisfying that GR⁺-variant of Knast's equation : KNAST(GR⁺).");
 }
 
-void info_knastat(FILE* out) {
+void info_knastat(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Languages with a syntactic morphism satisfying that AT-variant of Knast's equation : KNASTAT.");
 }
-
 
 /**********************************/
 /* Unambiguous Polynomial closure */
 /**********************************/
 
-void info_upol_dd(FILE* out) {
+void info_upol_dd(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unambiguous polynomial closure of DD : UPol(DD).");
     print_dline_box(0, out, " Definition : Contains all finite disjoint unions of unambiguous DD-monomials.");
     print_dline_box(0, out, " Characterizations : ");
@@ -2071,28 +2269,32 @@ void info_upol_dd(FILE* out) {
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose DD-orbits are trivial.");
 }
 
-void info_upol_modp(FILE* out) {
+void info_upol_modp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unambiguous polynomial closure of MOD⁺ : UPol(MOD⁺).");
     print_dline_box(0, out, " Definition : Contains all finite disjoint unions of unambiguous MOD⁺-monomials.");
     print_dline_box(0, out, "  - Least Boolean agebra containing MOD and the languages wA* and A*w where w is a word.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose MOD⁺-orbits are trivial.");
 }
 
-void info_upol_amtp(FILE* out) {
+void info_upol_amtp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unambiguous polynomial closure of AMT⁺ : UPol(AMT⁺).");
     print_dline_box(0, out, " Definition : Contains all finite disjoint unions of unambiguous AMT⁺-monomials.");
     print_dline_box(0, out, "  - Least Boolean agebra containing AMT and the languages wA* and A*w where w is a word.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose AMT⁺-orbits are trivial.");
 }
 
-void info_upol_grp(FILE* out) {
+void info_upol_grp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unambiguous polynomial closure of GR⁺ : UPol(GR⁺).");
     print_dline_box(0, out, " Definition : Contains all finite disjoint unions of unambiguous GR⁺-monomials.");
     print_dline_box(0, out, "  - Least Boolean agebra containing GR and the languages wA* and A*w where w is a word.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose GR⁺-orbits are trivial.");
 }
 
-void info_ubpol2_st(FILE* out) {
+void info_ubpol2_st(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unambiguous polynomial closure of BPol₂(ST) : UPol(BPol₂(ST)).");
     print_dline_box(0, out, " Definition : Contains all finite disjoint unions of unambiguous BPol₂(ST)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -2100,9 +2302,9 @@ void info_ubpol2_st(FILE* out) {
     print_dline_box(0, out, "  - Level Δ₂(AT) in the alternation hierarchy of first-order logic with alphabetic predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism satisfying (esete)ʷ⁺¹ = (esete)ʷt(esete)ʷ for all s,t ∊ M");
     print_dline_box(0, out, "    and e ∊ E(M) where (e,s) is a BPol(ST)-pair.");
-
 }
-void info_ubpol2_mod(FILE* out) {
+void info_ubpol2_mod(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unambiguous polynomial closure of BPol₂(MOD) : UPol(BPol₂(MOD)).");
     print_dline_box(0, out, " Definition : Contains all finite disjoint unions of unambiguous BPol₂(MOD)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -2110,9 +2312,9 @@ void info_ubpol2_mod(FILE* out) {
     print_dline_box(0, out, "    the modular predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism satisfying (esete)ʷ⁺¹ = (esete)ʷt(esete)ʷ for all s,t ∊ M");
     print_dline_box(0, out, "    and e ∊ E(M) where (e,s) is a BPol(MOD)-pair.");
-
 }
-void info_ubpol2_amt(FILE* out) {
+void info_ubpol2_amt(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unambiguous polynomial closure of BPol₂(AMT) : UPol(BPol₂(AMT)).");
     print_dline_box(0, out, " Definition : Contains all finite disjoint unions of unambiguous BPol₂(AMT)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -2120,9 +2322,9 @@ void info_ubpol2_amt(FILE* out) {
     print_dline_box(0, out, "    the alphabetic modular predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism satisfying (esete)ʷ⁺¹ = (esete)ʷt(esete)ʷ for all s,t ∊ M");
     print_dline_box(0, out, "    and e ∊ E(M) where (e,s) is a BPol(AMT)-pair.");
-
 }
-void info_ubpol2_gr(FILE* out) {
+void info_ubpol2_gr(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unambiguous polynomial closure of BPol₂(GR) : UPol(BPol₂(GR)).");
     print_dline_box(0, out, " Definition : Contains all finite disjoint unions of unambiguous BPol₂(GR)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -2130,9 +2332,9 @@ void info_ubpol2_gr(FILE* out) {
     print_dline_box(0, out, "    the group predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism satisfying (esete)ʷ⁺¹ = (esete)ʷt(esete)ʷ for all s,t ∊ M");
     print_dline_box(0, out, "    and e ∊ E(M) where (e,s) is a BPol(GR)-pair.");
-
 }
-void info_ubpol2_dd(FILE* out) {
+void info_ubpol2_dd(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unambiguous polynomial closure of BPol₂(DD) : UPol(BPol₂(DD)).");
     print_dline_box(0, out, " Definition : Contains all finite disjoint unions of unambiguous BPol₂(DD)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -2140,9 +2342,9 @@ void info_ubpol2_dd(FILE* out) {
     print_dline_box(0, out, "    the successor.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism satisfying (esete)ʷ⁺¹ = (esete)ʷt(esete)ʷ for all s,t ∊ M");
     print_dline_box(0, out, "    and e ∊ E(M) where (e,s) is a BPol(DD)-pair.");
-
 }
-void info_ubpol2_modp(FILE* out) {
+void info_ubpol2_modp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unambiguous polynomial closure of BPol₂(MOD⁺) : UPol(BPol₂(MOD⁺)).");
     print_dline_box(0, out, " Definition : Contains all finite disjoint unions of unambiguous BPol₂(MOD⁺)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -2150,9 +2352,9 @@ void info_ubpol2_modp(FILE* out) {
     print_dline_box(0, out, "    the successor and the modular predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism satisfying (esete)ʷ⁺¹ = (esete)ʷt(esete)ʷ for all s,t ∊ M");
     print_dline_box(0, out, "    and e ∊ E(M) where (e,s) is a BPol(MOD⁺)-pair.");
-
 }
-void info_ubpol2_amtp(FILE* out) {
+void info_ubpol2_amtp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unambiguous polynomial closure of BPol₂(AMT⁺) : UPol(BPol₂(AMT⁺)).");
     print_dline_box(0, out, " Definition : Contains all finite disjoint unions of unambiguous BPol₂(AMT⁺)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -2160,9 +2362,9 @@ void info_ubpol2_amtp(FILE* out) {
     print_dline_box(0, out, "    the successor and the alphabetic modular predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism satisfying (esete)ʷ⁺¹ = (esete)ʷt(esete)ʷ for all s,t ∊ M");
     print_dline_box(0, out, "    and e ∊ E(M) where (e,s) is a BPol(AMT⁺)-pair.");
-
 }
-void info_ubpol2_grp(FILE* out) {
+void info_ubpol2_grp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unambiguous polynomial closure of BPol₂(GR⁺) : UPol(BPol₂(GR⁺)).");
     print_dline_box(0, out, " Definition : Contains all finite disjoint unions of unambiguous BPol₂(GR⁺)-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -2170,16 +2372,14 @@ void info_ubpol2_grp(FILE* out) {
     print_dline_box(0, out, "    the successor and the group predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism satisfying (esete)ʷ⁺¹ = (esete)ʷt(esete)ʷ for all s,t ∊ M");
     print_dline_box(0, out, "    and e ∊ E(M) where (e,s) is a BPol(GR⁺)-pair.");
-
 }
-
 
 /***************/
 /* UTL closure */
 /***************/
 
-
-void info_ul(FILE* out) {
+void info_ul(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unambiguous languages : UL.");
     print_dline_box(0, out, " Definition : Contains all finite disjoint unions of unambiguous AT-monomials.");
     print_dline_box(0, out, " Characterizations :");
@@ -2187,11 +2387,10 @@ void info_ul(FILE* out) {
     print_dline_box(0, out, "  - Level Δ₂(<) in the alternation hierarchy of first-order logic with the linear order.");
     print_dline_box(0, out, "  - Unary temporal logic with finally and previously (TL = F + P).");
     print_dline_box(0, out, "  - Languages with a syntactic monoid in DA.");
-
 }
 
-
-void info_utl_mod(FILE* out) {
+void info_utl_mod(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unary temporal logic closure of MOD : TL(MOD).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Unambiguous polynomial closure of BPol(MOD) (UPol(BPol(MOD))).");
@@ -2199,10 +2398,10 @@ void info_utl_mod(FILE* out) {
     print_dline_box(0, out, "  - Level Δ₂(<,MOD) in the alternation hierarchy of first-order logic with the linear order and");
     print_dline_box(0, out, "    the modular predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose MOD-kernel is in DA.");
-
 }
 
-void info_utl_amt(FILE* out) {
+void info_utl_amt(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unary temporal logic closure of AMT : TL(AMT).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Unambiguous polynomial closure of BPol(AMT) (UPol(BPol(AMT))).");
@@ -2211,9 +2410,9 @@ void info_utl_amt(FILE* out) {
     print_dline_box(0, out, "  - Level Δ₂(<,AMOD) in the alternation hierarchy of first-order logic with the linear order and");
     print_dline_box(0, out, "    the alphabetic modular predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose MOD-kernel is in DA.");
-
 }
-void info_utl_gr(FILE* out) {
+void info_utl_gr(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unary temporal logic closure of GR : TL(GR).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Unambiguous polynomial closure of BPol(GR) (UPol(BPol(GR))).");
@@ -2221,9 +2420,9 @@ void info_utl_gr(FILE* out) {
     print_dline_box(0, out, "  - Level Δ₂(<,GR) in the alternation hierarchy of first-order logic with the linear order and");
     print_dline_box(0, out, "    the group predicates.");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose GR-kernel is in DA.");
-
 }
-void info_utl_dd(FILE* out) {
+void info_utl_dd(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unary temporal logic closure of DD : TL(DD).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Unambiguous polynomial closure BPol(DD) (UPol(BPol(DD))).");
@@ -2232,9 +2431,9 @@ void info_utl_dd(FILE* out) {
     print_dline_box(0, out, "    successor.");
     print_dline_box(0, out, "  - Unary temporal logic with finally, next, previously and yesterday (TLX = F + X + P + Y).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose DD-orbits are in DA.");
-
 }
-void info_utl_modp(FILE* out) {
+void info_utl_modp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unary temporal logic closure of MOD⁺ : TL(MOD⁺).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Unambiguous polynomial closure of BPol(MOD⁺) (UPol(BPol(MOD⁺))).");
@@ -2244,9 +2443,9 @@ void info_utl_modp(FILE* out) {
     print_dline_box(0, out, "    the successor and the modular predicates.");
     print_dline_box(0, out, "  - Extended unary temporal logic closure of MOD (TLX(MOD)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose MOD⁺-orbits are in DA.");
-
 }
-void info_utl_amtp(FILE* out) {
+void info_utl_amtp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unary temporal logic closure of AMT⁺ : TL(AMT⁺).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Unambiguous polynomial closure of BPol(AMT⁺) (UPol(BPol(AMT⁺))).");
@@ -2256,9 +2455,9 @@ void info_utl_amtp(FILE* out) {
     print_dline_box(0, out, "    the successor and the alphabetic modular predicates.");
     print_dline_box(0, out, "  - Extended unary temporal logic closure of AMT (TLX(AMT)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose AMT⁺-orbits are in DA.");
-
 }
-void info_utl_grp(FILE* out) {
+void info_utl_grp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unary temporal logic closure of GR⁺ : TL(GR⁺).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Unambiguous polynomial closure of BPol(GR⁺) (UPol(BPol(GR⁺))).");
@@ -2268,15 +2467,10 @@ void info_utl_grp(FILE* out) {
     print_dline_box(0, out, "    the successor and the group predicates.");
     print_dline_box(0, out, "  - Extended unary temporal logic closure of GR (TLX(GR)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose GR⁺-orbits are in DA.");
-
 }
 
-
-
-
-
-
-void info_utl2_st(FILE* out) {
+void info_utl2_st(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unary temporal logic closure of TL(ST) : TL₂(ST).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Two-variable first-order logic with alphabetic predicates (FO²(AT)).");
@@ -2284,388 +2478,361 @@ void info_utl2_st(FILE* out) {
     print_dline_box(0, out, "  - Level one in the nested temporal hierarchy of basis BPol(ST) (TL(BPol(ST))).");
     print_dline_box(0, out, "  - Level two in the nested temporal hierarchy of basis ST (TL₂(ST)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(ST)-orbits are in DA.");
-
 }
-void info_utl2_mod(FILE* out) {
+void info_utl2_mod(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unary temporal logic closure of TL(MOD) : TL₂(MOD).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the nested temporal hierarchy of basis BPol(MOD) (TL(BPol(MOD))).");
     print_dline_box(0, out, "  - Level two in the nested temporal hierarchy of basis MOD (TL₂(MOD)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(MOD)-orbits are in DA.");
-
 }
-void info_utl2_amt(FILE* out) {
+void info_utl2_amt(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unary temporal logic closure of TL(AMT) : TL₂(AMT).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the nested temporal hierarchy of basis BPol(AMT) (TL(BPol(AMT))).");
     print_dline_box(0, out, "  - Level two in the nested temporal hierarchy of basis AMT (TL₂(AMT)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(AMT)-orbits are in DA.");
-
 }
-void info_utl2_gr(FILE* out) {
+void info_utl2_gr(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unary temporal logic closure of TL(GR) : TL₂(GR).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the nested temporal hierarchy of basis BPol(GR) (TL(BPol(GR))).");
     print_dline_box(0, out, "  - Level two in the nested temporal hierarchy of basis GR (TL₂(GR)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(GR)-orbits are in DA.");
-
 }
-void info_utl2_dd(FILE* out) {
+void info_utl2_dd(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unary temporal logic closure of TL(DD) : TL₂(DD).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the nested temporal hierarchy of basis LT (TL(LT)).");
     print_dline_box(0, out, "  - Level one in the nested temporal hierarchy of basis BPol(DD) (TL(BPol(DD))).");
     print_dline_box(0, out, "  - Level two in the nested temporal hierarchy of basis DD (TL₂(DD)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(DD)-orbits are in DA.");
-
 }
-void info_utl2_modp(FILE* out) {
+void info_utl2_modp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unary temporal logic closure of TL(MOD⁺) : TL₂(MOD⁺).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the nested temporal hierarchy of basis BPol(MOD⁺) (TL(BPol(MOD⁺))).");
     print_dline_box(0, out, "  - Level two in the nested temporal hierarchy of basis MOD⁺ (TL₂(MOD⁺)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(MOD⁺)-orbits are in DA.");
-
 }
-void info_utl2_amtp(FILE* out) {
+void info_utl2_amtp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unary temporal logic closure of TL(AMT⁺) : TL₂(AMT⁺).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the nested temporal hierarchy of basis BPol(AMT⁺) (TL(BPol(AMT⁺))).");
     print_dline_box(0, out, "  - Level two in the nested temporal hierarchy of basis AMT⁺ (TL₂(AMT⁺)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(AMT⁺)-orbits are in DA.");
-
 }
-void info_utl2_grp(FILE* out) {
+void info_utl2_grp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Unary temporal logic closure of TL(GR⁺) : TL₂(GR⁺).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the nested temporal hierarchy of basis BPol(GR⁺) (TL(BPol(GR⁺))).");
     print_dline_box(0, out, "  - Level two in the nested temporal hierarchy of basis GR⁺ (TL₂(GR⁺)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(GR⁺)-orbits are in DA.");
-
 }
-
-
-
-
 
 /***************/
 /* FTL closure */
 /***************/
 
-
-
-
-void info_ftl_st(FILE* out) {
+void info_ftl_st(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Future temporal logic closure of ST : FL(ST).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Right polynomial closure of BPol(ST) (RPol(BPol(ST))).");
     print_dline_box(0, out, "  - Unary temporal logic with finally (FL = F).");
     print_dline_box(0, out, "  - Languages with an L-trivial syntactic monoid.");
-
 }
 
-
-void info_ftl_mod(FILE* out) {
+void info_ftl_mod(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Future temporal logic closure of MOD : FL(MOD).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Right polynomial closure of BPol(MOD) (RPol(BPol(MOD))).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose MOD-kernel is L-trivial.");
-
 }
 
-void info_ftl_amt(FILE* out) {
+void info_ftl_amt(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Future temporal logic closure of AMT : FL(AMT).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Right polynomial closure of BPol(AMT) (RPol(BPol(AMT))).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose AMT-kernel is L-trivial.");
-
 }
-void info_ftl_gr(FILE* out) {
+void info_ftl_gr(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Future temporal logic closure of GR : FL(GR).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Right polynomial closure of BPol(GR) (RPol(BPol(GR))).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose GR-kernel is L-trivial.");
-
 }
-void info_ftl_dd(FILE* out) {
+void info_ftl_dd(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Future temporal logic closure of DD : FL(DD).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Right polynomial closure of BPol(DD) (RPol(BPol(DD))).");
     print_dline_box(0, out, "  - Unary temporal logic with finally and next (FLX = F + X).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose DD-orbits are L-trivial.");
-
 }
-void info_ftl_modp(FILE* out) {
+void info_ftl_modp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Future temporal logic closure of MOD⁺ : FL(MOD⁺).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Right polynomial closure of BPol(MOD⁺) (RPol(BPol(MOD⁺))).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose MOD⁺-orbits are L-trivial.");
-
 }
-void info_ftl_amtp(FILE* out) {
+void info_ftl_amtp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Future temporal logic closure of AMT⁺ : FL(AMT⁺).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Right polynomial closure of BPol(AMT⁺) (RPol(BPol(AMT⁺))).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose AMT⁺-orbits are L-trivial.");
-
 }
-void info_ftl_grp(FILE* out) {
+void info_ftl_grp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Future temporal logic closure of GR⁺ : FL(GR⁺).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Right polynomial closure of BPol(GR⁺) (RPol(BPol(GR⁺))).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose GR⁺-orbits are L-trivial.");
-
 }
 
-
-
-
-void info_ftl2_st(FILE* out) {
+void info_ftl2_st(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Future temporal logic closure of FL(ST) : FL₂(ST).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis AT (FL(AT)).");
     print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(ST) (FL(BPol(ST))).");
     print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis ST (FL₂(ST)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(ST)-orbits are L-trivial.");
-
 }
-void info_ftl2_mod(FILE* out) {
+void info_ftl2_mod(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Future temporal logic closure of FL(MOD) : FL₂(MOD).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(MOD) (FL(BPol(MOD))).");
     print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis MOD (FL₂(MOD)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(MOD)-orbits are L-trivial.");
-
 }
-void info_ftl2_amt(FILE* out) {
+void info_ftl2_amt(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Future temporal logic closure of FL(AMT) : FL₂(AMT).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(AMT) (FL(BPol(AMT))).");
     print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis AMT (FL₂(AMT)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(AMT)-orbits are L-trivial.");
-
 }
-void info_ftl2_gr(FILE* out) {
+void info_ftl2_gr(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Future temporal logic closure of FL(GR) : FL₂(GR).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(GR) (FL(BPol(GR))).");
     print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis GR (FL₂(GR)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(GR)-orbits are L-trivial.");
-
 }
-void info_ftl2_dd(FILE* out) {
+void info_ftl2_dd(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Future temporal logic closure of FL(DD) : FL₂(DD).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis LT (FL(LT)).");
     print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(DD) (FL(BPol(DD))).");
     print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis DD (FL₂(DD)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(DD)-orbits are L-trivial.");
-
 }
-void info_ftl2_modp(FILE* out) {
+void info_ftl2_modp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Future temporal logic closure of FL(MOD⁺) : FL₂(MOD⁺).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(MOD⁺) (FL(BPol(MOD⁺))).");
     print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis MOD⁺ (FL₂(MOD⁺)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(MOD⁺)-orbits are L-trivial.");
-
 }
-void info_ftl2_amtp(FILE* out) {
+void info_ftl2_amtp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Future temporal logic closure of FL(AMT⁺) : FL₂(AMT⁺).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(AMT⁺) (FL(BPol(AMT⁺))).");
     print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis AMT⁺ (FL₂(AMT⁺)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(AMT⁺)-orbits are L-trivial.");
-
 }
-void info_ftl2_grp(FILE* out) {
+void info_ftl2_grp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Future temporal logic closure of FL(GR⁺) : FL₂(GR⁺).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(GR⁺) (FL(BPol(GR⁺))).");
     print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis GR⁺ (FL₂(GR⁺)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(GR⁺)-orbits are L-trivial.");
-
 }
-
-
-
-
-
-
-
-
 
 /***************/
 /* PTL closure */
 /***************/
 
-
-
-
-void info_ptl_st(FILE* out) {
+void info_ptl_st(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of ST : PL(ST).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Left polynomial closure of BPol(ST) (LPol(BPol(ST))).");
     print_dline_box(0, out, "  - Unary temporal logic with previously (PL = P).");
     print_dline_box(0, out, "  - Languages with an R-trivial syntactic monoid.");
-
 }
 
-
-void info_ptl_mod(FILE* out) {
+void info_ptl_mod(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of MOD : PL(MOD).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Left polynomial closure of BPol(MOD) (LPol(BPol(MOD))).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose MOD-kernel is R-trivial.");
-
 }
 
-void info_ptl_amt(FILE* out) {
+void info_ptl_amt(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of AMT : PL(AMT).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Left polynomial closure of BPol(AMT) (LPol(BPol(AMT))).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose AMT-kernel is R-trivial.");
-
 }
-void info_ptl_gr(FILE* out) {
+void info_ptl_gr(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of GR : PL(GR).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Left polynomial closure of BPol(GR) (LPol(BPol(GR))).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose GR-kernel is R-trivial.");
-
 }
-void info_ptl_dd(FILE* out) {
+void info_ptl_dd(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of DD : PL(DD).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Left polynomial closure of BPol(DD) (LPol(BPol(DD))).");
     print_dline_box(0, out, "  - Unary temporal logic with previously and yesterday (PLX = P + Y).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose DD-orbits are R-trivial.");
-
 }
-void info_ptl_modp(FILE* out) {
+void info_ptl_modp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of MOD⁺ : PL(MOD⁺).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Left polynomial closure of BPol(MOD⁺) (LPol(BPol(MOD⁺))).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose MOD⁺-orbits are R-trivial.");
-
 }
-void info_ptl_amtp(FILE* out) {
+void info_ptl_amtp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of AMT⁺ : PL(AMT⁺).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Left polynomial closure of BPol(AMT⁺) (LPol(BPol(AMT⁺))).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose AMT⁺-orbits are R-trivial.");
-
 }
-void info_ptl_grp(FILE* out) {
+void info_ptl_grp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of GR⁺ : PL(GR⁺).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Left polynomial closure of BPol(GR⁺) (LPol(BPol(GR⁺))).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose GR⁺-orbits are R-trivial.");
-
 }
 
-
-
-
-void info_ptl2_st(FILE* out) {
+void info_ptl2_st(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of PL(ST) : PL₂(ST).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis AT (PL(AT)).");
     print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(ST) (PL(BPol(ST))).");
     print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis ST (PL₂(ST)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(ST)-orbits are R-trivial.");
-
 }
-void info_ptl2_mod(FILE* out) {
+void info_ptl2_mod(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of PL(MOD) : PL₂(MOD).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(MOD) (PL(BPol(MOD))).");
     print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis MOD (PL₂(MOD)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(MOD)-orbits are R-trivial.");
-
 }
-void info_ptl2_amt(FILE* out) {
+void info_ptl2_amt(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of PL(AMT) : PL₂(AMT).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(AMT) (PL(BPol(AMT))).");
     print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis AMT (PL₂(AMT)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(AMT)-orbits are R-trivial.");
-
 }
-void info_ptl2_gr(FILE* out) {
+void info_ptl2_gr(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of PL(GR) : PL₂(GR).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(GR) (PL(BPol(GR))).");
     print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis GR (PL₂(GR)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(GR)-orbits are R-trivial.");
-
 }
-void info_ptl2_dd(FILE* out) {
+void info_ptl2_dd(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of PL(DD) : PL₂(DD).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis LT (PL(LT)).");
     print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(DD) (PL(BPol(DD))).");
     print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis DD (PL₂(DD)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(DD)-orbits are R-trivial.");
-
 }
-void info_ptl2_modp(FILE* out) {
+void info_ptl2_modp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of PL(MOD⁺) : PL₂(MOD⁺).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(MOD⁺) (PL(BPol(MOD⁺))).");
     print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis MOD⁺ (PL₂(MOD⁺)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(MOD⁺)-orbits are R-trivial.");
-
 }
-void info_ptl2_amtp(FILE* out) {
+void info_ptl2_amtp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of PL(AMT⁺) : PL₂(AMT⁺).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(AMT⁺) (PL(BPol(AMT⁺))).");
     print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis AMT⁺ (PL₂(AMT⁺)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(AMT⁺)-orbits are R-trivial.");
-
 }
-void info_ptl2_grp(FILE* out) {
+void info_ptl2_grp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of PL(GR⁺) : PL₂(GR⁺).");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(GR⁺) (PL(BPol(GR⁺))).");
     print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis GR⁺ (PL₂(GR⁺)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(GR⁺)-orbits are R-trivial.");
-
 }
-
 
 /******************/
 /* Single classes */
 /******************/
 
-void info_at(FILE* out) {
+void info_at(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Alphabet testable languages : AT.");
     print_dline_box(0, out, " Definition : Boolean combinations of languages A*aA* where a ∊ A is a letter.");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - One variable first-order logic (FO¹(∅)).");
     print_dline_box(0, out, "  - Languages with an idempotent and commutative syntactic monoid.");
-
 }
-void info_att(FILE* out) {
+void info_att(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Alphabet threshold testable languages : ATT.");
     print_dline_box(0, out, " Definition : Boolean combinations of languages of the form (A*aA*)ᵏ where a ∊ A is a letter");
     print_dline_box(0, out, "    and k ≥ 1 is a number.");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - First-order logic with equality only (FO(∅)).");
     print_dline_box(0, out, "  - Languages with an aperiodic and commutative syntactic monoid.");
-
 }
 
-void info_lt(FILE* out) {
+void info_lt(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Locally testable languages : LT.");
     print_dline_box(0, out, " Definition : Boolean combinations of languages of the form wA*, A*w and A*wA* where w ∊ A*");
     print_dline_box(0, out, "    is an arbitrary word.");
     print_dline_box(0, out, " Characterization :");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose DD-orbits are idempotent and commutative.");
-
 }
-void info_ltt(FILE* out) {
+void info_ltt(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Locally threshold testable languages : LTT.");
     print_dline_box(0, out, " Definition : Boolean combinations of languages of the form wA*, A*w and F(w,k) where w ∊ A*");
     print_dline_box(0, out, "    is an arbitrary word and k ≥ 1 (F(w,k) consists of all words with k occurrences of the infix w).");
@@ -2673,21 +2840,21 @@ void info_ltt(FILE* out) {
     print_dline_box(0, out, "  - First-order logic with successor (FO(+1)).");
     print_dline_box(0, out, "  - Languages with an aperiodic syntactic semigroup S satisfying the equation erfsetf = etfserf");
     print_dline_box(0, out, "    for all elements r,s,t ∊ S and all idempotents e,f ∊ E(S).");
-
 }
-void info_st(FILE* out) {
+void info_st(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Basis of the Straubing-Thérien hierarchy : ST.");
     print_dline_box(0, out, " Definition : trivial class consisting of the languages ∅ and A*.");
     print_dline_box(0, out, " Characterization : Languages with a trivial syntactic monoid.");
-
 }
-void info_dd(FILE* out) {
+void info_dd(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Basis of the dot-depth hierarchy : DD.");
     print_dline_box(0, out, " Definition : class consisting of the languages ∅, {ε}, A⁺ and A*.");
     print_dline_box(0, out, " Characterization : Languages with a trivial syntactic semigroup.");
-
 }
-void info_mod(FILE* out) {
+void info_mod(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Modulo languages : MOD.");
     print_dline_box(0, out, " Definition : Finite unions of languages (Aⁿ)*Aᵏ where n > k ≥ 1 (membership of a word");
     print_dline_box(0, out, "    in the language depends only on its length modulo a fixed integer).");
@@ -2695,67 +2862,59 @@ void info_mod(FILE* out) {
     print_dline_box(0, out, "  - Languages with a syntactic morphism into a group mapping all a ∊ A to the same element.");
     print_dline_box(0, out, "  - Languages with a minimal automaton which a permutation automaton in which every a ∊ A");
     print_dline_box(0, out, "    has the same action on the states.");
-
 }
 
-void info_modp(FILE* out) {
+void info_modp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Extended modulo languages : MOD⁺.");
     print_dline_box(0, out, " Definition : Least Boolean algebra containing MOD and {ε}.");
     print_dline_box(0, out, " Characterizations : Languages with a syntactic semigroup which is a group and whose");
     print_dline_box(0, out, "    syntactic morphism maps every letter a to the same element.");
-
 }
-void info_amt(FILE* out) {
+void info_amt(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Alphabet modulo testable languages AMT.");
     print_dline_box(0, out, " Definition : Boolean combinations of languages which count the occurrences of some letter");
     print_dline_box(0, out, "    a ∊ A modulo an integer.");
     print_dline_box(0, out, " Characterization : Languages with a syntactic monoid which is a commutative group.");
-
-
 }
-void info_amtp(FILE* out) {
+void info_amtp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Extended alphabetic modulo testable languages : AMT⁺.");
     print_dline_box(0, out, " Definition : Least Boolean algebra containing AMT and {ε}.");
     print_dline_box(0, out, " Characterization : Languages with a syntactic semigroup which is a commutative group.");
-
 }
-void info_gr(FILE* out) {
+void info_gr(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Group languages GR.");
     print_dline_box(0, out, " Characterizations :");
     print_dline_box(0, out, "  - Languages with a syntactic monoid which is a group.");
     print_dline_box(0, out, "  - Languages with a minimal automaton which is a permutation automaton.");
-
-
 }
-void info_grp(FILE* out) {
+void info_grp(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Extended group languages : GR⁺.");
     print_dline_box(0, out, " Definition : Least Boolean algebra containing GR and {ε}.");
     print_dline_box(0, out, " Characterization : Languages with a syntactic semigroup which is a group.");
-
-
 }
 
-void info_reg(FILE* out) {
+void info_reg(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Regular languages : REG.");
     print_dline_box(0, out, " Definition : Languages degfined by a regular expression.");
 }
 
-
-
-void info_empty(FILE* out) {
+void info_empty(FILE *out)
+{
     print_dtitle_box(10, false, out, 1, "Empty class : EMPTY.");
     print_dline_box(0, out, " Definition : Contains no language.");
 }
 
-
-
-
-
 /*********************/
-    /* Affichage partagé */
-    /*********************/
+/* Affichage partagé */
+/*********************/
 
-void print_info_input(int i, FILE* out)
+void print_info_input(int i, FILE *out)
 {
     switch (objects[i].type)
     {
@@ -2793,14 +2952,14 @@ void print_info_input(int i, FILE* out)
     }
 }
 
-void print_start_comp(FILE* out, char* class)
+void print_start_comp(FILE *out, char *class)
 {
     char mess[MESSAGESIZE];
     sprintf(mess, "Deciding membership of the input language in %s.", class);
     print_dtitle_box(10, true, out, 1, mess);
 }
 
-void print_conclusion_comp(FILE* out, bool res, const char* namec)
+void print_conclusion_comp(FILE *out, bool res, const char *namec)
 {
     char mess[MESSAGESIZE];
     if (res)
@@ -2815,8 +2974,7 @@ void print_conclusion_comp(FILE* out, bool res, const char* namec)
     print_dtitle_box(10, true, out, 1, mess);
 }
 
-
-void print_conclusion_separ(FILE* out, bool res, const char* namec)
+void print_conclusion_separ(FILE *out, bool res, const char *namec)
 {
     char mess[MESSAGESIZE];
     if (res)
@@ -2831,19 +2989,12 @@ void print_conclusion_separ(FILE* out, bool res, const char* namec)
     print_dtitle_box(10, true, out, 1, mess);
 }
 
-
-
 /***********************************************/
 /* Affichage des informations sur un opérateur */
 /***********************************************/
 
-
-
-
-
-
 // Negation hierarchies
-void print_infooper_neghiera(classes c, FILE* out)
+void print_infooper_neghiera(classes c, FILE *out)
 {
     switch (c)
     {
@@ -2925,7 +3076,7 @@ void print_infooper_neghiera(classes c, FILE* out)
 }
 
 // Future/past hierarchies
-void print_infooper_fphiera(classes c, FILE* out)
+void print_infooper_fphiera(classes c, FILE *out)
 {
     switch (c)
     {

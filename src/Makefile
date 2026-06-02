@@ -1,4 +1,4 @@
-# CC=gcc or clang or gcc-14 (on OSX)
+# CC=gcc or clang or gcc-15 (on OSX)
 CC=gcc
 
 # If a scanner+parser is needed.

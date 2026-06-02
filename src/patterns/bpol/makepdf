@@ -1,0 +1,5 @@
+#!/bin/bash
+list="$(find . -name \*.tex -type f)"
+for file in $list; do 
+   pdflatex "$file" -output-directory="$(dirname "$file")"
+done

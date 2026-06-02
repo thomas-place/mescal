@@ -1,18 +1,19 @@
 #include "type_partitions.h"
-#include <stdint.h>
 #include <limits.h>
-
+#include <stdint.h>
 
 /**************/
 /* First Type */
 /**************/
 
-parti* create_parti(uint size_set, uint size_par, uint* numcl) {
-    if (size_set == 0 || size_par == 0) {
+parti *create_parti(uint size_set, uint size_par, uint *numcl)
+{
+    if (size_set == 0 || size_par == 0)
+    {
         fprintf(stderr, "Warning, cannot create a partition of size zero. Returned NULL.\n");
         return NULL;
     }
-    parti* new;
+    parti *new;
     MALLOC(new, 1);
     new->size_set = size_set;
     new->size_par = size_par;
@@ -23,22 +24,24 @@ parti* create_parti(uint size_set, uint size_par, uint* numcl) {
     CALLOC(new->cl_size, size_par);
 
     // Initialization of the classes sizes
-    for (uint i = 0; i < size_set; i++) {
+    for (uint i = 0; i < size_set; i++)
+    {
         new->cl_size[numcl[i]]++;
     }
 
     // Strating point of each class in the storage
     new->cl_elems[0] = new->storage; // The first class starts at the beginning of the storage
-    for (uint i = 1; i < size_par; i++) {
+    for (uint i = 1; i < size_par; i++)
+    {
         new->cl_elems[i] = new->cl_elems[i - 1] + new->cl_size[i - 1]; // Each class starts after the previous one
     }
 
-
     // We now fill the storage.
-    uint* c;
+    uint *c;
     CALLOC(c, size_par);
 
-    for (uint i = 0; i < size_set; i++) {
+    for (uint i = 0; i < size_set; i++)
+    {
         // Each element is stored in the storage at the position of its class
         new->cl_elems[numcl[i]][c[numcl[i]]] = i;
         c[numcl[i]]++; // Increment the counter for the class
@@ -62,10 +65,9 @@ parti* create_parti(uint size_set, uint size_par, uint* numcl) {
 //     free(p);
 // }
 
-
-void delete_parti(parti* p)
+void delete_parti(parti *p)
 {
-    if (p == NULL)
+    if (!p)
     {
         return;
     }
@@ -76,7 +78,7 @@ void delete_parti(parti* p)
     free(p);
 }
 
-bool istrivial_parti(parti* p)
+bool istrivial_parti(parti *p)
 {
     return p->size_par == p->size_set;
 }
@@ -115,27 +117,30 @@ bool istrivial_parti(parti* p)
 
 // }
 
-parti* restrict_parti(parti* P, uint size, bool* insub, uint* tosub)
+parti *restrict_parti(parti *P, uint size, bool *insub, uint *tosub)
 {
-    uint* newnumcl;
+    uint *newnumcl;
     MALLOC(newnumcl, size);
     uint num = 0;
-    for (uint i = 0; i < P->size_par; i++) {
+    for (uint i = 0; i < P->size_par; i++)
+    {
         bool inter = false;
-        for (uint j = 0; j < P->cl_size[i]; j++) {
-            if (insub[P->cl_elems[i][j]]) {
+        for (uint j = 0; j < P->cl_size[i]; j++)
+        {
+            if (insub[P->cl_elems[i][j]])
+            {
                 inter = true;
                 newnumcl[tosub[P->cl_elems[i][j]]] = num;
             }
         }
-        if (inter) {
+        if (inter)
+        {
             num++;
         }
     }
 
     return create_parti(size, num, newnumcl);
 }
-
 
 // parti* restrict_parti_subset(parti* P, uint size, bool* insub, uint* tosub, uint* fromind)
 // {
@@ -172,40 +177,58 @@ parti* restrict_parti(parti* P, uint size, bool* insub, uint* tosub)
 
 // }
 
-
-parti* restrict_parti_subset(parti* P, uint size, bool* insub, uint* tosub, uint* fromind)
+parti *restrict_parti_subset(parti *P, uint size, bool *insub, uint *tosub, uint *fromind)
 {
-    uint* newnumcl;
+    uint *newnumcl;
     MALLOC(newnumcl, size);
     uint num = 0;
-    for (uint i = 0; i < P->size_par; i++) {
+    for (uint i = 0; i < P->size_par; i++)
+    {
         bool inter = false;
-        for (uint j = 0; j < P->cl_size[i]; j++) {
+        for (uint j = 0; j < P->cl_size[i]; j++)
+        {
             uint s = fromind[P->cl_elems[i][j]];
-            if (insub[s]) {
+            if (insub[s])
+            {
                 inter = true;
                 newnumcl[tosub[s]] = num;
             }
         }
-        if (inter) {
+        if (inter)
+        {
             num++;
         }
     }
     return create_parti(size, num, newnumcl);
 }
 
-uint* parti_compute_inv(parti* P)
+uint *parti_compute_inv(parti *P)
 {
-    uint* inv;
+    uint *inv;
     MALLOC(inv, P->size_set);
-    for (uint c = 0; c < P->size_par; c++) {
-        for (uint j = 0; j < P->cl_size[c]; j++) {
+    for (uint c = 0; c < P->size_par; c++)
+    {
+        for (uint j = 0; j < P->cl_size[c]; j++)
+        {
             inv[P->cl_elems[c][j]] = j; // The index of the element in its class
         }
     }
     return inv;
 }
 
+void print_parti(parti *P)
+{
+    printf("Partition of size set %d into %d classes:\n", P->size_set, P->size_par);
+    for (uint c = 0; c < P->size_par; c++)
+    {
+        printf("Class %d (size %d): ", c, P->cl_size[c]);
+        for (uint j = 0; j < P->cl_size[c]; j++)
+        {
+            printf("%d ", P->cl_elems[c][j]);
+        }
+        printf("\n");
+    }
+}
 
 /**************/
 /* Union-Find */
@@ -213,14 +236,14 @@ uint* parti_compute_inv(parti* P)
 
 // Crée un union-find de l'ensemble des éléments de 0 à size-1
 // Initialement, la partition est composée de singletons
-ufind* create_ufind(uint size)
+ufind *create_ufind(uint size)
 {
     if (size == 0)
     {
         printf("Warning, cannot create a union-find of size zero. Returned NULL.\n");
         return NULL;
     }
-    ufind* new;
+    ufind *new;
     MALLOC(new, 1);
     new->size_set = size; // On partitionne les éléments de 0 à size-1
     new->size_par = size; // Initialement, chaque classe est un singleton, on a donc size classes
@@ -240,14 +263,14 @@ ufind* create_ufind(uint size)
     {
         new->parent[i] = i;
         new->sizec[i] = 1; // Chaque classe est un singleton
-        new->rank[i] = 0; // La profondeur de l'arbre est 0
+        new->rank[i] = 0;  // La profondeur de l'arbre est 0
     }
     // les éléments au delà de size_set ne servent pas
     return new;
 }
 
 // Suppression
-void delete_ufind(ufind* uf)
+void delete_ufind(ufind *uf)
 {
     if (uf == NULL)
     {
@@ -260,17 +283,17 @@ void delete_ufind(ufind* uf)
 }
 
 // Récupération d'information
-uint sizeset_ufind(ufind* uf)
+uint sizeset_ufind(ufind *uf)
 {
     return uf->size_set;
 }
 
-uint sizepar_ufind(ufind* uf)
+uint sizepar_ufind(ufind *uf)
 {
     return uf->size_par;
 }
 
-static void grow_ufind(ufind* uf)
+static void grow_ufind(ufind *uf)
 {
     uf->size_tab = 2 * uf->size_tab;
     REALLOC(uf->parent, uf->size_tab);
@@ -279,7 +302,7 @@ static void grow_ufind(ufind* uf)
 }
 
 // Agrandit la partition en ajoutant un élément
-void makeset_ufind(ufind* uf)
+void makeset_ufind(ufind *uf)
 {
     if (uf->size_tab == uf->size_set)
     {
@@ -288,14 +311,14 @@ void makeset_ufind(ufind* uf)
 
     uf->parent[uf->size_set] = uf->size_set;
     uf->sizec[uf->size_set] = 1; // La classe du nouvel élément est un singleton
-    uf->rank[uf->size_set] = 0; // L'arbre correspondant est de profondeur 0
+    uf->rank[uf->size_set] = 0;  // L'arbre correspondant est de profondeur 0
 
     uf->size_set++;
     uf->size_par++;
 }
 
 // Recherche
-uint find_ufind(uint i, ufind* uf)
+uint find_ufind(uint i, ufind *uf)
 {
     if (uf->parent[i] != i)
     {
@@ -305,14 +328,14 @@ uint find_ufind(uint i, ufind* uf)
 }
 
 // Récupération de la taille de la classe
-uint sizeclass_ufind(uint i, ufind* uf)
+uint sizeclass_ufind(uint i, ufind *uf)
 {
     i = find_ufind(i, uf);
     return uf->sizec[i];
 }
 
 // Union
-void union_ufind(uint i, uint j, ufind* uf)
+void union_ufind(uint i, uint j, ufind *uf)
 {
     i = find_ufind(i, uf);
     j = find_ufind(j, uf);
@@ -340,7 +363,7 @@ void union_ufind(uint i, uint j, ufind* uf)
 }
 
 // Affichage
-void print_ufind(ufind* uf)
+void print_ufind(ufind *uf)
 {
     CRITICAL("Union-find of %d elements, %d classes", uf->size_set, uf->size_par);
     for (uint i = 0; i < uf->size_set; i++)
@@ -349,7 +372,7 @@ void print_ufind(ufind* uf)
     }
 
     // Classes et remplissage actuel
-    dequeue* classes[uf->size_par];
+    dequeue *classes[uf->size_par];
     for (uint c = 0; c < uf->size_par; c++)
     {
         classes[c] = create_dequeue();
@@ -405,12 +428,6 @@ void print_ufind(ufind* uf)
     }
 }
 
-
-
-
-
-
-
 // Conversion en Union-Find
 // ufind* parti_to_ufind(parti* p)
 // {
@@ -425,9 +442,9 @@ void print_ufind(ufind* uf)
 //     return uf;
 // }
 
-ufind* parti_to_ufind(parti* p)
+ufind *parti_to_ufind(parti *p)
 {
-    ufind* uf = create_ufind(p->size_set);
+    ufind *uf = create_ufind(p->size_set);
     for (uint c = 0; c < p->size_par; c++)
     {
         for (uint i = 1; i < p->cl_size[c]; i++)
@@ -479,11 +496,10 @@ ufind* parti_to_ufind(parti* p)
 //     return new;
 // }
 
-
 // Construction depuis Union-Find
-parti* ufind_to_parti(ufind* uf)
+parti *ufind_to_parti(ufind *uf)
 {
-    uint* numcl;
+    uint *numcl;
     MALLOC(numcl, uf->size_set);
     for (uint i = 0; i < uf->size_set; i++)
     {
@@ -513,7 +529,6 @@ parti* ufind_to_parti(ufind* uf)
 //     new->size_par = uf->size_par;
 //     new->size_set = uf->size_set;
 
-
 //     MALLOC(new->cl, new->size_par);
 //     for (uint c = 0; c < new->size_par; c++)
 //     {
@@ -521,15 +536,12 @@ parti* ufind_to_parti(ufind* uf)
 //     }
 //     MALLOC(new->numcl, new->size_set);
 
-
 //     // Tableau qui mémorise les éléments déjà traités
 //     bool* doelems;
 //     CALLOC(doelems, new->size_set);
 
-
 //     // Prochain numéro de classe
 //     uint num_class = 0;
-
 
 //     // Calcul des classes
 //     for (uint d = 0; d < P->size_par; d++)
@@ -555,17 +567,12 @@ parti* ufind_to_parti(ufind* uf)
 //     return new;
 // }
 
-
-parti* ufind_to_parti_refined(ufind* uf, parti* P)
+parti *ufind_to_parti_refined(ufind *uf, parti *P)
 {
-    uint* numcl;
+    uint *numcl;
     MALLOC(numcl, uf->size_set);
-    for (uint i = 0; i < uf->size_set; i++)
-    {
-        numcl[i] = UINT_MAX;
-    }
+    MEMSET(numcl, UINT_MAX, uf->size_set);
     uint num_class = 0;
-
 
     // Calcul des classes
     for (uint d = 0; d < P->size_par; d++)

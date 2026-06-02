@@ -1,17 +1,17 @@
 #include "nfa_determi.h"
 #include "type_hash.h"
 
-
 // Storage of the subsets for the subset construction
-static ulong det_cons_size = 0; // Full size of the det_sets array.
-static ulong det_cons_elem = 0; // Number of subsets already stored in the det_sets array.
-static uint det_cons_states = 0; // Number of states in the original nfa.
-static uint det_cons_letters = 0; // Number of letters in the original nfa (size of the alphabet).
-static bool* det_cons_sets = NULL; // Array that stores the sets (a single set uses det_cons_states cells). Size: det_cons_size * det_cons_states.
-static uint* det_cons_next = NULL; //!< Array that stores the computed transitions (a single transition uses det_cons_letters cells). Size: det_cons_size * det_cons_letters.
+static ulong det_cons_size = 0;    // Full size of the det_sets array.
+static ulong det_cons_elem = 0;    // Number of subsets already stored in the det_sets array.
+static uint det_cons_states = 0;   // Number of states in the original nfa.
+static uint det_cons_letters = 0;  // Number of letters in the original nfa (size of the alphabet).
+static bool *det_cons_sets = NULL; // Array that stores the sets (a single set uses det_cons_states cells). Size: det_cons_size * det_cons_states.
+static uint *det_cons_next = NULL; //!< Array that stores the computed transitions (a single transition uses det_cons_letters cells). Size: det_cons_size * det_cons_letters.
 
 // Initialize the arrays used in the subset construction.
-static void det_cons_init(uint size, uint states, uint letters) {
+static void det_cons_init(uint size, uint states, uint letters)
+{
     size = max(size, 2); // Ensures that the size is at least 2.
     det_cons_size = size;
     det_cons_elem = 0;
@@ -22,7 +22,8 @@ static void det_cons_init(uint size, uint states, uint letters) {
 }
 
 // Deletes the arrays used in the subset construction and resets the variables.
-static void det_cons_delete() {
+static void det_cons_delete()
+{
     free(det_cons_sets);
     det_cons_sets = NULL;
     free(det_cons_next);
@@ -34,8 +35,10 @@ static void det_cons_delete() {
 }
 
 // Doubles the size of the arrays used in the subset construction if necessary.
-static void det_cons_grow() {
-    if (det_cons_size <= det_cons_elem) {
+static void det_cons_grow()
+{
+    if (det_cons_size <= det_cons_elem)
+    {
         det_cons_size <<= 1;
         REALLOC(det_cons_sets, det_cons_size * det_cons_states);
         REALLOC(det_cons_next, det_cons_size * det_cons_letters);
@@ -43,11 +46,14 @@ static void det_cons_grow() {
 }
 
 // Checks if two sets stored in the det_cons_sets array are equal.
-static bool det_cons_equal(uint i, uint j) {
+static bool det_cons_equal(uint i, uint j)
+{
     ulong zi = i * det_cons_states; // The index of the first element.
     ulong zj = j * det_cons_states; // The index of the second element.
-    for (uint h = 0; h < det_cons_states; h++) {
-        if (det_cons_sets[zi + h] != det_cons_sets[zj + h]) {
+    for (uint h = 0; h < det_cons_states; h++)
+    {
+        if (det_cons_sets[zi + h] != det_cons_sets[zj + h])
+        {
             return false; // If any element is different, the two sets are not equal.
         }
     }
@@ -55,53 +61,64 @@ static bool det_cons_equal(uint i, uint j) {
 }
 
 // Hash function for the sets stored in the det_cons_sets array.
-static uint det_cons_hash(uint i, uint size_hash) {
+static uint det_cons_hash(uint i, uint size_hash)
+{
     ulong e = i * det_cons_states; // The index of the element in the mor_perms array.
     uint hash = 0;
 
     uint a = 0x9e3779b9; // fractional bits of the golden ratio
 
-    //uint count = 0;
+    // uint count = 0;
 
-    for (uint j = 0; j < det_cons_states; j++) {
-        if (!det_cons_sets[e + j]) {
+    for (uint j = 0; j < det_cons_states; j++)
+    {
+        if (!det_cons_sets[e + j])
+        {
             hash = (hash * 3 + 1 * a) % size_hash;
-            //continue; // If the state is not in the set, we skip it.
+            // continue; // If the state is not in the set, we skip it.
         }
         else
         {
             hash = (hash * 3 + 2 * a) % size_hash;
         }
 
-        //hash = (hash * (det_cons_states + 1) + j * a) % size_hash;
-        //count++;
+        // hash = (hash * (det_cons_states + 1) + j * a) % size_hash;
+        // count++;
     }
-    //hash = (hash * (det_cons_states + 1) + count * a) % size_hash;
+    // hash = (hash * (det_cons_states + 1) + count * a) % size_hash;
     return hash;
 }
 
 // Construction of the state names from the sets stored in the det_cons_sets array.
-static char** det_cons_names(char** oldnames) {
-    if (det_cons_elem == 0) {
+static char **det_cons_names(char **oldnames)
+{
+    if (det_cons_elem == 0)
+    {
         return NULL; // If no states have been constructed, we return NULL.
     }
-    char** names;
+    char **names;
     MALLOC(names, det_cons_elem);
 
-    for (uint q = 0; q < det_cons_elem; q++) {
+    for (uint q = 0; q < det_cons_elem; q++)
+    {
         uint string_size = 2; // We start with 2 for the brackets.
-        for (uint i = 0; i < det_cons_states; i++) {
-            if (det_cons_sets[q * det_cons_states + i]) {
-                if (oldnames) {
+        for (uint i = 0; i < det_cons_states; i++)
+        {
+            if (det_cons_sets[q * det_cons_states + i])
+            {
+                if (oldnames)
+                {
                     string_size += strlen(oldnames[i]) + 1;
                 }
-                else {
+                else
+                {
                     string_size += get_uint_length(i) + 1;
                 }
             }
         }
 
-        if (string_size < 3) {
+        if (string_size < 3)
+        {
             names[q] = strdup("∅");
             continue;
         }
@@ -110,18 +127,24 @@ static char** det_cons_names(char** oldnames) {
         sprintf(names[q], "{");
         char aux[10];
         bool first = true;
-        for (uint i = 0; i < det_cons_states; i++) {
-            if (det_cons_sets[q * det_cons_states + i]) {
-                if (first) {
+        for (uint i = 0; i < det_cons_states; i++)
+        {
+            if (det_cons_sets[q * det_cons_states + i])
+            {
+                if (first)
+                {
                     first = false;
                 }
-                else {
+                else
+                {
                     strcat(names[q], ",");
                 }
-                if (oldnames) {
+                if (oldnames)
+                {
                     strcat(names[q], oldnames[i]);
                 }
-                else {
+                else
+                {
                     sprintf(aux, "%d", i);
                     strcat(names[q], aux);
                 }
@@ -133,10 +156,10 @@ static char** det_cons_names(char** oldnames) {
     return names;
 }
 
-
-dfa* nfa_determinize(nfa* A, bool names) {
-
-    if (!A) {
+dfa *nfa_determinize(nfa *A, bool names)
+{
+    if (!A)
+    {
         return NULL;
     }
 
@@ -144,60 +167,72 @@ dfa* nfa_determinize(nfa* A, bool names) {
     A = nfa_elimeps(A);
 
     uchar power = get_uint_lbinary(A->trans->size_graph) + 2; // We compute the initial power of two for the size of the hash table.
-    uint thesize = 1U << power; // The size of the hash table is 2^power.
+    uint thesize = 1U << power;                               // The size of the hash table is 2^power.
 
     det_cons_init(thesize, A->trans->size_graph, A->trans->size_alpha);
 
     // Initialize the hash table.
-    hash_table* thehash = create_hash_table(power, &det_cons_hash, &det_cons_equal);
+    hash_table *thehash = create_hash_table(power, &det_cons_hash, &det_cons_equal);
 
     // Stack containing the elements to be processed.
-    dequeue* thestack = create_dequeue();
+    dequeue *thestack = create_dequeue();
 
     // Create the first element: the set of initial states of the NFA.
     uint ini = 0;
-    for (uint i = 0; i < A->trans->size_graph; i++) {
-        if (ini < size_dequeue(A->initials) && lefread_dequeue(A->initials, ini) == i) {
+    for (uint i = 0; i < A->trans->size_graph; i++)
+    {
+        if (ini < A->nb_initials && A->initials[ini] == i)
+        {
             // If the state i is an initial state of the NFA, we add it to the set.
             det_cons_sets[i] = true;
             ini++;
         }
-        else {
+        else
+        {
             // If the state i is not an initial state of the NFA, we do not add it to the set.
             det_cons_sets[i] = false;
         }
     }
     det_cons_elem++;
     hash_table_insert(thehash, 0); // Insert this set in the hash table.
-    rigins_dequeue(0, thestack); // Add the identity to the stack.
+    rigins_dequeue(0, thestack);   // Add the identity to the stack.
 
-    while (!isempty_dequeue(thestack)) {
+    while (!isempty_dequeue(thestack))
+    {
         // We retrieve the state to be processed.
         uint s = rigpull_dequeue(thestack);
 
         // We calculate the transitions from this state.
-        for (uint a = 0; a < A->trans->size_alpha; a++) {
+        for (uint a = 0; a < A->trans->size_alpha; a++)
+        {
             ulong i = det_cons_elem * det_cons_states; // The number of the new element is the next one.
             ulong j = s * det_cons_states;
-            for (uint q = 0; q < A->trans->size_graph; q++) {
+            for (uint q = 0; q < A->trans->size_graph; q++)
+            {
                 det_cons_sets[i + q] = false; // Initialize the new set to false.
             }
-            for (uint q = 0; q < A->trans->size_graph; q++) {
-                if (!det_cons_sets[j + q]) {
+            for (uint q = 0; q < A->trans->size_graph; q++)
+            {
+                if (!det_cons_sets[j + q])
+                {
                     continue; // If the state q is not in the set, we skip it.
                 }
-                for (uint h = 0; h < size_dequeue(A->trans->edges[q][a]); h++) {
-                    uint r = lefread_dequeue(A->trans->edges[q][a], h); // For each state q in the set of states of the current state s,
-                    det_cons_sets[i + r] = true; // we add the states reachable from q by the letter a to the new set.
+                uint start = A->trans->intervals[A->trans->size_alpha * q + a];
+                uint end = A->trans->intervals[A->trans->size_alpha * q + a + 1];
+
+                for (uint h = start; h < end; h++)
+                {
+                    uint r = A->trans->storage[h]; // For each state q in the set of states of the current state s,
+                    det_cons_sets[i + r] = true;   // we add the states reachable from q by the letter a to the new set.
                 }
             }
 
             uint h = hash_table_insert(thehash, det_cons_elem); // Try to insert the new state in the hash table.
 
-            if (h == det_cons_elem) {
+            if (h == det_cons_elem)
+            {
                 // The state was not already constructed.
                 rigins_dequeue(det_cons_elem, thestack); // We add it to the stack for future processing.
-
 
                 // Prepare the next state in the table.
                 det_cons_elem++; // Increment the number of states constructed.
@@ -213,22 +248,27 @@ dfa* nfa_determinize(nfa* A, bool names) {
     delete_hash_table(thehash); // Delete the hash table.
     delete_dequeue(thestack);
 
+    //    printf("DFA states constructed: %lu\n", det_cons_elem);
+
     // We can now build the DFA.
-    dfa* DFA;
+    dfa *DFA;
     CALLOC(DFA, 1);
-    DFA->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha); // Copy letter names
+    DFA->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha);   // Copy letter names
     DFA->trans = create_dgraph_noedges(det_cons_elem, A->trans->size_alpha); // Create the graph.
 
     DFA->initial = 0; // The initial state of the DFA is the first state constructed.
 
     // Computing the final states.
-    bool* tempfinals;
+    bool *tempfinals;
     CALLOC(tempfinals, det_cons_elem);
     DFA->nb_finals = 0;
-    for (uint i = 0; i < det_cons_elem; i++) {
+    for (uint i = 0; i < det_cons_elem; i++)
+    {
         // For each state in the DFA, we check if it contains a final state of the NFA.
-        for (uint j = 0; j < size_dequeue(A->finals); j++) {
-            if (det_cons_sets[i * det_cons_states + lefread_dequeue(A->finals, j)]) {
+        for (uint j = 0; j < A->nb_finals; j++)
+        {
+            if (det_cons_sets[i * det_cons_states + A->finals[j]])
+            {
                 tempfinals[i] = true; // If it contains a final state, we mark it as a final state.
                 DFA->nb_finals++;
                 break;
@@ -239,8 +279,10 @@ dfa* nfa_determinize(nfa* A, bool names) {
     // Assigning the finals states.
     uint h = 0;
     MALLOC(DFA->finals, DFA->nb_finals); // Allocate the finals array.
-    for (uint i = 0; i < det_cons_elem; i++) {
-        if (tempfinals[i]) {
+    for (uint i = 0; i < det_cons_elem; i++)
+    {
+        if (tempfinals[i])
+        {
             DFA->finals[h] = i; // If the state is a final state, we add it to the list of finals states of the DFA.
             h++;
         }
@@ -248,21 +290,24 @@ dfa* nfa_determinize(nfa* A, bool names) {
     free(tempfinals); // We can delete the temporary array used to store the final states.
 
     // Computing the transitions of the DFA.
-    DFA->trans = create_dgraph_noedges(det_cons_elem, A->trans->size_alpha);
-    for (uint i = 0; i < det_cons_elem; i++) {
-        for (uint a = 0; a < A->trans->size_alpha; a++) {
+    for (uint i = 0; i < det_cons_elem; i++)
+    {
+        for (uint a = 0; a < A->trans->size_alpha; a++)
+        {
             DFA->trans->edges[i][a] = det_cons_next[i * det_cons_letters + a]; // The next state for the letter a.
         }
     }
+    DFA->trans->size_edges = det_cons_elem * A->trans->size_alpha;
 
-    // Computation of the state names    
-    if (names) {
+    // Computation of the state names
+    if (names)
+    {
         DFA->state_names = det_cons_names(A->state_names); // We compute the names of the states of the DFA.
     }
-    else {
+    else
+    {
         DFA->state_names = NULL;
     }
-
 
     // We can delete the arrays used in the subset construction.
     det_cons_delete();
@@ -270,45 +315,47 @@ dfa* nfa_determinize(nfa* A, bool names) {
     return DFA;
 }
 
-void dfa_get_mirror_info(dfa* A, dfa_mirror_info* mirror) {
+void dfa_get_mirror_info(dfa *A, dfa_mirror_info *mirror)
+{
     uint n = A->trans->size_alpha * A->trans->size_graph;
     MALLOC(mirror->edges, n);
     MALLOC(mirror->ed_edges, n);
     MALLOC(mirror->st_edges, n);
-    uint* temp;
+    uint *temp;
     CALLOC(temp, n);
 
-    for (uint q = 0; q < A->trans->size_graph; q++) {
-        for (uint a = 0; a < A->trans->size_alpha; a++) {
+    for (uint q = 0; q < A->trans->size_graph; q++)
+    {
+        for (uint a = 0; a < A->trans->size_alpha; a++)
+        {
             temp[A->trans->edges[q][a] * A->trans->size_alpha + a]++;
         }
     }
 
-
     mirror->st_edges[0] = 0;
     mirror->ed_edges[0] = 0;
-    for (uint i = 1; i < n; i++) {
+    for (uint i = 1; i < n; i++)
+    {
         mirror->st_edges[i] = mirror->st_edges[i - 1] + temp[i - 1];
         mirror->ed_edges[i] = mirror->st_edges[i];
     }
     free(temp);
 
-
-    for (uint q = 0; q < A->trans->size_graph; q++) {
-        for (uint a = 0; a < A->trans->size_alpha; a++) {
+    for (uint q = 0; q < A->trans->size_graph; q++)
+    {
+        for (uint a = 0; a < A->trans->size_alpha; a++)
+        {
             uint i = A->trans->edges[q][a] * A->trans->size_alpha + a;
             mirror->edges[mirror->ed_edges[i]] = q;
             mirror->ed_edges[i]++;
         }
     }
-
 }
 
-
-
-
-dfa* dfa_determinize_mirror(dfa* A, bool names) {
-    if (!A) {
+dfa *dfa_determinize_mirror(dfa *A, bool names)
+{
+    if (!A)
+    {
         return NULL;
     }
 
@@ -316,52 +363,61 @@ dfa* dfa_determinize_mirror(dfa* A, bool names) {
     dfa_get_mirror_info(A, &mirror); // Get the mirror information of the DFA.
 
     uchar power = get_uint_lbinary(A->trans->size_graph) + 2; // We compute the initial power of two for the size of the hash table.
-    uint thesize = 1U << power; // The size of the hash table is 2^power.
+    uint thesize = 1U << power;                               // The size of the hash table is 2^power.
 
     det_cons_init(thesize, A->trans->size_graph, A->trans->size_alpha);
 
     // Initialize the hash table.
-    hash_table* thehash = create_hash_table(power, &det_cons_hash, &det_cons_equal);
+    hash_table *thehash = create_hash_table(power, &det_cons_hash, &det_cons_equal);
 
     // Stack containing the elements to be processed.
-    dequeue* thestack = create_dequeue();
+    dequeue *thestack = create_dequeue();
 
     // Create the first element: the set of initial states of the mirror (the final states of the original DFA).
     uint ini = 0;
-    for (uint i = 0; i < A->trans->size_graph; i++) {
-        if (ini < A->nb_finals && A->finals[ini] == i) {
+    for (uint i = 0; i < A->trans->size_graph; i++)
+    {
+        if (ini < A->nb_finals && A->finals[ini] == i)
+        {
             // If the state i is a final state in A, we add it to the set.
             det_cons_sets[i] = true;
             ini++;
         }
-        else {
+        else
+        {
             // If the state i is not an initial state of the NFA, we do not add it to the set.
             det_cons_sets[i] = false;
         }
     }
     det_cons_elem++;
     hash_table_insert(thehash, 0); // Insert this set in the hash table.
-    rigins_dequeue(0, thestack); // Add the identity to the stack.
+    rigins_dequeue(0, thestack);   // Add the identity to the stack.
 
-    while (!isempty_dequeue(thestack)) {
+    while (!isempty_dequeue(thestack))
+    {
         // We retrieve the state to be processed.
         uint s = rigpull_dequeue(thestack);
 
         // We calculate the transition from this state.
-        for (uint a = 0; a < A->trans->size_alpha; a++) {
+        for (uint a = 0; a < A->trans->size_alpha; a++)
+        {
             ulong i = det_cons_elem * det_cons_states; // The number of the new element is the next one.
             ulong j = s * det_cons_states;
-            for (uint q = 0; q < A->trans->size_graph; q++) {
+            for (uint q = 0; q < A->trans->size_graph; q++)
+            {
                 det_cons_sets[i + q] = false; // Initialize the new set to false.
             }
-            for (uint q = 0; q < A->trans->size_graph; q++) {
-                if (!det_cons_sets[j + q]) {
+            for (uint q = 0; q < A->trans->size_graph; q++)
+            {
+                if (!det_cons_sets[j + q])
+                {
                     continue; // If the state q is not in the set, we skip it.
                 }
                 uint index = q * A->trans->size_alpha + a;
                 uint h = mirror.st_edges[index]; // Get the first edge for the letter a from state q.
-                while (h < mirror.ed_edges[index]) {
-                    uint r = mirror.edges[h]; // For each state q in the set of states of the current state s,
+                while (h < mirror.ed_edges[index])
+                {
+                    uint r = mirror.edges[h];    // For each state q in the set of states of the current state s,
                     det_cons_sets[i + r] = true; // we add the states reachable from q by the letter a to the new set.
                     h++;
                 }
@@ -369,10 +425,10 @@ dfa* dfa_determinize_mirror(dfa* A, bool names) {
 
             uint h = hash_table_insert(thehash, det_cons_elem); // Try to insert the new state in the hash table.
 
-            if (h == det_cons_elem) {
+            if (h == det_cons_elem)
+            {
                 // The state was not already constructed.
                 rigins_dequeue(det_cons_elem, thestack); // We add it to the stack for future processing.
-
 
                 // Prepare the next state in the table.
                 det_cons_elem++; // Increment the number of states constructed.
@@ -393,30 +449,32 @@ dfa* dfa_determinize_mirror(dfa* A, bool names) {
     delete_dequeue(thestack);
 
     // We can now build the DFA.
-    dfa* DFA;
+    dfa *DFA;
     CALLOC(DFA, 1);
     DFA->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha); // Copy letter names
-    DFA->trans = create_dgraph_noedges(det_cons_elem, A->trans->size_alpha); // Create the graph.
 
     DFA->initial = 0; // The initial state of the DFA is the first state constructed.
 
     // Computing the final states.
-    bool* tempfinals;
+    bool *tempfinals;
     CALLOC(tempfinals, det_cons_elem);
     DFA->nb_finals = 0;
-    for (uint i = 0; i < det_cons_elem; i++) {
-        if (det_cons_sets[i * det_cons_states + A->initial]) {
+    for (uint i = 0; i < det_cons_elem; i++)
+    {
+        if (det_cons_sets[i * det_cons_states + A->initial])
+        {
             tempfinals[i] = true; // If it contains a final state, we mark it as a final state.
             DFA->nb_finals++;
         }
-
     }
 
     // Assigning the finals states.
     uint h = 0;
     MALLOC(DFA->finals, DFA->nb_finals); // Allocate the finals array.
-    for (uint i = 0; i < det_cons_elem; i++) {
-        if (tempfinals[i]) {
+    for (uint i = 0; i < det_cons_elem; i++)
+    {
+        if (tempfinals[i])
+        {
             DFA->finals[h] = i; // If the state is a final state, we add it to the list of finals states of the DFA.
             h++;
         }
@@ -425,85 +483,88 @@ dfa* dfa_determinize_mirror(dfa* A, bool names) {
 
     // Computing the transitions of the DFA.
     DFA->trans = create_dgraph_noedges(det_cons_elem, A->trans->size_alpha);
-    for (uint i = 0; i < det_cons_elem; i++) {
-        for (uint a = 0; a < A->trans->size_alpha; a++) {
+    for (uint i = 0; i < det_cons_elem; i++)
+    {
+        for (uint a = 0; a < A->trans->size_alpha; a++)
+        {
             DFA->trans->edges[i][a] = det_cons_next[i * det_cons_letters + a]; // The next state for the letter a.
         }
     }
+    DFA->trans->size_edges = det_cons_elem * A->trans->size_alpha;
 
-    // Computation of the state names    
-    if (names) {
+    // Computation of the state names
+    if (names)
+    {
         DFA->state_names = det_cons_names(A->state_names); // We compute the names of the states of the DFA.
     }
-    else {
+    else
+    {
         DFA->state_names = NULL;
     }
-
 
     // We can delete the arrays used in the subset construction.
     det_cons_delete();
     return DFA;
 }
 
-
-
-
-
-
-
-
 // Complementation
-nfa* nfa_complement(nfa* A) {
-    dfa* B = nfa_determinize(A, true);
+nfa *nfa_complement(nfa *A)
+{
+    dfa *B = nfa_determinize(A, true);
 
     uint sizef = B->trans->size_graph - B->nb_finals;
-    uint* finals;
+    uint *finals;
     MALLOC(finals, sizef);
 
     uint i = 0;
     uint j = 0;
-    for (uint q = 0; q < B->trans->size_graph; q++) {
-        if (B->finals[i] == q) {
+    for (uint q = 0; q < B->trans->size_graph; q++)
+    {
+        if (B->finals[i] == q)
+        {
             // If the state q is a final state in the original DFA, we skip it.
             i++;
         }
-        else {
+        else
+        {
             // If the state q is not a final state in the original DFA, we add it to the list of final states in the new DFA.
             finals[j] = q;
             j++;
         }
     }
 
-    free(B->finals); // Free the old finals array.
-    B->finals = finals; // Assign the new finals array.
+    free(B->finals);      // Free the old finals array.
+    B->finals = finals;   // Assign the new finals array.
     B->nb_finals = sizef; // Update the number of final states.
 
-    nfa* C = dfa_to_nfa(B); // Convert the DFA to an NFA.
-    dfa_delete(B); // Delete the DFA.
+    nfa *C = dfa_to_nfa(B); // Convert the DFA to an NFA.
+    dfa_delete(B);          // Delete the DFA.
 
     return C;
 }
 
-
-
 // Complementation
-dfa* dfa_complement(dfa* A) {
-    dfa* B;
+dfa *dfa_complement(dfa *A)
+{
+    dfa *B;
     CALLOC(B, 1);
     B->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha); // Copy letter names
-    B->initial = A->initial; // The initial state is the same as in the original DFA.
-    B->trans = copy_dgraph(A->trans); // Copy the transitions from the original DFA.
+    B->initial = A->initial;                                             // The initial state is the same as in the original DFA.
+    B->trans = copy_dgraph(A->trans);                                    // Copy the transitions from the original DFA.
 
     B->nb_finals = A->trans->size_graph - A->nb_finals; // The number of final states is the total number of states minus the number of final states in the original DFA.
-    MALLOC(B->finals, B->nb_finals); // Allocate the finals array.
+    MALLOC(B->finals, B->nb_finals);                    // Allocate the finals array.
     uint ja = 0;
     uint jb = 0;
-    for (uint q = 0; q < A->trans->size_graph; q++) {
-        if (q == A->finals[ja]) {
+    for (uint q = 0; q < A->trans->size_graph; q++)
+    {
+        if (q == A->finals[ja])
+        {
             // If the state q is a final state in the original DFA, we skip it.
             ja++;
         }
-        else {
+        else
+        {
             // If the state q is not a final state in the original DFA, we add it to the list of final states in the new DFA.
             B->finals[jb] = q;
             jb++;

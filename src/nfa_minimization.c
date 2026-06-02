@@ -4,97 +4,108 @@
 /*+ Auxiliary +*/
 /***************/
 
-dfa* dfa_mini_canonical_copy(dfa* A) {
-    if (!A) {
+dfa *dfa_mini_canonical_copy(dfa *A)
+{
+    if (!A)
+    {
         return NULL;
     }
 
     // Computation of the canonical ordering on the states
     int map[A->trans->size_graph];
     int imap[A->trans->size_graph];
-    for (uint i = 0; i < A->trans->size_graph;i++) {
+    for (uint i = 0; i < A->trans->size_graph; i++)
+    {
         map[i] = -1;
     }
-    dequeue* queue = create_dequeue();
+    dequeue *queue = create_dequeue();
     rigins_dequeue(A->initial, queue);
     uint count = 0;
 
-    while (!isempty_dequeue(queue)) {
+    while (!isempty_dequeue(queue))
+    {
         uint q = lefpull_dequeue(queue);
-        if (map[q] != -1) {
+        if (map[q] != -1)
+        {
             continue;
         }
         map[q] = count;
         imap[count] = q;
         count++;
-        for (uint a = 0; a < A->trans->size_alpha;a++) {
+        for (uint a = 0; a < A->trans->size_alpha; a++)
+        {
             rigins_dequeue(A->trans->edges[q][a], queue);
         }
     }
     delete_dequeue(queue);
 
-    dfa* B;
+    dfa *B;
     CALLOC(B, 1);
     B->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha);
     B->trans = create_dgraph_noedges(A->trans->size_graph, A->trans->size_alpha);
-    for (uint q = 0; q < A->trans->size_graph;q++) {
-        for (uint a = 0; a < A->trans->size_alpha;a++) {
+    for (uint q = 0; q < A->trans->size_graph; q++)
+    {
+        for (uint a = 0; a < A->trans->size_alpha; a++)
+        {
             B->trans->edges[q][a] = map[A->trans->edges[imap[q]][a]];
         }
     }
     B->initial = 0;
     B->nb_finals = A->nb_finals;
     MALLOC(B->finals, A->nb_finals);
-    for (uint i = 0; i < A->nb_finals;i++) {
+    for (uint i = 0; i < A->nb_finals; i++)
+    {
         B->finals[i] = map[A->finals[i]];
     }
+    B->trans->size_edges = B->trans->size_graph * B->trans->size_alpha;
     return B;
-
 }
-
 
 /******************************/
 /*+ Algorithme de Brzozowski +*/
 /******************************/
 
-dfa* nfa_brzozowski(nfa* A) {
-    nfa* B = nfa_mirror(A);
-    dfa* C = nfa_determinize(B, false);
+dfa *nfa_brzozowski(nfa *A)
+{
+    nfa *B = nfa_mirror(A);
+    dfa *C = nfa_determinize(B, false);
     nfa_delete(B);
-    dfa* D = dfa_determinize_mirror(C, false);
+    dfa *D = dfa_determinize_mirror(C, false);
     dfa_delete(C);
     return D;
 }
 
-dfa* dfa_brzozowski(dfa* A) {
-    dfa* C = dfa_determinize_mirror(A, false);
-    dfa* D = dfa_determinize_mirror(C, false);
+dfa *dfa_brzozowski(dfa *A)
+{
+    dfa *C = dfa_determinize_mirror(A, false);
+    dfa *D = dfa_determinize_mirror(C, false);
     dfa_delete(C);
     return D;
 }
-
 
 /****************************/
 /*+ Algorithme de Hopcroft +*/
 /****************************/
 
-
-
-static dequeue* dfa_create_hopcroft_candidate(uint* array, uint l, uint r) {
-    dequeue* new = create_dequeue();
-    for (uint i = l; i < r;i++) {
+static dequeue *dfa_create_hopcroft_candidate(uint *array, uint l, uint r)
+{
+    dequeue *new = create_dequeue();
+    for (uint i = l; i < r; i++)
+    {
         rigins_dequeue(array[i], new);
     }
     return new;
 }
 
-hopcroft_partition* dfa_hopcroft_initial(uint size_auto, uint* finals, uint nb_finals) {
-    if (nb_finals == 0 || nb_finals == size_auto) {
+hopcroft_partition *dfa_hopcroft_initial(uint size_auto, uint *finals, uint nb_finals)
+{
+    if (nb_finals == 0 || nb_finals == size_auto)
+    {
         fprintf(stderr, "Error in Hopcroft's algorithm: should not compute a partition when the set of final states is trivial.\n");
         return NULL;
     }
 
-    hopcroft_partition* new;
+    hopcroft_partition *new;
     MALLOC(new, 1);
     new->size_set = size_auto;
     new->size_par = 2;
@@ -109,23 +120,25 @@ hopcroft_partition* dfa_hopcroft_initial(uint size_auto, uint* finals, uint nb_f
     uint r = new->size_set - 1;
 
     // Pour chaque état (pris dans l'ordre)
-    for (uint q = 0; q < new->size_set;q++) {
+    for (uint q = 0; q < new->size_set; q++)
+    {
 
         // Si cet état est final
-        if (i < nb_finals && finals[i] == q) {
+        if (i < nb_finals && finals[i] == q)
+        {
             new->parray[l] = q;
             new->parray_i[q] = l;
             new->classes[q] = 0;
             l++;
             i++;
         }
-        else {
+        else
+        {
             new->parray[r] = q;
             new->parray_i[q] = r;
             new->classes[q] = 1;
             r--;
         }
-
     }
 
     new->lindex[0] = 0;
@@ -135,53 +148,60 @@ hopcroft_partition* dfa_hopcroft_initial(uint size_auto, uint* finals, uint nb_f
     return new;
 }
 
-dfa* dfa_hopcroft_genauto(dfa* D, hopcroft_partition* p) {
-    if (!p || !D) {
+dfa *dfa_hopcroft_genauto(dfa *D, hopcroft_partition *p)
+{
+    if (!p || !D)
+    {
         return NULL;
     }
 
-
-
-
-    //Computation of the final states
-    bool* finals;
+    // Computation of the final states
+    bool *finals;
     uint nb_finals = 0;
     CALLOC(finals, p->size_par);
-    for (uint i = 0; i < D->nb_finals;i++) {
+    for (uint i = 0; i < D->nb_finals; i++)
+    {
         finals[p->classes[D->finals[i]]] = true;
         nb_finals++;
     }
 
-
-    dfa* MINI;
+    dfa *MINI;
     CALLOC(MINI, 1);
     MINI->alphabet = duplicate_alphabet(D->alphabet, D->trans->size_alpha);
     MINI->trans = create_dgraph_noedges(p->size_par, D->trans->size_alpha);
 
-    for (uint cq = 0; cq < p->size_par;cq++) {
-        for (uint a = 0; a < D->trans->size_alpha;a++) {
+    for (uint cq = 0; cq < p->size_par; cq++)
+    {
+        for (uint a = 0; a < D->trans->size_alpha; a++)
+        {
             uint q = p->parray[p->lindex[cq]];
             MINI->trans->edges[cq][a] = p->classes[D->trans->edges[q][a]];
         }
     }
+    MINI->trans->size_edges = MINI->trans->size_graph * MINI->trans->size_alpha;
+    // view_dgraph(MINI->trans);
     MINI->initial = p->classes[D->initial];
 
     MALLOC(MINI->finals, nb_finals);
     MINI->nb_finals = nb_finals;
     uint j = 0;
-    for (uint cq = 0; cq < p->size_par;cq++) {
-        if (finals[cq]) {
+    for (uint cq = 0; cq < p->size_par; cq++)
+    {
+        if (finals[cq])
+        {
             MINI->finals[j] = cq;
             j++;
         }
     }
     free(finals);
+    // view_dfa(MINI);
     return MINI;
 }
 
-
-void dfa_hopcroft_free(hopcroft_partition* p) {
-    if (!p) {
+void dfa_hopcroft_free(hopcroft_partition *p)
+{
+    if (!p)
+    {
         return;
     }
     free(p->classes);
@@ -193,7 +213,6 @@ void dfa_hopcroft_free(hopcroft_partition* p) {
     return;
 }
 
-
 /* static void print_class(hopcroft_partition* p, uint c) {
     printf("class: %d\n", c);
     printf("elements: ");
@@ -203,32 +222,41 @@ void dfa_hopcroft_free(hopcroft_partition* p) {
     printf("\n");
 } */
 
+dfa *dfa_hopcroft(dfa *A)
+{
 
-
-
-dfa* dfa_hopcroft(dfa* A) {
-
-    if (!A) {
+    if (!A)
+    {
         return NULL;
     }
 
-    A = dfa_trim(A);
+    // printf("#### dfa_hopcroft: trimming the DFA.\n");
+
+    A = dfa_trim(A, false, true);
+
+    // printf("#### dfa_hopcroft: DFA trimmed.\n");
+
     // Traitement du cas où l'ensemble des états finaux est trivial (on retourne un automate trivial).
-    if (A->nb_finals == 0 || A->nb_finals == A->trans->size_graph) {
-        dfa* MINI;
+    if (A->nb_finals == 0 || A->nb_finals == A->trans->size_graph)
+    {
+        dfa *MINI;
         CALLOC(MINI, 1);
         MINI->alphabet = duplicate_alphabet(A->alphabet, A->trans->size_alpha);
         MINI->trans = create_dgraph_noedges(1, A->trans->size_alpha);
         MINI->initial = 0;
-        for (uint a = 0; a < A->trans->size_alpha;a++) {
+        MINI->trans->size_edges = A->trans->size_alpha;
+        for (uint a = 0; a < A->trans->size_alpha; a++)
+        {
             MINI->trans->edges[0][a] = 0;
         }
-        if (A->nb_finals > 0) {
+        if (A->nb_finals > 0)
+        {
             MALLOC(MINI->finals, 1);
             MINI->nb_finals = 1;
             MINI->finals[0] = 0;
         }
-        else {
+        else
+        {
             MINI->nb_finals = 0;
             MINI->finals = NULL;
         }
@@ -238,55 +266,54 @@ dfa* dfa_hopcroft(dfa* A) {
 
     // On sait maintenant que l'ensemble des états finaux est non-trivial.
     // Calcul de la partition initiale
-    hopcroft_partition* p = dfa_hopcroft_initial(A->trans->size_graph, A->finals, A->nb_finals);
+    hopcroft_partition *p = dfa_hopcroft_initial(A->trans->size_graph, A->finals, A->nb_finals);
 
     // Calcul du miroir de l'automate (utile pour l'algorithme)
     dfa_mirror_info mirror;
     dfa_get_mirror_info(A, &mirror);
 
-
-    //nfa* MA = dfa_mirror(A);
-
     // Création de la pile des classes à traiter (on empile la plus petite des deux)
-    dequeue_gen* thestack = create_dequeue_gen();
-    if (p->rindex[0] - p->lindex[0] < p->rindex[1] - p->lindex[1]) {
+    dequeue_gen *thestack = create_dequeue_gen();
+    if (p->rindex[0] - p->lindex[0] < p->rindex[1] - p->lindex[1])
+    {
         rigins_dequeue_gen(dfa_create_hopcroft_candidate(p->parray, p->lindex[0], p->rindex[0]), thestack);
     }
-    else {
+    else
+    {
         rigins_dequeue_gen(dfa_create_hopcroft_candidate(p->parray, p->lindex[1], p->rindex[1]), thestack);
     }
     // Création d'une table temporaire des indices droits
-    uint* rtemp;
+    uint *rtemp;
     MALLOC(rtemp, p->size_set);
     rtemp[0] = p->rindex[0];
     rtemp[1] = p->rindex[1];
 
     // Boucle principale
-    while (!isempty_dequeue_gen(thestack)) {
+    while (!isempty_dequeue_gen(thestack))
+    {
 
         // On prend une classe en haut de la pile
-        dequeue* cand = (dequeue*)rigpull_dequeue_gen(thestack);
+        dequeue *cand = (dequeue *)rigpull_dequeue_gen(thestack);
 
-
-
-
-        for (uint a = 0; a < A->trans->size_alpha;a++) {
-            dequeue* visited = create_dequeue();
+        for (uint a = 0; a < A->trans->size_alpha; a++)
+        {
+            dequeue *visited = create_dequeue();
             // Pour chaque antécédent r de la classe c par la lettre a (c'est ici que set le miroir)
-            for (uint i = 0; i < size_dequeue(cand);i++) {
+            for (uint i = 0; i < size_dequeue(cand); i++)
+            {
                 uint k = lefread_dequeue(cand, i) * A->trans->size_alpha + a;
-                for (uint j = mirror.st_edges[k]; j < mirror.ed_edges[k];j++) {
+                for (uint j = mirror.st_edges[k]; j < mirror.ed_edges[k]; j++)
+                {
 
                     // L'antécédent
                     uint r = mirror.edges[j];
 
-
                     // La classe de r
                     uint cr = p->classes[r];
 
-
-                    // Si on n'a pas encore traité la classe cr, on la marque comme visitée 
-                    if (rtemp[cr] == p->rindex[cr]) {
+                    // Si on n'a pas encore traité la classe cr, on la marque comme visitée
+                    if (rtemp[cr] == p->rindex[cr])
+                    {
                         rigins_dequeue(cr, visited);
                     }
 
@@ -302,50 +329,20 @@ dfa* dfa_hopcroft(dfa* A) {
                     // On décrémente le marqueur de fin de la classe
                     rtemp[cr]--;
                 }
-
-
-                // for (uint j = 0; j < size_dequeue(MA->trans->edges[lefread_dequeue(cand, i)][a]);j++) {
-
-
-                //     // L'antécédent
-                //     uint r = lefread_dequeue(MA->trans->edges[lefread_dequeue(cand, i)][a], j);
-
-
-                //     // La classe de r
-                //     uint cr = p->classes[r];
-
-
-                //     // Si on n'a pas encore traité la classe cr, on la marque comme visitée 
-                //     if (rtemp[cr] == p->rindex[cr]) {
-                //         rigins_dequeue(cr, visited);
-                //     }
-
-                //     // On swap r avec l'élément à la fin du tableau des éléments
-                //     uint q = p->parray[rtemp[cr] - 1];
-
-                //     p->parray[p->parray_i[r]] = q;
-                //     p->parray_i[q] = p->parray_i[r];
-
-                //     p->parray[rtemp[cr] - 1] = r;
-                //     p->parray_i[r] = rtemp[cr] - 1;
-
-                //     // On décrémente le marqueur de fin de la classe
-                //     rtemp[cr]--;
-                // }
             }
 
-
             // Mise à jour des classes visitées (si nécessaire)
-            for (uint i = 0; i < size_dequeue(visited);i++) {
+            for (uint i = 0; i < size_dequeue(visited); i++)
+            {
                 // La classe visitée
                 uint d = lefread_dequeue(visited, i);
                 // Si tous les éléments de d étaient envoyés vers c par la lettre a la classe ne doit pas être divisée
-                if (rtemp[d] == p->lindex[d]) {
+                if (rtemp[d] == p->lindex[d])
+                {
                     // On réinitialise rtemp[d] pour le cycle suivant
                     rtemp[d] = p->rindex[d];
                     continue;
                 }
-
 
                 // Sinon, on créé un nouvelle classe dans laquelle on met une partie des éléments de d (son numéro est la taille de la partition actuelle)
                 uint nd = p->size_par;
@@ -356,79 +353,87 @@ dfa* dfa_hopcroft(dfa* A) {
                 p->rindex[d] = p->lindex[nd];
 
                 // Mise à jour du tableau des classes
-                for (uint j = p->lindex[nd]; j < p->rindex[nd];j++) {
+                for (uint j = p->lindex[nd]; j < p->rindex[nd]; j++)
+                {
                     p->classes[p->parray[j]] = nd;
                 }
 
-                // On ajoute une des deux classes (la plus petite) à la pile. 
-                if (p->rindex[nd] - p->lindex[nd] < p->rindex[d] - p->lindex[d]) {
+                // On ajoute une des deux classes (la plus petite) à la pile.
+                if (p->rindex[nd] - p->lindex[nd] < p->rindex[d] - p->lindex[d])
+                {
                     rigins_dequeue_gen(dfa_create_hopcroft_candidate(p->parray, p->lindex[d], p->rindex[d]), thestack);
                 }
-                else {
+                else
+                {
                     rigins_dequeue_gen(dfa_create_hopcroft_candidate(p->parray, p->lindex[nd], p->rindex[nd]), thestack);
                 }
-
-
             }
             delete_dequeue(visited);
         }
         delete_dequeue(cand);
-
     }
 
     free(rtemp);
     delete_dequeue_gen(thestack);
 
-    dfa* MINI;
-    if (p->size_par == A->trans->size_graph) {
+    dfa *MINI;
+    if (p->size_par == A->trans->size_graph)
+    {
         MINI = A;
     }
-    else {
+    else
+    {
         MINI = dfa_hopcroft_genauto(A, p);
         dfa_delete(A);
     }
 
-
-
     free(mirror.ed_edges);
     free(mirror.edges);
     free(mirror.st_edges);
-    //nfa_delete(MA);
+    // nfa_delete(MA);
     dfa_hopcroft_free(p);
+    // printf("#### dfa_hopcroft: minimal DFA computed.\n");
+    // fflush(stdout);
     return MINI;
 }
-
 
 /************************/
 /** Canonical ordering **/
 /************************/
 
-void dfa_mini_canonical_ordering(dfa* A) {
-    if (!A || A->order) {
+void dfa_mini_canonical_ordering(dfa *A)
+{
+    if (!A || A->order)
+    {
         return;
     }
+    // printf("#### dfa_mini_canonical_ordering: computing canonical ordering.\n");
 
     uint thesize = A->trans->size_graph;
     // Array that marks the visited pairs.
     MALLOC(A->order, thesize);
-    for (uint i = 0; i < thesize; i++) {
-        CALLOC(A->order[i], thesize);
+    CALLOC(A->order_storage, thesize * thesize);
+    for (uint i = 0; i < thesize; i++)
+    {
+        A->order[i] = A->order_storage + i * thesize;
     }
+    // return;
 
     // Stacks for the DFS which computes all pairs incomparable of states
     // A pair (q,r) is incomparable if q is NOT smaller than r for the canonical order.
     // First stack stores element 1 in the pair, second stack stores element 2 in the pair.
-    dequeue* stack_one = create_dequeue();
-    dequeue* stack_two = create_dequeue();
-
+    dequeue *stack_one = create_dequeue();
+    dequeue *stack_two = create_dequeue();
 
     // We push the starting pairs (final, non-final) which are clearly incomparable.
     for (uint i = 0; i < A->nb_finals; i++)
     {
         uint j = 0;
-        for (uint q = 0; q < thesize; q++) {
+        for (uint q = 0; q < thesize; q++)
+        {
             // We skip q if it is a final state.
-            if (j < A->nb_finals && A->finals[j] == q) {
+            if (j < A->nb_finals && A->finals[j] == q)
+            {
                 j++;
                 continue;
             }
@@ -437,49 +442,139 @@ void dfa_mini_canonical_ordering(dfa* A) {
         }
     }
 
-
     // Computation of the mirror automaton (used in the DFS).
-    lgraph* mirror = dgraph_mirror(A->trans);
+    lgraph *mirror = dgraph_mirror(A->trans);
 
     // The DFS
-    while (!isempty_dequeue(stack_one)) {
+    while (!isempty_dequeue(stack_one))
+    {
 
         // We pop a pair (q, r) from the stacks.
         uint q = rigpull_dequeue(stack_one);
         uint r = rigpull_dequeue(stack_two);
 
         // We skip the pair if it has already been visited.
-        if (A->order[q][r]) {
+        if (A->order[q][r])
+        {
             continue;
         }
 
         // We mark the pair as visited.
         A->order[q][r] = true;
 
-
         // We push all pairs from which we can reach (q, r) in either the left or right Cayley graph
         // These pairs are also incomparable.
-        for (uint a = 0; a < A->trans->size_alpha; a++) {
-            for (uint i = 0; i < size_dequeue(mirror->edges[q][a]); i++) {
-                for (uint j = 0; j < size_dequeue(mirror->edges[r][a]); j++) {
-                    rigins_dequeue(lefread_dequeue(mirror->edges[q][a], i), stack_one);
-                    rigins_dequeue(lefread_dequeue(mirror->edges[r][a], j), stack_two);
+        for (uint a = 0; a < A->trans->size_alpha; a++)
+        {
+            uint startq = LGSTART(mirror, q, a);
+            uint endq = LGEND(mirror, q, a);
+            uint startr = LGSTART(mirror, r, a);
+            uint endr = LGEND(mirror, r, a);
+            for (uint i = startq; i < endq; i++)
+            {
+                for (uint j = startr; j < endr; j++)
+                {
+                    rigins_dequeue(mirror->storage[i], stack_one);
+                    rigins_dequeue(mirror->storage[j], stack_two);
                 }
             }
         }
     }
 
     // We may now inverse the visted array to get the canonical order.
-    for (uint q = 0; q < thesize; q++) {
-        for (uint r = 0; r < thesize; r++) {
+    for (uint q = 0; q < thesize; q++)
+    {
+        for (uint r = 0; r < thesize; r++)
+        {
             A->order[q][r] = !A->order[q][r];
         }
     }
-
 
     delete_dequeue(stack_one);
     delete_dequeue(stack_two);
     delete_lgraph(mirror);
 }
 
+static uint dfa_get_name_length(dfa *A, uint q)
+{
+    if (A->state_names)
+    {
+        return strlen(A->state_names[q]);
+    }
+    else
+    {
+        return get_uint_length(q);
+    }
+}
 
+static void dfa_print_sub_aligned(dfa *A, dequeue *elems, uint width, uint padding, FILE *out)
+{
+    uint max_size = width - padding;
+    uint use_size = 0;
+    for (uint i = 0; i < size_dequeue(elems); i++)
+    {
+        uint e = lefread_dequeue(elems, i);
+        uint size_elem = dfa_get_name_length(A, e);
+
+        if (size_elem + use_size + 2 > max_size || (i == size_dequeue(elems) - 1 && size_elem + use_size > max_size))
+        {
+            for (uint j = 0; j < max_size - use_size; j++)
+            {
+                fprintf(out, " ");
+            }
+            fprintf(out, "│\n│");
+            for (uint j = 0; j < padding; j++)
+            {
+                fprintf(out, " ");
+            }
+            use_size = 0;
+        }
+        dfa_print_state(A, e, out);
+        use_size = use_size + size_elem;
+        if (i < size_dequeue(elems) - 1)
+        {
+            fprintf(out, ", ");
+            use_size = use_size + 2;
+        }
+    }
+    print_spaces(max_size - use_size, out);
+    fprintf(out, "│\n");
+}
+
+void dfa_print_order(dfa *A, FILE *out)
+{
+    dfa_mini_canonical_ordering(A); // Calcul
+    print_top_line(100, out);
+
+    // Calcul de la longueur maximale d'un nom
+    uint size_max = 1;
+    for (uint q = 0; q < A->trans->size_graph; q++)
+    {
+        size_max = max(size_max, dfa_get_name_length(A, q));
+    }
+
+    uint padding = 24 + size_max;
+
+    for (uint q = 0; q < A->trans->size_graph; q++)
+    {
+        fprintf(out, "│Elements larger than ");
+        dfa_print_state(A, q, out);
+        fprintf(out, " : ");
+        dequeue *temp = create_dequeue();
+        for (uint r = 0; r < A->trans->size_graph; r++)
+        {
+            if (A->order[q][r])
+            {
+                rigins_dequeue(r, temp);
+            }
+        }
+
+        dfa_print_sub_aligned(A, temp, 100, padding, out);
+        delete_dequeue(temp);
+    }
+    print_bot_line(100, out);
+
+    graph *tred = tclos_reduction_graph(A->order, A->trans->size_graph);
+    view_dfa_order(A, tred);
+    delete_graph(tred);
+}

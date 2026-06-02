@@ -11,11 +11,12 @@
 #define KEYWORDS_MAX 512
 uint keywords_count, strings_count;
 com_keyword keywords_keyarray[KEYWORDS_MAX];
-const char* keywords_strarray[KEYWORDS_MAX];
-const char* all_strings[KEYWORDS_MAX];
+const char *keywords_strarray[KEYWORDS_MAX];
+const char *all_strings[KEYWORDS_MAX];
 
 // Ajout d'un keyword
-void keywords_add_key(com_keyword thekey, const char* thename) {
+void keywords_add_key(com_keyword thekey, const char *thename)
+{
     keywords_keyarray[keywords_count] = thekey;
     keywords_strarray[keywords_count] = thename;
     keywords_count++;
@@ -24,7 +25,8 @@ void keywords_add_key(com_keyword thekey, const char* thename) {
 }
 
 // Ajout de tous les keywords
-void keywords_add_all_keys(void) {
+void keywords_add_all_keys(void)
+{
     // Interface
     keywords_add_key(KY_INTERFACE, "exit");
     keywords_add_key(KY_INTERFACE, "help");
@@ -66,7 +68,6 @@ void keywords_add_all_keys(void) {
     keywords_add_key(KY_REGEXPS, "regexps");
     keywords_add_key(KY_RECDEFS, "recdefs");
 
-
     // Commandes automates
 
     keywords_add_key(KY_INTERSEC, "intersection");
@@ -97,10 +98,13 @@ void keywords_add_all_keys(void) {
     keywords_add_key(KY_NOSIMC, "nosimplec");
     keywords_add_key(KY_FOLDING, "folding");
     keywords_add_key(KY_DIRECTPRODUCT, "directproduct");
+    keywords_add_key(KY_LQUOTIENT, "lquotient");
+    keywords_add_key(KY_RQUOTIENT, "rquotient");
 
     // Commandes morphismes
     keywords_add_key(KY_SYNT, "syntactic");
     keywords_add_key(KY_IMAGE, "image");
+    keywords_add_key(KY_FACTO, "facto");
     keywords_add_key(KY_LCAY, "lcayley");
     keywords_add_key(KY_RCAY, "rcayley");
     keywords_add_key(KY_ORDER, "order");
@@ -110,7 +114,6 @@ void keywords_add_all_keys(void) {
     keywords_add_key(KY_GKER, "gkernel");
     keywords_add_key(KY_AKER, "akernel");
     keywords_add_key(KY_ORB, "orbit");
-
 
     // Shared
     keywords_add_key(KY_COMMUT, "commutative");
@@ -138,6 +141,8 @@ void keywords_add_all_keys(void) {
     keywords_add_key(KY_NOT, "not");
     keywords_add_key(KY_FILTER, "filter");
     keywords_add_key(KY_NOSMALLCOUNTER, "nosmallcounter");
+    keywords_add_key(KY_NOSINK, "nosink");
+    keywords_add_key(KY_NOSELFLOOPS, "noselfloops");
 
     // Classes
     keywords_add_key(KY_HTGEN, "HTGEN");
@@ -146,6 +151,7 @@ void keywords_add_all_keys(void) {
     keywords_add_key(KY_SF, "SF");
     keywords_add_key(KY_UL, "UL");
     keywords_add_key(KY_PPT, "PPT");
+    keywords_add_key(KY_COPPT, "COPPT");
     keywords_add_key(KY_PT, "PT");
     keywords_add_key(KY_LT, "LT");
     keywords_add_key(KY_LTT, "LTT");
@@ -163,6 +169,8 @@ void keywords_add_all_keys(void) {
     // Opérateurs
     keywords_add_key(KY_POL, "POL");
     keywords_add_key(KY_POL2, "POL2");
+    keywords_add_key(KY_COPOL, "COPOL");
+    keywords_add_key(KY_COPOL2, "COPOL2");
     keywords_add_key(KY_BPOL, "BPOL");
     keywords_add_key(KY_BPOL2, "BPOL2");
     keywords_add_key(KY_UBPOL, "UBPOL");
@@ -187,27 +195,33 @@ void keywords_add_all_keys(void) {
 /* Generic display commands */
 /****************************/
 
-void print_string_chain(const string_chain* thechain, FILE* out) {
-    if (!thechain) {
+void print_string_chain(const string_chain *thechain, FILE *out)
+{
+    if (!thechain)
+    {
         fprintf(out, "NULL");
         return;
     }
 
     fprintf(out, "%s", thechain->string);
     thechain = thechain->next;
-    while (thechain) {
+    while (thechain)
+    {
         fprintf(out, ".%s", thechain->string);
         thechain = thechain->next;
     }
 }
 
-void print_command(com_command* thecom, FILE* out) {
-    if (!thecom) {
+void print_command(com_command *thecom, FILE *out)
+{
+    if (!thecom)
+    {
         fprintf(out, "NULL");
         return;
     }
-    com_parameters* pars;
-    switch (thecom->thetype) {
+    com_parameters *pars;
+    switch (thecom->thetype)
+    {
     case CMT_RAW:
         fprintf(out, "\"%s\"", thecom->main->string);
         return;
@@ -218,13 +232,15 @@ void print_command(com_command* thecom, FILE* out) {
         return;
     case CMT_KEY:
         print_string_chain(thecom->main, out);
-        if (com_nbparams(thecom->params) == 0) {
+        if (com_nbparams(thecom->params) == 0)
+        {
             return;
         }
         pars = thecom->params;
         fprintf(out, "(");
         print_command(pars->param, out);
-        for (int i = 1; i < com_nbparams(thecom->params); i++) {
+        for (int i = 1; i < com_nbparams(thecom->params); i++)
+        {
             pars = pars->next;
             fprintf(out, ",");
             print_command(pars->param, out);
@@ -242,14 +258,18 @@ void print_command(com_command* thecom, FILE* out) {
 /* Conversion d'une chaîne en élement */
 /**************************************/
 
-static bool keywords_comp_chain(const char* s, const char* slow) {
+static bool keywords_comp_chain(const char *s, const char *slow)
+{
     uint len = strlen(s);
-    if (strlen(s) != strlen(slow)) {
+    if (strlen(s) != strlen(slow))
+    {
         return false;
     }
 
-    for (uint i = 0; i < len; i++) {
-        if (tolower(s[i]) != tolower(slow[i])) {
+    for (uint i = 0; i < len; i++)
+    {
+        if (tolower(s[i]) != tolower(slow[i]))
+        {
             return false;
         }
     }
@@ -257,30 +277,40 @@ static bool keywords_comp_chain(const char* s, const char* slow) {
     return true;
 }
 
-const char* keywordtostring(com_keyword key) {
-    for (uint i = 0; i < keywords_count; i++) {
-        if (keywords_keyarray[i] == key) {
+const char *keywordtostring(com_keyword key)
+{
+    for (uint i = 0; i < keywords_count; i++)
+    {
+        if (keywords_keyarray[i] == key)
+        {
             return keywords_strarray[i];
         }
     }
     return NULL;
 }
 
-com_keyword string_to_keyword(const char* s) {
-    for (uint i = 0; i < keywords_count; i++) {
-        if (keywords_comp_chain(s, keywords_strarray[i])) {
+com_keyword string_to_keyword(const char *s)
+{
+    for (uint i = 0; i < keywords_count; i++)
+    {
+        if (keywords_comp_chain(s, keywords_strarray[i]))
+        {
             return keywords_keyarray[i];
         }
     }
     return KY_NULL;
 }
 
-bool check_varname(const char* name) {
-    if (name == NULL || name[0] < 'A' || name[0] > 'Z' || strlen(name) > NAME_MAXSIZE) {
+bool check_varname(const char *name)
+{
+    if (name == NULL || name[0] < 'A' || name[0] > 'Z' || strlen(name) > NAME_MAXSIZE)
+    {
         return false;
     }
-    for (uint i = 0; i < keywords_count; i++) {
-        if (keywords_comp_chain(name, keywords_strarray[i])) {
+    for (uint i = 0; i < keywords_count; i++)
+    {
+        if (keywords_comp_chain(name, keywords_strarray[i]))
+        {
             return false;
         }
     }
@@ -291,13 +321,17 @@ bool check_varname(const char* name) {
 /* Informations sur une commande */
 /*********************************/
 
-bool com_isclass(com_command* thecom) {
-    if (!thecom || thecom->thetype != CMT_KEY || thecom->main->next) {
+bool com_isclass(com_command *thecom)
+{
+    if (!thecom || thecom->thetype != CMT_KEY || thecom->main->next)
+    {
         return false;
     }
     com_keyword key = key_from_string_chain_single(thecom->main);
-    if (com_nbparams(thecom->params) == 0) {
-        switch (key) {
+    if (com_nbparams(thecom->params) == 0)
+    {
+        switch (key)
+        {
         case KY_AT:
         case KY_ATT:
         case KY_SF:
@@ -323,8 +357,10 @@ bool com_isclass(com_command* thecom) {
         }
     }
 
-    if (com_nbparams(thecom->params) == 1) {
-        switch (key) {
+    if (com_nbparams(thecom->params) == 1)
+    {
+        switch (key)
+        {
         case KY_POL:
         case KY_POL2:
         case KY_BPOL:
@@ -351,46 +387,58 @@ bool com_isclass(com_command* thecom) {
     return false;
 }
 
-bool com_israw(const com_command* thecom) {
-    if (thecom == NULL || thecom->main == NULL || thecom->main->next != NULL || thecom->params != NULL || thecom->thetype != CMT_RAW) {
+bool com_israw(const com_command *thecom)
+{
+    if (thecom == NULL || thecom->main == NULL || thecom->main->next != NULL || thecom->params != NULL || thecom->thetype != CMT_RAW)
+    {
         return false;
     }
     return true;
 }
 
-bool com_single(const com_command* thecom) {
-    if (thecom == NULL || thecom->main == NULL || thecom->main->next != NULL || (thecom->params != NULL && thecom->params->count != 0)) {
+bool com_single(const com_command *thecom)
+{
+    if (thecom == NULL || thecom->main == NULL || thecom->main->next != NULL || (thecom->params != NULL && thecom->params->count != 0))
+    {
         return false;
     }
     return true;
 }
 
-bool com_single_par(const com_command* thecom) {
-    if (thecom == NULL || thecom->main == NULL || thecom->main->next != NULL) {
+bool com_single_par(const com_command *thecom)
+{
+    if (thecom == NULL || thecom->main == NULL || thecom->main->next != NULL)
+    {
         return false;
     }
     return true;
 }
 
-int com_nbparams(const com_parameters* thepar) {
+int com_nbparams(const com_parameters *thepar)
+{
     int res = 0;
-    while (thepar != NULL) {
+    while (thepar != NULL)
+    {
         thepar = thepar->next;
         res++;
     }
     return res;
 }
 
-com_command* com_getparam(const com_parameters* thepar, int n) {
-    if (thepar == NULL) {
+com_command *com_getparam(const com_parameters *thepar, int n)
+{
+    if (thepar == NULL)
+    {
         return NULL;
     }
 
-    if (thepar->count <= n) {
+    if (thepar->count <= n)
+    {
         return NULL;
     }
 
-    while (n > 0) {
+    while (n > 0)
+    {
         thepar = thepar->next;
         n--;
     }
@@ -400,22 +448,28 @@ com_command* com_getparam(const com_parameters* thepar, int n) {
 
 // Retourne le mot-clé associé au premier maillon d'une chaîne (KY_NULL si il
 // n'y en a pas)
-com_keyword key_from_string_chain(const string_chain* thechain) {
-    if (thechain == NULL) {
+com_keyword key_from_string_chain(const string_chain *thechain)
+{
+    if (thechain == NULL)
+    {
         return KY_NULL;
     }
-    else {
+    else
+    {
         return string_to_keyword(thechain->string);
     }
 }
 
 // Retourne le mot-clé associé à une chaîne d'un seul maillon (KY_NULL si il n'y
 // en a pas ou si il y a plus d'un maillon)
-com_keyword key_from_string_chain_single(const string_chain* thechain) {
-    if (thechain == NULL || thechain->next != NULL) {
+com_keyword key_from_string_chain_single(const string_chain *thechain)
+{
+    if (thechain == NULL || thechain->next != NULL)
+    {
         return KY_NULL;
     }
-    else {
+    else
+    {
         return string_to_keyword(thechain->string);
     }
 }
@@ -424,21 +478,25 @@ com_keyword key_from_string_chain_single(const string_chain* thechain) {
 /* Récupération d'une commande */
 /*******************************/
 
-string_chain* com_make_string_chain(char* s, string_chain* thechain) {
-    string_chain* new;
+string_chain *com_make_string_chain(char *s, string_chain *thechain)
+{
+    string_chain *new;
     MALLOC(new, 1);
     new->string = s;
     new->next = thechain;
     return new;
 }
 
-com_parameters* com_make_parameters(com_command* theparam, com_parameters* params) {
-    com_parameters* new;
+com_parameters *com_make_parameters(com_command *theparam, com_parameters *params)
+{
+    com_parameters *new;
     MALLOC(new, 1);
-    if (params) {
+    if (params)
+    {
         new->count = params->count + 1;
     }
-    else {
+    else
+    {
         new->count = 1;
     }
     new->next = params;
@@ -446,12 +504,14 @@ com_parameters* com_make_parameters(com_command* theparam, com_parameters* param
     return new;
 }
 
-com_command* com_make_command(char* s, com_command* thecom) {
-    if (!thecom) {
+com_command *com_make_command(char *s, com_command *thecom)
+{
+    if (!thecom)
+    {
         free(s);
         return NULL;
     }
-    string_chain* new;
+    string_chain *new;
     MALLOC(new, 1);
     new->string = s;
     new->next = thecom->main;
@@ -459,12 +519,13 @@ com_command* com_make_command(char* s, com_command* thecom) {
     return thecom;
 }
 
-com_command* com_init_command(char* s, com_parameters* params) {
-    string_chain* new;
+com_command *com_init_command(char *s, com_parameters *params)
+{
+    string_chain *new;
     MALLOC(new, 1);
     new->string = s;
     new->next = NULL;
-    com_command* thecom;
+    com_command *thecom;
     MALLOC(thecom, 1);
     thecom->thetype = CMT_KEY;
     thecom->params = params;
@@ -472,12 +533,13 @@ com_command* com_init_command(char* s, com_parameters* params) {
     return thecom;
 }
 
-com_command* com_init_rawcommand(char* s) {
-    string_chain* new;
+com_command *com_init_rawcommand(char *s)
+{
+    string_chain *new;
     MALLOC(new, 1);
     new->string = s;
     new->next = NULL;
-    com_command* thecom;
+    com_command *thecom;
     MALLOC(thecom, 1);
     thecom->thetype = CMT_RAW;
     thecom->params = NULL;
@@ -485,19 +547,21 @@ com_command* com_init_rawcommand(char* s) {
     return thecom;
 }
 
-com_command* com_init_indexing(char* s, char* num) {
-    char* end;
+com_command *com_init_indexing(char *s, char *num)
+{
+    char *end;
     uint ind = strtol(num, &end, 10);
-    if (*end != '\0') {
+    if (*end != '\0')
+    {
         free(s);
         free(num);
         return NULL;
     }
-    string_chain* new;
+    string_chain *new;
     MALLOC(new, 1);
     new->string = s;
     new->next = NULL;
-    com_command* thecom;
+    com_command *thecom;
     MALLOC(thecom, 1);
     thecom->main = new;
     thecom->thetype = CMT_IND;
@@ -506,24 +570,30 @@ com_command* com_init_indexing(char* s, char* num) {
     return thecom;
 }
 
-void com_free_string_chain(string_chain* thechain) {
-    if (thechain) {
+void com_free_string_chain(string_chain *thechain)
+{
+    if (thechain)
+    {
         com_free_string_chain(thechain->next);
         free(thechain->string);
         free(thechain);
     }
 }
 
-void com_free_parameters(com_parameters* params) {
-    if (params) {
+void com_free_parameters(com_parameters *params)
+{
+    if (params)
+    {
         com_free_parameters(params->next);
         com_free_command(params->param);
         free(params);
     }
 }
 
-void com_free_command(com_command* thecom) {
-    if (thecom) {
+void com_free_command(com_command *thecom)
+{
+    if (thecom)
+    {
         com_free_string_chain(thecom->main);
         com_free_parameters(thecom->params);
         free(thecom);

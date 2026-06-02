@@ -8,7 +8,6 @@
 #include "alloc.h"
 #include "error.h"
 
-
 #include "monoid_kernels.h"
 #include "nfa_mccluskey.h"
 #include "nfa_minimization.h"
@@ -39,18 +38,18 @@ extern sub_level optimization_level;
  * @return
  * The index of the linked object.
  */
-int com_get_object(int i, //<! Index of the original object in the table.
-    string_chain* chain //<! The command chain.
+int com_get_object(int i,              //<! Index of the original object in the table.
+                   string_chain *chain //<! The command chain.
 );
 
 /**
  * @brief
  * Setup of a recursive relation.
  */
-void com_setrec_command(char* varname, //!< Name of the variable representing the whole recursive definition.
-    char* subname, //!< Name of the particular subvariable to set.
-    char* param, //!< Name of the parameter to set.
-    com_command* com //!< Regular expression to assign (possibly symbolic)
+void com_setrec_command(char *varname,   //!< Name of the variable representing the whole recursive definition.
+                        char *subname,   //!< Name of the particular subvariable to set.
+                        char *param,     //!< Name of the parameter to set.
+                        com_command *com //!< Regular expression to assign (possibly symbolic)
 );
 
 /**
@@ -60,7 +59,8 @@ void com_setrec_command(char* varname, //!< Name of the variable representing th
  * @remark
  * Only impacts the commands that return an object.
  */
-typedef enum {
+typedef enum
+{
     MODE_DEFAULT, //!< Default mode: stores a new object only if does not exist yet (no copy).
     MODE_COPY,    //!< Copy mode: creates a new even it already exists (makes a copy).
     MODE_PRINT,   //!< Display mode: no new object is created.
@@ -75,17 +75,15 @@ typedef enum {
  * If the command does not compute an object: -1.
  * If there was an error in evaluating the command: -2.
  */
-int com_apply_command(com_command* com, //!< The command to apply.
-    char* varname, //!< The name of the variable to store the result (NULL if no result to store).
-    com_mode mode, //!< The mode to apply the command.
-    bool* new //!< Used to indicate whether a new object has been created (NULL if not needed).
+int com_apply_command(com_command *com, //!< The command to apply.
+                      char *varname,    //!< The name of the variable to store the result (NULL if no result to store).
+                      com_mode mode,    //!< The mode to apply the command.
+                      bool *new         //!< Used to indicate whether a new object has been created (NULL if not needed).
 );
-
 
 /******************************/
 /*+ Parameter interpretation +*/
 /******************************/
-
 
 /**
  * @brief
@@ -94,10 +92,10 @@ int com_apply_command(com_command* com, //!< The command to apply.
  * @return
  * True if the parameter is indeed a class, false otherwise.
  */
-bool param_getclass(com_parameters* pars, //!< The parameters list.
-    int p,                                //!< The parameter index.
-    const char* str,                      //!< The string used to call the command.
-    classes* class                    //!< The class returned by pointer in case of success.
+bool param_getclass(com_parameters *pars, //!< The parameters list.
+                    int p,                //!< The parameter index.
+                    const char *str,      //!< The string used to call the command.
+                    classes *class        //!< The class returned by pointer in case of success.
 );
 
 /**
@@ -107,12 +105,11 @@ bool param_getclass(com_parameters* pars, //!< The parameters list.
  * @return
  * True if the parameter is indeed raw text, false otherwise.
  */
-bool param_getrawtext(com_parameters* pars, //!< The parameters list.
-    int p,                                  //!< The parameter index.
-    const char* str,                        //!< The string used to call the command.
-    char** rawtext                          //!< The raw text returned by pointer in case of success (no MALLOC is done, pointeer to the char* in the command).
+bool param_getrawtext(com_parameters *pars, //!< The parameters list.
+                      int p,                //!< The parameter index.
+                      const char *str,      //!< The string used to call the command.
+                      char **rawtext        //!< The raw text returned by pointer in case of success (no MALLOC is done, pointeer to the char* in the command).
 );
-
 
 /**
  * @brief
@@ -121,10 +118,10 @@ bool param_getrawtext(com_parameters* pars, //!< The parameters list.
  * @return
  * True if the parameter is indeed an integer, false otherwise.
  */
-bool param_getinteger(com_parameters* pars, //!< The parameters list.
-    int p,                                  //!< The parameter index.
-    const char* str,                        //!< The string used to call the command.
-    int* integer                            //!< The integer returned by pointer in case of success.
+bool param_getinteger(com_parameters *pars, //!< The parameters list.
+                      int p,                //!< The parameter index.
+                      const char *str,      //!< The string used to call the command.
+                      int *integer          //!< The integer returned by pointer in case of success.
 );
 
 /**
@@ -134,30 +131,30 @@ bool param_getinteger(com_parameters* pars, //!< The parameters list.
  * @return
  * True if the parameter is indeed an integer, false otherwise.
  */
-bool param_getlong(com_parameters* pars, //!< The parameters list.
-    int p,                                  //!< The parameter index.
-    const char* str,                        //!< The string used to call the command.
-    long* integer                            //!< The integer returned by pointer in case of success.
+bool param_getlong(com_parameters *pars, //!< The parameters list.
+                   int p,                //!< The parameter index.
+                   const char *str,      //!< The string used to call the command.
+                   long *integer         //!< The integer returned by pointer in case of success.
 );
 
-typedef enum {
-    PAR_CLASS,    //!< The parameter is a class.
-    PAR_RAWTEXT,  //!< The parameter is raw text.
-    PAR_INTEGER,  //!< The parameter is an integer.
+typedef enum
+{
+    PAR_CLASS,      //!< The parameter is a class.
+    PAR_RAWTEXT,    //!< The parameter is raw text.
+    PAR_INTEGER,    //!< The parameter is an integer.
     PAR_AUTOMATONV, //!< The parameter is an automaton variable (more restrictive than the next one).
-    PAR_AUTOMATON, //!< The parameter is an automaton.
-    PAR_REGEXP,   //!< The parameter is a regular expression.
-    PAR_MORPHISM, //!< The parameter is a morphism.
-    PAR_RECDEF,   //!< The parameter is a recursive definition.
-    PAR_AUTOMOR, //!< The parameter is an automaton or a morphism.
-    PAR_AUTOREG,  //!< The parameter is an automaton or a regular expression.
-    PAR_REGMOR,  //!< The parameter is a regular expression or a morphism.
+    PAR_AUTOMATON,  //!< The parameter is an automaton.
+    PAR_REGEXP,     //!< The parameter is a regular expression.
+    PAR_MORPHISM,   //!< The parameter is a morphism.
+    PAR_RECDEF,     //!< The parameter is a recursive definition.
+    PAR_AUTOMOR,    //!< The parameter is an automaton or a morphism.
+    PAR_AUTOREG,    //!< The parameter is an automaton or a regular expression.
+    PAR_REGMOR,     //!< The parameter is a regular expression or a morphism.
     PAR_REGAUTOMOR, //!< The parameter is a regular expression or an automaton or a morphism.
-    PAR_OBJECTV,  //!< The parameter is an object variable (more restrictive than the next one).
-    PAR_OBJECT,   //!< The parameter is an arbitrary object.
-    PAR_NONE,     //!< The parameter is not used.
-} par_type; //!< The type of the parameter.
-
+    PAR_OBJECTV,    //!< The parameter is an object variable (more restrictive than the next one).
+    PAR_OBJECT,     //!< The parameter is an arbitrary object.
+    PAR_NONE,       //!< The parameter is not used.
+} par_type;         //!< The type of the parameter.
 
 /**
  * @brief
@@ -166,10 +163,10 @@ typedef enum {
  * @return
  * True if the type is correct, false otherwise.
  */
-bool param_checkobjtype(int i, //!< Index in the object table.
-    par_type type,                //!< The expected type of the object.
-    int p,                 //!< The parameter index.
-    const char* str //!< The string used to call the command.
+bool param_checkobjtype(int i,          //!< Index in the object table.
+                        par_type type,  //!< The expected type of the object.
+                        int p,          //!< The parameter index.
+                        const char *str //!< The string used to call the command.
 );
 
 /**
@@ -182,29 +179,27 @@ bool param_checkobjtype(int i, //!< Index in the object table.
  * @return
  * -1 in case of success, -2 in case of error.
  */
-int param_retrieve(com_parameters* pars, //!< The parameters list.
-    int n,                               //!< The expected number of parameters to retrieve.
-    int f,                               //!< The number of optional parameters (at least n - f parameters in total).
-    par_type* types,                     //!< The types of the parameters (array of size n).
-    classes* classes,                    //!< Used to return the evaluated classes.
-    char** rawtext,                      //!< Used to return the evaluated raw text.
-    int* integers,                       //!< Used to return the evaluated integers.
-    int* objs,                           //!< Used to return the evaluated objects.
-    bool* saved,                         //!< Used to indicate whether new objects have been created.
-    const char* str                      //!< The string used to call the command.
+int param_retrieve(com_parameters *pars, //!< The parameters list.
+                   int n,                //!< The expected number of parameters to retrieve.
+                   int f,                //!< The number of optional parameters (at least n - f parameters in total).
+                   par_type *types,      //!< The types of the parameters (array of size n).
+                   classes *classes,     //!< Used to return the evaluated classes.
+                   char **rawtext,       //!< Used to return the evaluated raw text.
+                   int *integers,        //!< Used to return the evaluated integers.
+                   int *objs,            //!< Used to return the evaluated objects.
+                   bool *saved,          //!< Used to indicate whether new objects have been created.
+                   const char *str       //!< The string used to call the command.
 );
 
 /**
  * @brief
  * Generic usage function.
  */
-void usage_generic(par_type* types,      //!< The types of the parameters.
-    int n,                               //!< The number of parameters.
-    par_type typeret,                    //!< Return type of the command.
-    const char* str                      //!< The string used to call the command.
+void usage_generic(par_type *types,  //!< The types of the parameters.
+                   int n,            //!< The number of parameters.
+                   par_type typeret, //!< Return type of the command.
+                   const char *str   //!< The string used to call the command.
 );
-
-
 
 /**
  * @brief
@@ -216,21 +211,15 @@ void usage_generic(par_type* types,      //!< The types of the parameters.
  * @return
  * Returns -1 if the parameter is an integer, -2 is the conversion fails.
  */
-int com_integer_par(com_parameters* pars, //!< The parameters of the command.
-    int p, //!< The parameter to convert.
-    const char* str, //!< The string used to call the command.
-    int* res //!< The integer to store the result.
+int com_integer_par(com_parameters *pars, //!< The parameters of the command.
+                    int p,                //!< The parameter to convert.
+                    const char *str,      //!< The string used to call the command.
+                    int *res              //!< The integer to store the result.
 );
-
-
-
-
 
 /********************************/
 /*+ Computation of new objects +*/
 /********************************/
-
-
 
 /**
  * @brief
@@ -242,9 +231,9 @@ int com_integer_par(com_parameters* pars, //!< The parameters of the command.
  * @return
  * The index of the created regular expression.
  */
-int shell_mccluskey_reg(char* varname, //!< The variable name for the new object.
-    com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< string used to call the command. 
+int shell_mccluskey_reg(char *varname,        //!< The variable name for the new object.
+                        com_parameters *pars, //!< The parameters of the command.
+                        const char *str       //!< string used to call the command.
 );
 
 /**
@@ -257,9 +246,9 @@ int shell_mccluskey_reg(char* varname, //!< The variable name for the new object
  * @return
  * The index of the created NFA.
  */
-int shell_thompson_nfa(char* varname, //!< The variable name for the new object.
-    com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< string used to call the command. 
+int shell_thompson_nfa(char *varname,        //!< The variable name for the new object.
+                       com_parameters *pars, //!< The parameters of the command.
+                       const char *str       //!< string used to call the command.
 );
 
 /**
@@ -272,9 +261,9 @@ int shell_thompson_nfa(char* varname, //!< The variable name for the new object.
  * @return
  * The index of the created NFA.
  */
-int shell_glushkov_nfa(char* varname, //!< The variable name for the new object.
-    com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< string used to call the command. 
+int shell_glushkov_nfa(char *varname,        //!< The variable name for the new object.
+                       com_parameters *pars, //!< The parameters of the command.
+                       const char *str       //!< string used to call the command.
 );
 
 /**
@@ -287,9 +276,25 @@ int shell_glushkov_nfa(char* varname, //!< The variable name for the new object.
  * @return
  * The index of the created NFA.
  */
-int shell_mirror_nfa(char* varname, //!< The variable name for the new object.
-    com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< string used to call the command. 
+int shell_mirror_nfa(char *varname,        //!< The variable name for the new object.
+                     com_parameters *pars, //!< The parameters of the command.
+                     const char *str       //!< string used to call the command.
+);
+
+/**
+ * @brief
+ * Computes the quotient of a NFA or regular expression by a word.
+ *
+ * @remark
+ * If an object with the same name already exists, it is deleted.
+ *
+ * @return
+ * The index of the created NFA.
+ */
+int shell_quotient_nfa(char *varname,        //!< The variable name for the new object.
+                       com_parameters *pars, //!< The parameters of the command.
+                       const char *str,      //!< string used to call the command.
+                       bool side             //!< true for left quotient, false for right quotient.
 );
 
 /**
@@ -302,9 +307,9 @@ int shell_mirror_nfa(char* varname, //!< The variable name for the new object.
  * @return
  * The index of the created NFA.
  */
-int shell_union_nfa(char* varname, //!< The variable name for the new object.
-    com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< string used to call the command.
+int shell_union_nfa(char *varname,        //!< The variable name for the new object.
+                    com_parameters *pars, //!< The parameters of the command.
+                    const char *str       //!< string used to call the command.
 );
 
 /**
@@ -317,9 +322,9 @@ int shell_union_nfa(char* varname, //!< The variable name for the new object.
  * @return
  * The index of the created NFA.
  */
-int shell_intersect_nfa(char* varname, //!< The variable name for the new object.
-    com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< string used to call the command.
+int shell_intersect_nfa(char *varname,        //!< The variable name for the new object.
+                        com_parameters *pars, //!< The parameters of the command.
+                        const char *str       //!< string used to call the command.
 );
 
 /**
@@ -332,9 +337,9 @@ int shell_intersect_nfa(char* varname, //!< The variable name for the new object
  * @return
  * The index of the created DFA.
  */
-int shell_directproduct_dfa(char* varname, //!< The variable name for the new object.
-    com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< string used to call the command.
+int shell_directproduct_dfa(char *varname,        //!< The variable name for the new object.
+                            com_parameters *pars, //!< The parameters of the command.
+                            const char *str       //!< string used to call the command.
 );
 
 /**
@@ -347,9 +352,9 @@ int shell_directproduct_dfa(char* varname, //!< The variable name for the new ob
  * @return
  * The index of the created NFA.
  */
-int shell_concat_nfa(char* varname, //!< The variable name for the new object.
-    com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< string used to call the command.
+int shell_concat_nfa(char *varname,        //!< The variable name for the new object.
+                     com_parameters *pars, //!< The parameters of the command.
+                     const char *str       //!< string used to call the command.
 );
 
 /**
@@ -362,9 +367,9 @@ int shell_concat_nfa(char* varname, //!< The variable name for the new object.
  * @return
  * The index of the created NFA.
  */
-int shell_kleene_nfa(char* varname, //!< The variable name for the new object.
-    com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< string used to call the command.
+int shell_kleene_nfa(char *varname,        //!< The variable name for the new object.
+                     com_parameters *pars, //!< The parameters of the command.
+                     const char *str       //!< string used to call the command.
 );
 
 /**
@@ -377,9 +382,9 @@ int shell_kleene_nfa(char* varname, //!< The variable name for the new object.
  * @return
  * The index of the created NFA.
  */
-int shell_elimeps_nfa(char* varname, //!< The variable name for the new object.
-    com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< string used to call the command.
+int shell_elimeps_nfa(char *varname,        //!< The variable name for the new object.
+                      com_parameters *pars, //!< The parameters of the command.
+                      const char *str       //!< string used to call the command.
 );
 
 /**
@@ -392,11 +397,10 @@ int shell_elimeps_nfa(char* varname, //!< The variable name for the new object.
  * @return
  * The index of the created NFA.
  */
-int shell_trim_nfa(char* varname, //!< The variable name for the new object.
-    com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< string used to call the command.
+int shell_trim_nfa(char *varname,        //!< The variable name for the new object.
+                   com_parameters *pars, //!< The parameters of the command.
+                   const char *str       //!< string used to call the command.
 );
-
 
 /**
  * @brief
@@ -411,11 +415,10 @@ int shell_trim_nfa(char* varname, //!< The variable name for the new object.
  * @return
  * The index of the created DFA.
  */
-int shell_determinize_nfa(char* varname, //!< The variable name for the new object.
-    com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< string used to call the command.
+int shell_determinize_nfa(char *varname,        //!< The variable name for the new object.
+                          com_parameters *pars, //!< The parameters of the command.
+                          const char *str       //!< string used to call the command.
 );
-
 
 /**
  * @brief
@@ -427,11 +430,10 @@ int shell_determinize_nfa(char* varname, //!< The variable name for the new obje
  * @return
  * The index of the created DFA.
  */
-int shell_complement_nfa(char* varname, //!< The variable name for the new object.
-    com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< string used to call the command.
+int shell_complement_nfa(char *varname,        //!< The variable name for the new object.
+                         com_parameters *pars, //!< The parameters of the command.
+                         const char *str       //!< string used to call the command.
 );
-
 
 /**
  * @brief
@@ -443,9 +445,9 @@ int shell_complement_nfa(char* varname, //!< The variable name for the new objec
  * @return
  * The index of the created NFA.
  */
-int shell_hopcroft_nfa(char* varname, //!< The variable name for the new object.
-    com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< string used to call the command.
+int shell_hopcroft_nfa(char *varname,        //!< The variable name for the new object.
+                       com_parameters *pars, //!< The parameters of the command.
+                       const char *str       //!< string used to call the command.
 );
 
 /**
@@ -458,9 +460,9 @@ int shell_hopcroft_nfa(char* varname, //!< The variable name for the new object.
  * @return
  * The index of the created NFA.
  */
-int shell_brzozowski_nfa(char* varname, //!< The variable name for the new object.
-    com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< string used to call the command.
+int shell_brzozowski_nfa(char *varname,        //!< The variable name for the new object.
+                         com_parameters *pars, //!< The parameters of the command.
+                         const char *str       //!< string used to call the command.
 );
 
 /**
@@ -473,9 +475,9 @@ int shell_brzozowski_nfa(char* varname, //!< The variable name for the new objec
  * @return
  * The index of the created NFA.
  */
-int shell_invtrans(char* varname, //!< The variable name for the new object.
-    com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< string used to call the command.
+int shell_invtrans(char *varname,        //!< The variable name for the new object.
+                   com_parameters *pars, //!< The parameters of the command.
+                   const char *str       //!< string used to call the command.
 );
 
 /**
@@ -488,9 +490,9 @@ int shell_invtrans(char* varname, //!< The variable name for the new object.
  * @return
  * The index of the created DFA.
  */
-int shell_folding_dfa(char* varname, //!< The variable name for the new object.
-    com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< string used to call the command.
+int shell_folding_dfa(char *varname,        //!< The variable name for the new object.
+                      com_parameters *pars, //!< The parameters of the command.
+                      const char *str       //!< string used to call the command.
 );
 
 /**
@@ -503,9 +505,9 @@ int shell_folding_dfa(char* varname, //!< The variable name for the new object.
  * @return
  * The index of the created NFA.
  */
-int shell_dycktrans_nfa(char* varname, //!< The variable name for the new object.
-    com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< string used to call the command.
+int shell_dycktrans_nfa(char *varname,        //!< The variable name for the new object.
+                        com_parameters *pars, //!< The parameters of the command.
+                        const char *str       //!< string used to call the command.
 );
 
 /**
@@ -518,9 +520,9 @@ int shell_dycktrans_nfa(char* varname, //!< The variable name for the new object
  * @return
  * The index of the created NFA.
  */
-int shell_random_nfa(char* varname, //!< The variable name for the new object.
-    com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< string used to call the command.
+int shell_random_nfa(char *varname,        //!< The variable name for the new object.
+                     com_parameters *pars, //!< The parameters of the command.
+                     const char *str       //!< string used to call the command.
 );
 
 /**
@@ -533,15 +535,10 @@ int shell_random_nfa(char* varname, //!< The variable name for the new object.
  * @return
  * The index of the created NFA.
  */
-int shell_random_dfa(char* varname, //!< The variable name for the new object.
-    com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< string used to call the command.
+int shell_random_dfa(char *varname,        //!< The variable name for the new object.
+                     com_parameters *pars, //!< The parameters of the command.
+                     const char *str       //!< string used to call the command.
 );
-
-
-
-
-
 
 /*******************/
 /*+ File handling +*/
@@ -554,9 +551,9 @@ int shell_random_dfa(char* varname, //!< The variable name for the new object.
  * @return
  * The index of the object in the table, or -2 on failure.
  */
-int shell_open_object(char* varname,   //!< The variable name for storing the object
-    com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_open_object(char *varname,        //!< The variable name for storing the object
+                      com_parameters *pars, //!< The parameters of the command.
+                      const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -566,8 +563,8 @@ int shell_open_object(char* varname,   //!< The variable name for storing the ob
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_save_to_file(com_parameters* pars,//!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_save_to_file(com_parameters *pars, //!< The parameters of the command.
+                       const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -577,8 +574,8 @@ int shell_save_to_file(com_parameters* pars,//!< The parameters of the command.
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_load_session(com_parameters* pars,//!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_load_session(com_parameters *pars, //!< The parameters of the command.
+                       const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -588,17 +585,13 @@ int shell_load_session(com_parameters* pars,//!< The parameters of the command.
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_save_session(com_parameters* pars,//!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_save_session(com_parameters *pars, //!< The parameters of the command.
+                       const char *str       //!< The string used to call the command.
 );
-
 
 /*************/
 /*+ Display +*/
 /*************/
-
-
-
 
 /**
  * @brief
@@ -607,8 +600,8 @@ int shell_save_session(com_parameters* pars,//!< The parameters of the command.
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_latex_gen(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_latex_gen(com_parameters *pars, //!< The parameters of the command.
+                    const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -618,8 +611,8 @@ int shell_latex_gen(com_parameters* pars, //!< The parameters of the command.
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_view_rcayley(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_view_rcayley(com_parameters *pars, //!< The parameters of the command.
+                       const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -629,8 +622,8 @@ int shell_view_rcayley(com_parameters* pars, //!< The parameters of the command.
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_view_lcayley(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_view_lcayley(com_parameters *pars, //!< The parameters of the command.
+                       const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -640,8 +633,8 @@ int shell_view_lcayley(com_parameters* pars, //!< The parameters of the command.
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_view_mormult(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_view_mormult(com_parameters *pars, //!< The parameters of the command.
+                       const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -651,8 +644,8 @@ int shell_view_mormult(com_parameters* pars, //!< The parameters of the command.
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_view_morder(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_view_morder(com_parameters *pars, //!< The parameters of the command.
+                      const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -662,8 +655,8 @@ int shell_view_morder(com_parameters* pars, //!< The parameters of the command.
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_view_idems(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_view_idems(com_parameters *pars, //!< The parameters of the command.
+                     const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -673,8 +666,8 @@ int shell_view_idems(com_parameters* pars, //!< The parameters of the command.
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_toggle_optimization(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_toggle_optimization(com_parameters *pars, //!< The parameters of the command.
+                              const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -684,8 +677,8 @@ int shell_toggle_optimization(com_parameters* pars, //!< The parameters of the c
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_toggle_membership(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_toggle_membership(com_parameters *pars, //!< The parameters of the command.
+                            const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -695,8 +688,8 @@ int shell_toggle_membership(com_parameters* pars, //!< The parameters of the com
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_view_mkernel(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_view_mkernel(com_parameters *pars, //!< The parameters of the command.
+                       const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -706,8 +699,8 @@ int shell_view_mkernel(com_parameters* pars, //!< The parameters of the command.
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_view_akernel(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_view_akernel(com_parameters *pars, //!< The parameters of the command.
+                       const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -717,8 +710,8 @@ int shell_view_akernel(com_parameters* pars, //!< The parameters of the command.
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_view_gkernel(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_view_gkernel(com_parameters *pars, //!< The parameters of the command.
+                       const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -728,8 +721,8 @@ int shell_view_gkernel(com_parameters* pars, //!< The parameters of the command.
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_view_orbits(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_view_orbits(com_parameters *pars, //!< The parameters of the command.
+                      const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -739,8 +732,8 @@ int shell_view_orbits(com_parameters* pars, //!< The parameters of the command.
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_view_nfa_run(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_view_nfa_run(com_parameters *pars, //!< The parameters of the command.
+                       const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -750,13 +743,22 @@ int shell_view_nfa_run(com_parameters* pars, //!< The parameters of the command.
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_view_mor_image(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_view_mor_image(com_parameters *pars, //!< The parameters of the command.
+                         const char *str       //!< The string used to call the command.
 );
 
+/**
+ * @brief
+ * Displays the facto forest of a word for a morphism.
+ *
+ * @return
+ * -1 on success, -2 on failure.
+ */
+int shell_view_facto(com_parameters *pars, //!< The parameters of the command.
+                     const char *str       //!< The string used to call the command.
+);
 
 int shell_jep(void);
-
 
 /*******************/
 /*+ Property test +*/
@@ -769,8 +771,8 @@ int shell_jep(void);
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_counterfree(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_counterfree(com_parameters *pars, //!< The parameters of the command.
+                      const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -780,8 +782,8 @@ int shell_counterfree(com_parameters* pars, //!< The parameters of the command.
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_autoda(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_autoda(com_parameters *pars, //!< The parameters of the command.
+                 const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -791,10 +793,9 @@ int shell_autoda(com_parameters* pars, //!< The parameters of the command.
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_permutation(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_permutation(com_parameters *pars, //!< The parameters of the command.
+                      const char *str       //!< The string used to call the command.
 );
-
 
 /**
  * @brief
@@ -803,10 +804,9 @@ int shell_permutation(com_parameters* pars, //!< The parameters of the command.
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_rtrivialrivial(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_rtrivialrivial(com_parameters *pars, //!< The parameters of the command.
+                         const char *str       //!< The string used to call the command.
 );
-
 
 /**
  * @brief
@@ -815,8 +815,8 @@ int shell_rtrivialrivial(com_parameters* pars, //!< The parameters of the comman
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_commutative(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_commutative(com_parameters *pars, //!< The parameters of the command.
+                      const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -826,10 +826,9 @@ int shell_commutative(com_parameters* pars, //!< The parameters of the command.
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_letteruniform(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_letteruniform(com_parameters *pars, //!< The parameters of the command.
+                        const char *str       //!< The string used to call the command.
 );
-
 
 /**
  * @brief
@@ -838,10 +837,9 @@ int shell_letteruniform(com_parameters* pars, //!< The parameters of the command
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_membership(com_parameters* pars, //!< Command parameters (should include the class and the input language).
-    const char* str //!< The command name.
+int shell_membership(com_parameters *pars, //!< Command parameters (should include the class and the input language).
+                     const char *str       //!< The command name.
 );
-
 
 /**
  * @brief
@@ -850,20 +848,8 @@ int shell_membership(com_parameters* pars, //!< Command parameters (should inclu
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_separation(com_parameters* pars, //!< Command parameters (should include the class and the input language).
-    const char* str //!< The command name.
-);
-
-
-/**
- * @brief
- * Summary of all available tests for concatenation hierarchies.
- *
- * @return
- * -1 on success, -2 on failure.
- */
-int shell_print_chiera(com_parameters* pars, //!< Command parameters (should include the input language).
-    const char* str //!< The command name.
+int shell_separation(com_parameters *pars, //!< Command parameters (should include the class and the input language).
+                     const char *str       //!< The command name.
 );
 
 /**
@@ -873,10 +859,20 @@ int shell_print_chiera(com_parameters* pars, //!< Command parameters (should inc
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_print_navhiera(com_parameters* pars, //!< Command parameters (should include the input language).
-    const char* str //!< The command name.
+int shell_print_chiera(com_parameters *pars, //!< Command parameters (should include the input language).
+                       const char *str       //!< The command name.
 );
 
+/**
+ * @brief
+ * Summary of all available tests for concatenation hierarchies.
+ *
+ * @return
+ * -1 on success, -2 on failure.
+ */
+int shell_print_navhiera(com_parameters *pars, //!< Command parameters (should include the input language).
+                         const char *str       //!< The command name.
+);
 
 /**
  * @brief
@@ -885,8 +881,8 @@ int shell_print_navhiera(com_parameters* pars, //!< Command parameters (should i
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_print_neghiera(com_parameters* pars, //!< Command parameters (should include the base class and the input language).
-    const char* str //!< The command name.
+int shell_print_neghiera(com_parameters *pars, //!< Command parameters (should include the base class and the input language).
+                         const char *str       //!< The command name.
 );
 
 /**
@@ -896,15 +892,13 @@ int shell_print_neghiera(com_parameters* pars, //!< Command parameters (should i
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_print_fphiera(com_parameters* pars, //!< Command parameters (should include the base class and the input language).
-    const char* str //!< The command name.
+int shell_print_fphiera(com_parameters *pars, //!< Command parameters (should include the base class and the input language).
+                        const char *str       //!< The command name.
 );
-
 
 /*************************/
 /*+ Examples generators +*/
 /*************************/
-
 
 /**
  * @brief
@@ -913,8 +907,8 @@ int shell_print_fphiera(com_parameters* pars, //!< Command parameters (should in
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_initfile_exall(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_initfile_exall(com_parameters *pars, //!< The parameters of the command.
+                         const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -924,8 +918,8 @@ int shell_initfile_exall(com_parameters* pars, //!< The parameters of the comman
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_initfile_exfp(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_initfile_exfp(com_parameters *pars, //!< The parameters of the command.
+                        const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -935,10 +929,9 @@ int shell_initfile_exfp(com_parameters* pars, //!< The parameters of the command
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_initfile_exdet(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_initfile_exdet(com_parameters *pars, //!< The parameters of the command.
+                         const char *str       //!< The string used to call the command.
 );
-
 
 /**
  * @brief
@@ -947,8 +940,8 @@ int shell_initfile_exdet(com_parameters* pars, //!< The parameters of the comman
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_continuefile(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_continuefile(com_parameters *pars, //!< The parameters of the command.
+                       const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -958,10 +951,9 @@ int shell_continuefile(com_parameters* pars, //!< The parameters of the command.
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_retrievefile(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_retrievefile(com_parameters *pars, //!< The parameters of the command.
+                       const char *str       //!< The string used to call the command.
 );
-
 
 /**
  * @brief
@@ -970,8 +962,8 @@ int shell_retrievefile(com_parameters* pars, //!< The parameters of the command.
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_browse_dfas(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_browse_dfas(com_parameters *pars, //!< The parameters of the command.
+                      const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -981,8 +973,8 @@ int shell_browse_dfas(com_parameters* pars, //!< The parameters of the command.
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_browse_dfas_neg(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_browse_dfas_neg(com_parameters *pars, //!< The parameters of the command.
+                          const char *str       //!< The string used to call the command.
 );
 
 /**
@@ -992,10 +984,9 @@ int shell_browse_dfas_neg(com_parameters* pars, //!< The parameters of the comma
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_browse_dfas_fp(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_browse_dfas_fp(com_parameters *pars, //!< The parameters of the command.
+                         const char *str       //!< The string used to call the command.
 );
-
 
 /**
  * @brief
@@ -1004,10 +995,9 @@ int shell_browse_dfas_fp(com_parameters* pars, //!< The parameters of the comman
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_browse_dfas_bug(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_browse_dfas_bug(com_parameters *pars, //!< The parameters of the command.
+                          const char *str       //!< The string used to call the command.
 );
-
 
 /**
  * @brief
@@ -1016,8 +1006,8 @@ int shell_browse_dfas_bug(com_parameters* pars, //!< The parameters of the comma
  * @return
  * -1 on success, -2 on failure.
  */
-int shell_browse_dfas_time(com_parameters* pars, //!< The parameters of the command.
-    const char* str //!< The string used to call the command.
+int shell_browse_dfas_time(com_parameters *pars, //!< The parameters of the command.
+                           const char *str       //!< The string used to call the command.
 );
 
 #endif

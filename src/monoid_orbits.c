@@ -1,24 +1,29 @@
 #include "monoid_orbits.h"
-#include "monoid_kernels.h"
 #include "monoid_display.h"
+#include "monoid_kernels.h"
 #include <time.h>
 
-orbits* init_orbits(morphism* M) {
-    orbits* new;
+orbits *init_orbits(morphism *M)
+{
+    orbits *new;
     MALLOC(new, 1);
     new->original = M;
 
-    //Other fields are not initialized at this point
+    // Other fields are not initialized at this point
     new->orbits = NULL;
     return new;
 }
 
-void delete_orbits(orbits* L) {
-    if (L == NULL) {
+void delete_orbits(orbits *L)
+{
+    if (L == NULL)
+    {
         return;
     }
-    for (uint i = 0; i < L->nb_computed; i++) {
-        if (L->orbits[i]) {
+    for (uint i = 0; i < L->nb_computed; i++)
+    {
+        if (L->orbits[i])
+        {
             delete_subsemi(L->orbits[i]);
         }
     }
@@ -26,18 +31,16 @@ void delete_orbits(orbits* L) {
     free(L);
 }
 
-
-
 /*************/
 /* DD-orbits */
 /*************/
 
 // Computes the DD-orbit of a given idempotent
-subsemi* compute_one_ddorb(morphism* M, uint e) {
-    green* G = M->rels;
-    subsemi* S = init_subsemi(M);
+subsemi *compute_one_ddorb(morphism *M, uint e)
+{
+    green *G = M->rels;
+    subsemi *S = init_subsemi(M);
     S->level = LV_FULL;
-
 
     // Computation of the elements inside the orbit
     CALLOC(S->mono_in_sub, M->r_cayley->size_graph);
@@ -45,18 +48,21 @@ subsemi* compute_one_ddorb(morphism* M, uint e) {
     // Computes all elements in the orbit
     // If e is the neutral element and there is no non-empty antecedent,
     // Then its orbit is the singleton {1}
-    if (e == ONE && !mor_nonempty_neutral(M)) {
+    if (e == ONE && !mor_nonempty_neutral(M))
+    {
         S->size = 1;
         S->mono_in_sub[ONE] = true;
     }
-    else {
-        dequeue* eM = compute_r_ideal(M, e, NULL);
-        dequeue* Me = compute_l_ideal(M, e, NULL);
-        dequeue* eMe = make_inter_sorted_dequeue(eM, Me);
+    else
+    {
+        dequeue *eM = compute_r_ideal(M, e, NULL);
+        dequeue *Me = compute_l_ideal(M, e, NULL);
+        dequeue *eMe = make_inter_sorted_dequeue(eM, Me);
         delete_dequeue(eM);
         delete_dequeue(Me);
         S->size = size_dequeue(eMe);
-        for (uint i = 0; i < S->size; i++) {
+        for (uint i = 0; i < S->size; i++)
+        {
             S->mono_in_sub[lefread_dequeue(eMe, i)] = true;
         }
         delete_dequeue(eMe);
@@ -84,54 +90,55 @@ subsemi* compute_one_ddorb(morphism* M, uint e) {
     return S;
 }
 
-orbits* compute_ddorbits(morphism* M) {
-    orbits* res;
+orbits *compute_ddorbits(morphism *M)
+{
+    orbits *res;
     MALLOC(res, 1);
     res->original = M;
     MALLOC(res->orbits, M->nb_min_regular_jcl);
     res->nb_computed = M->nb_min_regular_jcl;
     res->level = LV_FULL;
-    for (uint j = 0; j < M->nb_min_regular_jcl; j++) {
+    for (uint j = 0; j < M->nb_min_regular_jcl; j++)
+    {
         res->orbits[j] = compute_one_ddorb(M, M->regular_idems[j]);
     }
     return res;
 }
 
-
-
 /**************/
 /* G⁺-orbites */
 /**************/
 
-subsemi* compute_one_gplusorb(subsemi* ker, uint e) {
+subsemi *compute_one_gplusorb(subsemi *ker, uint e)
+{
 
     // The original morphism and its Green's relations.
-    morphism* M = ker->original;
+    morphism *M = ker->original;
 
-    subsemi* S = init_subsemi(M);
+    subsemi *S = init_subsemi(M);
     S->level = ker->level;
-
 
     // Computation of the elements inside the orbit
     CALLOC(S->mono_in_sub, M->r_cayley->size_graph);
 
-
-
     // Computes all elements in the orbit
     // If e is the neutral element and there is no non-empty antecedent,
     // Then its orbit is the singleton {1}
-    if (e == ONE && !mor_nonempty_neutral(M)) {
+    if (e == ONE && !mor_nonempty_neutral(M))
+    {
         S->size = 1;
         S->mono_in_sub[ONE] = true;
     }
-    else {
-        dequeue* eM = compute_r_ideal(M, e, ker->mono_in_sub);
-        dequeue* Me = compute_l_ideal(M, e, ker->mono_in_sub);
-        dequeue* eMe = make_inter_sorted_dequeue(eM, Me);
+    else
+    {
+        dequeue *eM = compute_r_ideal(M, e, ker->mono_in_sub);
+        dequeue *Me = compute_l_ideal(M, e, ker->mono_in_sub);
+        dequeue *eMe = make_inter_sorted_dequeue(eM, Me);
         delete_dequeue(eM);
         delete_dequeue(Me);
         S->size = size_dequeue(eMe);
-        for (uint i = 0; i < S->size; i++) {
+        for (uint i = 0; i < S->size; i++)
+        {
             uint s = lefread_dequeue(eMe, i);
             S->mono_in_sub[s] = true;
         }
@@ -154,35 +161,33 @@ subsemi* compute_one_gplusorb(subsemi* ker, uint e) {
     S->rels->JCL = restrict_parti_subset(ker->rels->JCL, S->size, S->mono_in_sub, S->mono_to_sub, ker->sub_to_mono);
     S->rels->HCL = restrict_parti_subset(ker->rels->HCL, S->size, S->mono_in_sub, S->mono_to_sub, ker->sub_to_mono);
 
-
     // Groups and regular elements.
     gr_green_compute(S->idem_list, S->nb_idems, S->rels);
     return S;
 }
 
-orbits* compute_gplusorbits(subsemi* S) {
-    morphism* M = S->original;
-    orbits* res;
+orbits *compute_gplusorbits(subsemi *S)
+{
+    morphism *M = S->original;
+    orbits *res;
     MALLOC(res, 1);
     res->original = M;
     MALLOC(res->orbits, M->nb_min_regular_jcl);
     res->nb_computed = M->nb_min_regular_jcl;
     res->level = S->level;
-    for (uint j = 0; j < M->nb_min_regular_jcl; j++) {
+    for (uint j = 0; j < M->nb_min_regular_jcl; j++)
+    {
         res->orbits[j] = compute_one_gplusorb(S, M->regular_idems[j]);
     }
     return res;
 }
 
-
-
-
 /*************/
 /* AT-orbits */
 /*************/
 
-
-subsemi* compute_one_ptorb(morphism* M, uint e, sub_level level) {
+subsemi *compute_one_ptorb(morphism *M, uint e, sub_level level)
+{
 
 #ifdef DEBUG_ORBITS
     printf("\nComputing the BPol(ST)-orbit of ");
@@ -193,15 +198,13 @@ subsemi* compute_one_ptorb(morphism* M, uint e, sub_level level) {
 
     bool malph[M->r_cayley->size_alpha];
     dgraph_compute_alph_scc(M->r_cayley, M->rels->RCL, M->rels->RCL->numcl[e], malph);
-    subsemi* S = init_subsemi(M);
+    subsemi *S = init_subsemi(M);
     S->level = level;
 
-
     // Computes the set of elements in the orbit
-    dequeue* eM = compute_r_ideal_alph(M, e, malph, NULL);
-    dequeue* Me = compute_l_ideal_alph(M, e, malph, NULL);
-    dequeue* eMe = make_inter_sorted_dequeue(eM, Me);
-
+    dequeue *eM = compute_r_ideal_alph(M, e, malph, NULL);
+    dequeue *Me = compute_l_ideal_alph(M, e, malph, NULL);
+    dequeue *eMe = make_inter_sorted_dequeue(eM, Me);
 
     S->size = size_dequeue(eMe);
 
@@ -209,10 +212,12 @@ subsemi* compute_one_ptorb(morphism* M, uint e, sub_level level) {
     MALLOC(S->mono_in_sub, M->r_cayley->size_graph);
     MALLOC(S->mono_to_sub, M->r_cayley->size_graph);
 
-    for (uint q = 0; q < M->r_cayley->size_graph; q++) {
+    for (uint q = 0; q < M->r_cayley->size_graph; q++)
+    {
         S->mono_in_sub[q] = false;
     }
-    for (uint i = 0; i < size_dequeue(eMe); i++) {
+    for (uint i = 0; i < size_dequeue(eMe); i++)
+    {
         S->sub_to_mono[i] = lefread_dequeue(eMe, i);
         S->mono_to_sub[lefread_dequeue(eMe, i)] = i;
         S->mono_in_sub[lefread_dequeue(eMe, i)] = true;
@@ -226,7 +231,6 @@ subsemi* compute_one_ptorb(morphism* M, uint e, sub_level level) {
     printf("Elements computed. Elements: %d. Time: %f seconds.\n", S->size, difftime(time(NULL), thetime));
 #endif
 
-
     // Computes the lists of idempotents
     compute_idems_subsemi(S);
 
@@ -236,18 +240,17 @@ subsemi* compute_one_ptorb(morphism* M, uint e, sub_level level) {
     // Computes the Green's relations.
     // We first compute the classes R,L,J in the original monoid by restricting the alphabet to malph
 
-
-
     // lgraph* jgraph = ldgraphs_to_lgraph(0, 2, 2, M->r_cayley, M->l_cayley);
     // parti* thej = ltarjan_alph(jgraph, malph);
     // delete_lgraph(jgraph);
 
     // We may now compute the Green's relations in the submonoid
-    if (level == LV_FULL) {
+    if (level == LV_FULL)
+    {
         CALLOC(S->rels, 1);
-        parti* right = dtarjan(M->r_cayley, malph, false);
-        parti* left = dtarjan(M->l_cayley, malph, false);
-        parti* thej = dualdtarjan(M->r_cayley, M->l_cayley, malph, false);
+        parti *right = dtarjan(M->r_cayley, malph, false);
+        parti *left = dtarjan(M->l_cayley, malph, false);
+        parti *thej = dualdtarjan(M->r_cayley, M->l_cayley, malph, false);
         S->rels->RCL = restrict_parti(right, S->size, S->mono_in_sub, S->mono_to_sub);
         S->rels->LCL = restrict_parti(left, S->size, S->mono_in_sub, S->mono_to_sub);
         S->rels->JCL = restrict_parti(thej, S->size, S->mono_in_sub, S->mono_to_sub);
@@ -261,55 +264,48 @@ subsemi* compute_one_ptorb(morphism* M, uint e, sub_level level) {
         // Groups and regular elements
         gr_green_compute(S->idem_list, S->nb_idems, S->rels);
     }
-    else {
+    else
+    {
         green_compute_sub_reg(S);
     }
-
-
 
 #ifdef DEBUG_ORBITS
     printf("Green relations computed. The end. Time: %f seconds.\n", difftime(time(NULL), thetime));
 #endif
 
-
     return S;
-
-
 }
 
-orbits* compute_ptorbits(morphism* M, sub_level level) {
-    orbits* res;
+orbits *compute_ptorbits(morphism *M, sub_level level)
+{
+    orbits *res;
     MALLOC(res, 1);
     res->original = M;
     MALLOC(res->orbits, M->nb_regular_jcl);
     res->nb_computed = M->nb_regular_jcl;
-    if (level == LV_FULL) {
+    if (level == LV_FULL)
+    {
         res->level = LV_FULL;
     }
-    else {
+    else
+    {
         res->level = LV_GREG;
     }
 
-    for (uint j = 0; j < M->nb_regular_jcl; j++) {
+    for (uint j = 0; j < M->nb_regular_jcl; j++)
+    {
         res->orbits[j] = compute_one_ptorb(M, M->regular_idems[j], res->level);
     }
     return res;
 }
 
-
-
 /******************/
 /* BPol(G)-orbits */
 /******************/
 
-
-
-
-
-
-
-static void bpg_fold(morphism* M, uint rcl, parti** fold, dgraph** g_fold, basis type) {
-    dgraph* rcl_g = mor_extract_rcl(M, rcl);
+static void bpg_fold(morphism *M, uint rcl, parti **fold, dgraph **g_fold, basis type)
+{
+    dgraph *rcl_g = mor_extract_rcl(M, rcl);
     *fold = dgraph_stal_fold(rcl_g, NULL, type);
     // switch (type)
     // {
@@ -332,25 +328,31 @@ static void bpg_fold(morphism* M, uint rcl, parti** fold, dgraph** g_fold, basis
     // }
 
     *g_fold = create_dgraph_noedges((*fold)->size_par, M->r_cayley->size_alpha);
-    for (uint i = 0; i < (*fold)->size_par; i++) {
-        for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
+    for (uint i = 0; i < (*fold)->size_par; i++)
+    {
+        for (uint a = 0; a < M->r_cayley->size_alpha; a++)
+        {
             (*g_fold)->edges[i][a] = UINT_MAX;
         }
     }
 
-    for (uint i = 0; i < rcl_g->size_graph;i++) {
-        for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
-            if (rcl_g->edges[i][a] != UINT_MAX) {
+    for (uint i = 0; i < rcl_g->size_graph; i++)
+    {
+        for (uint a = 0; a < M->r_cayley->size_alpha; a++)
+        {
+            if (rcl_g->edges[i][a] != UINT_MAX && (*g_fold)->edges[(*fold)->numcl[i]][a] == UINT_MAX)
+            {
                 (*g_fold)->edges[(*fold)->numcl[i]][a] = (*fold)->numcl[rcl_g->edges[i][a]];
+                (*g_fold)->size_edges++;
             }
         }
     }
+
     delete_dgraph(rcl_g);
 }
 
-
-
-subsemi* compute_one_bpgorb(morphism* M, uint e, sub_level level, basis type) {
+subsemi *compute_one_bpgorb(morphism *M, uint e, sub_level level, basis type)
+{
 
 #ifdef DEBUG_ORBITS
     switch (type)
@@ -377,17 +379,17 @@ subsemi* compute_one_bpgorb(morphism* M, uint e, sub_level level, basis type) {
 #endif
 
     // Case when the basis is ST
-    if (type == BA_ST) {
+    if (type == BA_ST)
+    {
         return compute_one_ptorb(M, e, level);
     }
 
-
-    green* G = M->rels;
+    green *G = M->rels;
 
     // The R-class of e
     uint rcl = G->RCL->numcl[e];
-    parti* rcl_fold;
-    dgraph* rcl_g_fold;
+    parti *rcl_fold;
+    dgraph *rcl_g_fold;
 
     bpg_fold(M, rcl, &rcl_fold, &rcl_g_fold, type);
 
@@ -395,13 +397,10 @@ subsemi* compute_one_bpgorb(morphism* M, uint e, sub_level level, basis type) {
     printf("Folding of the R-class computed. Elements: %d. Time: %f seconds.\n", rcl_fold->size_par, difftime(time(NULL), thetime));
 #endif
 
-
-
     // Computation of the Pol(G)-pairs
     uint size;
-    prod_pair* prod = dgraph_intersec(M->r_cayley, rcl_g_fold, G->RCL->cl_elems[rcl][0], rcl_fold->numcl[0], &size);
+    prod_pair *prod = dgraph_intersec(M->r_cayley, rcl_g_fold, G->RCL->cl_elems[rcl][0], rcl_fold->numcl[0], &size);
     delete_dgraph(rcl_g_fold);
-
 
 #ifdef DEBUG_ORBITS
     printf("Pol(G)-pairs computed. Size: %d, Time: %f.\n", size, difftime(time(NULL), thetime));
@@ -412,18 +411,19 @@ subsemi* compute_one_bpgorb(morphism* M, uint e, sub_level level, basis type) {
     mem_array_sorted(e, G->RCL->cl_elems[rcl], G->RCL->cl_size[rcl], &je);
     uint et = rcl_fold->numcl[je];
     delete_parti(rcl_fold);
-    dequeue* protorb = create_dequeue();
-    for (uint i = 0; i < size; i++) {
-        if (prod[i].q2 == et) {
+    dequeue *protorb = create_dequeue();
+    for (uint i = 0; i < size; i++)
+    {
+        if (prod[i].q2 == et)
+        {
             rigins_dequeue(prod[i].q1, protorb);
         }
     }
     free(prod);
     sort_dequeue_norepeat(protorb);
 
-
-    dequeue* Me = compute_l_ideal(M, e, NULL);
-    dequeue* orbset = make_inter_sorted_dequeue(protorb, Me);
+    dequeue *Me = compute_l_ideal(M, e, NULL);
+    dequeue *orbset = make_inter_sorted_dequeue(protorb, Me);
     delete_dequeue(Me);
 
 #ifdef DEBUG_ORBITS
@@ -431,21 +431,22 @@ subsemi* compute_one_bpgorb(morphism* M, uint e, sub_level level, basis type) {
 #endif
 
     // We may now construct the orbit.
-    subsemi* theorb = init_subsemi(M);
-    if (level == LV_FULL) {
+    subsemi *theorb = init_subsemi(M);
+    if (level == LV_FULL)
+    {
         theorb->level = LV_FULL;
     }
-    else {
+    else
+    {
         theorb->level = LV_GREG;
     }
-
 
     theorb->size = 0; // The size will be computed later
     CALLOC(theorb->mono_in_sub, M->r_cayley->size_graph);
     MALLOC(theorb->mono_to_sub, M->r_cayley->size_graph);
 
-
-    for (uint k = 0; k < size_dequeue(orbset); k++) {
+    for (uint k = 0; k < size_dequeue(orbset); k++)
+    {
         uint ese = lefread_dequeue(orbset, k);
         theorb->mono_in_sub[ese] = true;
         theorb->mono_to_sub[ese] = theorb->size;
@@ -456,8 +457,10 @@ subsemi* compute_one_bpgorb(morphism* M, uint e, sub_level level, basis type) {
 
     MALLOC(theorb->sub_to_mono, theorb->size);
     uint n = 0;
-    for (uint s = 0; s < M->r_cayley->size_graph; s++) {
-        if (theorb->mono_in_sub[s]) {
+    for (uint s = 0; s < M->r_cayley->size_graph; s++)
+    {
+        if (theorb->mono_in_sub[s])
+        {
             theorb->sub_to_mono[n] = s;
             n++;
         }
@@ -473,10 +476,12 @@ subsemi* compute_one_bpgorb(morphism* M, uint e, sub_level level, basis type) {
     printf("Idempotents computed. Time: %f seconds.\n", difftime(time(NULL), thetime));
 #endif
 
-    if (level == LV_FULL) {
+    if (level == LV_FULL)
+    {
         green_compute_sub(theorb);
     }
-    else {
+    else
+    {
         green_compute_sub_reg(theorb);
     }
 
@@ -484,77 +489,77 @@ subsemi* compute_one_bpgorb(morphism* M, uint e, sub_level level, basis type) {
     printf("Green relations computed. The end. Time: %f seconds.\n", difftime(time(NULL), thetime));
 #endif
 
-
     return theorb;
 }
 
-orbits* compute_bpgorbits(morphism* M, sub_level level, basis type) {
-    orbits* res;
+orbits *compute_bpgorbits(morphism *M, sub_level level, basis type)
+{
+    orbits *res;
     MALLOC(res, 1);
     res->original = M;
     MALLOC(res->orbits, M->nb_regular_jcl);
     res->nb_computed = M->nb_regular_jcl;
-    if (level == LV_FULL) {
+    if (level == LV_FULL)
+    {
         res->level = LV_FULL;
     }
-    else {
+    else
+    {
         res->level = LV_GREG;
     }
-    for (uint j = 0; j < M->nb_regular_jcl; j++) {
+    for (uint j = 0; j < M->nb_regular_jcl; j++)
+    {
         res->orbits[j] = compute_one_bpgorb(M, M->regular_idems[j], level, type);
     }
     return res;
 }
 
-
-
 /*******************/
 /* BPol(G⁺)-orbits */
 /*******************/
 
-
-subsemi* compute_one_orbit_from_pairs(morphism* M, uint e, dequeue* eM, bool** pairs, sub_level level) {
-    green* G = M->rels;
+subsemi *compute_one_orbit_from_pairs(morphism *M, uint e, dequeue *eM, bool **pairs, sub_level level)
+{
+    green *G = M->rels;
     // The R-class of e
     uint rcl = G->RCL->numcl[e];
 
-
     // We compute the set Me.
-    dequeue* Me = compute_l_ideal(M, e, NULL);
-
-
+    dequeue *Me = compute_l_ideal(M, e, NULL);
 
     // We may now compute the orbit of e
 
-    subsemi* theorb = init_subsemi(M);
-    if (level == LV_FULL) {
+    subsemi *theorb = init_subsemi(M);
+    if (level == LV_FULL)
+    {
         theorb->level = LV_FULL;
     }
-    else {
+    else
+    {
         theorb->level = LV_GREG;
     }
-
-
 
     theorb->size = 0; // The size will be computed later
     CALLOC(theorb->mono_in_sub, M->r_cayley->size_graph);
     MALLOC(theorb->mono_to_sub, M->r_cayley->size_graph);
 
-
     // Computes the orbit of e: if (ese,e) is a Pol(G)-pair, then ese is in the orbit.
 
     uint je;
     mem_array_sorted(e, G->RCL->cl_elems[rcl], G->RCL->cl_size[rcl], &je);
-    //mem_dequeue_sorted(e, G->RCL->cl[rcl], &je);
-    dequeue* protorb = create_dequeue();
-    for (uint i = 0; i < size_dequeue(eM); i++) {
-        if (pairs[i][je]) {
+    // mem_dequeue_sorted(e, G->RCL->cl[rcl], &je);
+    dequeue *protorb = create_dequeue();
+    for (uint i = 0; i < size_dequeue(eM); i++)
+    {
+        if (pairs[i][je])
+        {
             rigins_dequeue(lefread_dequeue(eM, i), protorb);
         }
     }
-    dequeue* orbset = make_inter_sorted_dequeue(protorb, Me);
+    dequeue *orbset = make_inter_sorted_dequeue(protorb, Me);
 
-    for (uint k = 0; k < size_dequeue(orbset); k++) {
+    for (uint k = 0; k < size_dequeue(orbset); k++)
+    {
         uint ese = lefread_dequeue(orbset, k);
         theorb->mono_in_sub[ese] = true;
         theorb->mono_to_sub[ese] = theorb->size;
@@ -565,8 +570,10 @@ subsemi* compute_one_orbit_from_pairs(morphism* M, uint e, dequeue* eM, bool** p
 
     MALLOC(theorb->sub_to_mono, theorb->size);
     uint n = 0;
-    for (uint s = 0; s < M->r_cayley->size_graph; s++) {
-        if (theorb->mono_in_sub[s]) {
+    for (uint s = 0; s < M->r_cayley->size_graph; s++)
+    {
+        if (theorb->mono_in_sub[s])
+        {
             theorb->sub_to_mono[n] = s;
             n++;
         }
@@ -577,32 +584,39 @@ subsemi* compute_one_orbit_from_pairs(morphism* M, uint e, dequeue* eM, bool** p
 
     compute_idems_subsemi(theorb);
 
-    if (level == LV_FULL) {
+    if (level == LV_FULL)
+    {
         green_compute_sub(theorb);
     }
-    else {
+    else
+    {
         green_compute_sub_reg(theorb);
     }
     return theorb;
 }
 
-// Computes the elements stabilized by the minimal idempotents in a R-class. 
-static void compute_idemstable(morphism* M, uint rcl, dequeue*** mults, bool*** table) {
-    green* G = M->rels;
-    dequeue** ret1;
-    bool** ret2;
+// Computes the elements stabilized by the minimal idempotents in a R-class.
+static void compute_idemstable(morphism *M, uint rcl, dequeue ***mults, bool ***table)
+{
+    green *G = M->rels;
+    dequeue **ret1;
+    bool **ret2;
     MALLOC(ret1, M->nb_min_regular_jcl - 1);
     MALLOC(ret2, M->nb_min_regular_jcl - 1);
-    for (uint i = 1; i < M->nb_min_regular_jcl; i++) {
+    for (uint i = 1; i < M->nb_min_regular_jcl; i++)
+    {
         ret1[i - 1] = create_dequeue();
         MALLOC(ret2[i - 1], G->RCL->cl_size[rcl]);
-        for (uint j = 0; j < G->RCL->cl_size[rcl]; j++) {
+        for (uint j = 0; j < G->RCL->cl_size[rcl]; j++)
+        {
             uint q = G->RCL->cl_elems[rcl][j];
-            if (mor_mult(M, q, M->regular_idems[i]) == q) {
+            if (mor_mult(M, q, M->regular_idems[i]) == q)
+            {
                 rigins_dequeue(q, ret1[i - 1]);
                 ret2[i - 1][j] = true;
             }
-            else {
+            else
+            {
                 ret2[i - 1][j] = false;
             }
         }
@@ -611,40 +625,40 @@ static void compute_idemstable(morphism* M, uint rcl, dequeue*** mults, bool*** 
     *table = ret2;
 }
 
-
-
-subsemi* compute_one_bpddorb(morphism* M, uint e, sub_level level) {
+subsemi *compute_one_bpddorb(morphism *M, uint e, sub_level level)
+{
 
     // If there exists a non-empty neutral element, the BPol(DD)-orbit is the same as the BPol(ST)-orbit
     // (and the latter is much faster to compute).
-    if (mor_nonempty_neutral(M)) {
+    if (mor_nonempty_neutral(M))
+    {
         return compute_one_ptorb(M, e, level);
     }
 
-    green* G = M->rels;
+    green *G = M->rels;
     // The R-class of e.
     uint rcl = G->RCL->numcl[e];
 
     // Table indicating which elements of the R-class are stable under right multiplication by a minimal idempotent.
-    dequeue** mults;
-    bool** idemstable;
+    dequeue **mults;
+    bool **idemstable;
     compute_idemstable(M, rcl, &mults, &idemstable);
 
     // We compute the set eM.
-    dequeue* eM = compute_r_ideal(M, e, NULL);
-
+    dequeue *eM = compute_r_ideal(M, e, NULL);
 
     // Preparation of the array of visited pairs.
-    bool** visited;
+    bool **visited;
     MALLOC(visited, size_dequeue(eM));
-    for (uint i = 0; i < size_dequeue(eM); i++) {
+    for (uint i = 0; i < size_dequeue(eM); i++)
+    {
         CALLOC(visited[i], G->RCL->cl_size[rcl]);
     }
 
     // Stacks to store the new pairs to treat.
-    dequeue* topstack = create_dequeue();
-    dequeue* botstack = create_dequeue();
-    dequeue* rigidem = create_dequeue();
+    dequeue *topstack = create_dequeue();
+    dequeue *botstack = create_dequeue();
+    dequeue *rigidem = create_dequeue();
 
     // We start from a trivial pair built from an element in the R-class.
     rigins_dequeue(G->RCL->cl_elems[rcl][0], topstack);
@@ -652,7 +666,8 @@ subsemi* compute_one_bpddorb(morphism* M, uint e, sub_level level) {
     rigins_dequeue(0, rigidem);
 
     // DFS
-    while (!isempty_dequeue(topstack)) {
+    while (!isempty_dequeue(topstack))
+    {
         uint q = rigpull_dequeue(topstack);
         uint r = rigpull_dequeue(botstack);
         uint l = rigpull_dequeue(rigidem);
@@ -660,15 +675,17 @@ subsemi* compute_one_bpddorb(morphism* M, uint e, sub_level level) {
         uint iq, ir;
         mem_dequeue_sorted(q, eM, &iq);
         mem_array_sorted(r, G->RCL->cl_elems[rcl], G->RCL->cl_size[rcl], &ir);
-        if (visited[iq][ir]) {
+        if (visited[iq][ir])
+        {
             continue;
         }
         visited[iq][ir] = true;
 
-
         // For each letter a, we add the pair (qa,ra)
-        for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
-            if (G->RCL->numcl[M->r_cayley->edges[r][a]] != rcl) {
+        for (uint a = 0; a < M->r_cayley->size_alpha; a++)
+        {
+            if (G->RCL->numcl[M->r_cayley->edges[r][a]] != rcl)
+            {
                 continue;
             }
             rigins_dequeue(M->r_cayley->edges[q][a], topstack);
@@ -676,16 +693,20 @@ subsemi* compute_one_bpddorb(morphism* M, uint e, sub_level level) {
             rigins_dequeue(0, rigidem);
         }
 
-        for (uint k = 1; k < M->nb_min_regular_jcl; k++) {
-            if (l == k) {
+        for (uint k = 1; k < M->nb_min_regular_jcl; k++)
+        {
+            if (l == k)
+            {
                 continue;
             }
             uint f = M->regular_idems[k];
             uint qf = mor_mult(M, q, f);
-            if (qf != q || !idemstable[k - 1][ir]) {
+            if (qf != q || !idemstable[k - 1][ir])
+            {
                 continue;
             }
-            for (uint j = 0; j < size_dequeue(mults[k - 1]); j++) {
+            for (uint j = 0; j < size_dequeue(mults[k - 1]); j++)
+            {
                 rigins_dequeue(q, topstack);
                 rigins_dequeue(lefread_dequeue(mults[k - 1], j), botstack);
                 rigins_dequeue(k, rigidem);
@@ -696,16 +717,18 @@ subsemi* compute_one_bpddorb(morphism* M, uint e, sub_level level) {
     delete_dequeue(topstack);
     delete_dequeue(botstack);
     delete_dequeue(rigidem);
-    for (uint k = 0; k < M->nb_min_regular_jcl - 1; k++) {
+    for (uint k = 0; k < M->nb_min_regular_jcl - 1; k++)
+    {
         free(idemstable[k]);
         delete_dequeue(mults[k]);
     }
     free(idemstable);
     free(mults);
 
-    subsemi* theorb = compute_one_orbit_from_pairs(M, e, eM, visited, level);
+    subsemi *theorb = compute_one_orbit_from_pairs(M, e, eM, visited, level);
 
-    for (uint q = 0; q < size_dequeue(eM); q++) {
+    for (uint q = 0; q < size_dequeue(eM); q++)
+    {
         free(visited[q]);
     }
     free(visited);
@@ -713,14 +736,12 @@ subsemi* compute_one_bpddorb(morphism* M, uint e, sub_level level) {
     return theorb;
 }
 
-
-
-
-static void compute_jmult_orbits(morphism* M, uint rcl, basis type, dequeue**** mults) {
+static void compute_jmult_orbits(morphism *M, uint rcl, basis type, dequeue ****mults)
+{
 
     // We first compute the folding of the R-class according to the type.
-    dgraph* rcl_g = mor_extract_rcl(M, rcl);
-    parti* fold = dgraph_stal_fold(rcl_g, NULL, type);
+    dgraph *rcl_g = mor_extract_rcl(M, rcl);
+    parti *fold = dgraph_stal_fold(rcl_g, NULL, type);
     // switch (type)
     // {
     // case BA_MOD:
@@ -742,45 +763,54 @@ static void compute_jmult_orbits(morphism* M, uint rcl, basis type, dequeue**** 
     delete_dgraph(rcl_g);
 
     // Preparation of the array of stable elements.
-    green* G = M->rels;
-    dequeue*** ret1;
-    bool** table;
+    green *G = M->rels;
+    dequeue ***ret1;
+    bool **table;
     MALLOC(ret1, M->nb_min_regular_jcl - 1);
     MALLOC(table, M->nb_min_regular_jcl - 1);
-    for (uint i = 1; i < M->nb_min_regular_jcl; i++) {
+    for (uint i = 1; i < M->nb_min_regular_jcl; i++)
+    {
         MALLOC(ret1[i - 1], G->RCL->cl_size[rcl]);
         MALLOC(table[i - 1], G->RCL->cl_size[rcl]);
-        for (uint j = 0; j < G->RCL->cl_size[rcl]; j++) {
+        for (uint j = 0; j < G->RCL->cl_size[rcl]; j++)
+        {
             uint q = G->RCL->cl_elems[rcl][j];
-            if (mor_mult(M, q, M->regular_idems[i]) == q) {
+            if (mor_mult(M, q, M->regular_idems[i]) == q)
+            {
                 table[i - 1][j] = true;
             }
-            else {
+            else
+            {
                 table[i - 1][j] = false;
             }
         }
     }
 
-
     // For every index of an element in set
-    for (uint k = 1; k < M->nb_min_regular_jcl; k++) {
-        for (uint j = 0; j < G->RCL->cl_size[rcl]; j++) {
-            if (!table[k - 1][j]) {
+    for (uint k = 1; k < M->nb_min_regular_jcl; k++)
+    {
+        for (uint j = 0; j < G->RCL->cl_size[rcl]; j++)
+        {
+            if (!table[k - 1][j])
+            {
                 ret1[k - 1][j] = NULL;
                 continue;
             }
             ret1[k - 1][j] = create_dequeue();
 
-            for (uint h = 0; h < fold->cl_size[fold->numcl[j]]; h++) {
+            for (uint h = 0; h < fold->cl_size[fold->numcl[j]]; h++)
+            {
                 uint r = G->RCL->cl_elems[rcl][fold->cl_elems[fold->numcl[j]][h]];
 
-                if (r != G->RCL->cl_elems[rcl][j] && table[k - 1][fold->cl_elems[fold->numcl[j]][h]]) {
+                if (r != G->RCL->cl_elems[rcl][j] && table[k - 1][fold->cl_elems[fold->numcl[j]][h]])
+                {
                     rigins_dequeue(r, ret1[k - 1][j]);
                 }
             }
         }
     }
-    for (uint i = 0; i < M->nb_min_regular_jcl - 1; i++) {
+    for (uint i = 0; i < M->nb_min_regular_jcl - 1; i++)
+    {
         free(table[i]);
     }
     free(table);
@@ -788,16 +818,18 @@ static void compute_jmult_orbits(morphism* M, uint rcl, basis type, dequeue**** 
     *mults = ret1;
 }
 
-
-subsemi* compute_one_bpgplusorb(morphism* M, uint e, sub_level level, basis type) {
+subsemi *compute_one_bpgplusorb(morphism *M, uint e, sub_level level, basis type)
+{
     // If the type is BA_ST, we compute the BPol(DD)-orbit.
-    if (type == BA_ST) {
+    if (type == BA_ST)
+    {
         return compute_one_bpddorb(M, e, level);
     }
 
     // If there exists a non-empty neutral element, the BPol(G⁺)-orbit is the same as the BPol(G)-orbit
     // (and the latter is much faster to compute).
-    if (mor_nonempty_neutral(M)) {
+    if (mor_nonempty_neutral(M))
+    {
         return compute_one_bpgorb(M, e, level, type);
     }
 
@@ -822,33 +854,33 @@ subsemi* compute_one_bpgplusorb(morphism* M, uint e, sub_level level, basis type
     ulong thetime = time(NULL);
 #endif
 
-    green* G = M->rels;
+    green *G = M->rels;
 
     // The R-class of e.
     uint rcl = G->RCL->numcl[e];
     // We compute the set eM.
-    dequeue* eM = compute_r_ideal(M, e, NULL);
+    dequeue *eM = compute_r_ideal(M, e, NULL);
 
-    // We compute the Pol(G⁺)-pairs in eM x rcl. 
-    dequeue*** mults;
+    // We compute the Pol(G⁺)-pairs in eM x rcl.
+    dequeue ***mults;
     compute_jmult_orbits(M, rcl, type, &mults);
 
 #ifdef DEBUG_ORBITS
     printf("Multiplication table computed. Time: %f seconds.\n", difftime(time(NULL), thetime));
 #endif
 
-
     // Preparation of the array of visited pairs.
-    bool** visited;
+    bool **visited;
     MALLOC(visited, size_dequeue(eM));
-    for (uint i = 0; i < size_dequeue(eM); i++) {
+    for (uint i = 0; i < size_dequeue(eM); i++)
+    {
         CALLOC(visited[i], G->RCL->cl_size[rcl]);
     }
 
     // Stacks to store the new pairs to treat.
-    dequeue* topstack = create_dequeue();
-    dequeue* botstack = create_dequeue();
-    dequeue* rigidem = create_dequeue();
+    dequeue *topstack = create_dequeue();
+    dequeue *botstack = create_dequeue();
+    dequeue *rigidem = create_dequeue();
 
     // We start from a trivial pair built from an element in the R-class.
     rigins_dequeue(G->RCL->cl_elems[rcl][0], topstack);
@@ -856,7 +888,8 @@ subsemi* compute_one_bpgplusorb(morphism* M, uint e, sub_level level, basis type
     rigins_dequeue(0, rigidem);
 
     // DFS
-    while (!isempty_dequeue(topstack)) {
+    while (!isempty_dequeue(topstack))
+    {
         uint q = rigpull_dequeue(topstack);
         uint r = rigpull_dequeue(botstack);
         uint l = rigpull_dequeue(rigidem);
@@ -864,15 +897,17 @@ subsemi* compute_one_bpgplusorb(morphism* M, uint e, sub_level level, basis type
         uint iq, ir;
         mem_dequeue_sorted(q, eM, &iq);
         mem_array_sorted(r, G->RCL->cl_elems[rcl], G->RCL->cl_size[rcl], &ir);
-        if (visited[iq][ir]) {
+        if (visited[iq][ir])
+        {
             continue;
         }
         visited[iq][ir] = true;
 
-
         // For each letter a, we add the pair (qa,ra)
-        for (uint a = 0; a < M->r_cayley->size_alpha; a++) {
-            if (G->RCL->numcl[M->r_cayley->edges[r][a]] != rcl) {
+        for (uint a = 0; a < M->r_cayley->size_alpha; a++)
+        {
+            if (G->RCL->numcl[M->r_cayley->edges[r][a]] != rcl)
+            {
                 continue;
             }
             rigins_dequeue(M->r_cayley->edges[q][a], topstack);
@@ -880,16 +915,20 @@ subsemi* compute_one_bpgplusorb(morphism* M, uint e, sub_level level, basis type
             rigins_dequeue(0, rigidem);
         }
 
-        for (uint k = 1; k < M->nb_min_regular_jcl; k++) {
-            if (l == k) {
+        for (uint k = 1; k < M->nb_min_regular_jcl; k++)
+        {
+            if (l == k)
+            {
                 continue;
             }
             uint f = M->regular_idems[k];
             uint qf = mor_mult(M, q, f);
-            if (qf != q || !mults[k - 1][ir]) {
+            if (qf != q || !mults[k - 1][ir])
+            {
                 continue;
             }
-            for (uint j = 0; j < size_dequeue(mults[k - 1][ir]); j++) {
+            for (uint j = 0; j < size_dequeue(mults[k - 1][ir]); j++)
+            {
                 rigins_dequeue(q, topstack);
                 rigins_dequeue(lefread_dequeue(mults[k - 1][ir], j), botstack);
                 rigins_dequeue(k, rigidem);
@@ -904,9 +943,12 @@ subsemi* compute_one_bpgplusorb(morphism* M, uint e, sub_level level, basis type
     delete_dequeue(topstack);
     delete_dequeue(botstack);
     delete_dequeue(rigidem);
-    for (uint k = 1; k < M->nb_min_regular_jcl; k++) {
-        for (uint i = 0; i < G->RCL->cl_size[rcl]; i++) {
-            if (mults[k - 1][i]) {
+    for (uint k = 1; k < M->nb_min_regular_jcl; k++)
+    {
+        for (uint i = 0; i < G->RCL->cl_size[rcl]; i++)
+        {
+            if (mults[k - 1][i])
+            {
                 delete_dequeue(mults[k - 1][i]);
             }
         }
@@ -915,41 +957,39 @@ subsemi* compute_one_bpgplusorb(morphism* M, uint e, sub_level level, basis type
     }
     free(mults);
 
-    subsemi* theorb = compute_one_orbit_from_pairs(M, e, eM, visited, level);
+    subsemi *theorb = compute_one_orbit_from_pairs(M, e, eM, visited, level);
 
 #ifdef DEBUG_ORBITS
     printf("Orbit computed. Time: %f seconds.\n", difftime(time(NULL), thetime));
 #endif
 
-    for (uint q = 0; q < size_dequeue(eM); q++) {
+    for (uint q = 0; q < size_dequeue(eM); q++)
+    {
         free(visited[q]);
     }
     free(visited);
     delete_dequeue(eM);
     return theorb;
-    }
+}
 
-
-
-
-
-
-orbits* compute_bpgplusorbits(morphism* M, sub_level level, basis type) {
-    orbits* res;
+orbits *compute_bpgplusorbits(morphism *M, sub_level level, basis type)
+{
+    orbits *res;
     MALLOC(res, 1);
     res->original = M;
     MALLOC(res->orbits, M->nb_regular_jcl);
     res->nb_computed = M->nb_regular_jcl;
-    if (level == LV_FULL) {
+    if (level == LV_FULL)
+    {
         res->level = LV_FULL;
     }
-    else {
+    else
+    {
         res->level = LV_GREG;
     }
-    for (uint j = 0; j < M->nb_regular_jcl; j++) {
+    for (uint j = 0; j < M->nb_regular_jcl; j++)
+    {
         res->orbits[j] = compute_one_bpgplusorb(M, M->regular_idems[j], level, type);
     }
     return res;
 }
-
-

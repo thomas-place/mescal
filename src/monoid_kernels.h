@@ -7,61 +7,47 @@
 #ifndef MONOID_KERNELS_H
 #define MONOID_KERNELS_H
 
- /*  _  __                    _      */
- /* | |/ /___ _ __ _ __   ___| |___  */
- /* | ' // _ \ '__| '_ \ / _ \ / __| */
- /* | . \  __/ |  | | | |  __/ \__ \ */
- /* |_|\_\___|_|  |_| |_|\___|_|___/ */
+/*  _  __                    _      */
+/* | |/ /___ _ __ _ __   ___| |___  */
+/* | ' // _ \ '__| '_ \ / _ \ / __| */
+/* | . \  __/ |  | | | |  __/ \__ \ */
+/* |_|\_\___|_|  |_| |_|\___|_|___/ */
 
+#include "flint/fmpz.h"
+#include "flint/fmpz_mat.h"
 #include "monoid.h"
 #include "monoid_sub.h"
 #include "sep_group.h"
-#include "flint/fmpz.h"
-#include "flint/fmpz_mat.h"
 
-//#define DEBUG_KERNEL
+// #define DEBUG_KERNEL
 
-/**
- * @brief
- * Computes a DFA from the right Cayley graph of a morphism. Discards all
- * transitions which are entering a new regular R-class.
- *
- * @remark
- * Used to compute full Kernels.
- *
- * @return
- * The DFA.
- */
-nfa* morphism_to_dnfa_kernel(morphism* //!< The morphism.
-);
+// /**
+//  * @brief
+//  * Computes a DFA from the right Cayley graph of a morphism. Discards all
+//  * transitions which are not internal to the R-classes.
+//  *
+//  * @remark
+//  * Used to compute the restriction of Kernels to regular elements.
+//  *
+//  * @return
+//  * The DFA.
+//  */
+// nfa *morphism_to_dfa_rcl(morphism * //!< The morphism.
+// );
 
-/**
- * @brief
- * Computes a DFA from the right Cayley graph of a morphism. Discards all
- * transitions which are not internal to the R-classes.
- *
- * @remark
- * Used to compute the restriction of Kernels to regular elements.
- *
- * @return
- * The DFA.
- */
-nfa* morphism_to_dfa_rcl(morphism* //!< The morphism.
-);
-
-/**
- * @brief
- * Computes a DFA from the left Cayley graph of a morphism. Discards all
- * transitions which are not internal to the L-classes.
- *
- * @remark
- * Used to compute the restriction of Kernels to regular elements.
- *
- * @return
- * The DFA.
- */
-nfa* morphism_to_dfa_lcl(morphism* //!< The morphism.
-);
+// /**
+//  * @brief
+//  * Computes a DFA from the left Cayley graph of a morphism. Discards all
+//  * transitions which are not internal to the L-classes.
+//  *
+//  * @remark
+//  * Used to compute the restriction of Kernels to regular elements.
+//  *
+//  * @return
+//  * The DFA.
+//  */
+// nfa *morphism_to_dfa_lcl(morphism * //!< The morphism.
+// );
 
 /**
  * @brief
@@ -77,10 +63,9 @@ nfa* morphism_to_dfa_lcl(morphism* //!< The morphism.
  * @return
  * The kernel.
  */
-subsemi* get_kernel(morphism* M, //!< The morphism.
-    sub_level level, //!< The desired computation level of the subsemigroup.
-    basis ba //!< The basis of the kernel (BA_MOD, BA_AMT or BA_GR). If BA_ST is used, an error is raised.
+subsemi *get_kernel(morphism *M,     //!< The morphism.
+                    sub_level level, //!< The desired computation level of the subsemigroup.
+                    basis ba         //!< The basis of the kernel (BA_MOD, BA_AMT or BA_GR). If BA_ST is used, an error is raised.
 );
-
 
 #endif

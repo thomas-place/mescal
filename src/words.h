@@ -7,11 +7,11 @@
 #ifndef WORDS_H_
 #define WORDS_H_
 
- /*  _         _   _                                  _  __        __            _      */
- /* | |    ___| |_| |_ ___ _ __ ___    __ _ _ __   __| | \ \      / /__  _ __ __| |___  */
- /* | |   / _ \ __| __/ _ \ '__/ __|  / _` | '_ \ / _` |  \ \ /\ / / _ \| '__/ _` / __| */
- /* | |__|  __/ |_| ||  __/ |  \__ \ | (_| | | | | (_| |   \ V  V / (_) | | | (_| \__ \ */
- /* |_____\___|\__|\__\___|_|  |___/  \__,_|_| |_|\__,_|    \_/\_/ \___/|_|  \__,_|___/ */
+/*  _         _   _                                  _  __        __            _      */
+/* | |    ___| |_| |_ ___ _ __ ___    __ _ _ __   __| | \ \      / /__  _ __ __| |___  */
+/* | |   / _ \ __| __/ _ \ '__/ __|  / _` | '_ \ / _` |  \ \ /\ / / _ \| '__/ _` / __| */
+/* | |__|  __/ |_| ||  __/ |  \__ \ | (_| | | | | (_| |   \ V  V / (_) | | | (_| \__ \ */
+/* |_____\___|\__|\__\___|_|  |___/  \__,_|_| |_|\__,_|    \_/\_/ \___/|_|  \__,_|___/ */
 
 #include "alloc.h"
 #include "tools.h"
@@ -30,7 +30,8 @@
  * @remark
  * If no subscript is desired, the associated parameter should be set to -1.
  */
-typedef struct {
+typedef struct
+{
     uchar lab; //!< The ASCII character.
     short num; //!< The subscript (must be either -1 or positive).
 } letter;
@@ -53,7 +54,7 @@ uint length_letter_utf8(letter //!< The letter.
  * The on-screen length of the displayed letter.
  */
 uint fprint_letter_utf8(letter, //!< The letter.
-    FILE* //!< The stream.
+                        FILE *  //!< The stream.
 );
 
 /**
@@ -64,13 +65,8 @@ uint fprint_letter_utf8(letter, //!< The letter.
  * The length of the displayed letter in bytes (generally larger than the on-screen length if there are UTF8 characters).
  */
 int sprint_letter_utf8(letter, //!< The letter.
-    char* //!< The string (must be large enough).
+                       char *  //!< The string (must be large enough).
 );
-
-
-
-
-
 
 /**
  * @brief
@@ -81,18 +77,17 @@ int sprint_letter_utf8(letter, //!< The letter.
  * This is used for the inverse transitions in NFAs.
  */
 void fprint_letter_gviz(letter, //!< The letter.
-    FILE*, //!< The stream.
-    bool //!< True if an inverse power has to be displayed, false otherwise.
+                        FILE *, //!< The stream.
+                        bool    //!< True if an inverse power has to be displayed, false otherwise.
 );
-
 
 /**
  * @brief
  * Displays a letter on a given stream: latex version for the subscripts.
  */
 void fprint_letter_latex(letter, //!< The letter.
-    FILE*, //!< The stream.
-    bool //!< True if an inverse power has to be displayed, false otherwise.
+                         FILE *, //!< The stream.
+                         bool    //!< True if an inverse power has to be displayed, false otherwise.
 );
 
 /**
@@ -102,8 +97,8 @@ void fprint_letter_latex(letter, //!< The letter.
  * @return
  * The comparison.
  */
-int compare_letters(const void*, //!< The first letter.
-    const void* //!< The second letter.
+int compare_letters(const void *, //!< The first letter.
+                    const void *  //!< The second letter.
 );
 
 /**
@@ -113,8 +108,8 @@ int compare_letters(const void*, //!< The first letter.
  * @return
  * A copy of the array of letters.
  */
-letter* duplicate_alphabet(const letter*, //!< The array of letters.
-    uint              //!< The size of the array of letters.
+letter *duplicate_alphabet(const letter *, //!< The array of letters.
+                           uint            //!< The size of the array of letters.
 );
 
 /**
@@ -127,11 +122,10 @@ letter* duplicate_alphabet(const letter*, //!< The array of letters.
  * @return
  * The index of the letter.
  */
-uint letter_index(letter l,      //!< The letter.
-    const letter* alphabet, //!< The alphabet (sorted in increasing order).
-    uint size_alphabet //!< The size of the alphabet (number of letters).
+uint letter_index(letter l,               //!< The letter.
+                  const letter *alphabet, //!< The alphabet (sorted in increasing order).
+                  uint size_alphabet      //!< The size of the alphabet (number of letters).
 );
-
 
 /**
  * @brief
@@ -140,8 +134,9 @@ uint letter_index(letter l,      //!< The letter.
  * @details
  * A word is implemented as a dequeue of letters.
  */
-typedef struct {
-    letter* array;   //!< Array of letters.
+typedef struct
+{
+    letter *array;   //!< Array of letters.
     uint size_array; //!< Size of the array of letters.
     uint left;       //!< Index of the leftmost letter (when nonempty).
     uint right;      //!< Index following the righmost letter (when nonempty).
@@ -155,13 +150,28 @@ typedef struct {
  * @return
  * An empty word.
  */
-word* create_empty_word(void);
+word *create_empty_word(void);
 
 /**
  * @brief
  * Release of a word.
  */
-void delete_word(word* //!< The word.
+void delete_word(word * //!< The word.
+);
+
+/**
+ * @brief
+ * Creates a word from a string.
+ *
+ * @remark
+ * The string must be composed of letters in the format a_b where a is an ASCII
+ * character and b is a non-negative integer (the subscript). If no subscript
+ * is desired, the format a is used.
+ *
+ * @return
+ * The created word.
+ */
+word *word_from_string(const char *st //!< The string.
 );
 
 /**
@@ -171,7 +181,7 @@ void delete_word(word* //!< The word.
  * @return
  * The length of the word.
  */
-uint size_word(const word* //!< The word.
+uint size_word(const word * //!< The word.
 );
 
 /**
@@ -181,7 +191,7 @@ uint size_word(const word* //!< The word.
  * @return.
  * A Boolean indicating whether the word is empty.
  */
-bool isempty_word(const word* //!< The word.
+bool isempty_word(const word * //!< The word.
 );
 
 /**
@@ -189,7 +199,7 @@ bool isempty_word(const word* //!< The word.
  * Concatenates a letter to the left of a word.
  */
 void lefcon_word(letter, //!< The letter.
-    word*  //!< The word.
+                 word *  //!< The word.
 );
 
 /**
@@ -197,7 +207,7 @@ void lefcon_word(letter, //!< The letter.
  * Concatenates a letter to the right of a word.
  */
 void rigcon_word(letter, //!< The letter.
-    word*  //!< The word.
+                 word *  //!< The word.
 );
 
 /**
@@ -210,8 +220,8 @@ void rigcon_word(letter, //!< The letter.
  * @return
  * The letter.
  */
-letter lefread_word(const word*, //!< The word.
-    uint          //!< The index.
+letter lefread_word(const word *, //!< The word.
+                    uint          //!< The index.
 );
 
 /**
@@ -224,8 +234,8 @@ letter lefread_word(const word*, //!< The word.
  * @return
  * The letter.
  */
-letter rigread_word(const word*, //!< The word.
-    uint          //!< The index.
+letter rigread_word(const word *, //!< The word.
+                    uint          //!< The index.
 );
 
 /**
@@ -235,7 +245,7 @@ letter rigread_word(const word*, //!< The word.
  * @return
  * The removed letter.
  */
-letter lefpull_word(word* //!< The word.
+letter lefpull_word(word * //!< The word.
 );
 
 /**
@@ -245,23 +255,23 @@ letter lefpull_word(word* //!< The word.
  * @return
  * The removed letter.
  */
-letter rigpull_word(word* //!< The word.
+letter rigpull_word(word * //!< The word.
 );
 
 /**
  * @brief
  * Concatenates two words into the left one.
  */
-void concatenate_word(word*, //!< The left word (modified).
-    const word* //!< The right word (not modified).
+void concatenate_word(word *,      //!< The left word (modified).
+                      const word * //!< The right word (not modified).
 );
 
 /**
  * @brief
  * Dislpays a word on a given stream (UTF8 is used for the subscripts of letters).
  */
-void display_word(const word*, //!< The word.
-    FILE* //!< The stream.
+void display_word(const word *, //!< The word.
+                  FILE *        //!< The stream.
 );
 
 /**
@@ -272,8 +282,8 @@ void display_word(const word*, //!< The word.
  * An array containing all letters that occur in the word, without repetition.
  * The length of this array is returned using the second parameter.
  */
-letter* get_alphabet_word(const word*, //!< The word.
-    uint* //!< A pointer used to return the length of the computed array.
+letter *get_alphabet_word(const word *, //!< The word.
+                          uint *        //!< A pointer used to return the length of the computed array.
 );
 
 #endif

@@ -6,20 +6,20 @@
 #ifndef SHELL_SCLASS_H
 #define SHELL_SCLASS_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdbool.h>
 #include "alloc.h"
 #include "shell_keywords.h"
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 /**
  * @brief
  * Internal names for all known classes.
  */
-typedef enum {
+typedef enum
+{
     // Ad-Hoc
     CL_HTGEN,
-
 
     // Star-free
     CL_SF,
@@ -44,6 +44,22 @@ typedef enum {
     CL_POL2MODP,
     CL_POL2AMTP,
     CL_POL2GRP,
+    CL_COPPT,
+    CL_COPOLMOD,
+    CL_COPOLAMT,
+    CL_COPOLGR,
+    CL_COPOLDD,
+    CL_COPOLMODP,
+    CL_COPOLAMTP,
+    CL_COPOLGRP,
+    CL_COPOL2ST,
+    CL_COPOL2MOD,
+    CL_COPOL2AMT,
+    CL_COPOL2GR,
+    CL_COPOL2DD,
+    CL_COPOL2MODP,
+    CL_COPOL2AMTP,
+    CL_COPOL2GRP,
 
     // Boolean Polynomial closure
     CL_PT,
@@ -70,7 +86,6 @@ typedef enum {
     CL_JORBAMTP,
     CL_JORBGRP,
     CL_JORBAT,
-
 
     CL_KNASTAMTP,
     CL_KNASTGRP,
@@ -169,13 +184,13 @@ typedef enum {
  * @brief
  * Array containing the information functions for all classes.
  */
-extern void (*class_infos[CL_END]) (FILE*);
+extern void (*class_infos[CL_END])(FILE *);
 
 /**
  * @brief
  * Array containing the classes names.
  */
-extern const char* class_names[CL_END];
+extern const char *class_names[CL_END];
 
 /*********************/
 /* General functions */
@@ -187,7 +202,6 @@ extern const char* class_names[CL_END];
  */
 void init_class_info(void);
 
-
 /**
  * @brief
  * Computes the class corresponding to a command
@@ -195,17 +209,13 @@ void init_class_info(void);
  * @remark
  * Returns CL_END if the command does not correspod to a class.
  */
-classes command_to_class(com_command*);
-
-
-
-
+classes command_to_class(com_command *);
 
 /**
  * @brief
  * Print information on a class
  */
-void print_class_info(classes, FILE*);
+void print_class_info(classes, FILE *);
 
 /**
  * @brief
@@ -220,204 +230,191 @@ bool class_is_basis(classes cl);
 /* AD-HOC */
 /**********/
 
-void info_htgen(FILE*);
+void info_htgen(FILE *);
 
 /*************/
 /* Star-free */
 /*************/
 
-void info_sf(FILE*);
-void info_sf_mod(FILE*);
-void info_sf_amt(FILE*);
-void info_sf_gr(FILE*);
-
-
+void info_sf(FILE *);
+void info_sf_mod(FILE *);
+void info_sf_amt(FILE *);
+void info_sf_gr(FILE *);
 
 /**********************/
 /* Polynomial closure */
 /**********************/
 
-void info_ppt(FILE*);
-void info_pol_mod(FILE*);
-void info_pol_amt(FILE*);
-void info_pol_gr(FILE*);
-void info_pol_dd(FILE*);
-void info_pol_modp(FILE*);
-void info_pol_amtp(FILE*);
-void info_pol_grp(FILE*);
-void info_pol2_st(FILE*);
-void info_pol2_mod(FILE*);
-void info_pol2_amt(FILE*);
-void info_pol2_gr(FILE*);
-void info_pol2_dd(FILE*);
-void info_pol2_modp(FILE*);
-void info_pol2_amtp(FILE*);
-void info_pol2_grp(FILE*);
-
+void info_ppt(FILE *);
+void info_pol_mod(FILE *);
+void info_pol_amt(FILE *);
+void info_pol_gr(FILE *);
+void info_pol_dd(FILE *);
+void info_pol_modp(FILE *);
+void info_pol_amtp(FILE *);
+void info_pol_grp(FILE *);
+void info_pol2_st(FILE *);
+void info_pol2_mod(FILE *);
+void info_pol2_amt(FILE *);
+void info_pol2_gr(FILE *);
+void info_pol2_dd(FILE *);
+void info_pol2_modp(FILE *);
+void info_pol2_amtp(FILE *);
+void info_pol2_grp(FILE *);
 
 /******************************/
 /* Boolean Polynomial closure */
 /******************************/
 
-void info_pt(FILE*);
-void info_bpol_mod(FILE*);
-void info_bpol_amt(FILE*);
-void info_bpol_gr(FILE*);
-void info_bpol_dd(FILE*);
-void info_bpol_modp(FILE*);
-void info_bpol_amtp(FILE*);
-void info_bpol_grp(FILE*);
-void info_bpol2_st(FILE*);
-void info_bpol2_mod(FILE*);
-void info_bpol2_amt(FILE*);
-void info_bpol2_gr(FILE*);
-void info_bpol2_dd(FILE*);
-void info_bpol2_modp(FILE*);
-void info_bpol2_amtp(FILE*);
-void info_bpol2_grp(FILE*);
+void info_pt(FILE *);
+void info_bpol_mod(FILE *);
+void info_bpol_amt(FILE *);
+void info_bpol_gr(FILE *);
+void info_bpol_dd(FILE *);
+void info_bpol_modp(FILE *);
+void info_bpol_amtp(FILE *);
+void info_bpol_grp(FILE *);
+void info_bpol2_st(FILE *);
+void info_bpol2_mod(FILE *);
+void info_bpol2_amt(FILE *);
+void info_bpol2_gr(FILE *);
+void info_bpol2_dd(FILE *);
+void info_bpol2_modp(FILE *);
+void info_bpol2_amtp(FILE *);
+void info_bpol2_grp(FILE *);
 
-void info_jorb_dd(FILE*);
-void info_jorb_mod(FILE*);
-void info_jorb_amt(FILE*);
-void info_jorb_modp(FILE*);
-void info_jorb_amtp(FILE*);
-void info_jorb_grp(FILE*);
-void info_jorb_at(FILE*);
+void info_jorb_dd(FILE *);
+void info_jorb_mod(FILE *);
+void info_jorb_amt(FILE *);
+void info_jorb_modp(FILE *);
+void info_jorb_amtp(FILE *);
+void info_jorb_grp(FILE *);
+void info_jorb_at(FILE *);
 
-void info_knastamtp(FILE*);
-void info_knastgrp(FILE*);
-void info_knastat(FILE*);
+void info_knastamtp(FILE *);
+void info_knastgrp(FILE *);
+void info_knastat(FILE *);
 
 /**********************************/
 /* Unambiguous Polynomial closure */
 /**********************************/
 
-void info_upol_dd(FILE*);
-void info_upol_modp(FILE*);
-void info_upol_amtp(FILE*);
-void info_upol_grp(FILE*);
+void info_upol_dd(FILE *);
+void info_upol_modp(FILE *);
+void info_upol_amtp(FILE *);
+void info_upol_grp(FILE *);
 
-void info_ubpol2_st(FILE*);
-void info_ubpol2_mod(FILE*);
-void info_ubpol2_amt(FILE*);
-void info_ubpol2_gr(FILE*);
-void info_ubpol2_dd(FILE*);
-void info_ubpol2_modp(FILE*);
-void info_ubpol2_amtp(FILE*);
-void info_ubpol2_grp(FILE*);
-
+void info_ubpol2_st(FILE *);
+void info_ubpol2_mod(FILE *);
+void info_ubpol2_amt(FILE *);
+void info_ubpol2_gr(FILE *);
+void info_ubpol2_dd(FILE *);
+void info_ubpol2_modp(FILE *);
+void info_ubpol2_amtp(FILE *);
+void info_ubpol2_grp(FILE *);
 
 /***************/
 /* UTL closure */
 /***************/
 
-void info_ul(FILE*);
-void info_utl_mod(FILE*);
-void info_utl_amt(FILE*);
-void info_utl_gr(FILE*);
-void info_utl_dd(FILE*);
-void info_utl_modp(FILE*);
-void info_utl_amtp(FILE*);
-void info_utl_grp(FILE*);
-void info_utl2_st(FILE*);
-void info_utl2_mod(FILE*);
-void info_utl2_amt(FILE*);
-void info_utl2_gr(FILE*);
-void info_utl2_dd(FILE*);
-void info_utl2_modp(FILE*);
-void info_utl2_amtp(FILE*);
-void info_utl2_grp(FILE*);
-
+void info_ul(FILE *);
+void info_utl_mod(FILE *);
+void info_utl_amt(FILE *);
+void info_utl_gr(FILE *);
+void info_utl_dd(FILE *);
+void info_utl_modp(FILE *);
+void info_utl_amtp(FILE *);
+void info_utl_grp(FILE *);
+void info_utl2_st(FILE *);
+void info_utl2_mod(FILE *);
+void info_utl2_amt(FILE *);
+void info_utl2_gr(FILE *);
+void info_utl2_dd(FILE *);
+void info_utl2_modp(FILE *);
+void info_utl2_amtp(FILE *);
+void info_utl2_grp(FILE *);
 
 /***************/
 /* FTL closure */
 /***************/
 
-void info_ftl_st(FILE*);
-void info_ftl_mod(FILE*);
-void info_ftl_amt(FILE*);
-void info_ftl_gr(FILE*);
-void info_ftl_dd(FILE*);
-void info_ftl_modp(FILE*);
-void info_ftl_amtp(FILE*);
-void info_ftl_grp(FILE*);
-void info_ftl2_st(FILE*);
-void info_ftl2_mod(FILE*);
-void info_ftl2_amt(FILE*);
-void info_ftl2_gr(FILE*);
-void info_ftl2_dd(FILE*);
-void info_ftl2_modp(FILE*);
-void info_ftl2_amtp(FILE*);
-void info_ftl2_grp(FILE*);
-
+void info_ftl_st(FILE *);
+void info_ftl_mod(FILE *);
+void info_ftl_amt(FILE *);
+void info_ftl_gr(FILE *);
+void info_ftl_dd(FILE *);
+void info_ftl_modp(FILE *);
+void info_ftl_amtp(FILE *);
+void info_ftl_grp(FILE *);
+void info_ftl2_st(FILE *);
+void info_ftl2_mod(FILE *);
+void info_ftl2_amt(FILE *);
+void info_ftl2_gr(FILE *);
+void info_ftl2_dd(FILE *);
+void info_ftl2_modp(FILE *);
+void info_ftl2_amtp(FILE *);
+void info_ftl2_grp(FILE *);
 
 /***************/
 /* PTL closure */
 /***************/
 
-void info_ptl_st(FILE*);
-void info_ptl_mod(FILE*);
-void info_ptl_amt(FILE*);
-void info_ptl_gr(FILE*);
-void info_ptl_dd(FILE*);
-void info_ptl_modp(FILE*);
-void info_ptl_amtp(FILE*);
-void info_ptl_grp(FILE*);
-void info_ptl2_st(FILE*);
-void info_ptl2_mod(FILE*);
-void info_ptl2_amt(FILE*);
-void info_ptl2_gr(FILE*);
-void info_ptl2_dd(FILE*);
-void info_ptl2_modp(FILE*);
-void info_ptl2_amtp(FILE*);
-void info_ptl2_grp(FILE*);
-
+void info_ptl_st(FILE *);
+void info_ptl_mod(FILE *);
+void info_ptl_amt(FILE *);
+void info_ptl_gr(FILE *);
+void info_ptl_dd(FILE *);
+void info_ptl_modp(FILE *);
+void info_ptl_amtp(FILE *);
+void info_ptl_grp(FILE *);
+void info_ptl2_st(FILE *);
+void info_ptl2_mod(FILE *);
+void info_ptl2_amt(FILE *);
+void info_ptl2_gr(FILE *);
+void info_ptl2_dd(FILE *);
+void info_ptl2_modp(FILE *);
+void info_ptl2_amtp(FILE *);
+void info_ptl2_grp(FILE *);
 
 /******************/
 /* Single classes */
 /******************/
 
-void info_at(FILE*);
-void info_att(FILE*);
-void info_lt(FILE*);
-void info_ltt(FILE*);
-void info_st(FILE*);
-void info_dd(FILE*);
-void info_mod(FILE*);
-void info_modp(FILE*);
-void info_amt(FILE*);
-void info_amtp(FILE*);
-void info_gr(FILE*);
-void info_grp(FILE*);
-void info_reg(FILE*);
-void info_empty(FILE*);
-
+void info_at(FILE *);
+void info_att(FILE *);
+void info_lt(FILE *);
+void info_ltt(FILE *);
+void info_st(FILE *);
+void info_dd(FILE *);
+void info_mod(FILE *);
+void info_modp(FILE *);
+void info_amt(FILE *);
+void info_amtp(FILE *);
+void info_gr(FILE *);
+void info_grp(FILE *);
+void info_reg(FILE *);
+void info_empty(FILE *);
 
 /*********************/
 /* Affichage partagé */
 /*********************/
 
-void print_info_input(int i, FILE* out);
+void print_info_input(int i, FILE *out);
 
-void print_start_comp(FILE* out, char* class);
+void print_start_comp(FILE *out, char *class);
 
-void print_conclusion_comp(FILE* out, bool res, const char* namec);
+void print_conclusion_comp(FILE *out, bool res, const char *namec);
 
-void print_conclusion_separ(FILE* out, bool res, const char* namec);
-
-
+void print_conclusion_separ(FILE *out, bool res, const char *namec);
 
 /***********************************************/
 /* Affichage des informations sur un opérateur */
 /***********************************************/
 
-
-
-
 // Negation hierarchies
-void print_infooper_neghiera(classes c, FILE* out);
+void print_infooper_neghiera(classes c, FILE *out);
 
 // Future/past hierarchies
-void print_infooper_fphiera(classes c, FILE* out);
+void print_infooper_fphiera(classes c, FILE *out);
 
 #endif

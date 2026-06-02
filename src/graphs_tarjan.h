@@ -6,22 +6,21 @@
 #ifndef TARJAN_H_
 #define TARJAN_H_
 
- /*   ____                 _             _____          _             _      */
- /*  / ___|_ __ __ _ _ __ | |__  ___ _  |_   _|_ _ _ __(_) __ _ _ __ ( )___  */
- /* | |  _| '__/ _` | '_ \| '_ \/ __(_)   | |/ _` | '__| |/ _` | '_ \|// __| */
- /* | |_| | | | (_| | |_) | | | \__ \_    | | (_| | |  | | (_| | | | | \__ \ */
- /*  \____|_|_ \__,_| .__/|_| |_|___(_)   |_|\__,_|_| _/ |\__,_|_| |_| |___/ */
- /*    / \  | | __ _|_|__  _ __(_) |_| |__  _ __ ___ |__/                    */
- /*   / _ \ | |/ _` |/ _ \| '__| | __| '_ \| '_ ` _ \                        */
- /*  / ___ \| | (_| | (_) | |  | | |_| | | | | | | | |                       */
- /* /_/   \_\_|\__, |\___/|_|  |_|\__|_| |_|_| |_| |_|                       */
- /*            |___/                                                         */
+/*   ____                 _             _____          _             _      */
+/*  / ___|_ __ __ _ _ __ | |__  ___ _  |_   _|_ _ _ __(_) __ _ _ __ ( )___  */
+/* | |  _| '__/ _` | '_ \| '_ \/ __(_)   | |/ _` | '__| |/ _` | '_ \|// __| */
+/* | |_| | | | (_| | |_) | | | \__ \_    | | (_| | |  | | (_| | | | | \__ \ */
+/*  \____|_|_ \__,_| .__/|_| |_|___(_)   |_|\__,_|_| _/ |\__,_|_| |_| |___/ */
+/*    / \  | | __ _|_|__  _ __(_) |_| |__  _ __ ___ |__/                    */
+/*   / _ \ | |/ _` |/ _ \| '__| | __| '_ \| '_ ` _ \                        */
+/*  / ___ \| | (_| | (_) | |  | | |_| | | | | | | | |                       */
+/* /_/   \_\_|\__, |\___/|_|  |_|\__|_| |_|_| |_| |_|                       */
+/*            |___/                                                         */
 
-//#define DEBUG_TARJAN
+// #define DEBUG_TARJAN
 
-
-#include "type_partitions.h"
 #include "graphs.h"
+#include "type_partitions.h"
 #include <stdbool.h>
 
 /***********************/
@@ -38,7 +37,7 @@
  * @return
  * The partition of the graph into strongly connected components.
  */
-parti* tarjan(graph* g //!< The unlabeled graph.
+parti *tarjan(graph *g //!< The unlabeled graph.
 );
 
 /**
@@ -51,8 +50,8 @@ parti* tarjan(graph* g //!< The unlabeled graph.
  * @return
  * The partition of the graph into strongly connected components.
  */
-parti* ltarjan(lgraph* g, //!< The labeled graph.
-    bool* alph //!< An array of Booleans indexed by the labels. Only the edges labeled by a letter marked true are considered. NULL means all labels are considered.
+parti *ltarjan(lgraph *g, //!< The labeled graph.
+               bool *alph //!< An array of Booleans indexed by the labels. Only the edges labeled by a letter marked true are considered. NULL means all labels are considered.
 );
 
 /**
@@ -65,11 +64,10 @@ parti* ltarjan(lgraph* g, //!< The labeled graph.
  * @return
  * The partition of the graph into strongly connected components.
  */
-parti* dtarjan(dgraph* g, //!< The complete deterministic labeled graph.
-    bool* alph, //!< An array of Booleans indexed by the labels. Only the edges labeled by a letter marked true are considered. NULL means all labels are considered.
-    bool ismor      //!< If true, the algorithm is run on a Cayley graph (all vertices are reachable from ONE = 0).
+parti *dtarjan(dgraph *g,  //!< The complete deterministic labeled graph.
+               bool *alph, //!< An array of Booleans indexed by the labels. Only the edges labeled by a letter marked true are considered. NULL means all labels are considered.
+               bool ismor  //!< If true, the algorithm is run on a Cayley graph (all vertices are reachable from ONE = 0).
 );
-
 
 /**
  * @brief
@@ -82,17 +80,15 @@ parti* dtarjan(dgraph* g, //!< The complete deterministic labeled graph.
  * @return
  * The partition of the graph into strongly connected components.
  */
-parti* dualdtarjan(dgraph* g1, //!< The first complete deterministic labeled graph.
-    dgraph* g2, //!< The second complete deterministic labeled graph.
-    bool* alph, //!< An array of Booleans indexed by the labels. Only the edges labeled by a letter marked true are considered. NULL means all labels are considered.
-    bool ismor //!< If true, the algorithm is run on Cayley graphs (all vertices are reachable from ONE = 0).
+parti *dualdtarjan(dgraph *g1, //!< The first complete deterministic labeled graph.
+                   dgraph *g2, //!< The second complete deterministic labeled graph.
+                   bool *alph, //!< An array of Booleans indexed by the labels. Only the edges labeled by a letter marked true are considered. NULL means all labels are considered.
+                   bool ismor  //!< If true, the algorithm is run on Cayley graphs (all vertices are reachable from ONE = 0).
 );
-
 
 /**************************/
 /*+ Computations on SCCS +*/
 /**************************/
-
 
 /**
  * @brief
@@ -101,11 +97,13 @@ parti* dualdtarjan(dgraph* g1, //!< The first complete deterministic labeled gra
  * @return
  * A pointer to the extracted dgraph.
  */
-dgraph* dgraph_extract(dgraph* g, //!< The dgraph to extract the SCC from.
-    parti* P, //!< The partition of the dgraph.
-    uint* inv, //!< The inverse mapping of the partition.
-    uint j //!< The index of the SCC to extract.
+dgraph *dgraph_extract(dgraph *g, //!< The dgraph to extract the SCC from.
+                       parti *P,  //!< The partition of the dgraph.
+                       uint *inv, //!< The inverse mapping of the partition.
+                       uint j     //!< The index of the SCC to extract.
 );
+
+dgraph *dgraph_to_unary(dgraph *G);
 
 /**
  * @brief
@@ -115,13 +113,15 @@ dgraph* dgraph_extract(dgraph* g, //!< The dgraph to extract the SCC from.
  * The alphabet is computed as an array of Booleans indexed by the letters. This
  * array muste be allocated by the caller and must have a size equal to the number
  * of labels in the graph.
+ *
+ * @return
+ * True if the alphabet is not empty, false otherwise.
  */
-void dgraph_compute_alph_scc(dgraph* g, //!< The graph.
-    parti* sccs, //!< The partition of the graph into strongly connected components.
-    uint scc, //!< The index of the SCC.
-    bool* alph //!< The array used to store the computed alphabet (an array indexed by the letters).
+bool dgraph_compute_alph_scc(dgraph *g,   //!< The graph.
+                             parti *sccs, //!< The partition of the graph into strongly connected components.
+                             uint scc,    //!< The index of the SCC.
+                             bool *alph   //!< The array used to store the computed alphabet (an array indexed by the letters).
 );
-
 
 /**
  * @brief
@@ -134,14 +134,13 @@ void dgraph_compute_alph_scc(dgraph* g, //!< The graph.
  * @return
  * True if the alphabet is not empty, false otherwise.
  */
-bool dgraph_common_alph_loop(dgraph* g, //!< The graph.
-    parti* sccs, //!< The partition of the graph into strongly connected components.
-    uint* inv_sccs, //!< The inverse mapping of the partition.
-    uint q1, //!< The index of the state in the first SCC.
-    uint q2, //!< The index of the state in the second SCC.
-    bool* alph //!< The alphabet of the SCC (an array indexed by the letters).
+bool dgraph_common_alph_loop(dgraph *g,      //!< The graph.
+                             parti *sccs,    //!< The partition of the graph into strongly connected components.
+                             uint *inv_sccs, //!< The inverse mapping of the partition.
+                             uint q1,        //!< The index of the state in the first SCC.
+                             uint q2,        //!< The index of the state in the second SCC.
+                             bool *alph      //!< The alphabet of the SCC (an array indexed by the letters).
 );
-
 
 /**
  * @brief
@@ -150,8 +149,8 @@ bool dgraph_common_alph_loop(dgraph* g, //!< The graph.
  * @remark
  * Discarded edges are give the destination value UINT_MAX.
  */
-void dgraph_discard_nonscc_edges(dgraph* g, //!< The dgraph to modify.
-    parti* sccs //!< The partition of the dgraph into sccs.
+void dgraph_discard_nonscc_edges(dgraph *g,  //!< The dgraph to modify.
+                                 parti *sccs //!< The partition of the dgraph into sccs.
 );
 
 /**
@@ -161,10 +160,9 @@ void dgraph_discard_nonscc_edges(dgraph* g, //!< The dgraph to modify.
  * @return
  * A pointer to the resulting dgraph.
  */
-dgraph* dgraph_copy_discard_nonscc_edges(dgraph* g, //!< The dgraph to copy.
-    parti* sccs //!< The SCCs of the dgraph.
+dgraph *dgraph_copy_discard_nonscc_edges(dgraph *g,  //!< The dgraph to copy.
+                                         parti *sccs //!< The SCCs of the dgraph.
 );
-
 
 /**
  * @brief
@@ -177,11 +175,14 @@ dgraph* dgraph_copy_discard_nonscc_edges(dgraph* g, //!< The dgraph to copy.
  * @return
  * A Boolean indicating whether there exists a non-trivial loop on the state q.
  */
-bool dgraph_ntrivial_loop(dgraph* g, //!< The dgraph to test.
-    parti* sccs, //!< The SCCs of the dgraph.
-    uint q //!< The state q.
+bool dgraph_ntrivial_loop(dgraph *g,   //!< The dgraph to test.
+                          parti *sccs, //!< The SCCs of the dgraph.
+                          uint q       //!< The state q.
 );
 
-
+bool dgraph_ntrivial_scc(dgraph *g,   //!< The dgraph to test.
+                         parti *sccs, //!< The SCCs of the dgraph.
+                         uint i       //!< The index of the SCC to test.
+);
 
 #endif // TARJAN_H_

@@ -3,24 +3,27 @@
 #include "error.h"
 #include "interrupt.h"
 #include "nfa.h"
+#include "printing.h"
 #include "regexp.h"
 #include "shell_errors.h"
-#include "printing.h"
 
-object* objects = NULL;
+object *objects = NULL;
 int nb_objects = 0;
 int nb_objemax = 0;
 
-char* object_types_names[DUMMY] = { "empty object", "regexp", "automaton", "automaton", "morphism", "recdef" };
+char *object_types_names[DUMMY] = {"empty object", "regexp", "automaton", "automaton", "morphism", "recdef"};
 
-void init_objects_array(void) {
+void init_objects_array(void)
+{
     CALLOC(objects, 1024);
     nb_objects = 0;
     nb_objemax = 1024;
 }
 
-void grow_objects_array(void) {
-    if (nb_objects >= nb_objemax) {
+void grow_objects_array(void)
+{
+    if (nb_objects >= nb_objemax)
+    {
         nb_objemax *= 2;
         REALLOC(objects, nb_objemax);
     }
@@ -30,12 +33,14 @@ void grow_objects_array(void) {
 /* Création/Suppression */
 /************************/
 
-ob_prefixname* create_prefixname_full(const char* name) {
-    if (!name || strlen(name) == 0) {
+ob_prefixname *create_prefixname_full(const char *name)
+{
+    if (!name || strlen(name) == 0)
+    {
         fprintf(stderr, "Error: tried to create a prefix with an empty name.\n");
         return NULL;
     }
-    ob_prefixname* prefix;
+    ob_prefixname *prefix;
     MALLOC(prefix, 1);
     prefix->name = strdup(name);
     prefix->count = 1;
@@ -43,16 +48,19 @@ ob_prefixname* create_prefixname_full(const char* name) {
     return prefix;
 }
 
-ob_prefixname* create_prefixname(const char* name, uint count) {
-    if (!name || strlen(name) == 0) {
+ob_prefixname *create_prefixname(const char *name, uint count)
+{
+    if (!name || strlen(name) == 0)
+    {
         fprintf(stderr, "Error: tried to create a prefix with an empty name.\n");
         return NULL;
     }
-    if (count == 0) {
+    if (count == 0)
+    {
         fprintf(stderr, "Error: tried to create a prefix with count 0.\n");
         return NULL;
     }
-    ob_prefixname* prefix;
+    ob_prefixname *prefix;
     MALLOC(prefix, 1);
     prefix->name = strdup(name);
     prefix->count = count;
@@ -60,83 +68,101 @@ ob_prefixname* create_prefixname(const char* name, uint count) {
     return prefix;
 }
 
-void remove_instance_prefixname(ob_prefixname* prefixname) {
-    if (!prefixname) {
+void remove_instance_prefixname(ob_prefixname *prefixname)
+{
+    if (!prefixname)
+    {
         return;
     }
-    if (prefixname->count > 0) {
+    if (prefixname->count > 0)
+    {
         prefixname->count--;
     }
 
-    if (prefixname->count == 0 || prefixname->digits == 0) {
+    if (prefixname->count == 0 || prefixname->digits == 0)
+    {
         free(prefixname->name);
         free(prefixname);
     }
 }
 
-int object_init(const char* name) {
+int object_init(const char *name)
+{
     grow_objects_array();
     int i = nb_objects++;
-    if (name) {
+    if (name)
+    {
         objects[i].prefix = create_prefixname_full(name);
         objects[i].number = UINT_MAX;
     }
-    else {
+    else
+    {
         objects[i].prefix = NULL;
         objects[i].number = UINT_MAX;
     }
     objects[i].type = EMPTYOBJ;
     objects[i].parent = -1;
-    for (uint j = 0; j < OD_SIZE; j++) {
+    for (uint j = 0; j < OD_SIZE; j++)
+    {
         objects[i].depend[j] = -1;
     }
     return i;
 }
 
-
-
-void object_swap(int i, int j) {
-    if (i < 0 || i >= nb_objects || j < 0 || j >= nb_objects) {
+void object_swap(int i, int j)
+{
+    if (i < 0 || i >= nb_objects || j < 0 || j >= nb_objects)
+    {
         fprintf(stderr, "Error: tried to swap an invalid object.\n");
         return;
     }
 
-    if (i == j) {
+    if (i == j)
+    {
         return;
     }
 
     // An array to store the objects connected to the two that are going to be swapped.
-    int tab[2 * (OD_SIZE)+2];
+    int tab[2 * (OD_SIZE) + 2];
 
     // The parents of the two objects.
     tab[0] = objects[i].parent;
     int s = 1;
-    if (tab[0] != objects[j].parent) {
+    if (tab[0] != objects[j].parent)
+    {
         tab[s++] = objects[j].parent;
     }
 
     // The dependencies of the two objects.
-    for (uchar h = 0; h < OD_SIZE; h++) {
+    for (uchar h = 0; h < OD_SIZE; h++)
+    {
         tab[s++] = objects[i].depend[h];
         tab[s++] = objects[j].depend[h];
     }
 
-    for (uchar g = 0; g < s; g++) {
+    for (uchar g = 0; g < s; g++)
+    {
         int k = tab[g];
-        if (k == -1) {
+        if (k == -1)
+        {
             continue;
         }
-        if (objects[k].parent == i) {
+        if (objects[k].parent == i)
+        {
             objects[k].parent = j;
         }
-        else if (objects[k].parent == j) {
+        else if (objects[k].parent == j)
+        {
             objects[k].parent = i;
         }
-        for (uchar h = 0; h < OD_SIZE; h++) {
-            if (objects[k].depend[h] == i) {
+        for (uchar h = 0; h < OD_SIZE; h++)
+        {
+            if (objects[k].depend[h] == i)
+            {
                 objects[k].depend[h] = j;
             }
-            else if (objects[k].depend[h] == j) {
+            else if (objects[k].depend[h] == j)
+            {
                 objects[k].depend[h] = i;
             }
         }
@@ -146,13 +172,15 @@ void object_swap(int i, int j) {
     objects[j] = temp;
 }
 
-void object_free_aux(object* theob) {
-    if (!theob) {
+void object_free_aux(object *theob)
+{
+    if (!theob)
+    {
         return;
     }
 
     remove_instance_prefixname(theob->prefix);
-    //free(theob->name);
+    // free(theob->name);
 
     switch (theob->type)
     {
@@ -166,21 +194,27 @@ void object_free_aux(object* theob) {
         dfa_delete(theob->obj_dfa);
         break;
     case MORPHISM:
-        if (theob->mor) {
+        if (theob->mor)
+        {
             delete_morphism(theob->mor->obj);
-            for (int i = 0; i < KER_SIZE; i++) {
+            for (int i = 0; i < KER_SIZE; i++)
+            {
                 delete_subsemi(theob->mor->kers[i]);
             }
-            for (int i = 0; i < ORB_SIZE; i++) {
+            for (int i = 0; i < ORB_SIZE; i++)
+            {
                 delete_orbits(theob->mor->orbs[i]);
             }
         }
         free(theob->mor);
         break;
     case RECDEF:
-        if (theob->rec) {
-            for (uint h = 0; h < theob->rec->num; h++) {
-                for (uint g = 0; g < theob->rec->init; g++) {
+        if (theob->rec)
+        {
+            for (uint h = 0; h < theob->rec->num; h++)
+            {
+                for (uint g = 0; g < theob->rec->init; g++)
+                {
                     reg_free(theob->rec->regexps[h][g]);
                 }
                 free(theob->rec->regexps[h]);
@@ -194,50 +228,59 @@ void object_free_aux(object* theob) {
     theob->type = EMPTYOBJ; // Clear the pointer to the deleted object
 }
 
-void object_free(int i) {
-    if (i < 0 || i >= nb_objects) {
-        //fprintf(stderr, "%d Error: tried to delete an invalid object.\n", i);
+void object_free(int i)
+{
+    if (i < 0 || i >= nb_objects)
+    {
+        // fprintf(stderr, "%d Error: tried to delete an invalid object.\n", i);
         return;
     }
-
-
 
     object_swap(i, nb_objects - 1);
     i = nb_objects - 1;
     uchar count = 1;
-    for (uint h = 0; h < OD_SIZE; h++) {
-        if (objects[i].depend[h] != -1) {
+    for (uint h = 0; h < OD_SIZE; h++)
+    {
+        if (objects[i].depend[h] != -1)
+        {
             object_swap(objects[i].depend[h], i - count);
             count++;
         }
     }
 
-    for (uint h = 0; h < count; h++) {
+    for (uint h = 0; h < count; h++)
+    {
         object_free_aux(&objects[i - h]);
         objects[i - h].type = EMPTYOBJ;
         nb_objects--;
     }
-
-
 }
 
-void object_free_all(void) {
-    for (int i = 0; i < nb_objects; i++) {
+void object_free_all(void)
+{
+    for (int i = 0; i < nb_objects; i++)
+    {
         object_free_aux(&objects[i]);
         objects[i].type = EMPTYOBJ;
     }
     nb_objects = 0;
 }
 
-void object_delete_prefix(const char* prefix) {
-    if (!prefix || strlen(prefix) == 0) {
+void object_delete_prefix(const char *prefix)
+{
+    if (!prefix || strlen(prefix) == 0)
+    {
         return;
     }
 
-    for (int i = 0; i < nb_objects; i++) {
-        if (objects[i].parent == -1 && strncmp(objects[i].prefix->name, prefix, strlen(prefix)) == 0) {
-            for (uint h = 0; h < OD_SIZE; h++) {
-                if (objects[i].depend[h] != -1) {
+    for (int i = 0; i < nb_objects; i++)
+    {
+        if (objects[i].parent == -1 && strncmp(objects[i].prefix->name, prefix, strlen(prefix)) == 0)
+        {
+            for (uint h = 0; h < OD_SIZE; h++)
+            {
+                if (objects[i].depend[h] != -1)
+                {
                     object_free_aux(&objects[objects[i].depend[h]]);
                 }
             }
@@ -247,27 +290,35 @@ void object_delete_prefix(const char* prefix) {
 
     int nu = 0;
 
-    for (int i = 0; i < nb_objects; i++) {
-        if (objects[i].type == EMPTYOBJ) {
+    for (int i = 0; i < nb_objects; i++)
+    {
+        if (objects[i].type == EMPTYOBJ)
+        {
             continue; // Skip deleted objects
         }
 
-        if (i == nu) {
+        if (i == nu)
+        {
             nu++;
             continue; // No need to move the object
         }
 
         int k = objects[i].parent;
-        if (k != -1) {
-            for (uchar h = 0; h < OD_SIZE; h++) {
-                if (objects[k].depend[h] == i) {
+        if (k != -1)
+        {
+            for (uchar h = 0; h < OD_SIZE; h++)
+            {
+                if (objects[k].depend[h] == i)
+                {
                     objects[k].depend[h] = nu;
                 }
             }
         }
-        for (uchar h = 0; h < OD_SIZE; h++) {
+        for (uchar h = 0; h < OD_SIZE; h++)
+        {
             int j = objects[i].depend[h];
-            if (j == -1) {
+            if (j == -1)
+            {
                 continue; // Skip if no dependency
             }
             objects[j].parent = nu; // Update the parent of the dependent object
@@ -275,12 +326,10 @@ void object_delete_prefix(const char* prefix) {
         objects[nu] = objects[i]; // Move the object to the new position
         objects[i].type = EMPTYOBJ;
         nu++;
-
     }
 
     nb_objects = nu; // Update the number of objects
 }
-
 
 /************************/
 /* Get/insert an object */
@@ -288,55 +337,64 @@ void object_delete_prefix(const char* prefix) {
 
 char full_name_buffer[256];
 
-const char* object_get_full_name(int i) {
-    if (i < 0 || i >= nb_objects) {
+const char *object_get_full_name(int i)
+{
+    if (i < 0 || i >= nb_objects)
+    {
         return NULL; // Invalid index
     }
-    if (objects[i].prefix == NULL) {
+    if (objects[i].prefix == NULL)
+    {
         return NULL; // No prefix name
     }
-    if (objects[i].number == UINT_MAX || objects[i].prefix->digits == 0) {
+    if (objects[i].number == UINT_MAX || objects[i].prefix->digits == 0)
+    {
         return objects[i].prefix->name; // Full name without suffix
     }
     sprintf(full_name_buffer, "%s%0*u", objects[i].prefix->name, objects[i].prefix->digits, objects[i].number);
     return full_name_buffer;
 }
 
-
-
-
-int object_get_from_name(const char* name) {
-    if (!name) {
+int object_get_from_name(const char *name)
+{
+    if (!name)
+    {
         return -1;
     }
-    for (int i = 0; i < nb_objects; i++) {
-        if (objects[i].parent == -1 && objects[i].prefix && strcmp(object_get_full_name(i), name) == 0) {
+    for (int i = 0; i < nb_objects; i++)
+    {
+        if (objects[i].parent == -1 && objects[i].prefix && strcmp(object_get_full_name(i), name) == 0)
+        {
             return i;
         }
     }
     return -1;
 }
 
-int object_delete_from_name(const char* name) {
+int object_delete_from_name(const char *name)
+{
     int i = object_get_from_name(name);
-    if (i == -1 || objects[i].parent != -1) {
+    if (i == -1 || objects[i].parent != -1)
+    {
         return -1;
     }
     object_free(i);
     return i;
 }
 
-
-
-int object_add_regexp(const char* name, regexp* theregexp) {
-    if (theregexp == NULL) {
+int object_add_regexp(const char *name, regexp *theregexp)
+{
+    if (theregexp == NULL)
+    {
         shell_error_null();
         return -1;
     }
 
-    if (name != NULL) {
+    if (name != NULL)
+    {
         int i = object_get_from_name(name);
-        if (i != -1) {
+        if (i != -1)
+        {
             object_free(i);
         }
     }
@@ -348,15 +406,19 @@ int object_add_regexp(const char* name, regexp* theregexp) {
     return i;
 }
 
-int object_add_automaton_nfa(const char* name, nfa* A) {
-    if (A == NULL) {
+int object_add_automaton_nfa(const char *name, nfa *A)
+{
+    if (A == NULL)
+    {
         shell_error_null();
         return -1;
     }
 
-    if (name != NULL) {
+    if (name != NULL)
+    {
         int i = object_get_from_name(name);
-        if (i != -1) {
+        if (i != -1)
+        {
             object_free(i);
         }
     }
@@ -369,15 +431,19 @@ int object_add_automaton_nfa(const char* name, nfa* A) {
     return i;
 }
 
-int object_add_automaton_dfa(const char* name, dfa* A) {
-    if (A == NULL) {
+int object_add_automaton_dfa(const char *name, dfa *A)
+{
+    if (A == NULL)
+    {
         shell_error_null();
         return -1;
     }
 
-    if (name != NULL) {
+    if (name != NULL)
+    {
         int i = object_get_from_name(name);
-        if (i != -1) {
+        if (i != -1)
+        {
             object_free(i);
         }
     }
@@ -389,42 +455,50 @@ int object_add_automaton_dfa(const char* name, dfa* A) {
     return i;
 }
 
-
-void object_add_automaton_dfa_family(const char* pname, dfa** array, uint count) {
-    if (count == 0) {
+void object_add_automaton_dfa_family(const char *pname, dfa **array, uint count)
+{
+    if (count == 0)
+    {
         return;
     }
-    if (!array || !pname) {
+    if (!array || !pname)
+    {
         shell_error_null();
         return;
     }
     // Deletes all objects with the given prefix.
     object_delete_prefix(pname);
-    ob_prefixname* prefixname = create_prefixname(pname, count);
+    ob_prefixname *prefixname = create_prefixname(pname, count);
 
-    for (uint k = 0; k < count; k++) {
+    for (uint k = 0; k < count; k++)
+    {
         grow_objects_array();
         int i = nb_objects++;
         objects[i].prefix = prefixname;
         objects[i].number = k;
         objects[i].type = DAUTOMATON;
         objects[i].parent = -1;
-        for (uint j = 0; j < OD_SIZE; j++) {
+        for (uint j = 0; j < OD_SIZE; j++)
+        {
             objects[i].depend[j] = -1;
         }
         objects[i].obj_dfa = array[k];
     }
 }
 
-int object_add_morphism(char* name, morphism* M) {
-    if (M == NULL) {
+int object_add_morphism(char *name, morphism *M)
+{
+    if (M == NULL)
+    {
         shell_error_null();
         return -1;
     }
 
-    if (name != NULL) {
+    if (name != NULL)
+    {
         int i = object_get_from_name(name);
-        if (i != -1) {
+        if (i != -1)
+        {
             object_free(i);
         }
     }
@@ -435,21 +509,26 @@ int object_add_morphism(char* name, morphism* M) {
     MALLOC(objects[i].mor, 1);
     objects[i].mor->obj = M;
 
-    for (int j = 0; j < KER_SIZE; j++) {
+    for (int j = 0; j < KER_SIZE; j++)
+    {
         objects[i].mor->kers[j] = NULL;
     }
-    for (int j = 0; j < ORB_SIZE; j++) {
+    for (int j = 0; j < ORB_SIZE; j++)
+    {
         objects[i].mor->orbs[j] = NULL;
     }
 
     return i;
 }
 
-int shell_copy_generic(int i, char* newname) {
-    if (i == -1) {
+int shell_copy_generic(int i, char *newname)
+{
+    if (i == -1)
+    {
         return -1;
     }
-    switch (objects[i].type) {
+    switch (objects[i].type)
+    {
     case DAUTOMATON:
         return object_add_automaton_dfa(newname, dfa_copy(objects[i].obj_dfa));
         break;
@@ -468,26 +547,30 @@ int shell_copy_generic(int i, char* newname) {
 /* Computing information on an existing object */
 /***********************************************/
 
-int shell_compute_minimal(int i) {
-    if (i < 0 || i > nb_objects - 1 || objects[i].type > MORPHISM || objects[i].type < REGEXP) {
+int shell_compute_minimal(int i)
+{
+    if (i < 0 || i > nb_objects - 1 || objects[i].type > MORPHISM || objects[i].type < REGEXP)
+    {
         fprintf(stderr, "Error: invalid object.\n");
         return -1;
     }
 
-    if (objects[i].parent != -1) {
+    if (objects[i].parent != -1)
+    {
         return shell_compute_minimal(objects[i].parent);
     }
 
-    if (objects[i].depend[OD_MINI] != -1) {
+    if (objects[i].depend[OD_MINI] != -1)
+    {
         return objects[i].depend[OD_MINI];
     }
 
-    dfa* mini = NULL;
+    dfa *mini = NULL;
     switch (objects[i].type)
     {
     case REGEXP:
     {
-        nfa* A = reg_thompson(objects[i].exp);
+        nfa *A = reg_thompson(objects[i].exp);
         mini = nfa_brzozowski(A);
         nfa_delete(A);
     }
@@ -496,7 +579,7 @@ int shell_compute_minimal(int i) {
         mini = nfa_brzozowski(objects[i].obj_nfa);
         break;
     case DAUTOMATON:
-        //mini = dfa_brzozowski(objects[i].obj_dfa);
+        // mini = dfa_brzozowski(objects[i].obj_dfa);
         mini = dfa_hopcroft(objects[i].obj_dfa);
         break;
     case MORPHISM:
@@ -515,9 +598,9 @@ int shell_compute_minimal(int i) {
         break;
     }
 
-
     int j = object_add_automaton_dfa(NULL, mini);
-    if (j == -1) {
+    if (j == -1)
+    {
         dfa_delete(mini);
         return j;
     }
@@ -527,51 +610,48 @@ int shell_compute_minimal(int i) {
     return j;
 }
 
-int shell_compute_syntac(int i, bool order) {
-    if (i < 0 || i > nb_objects - 1 || objects[i].type > MORPHISM || objects[i].type < REGEXP) {
+int shell_compute_syntac(int i)
+{
+    if (i < 0 || i > nb_objects - 1 || objects[i].type > MORPHISM || objects[i].type < REGEXP)
+    {
         fprintf(stderr, "Error: invalid object.\n");
         return INVALID_OBJECT;
     }
 
-    if (objects[i].parent != -1) {
-        //printf("Parent: %d\n", objects[i].parent);
-        return shell_compute_syntac(objects[i].parent, order);
+    if (objects[i].parent != -1)
+    {
+        // printf("Parent: %d\n", objects[i].parent);
+        return shell_compute_syntac(objects[i].parent);
     }
 
-
-
-    if (objects[i].depend[OD_SYNT] != -1) {
-        int j = objects[i].depend[OD_SYNT];
-        if (order && !objects[j].mor->obj->order) {
-            object_free(j);
-            objects[i].depend[OD_SYNT] = -1;
-        }
-        else {
-            return objects[i].depend[OD_SYNT];
-        }
+    if (objects[i].depend[OD_SYNT] != -1)
+    {
+        return objects[i].depend[OD_SYNT];
     }
 
     // Start by calculating the object's minimal automaton (if not already done).
     int j = shell_compute_minimal(i);
-    if (j < 0) {
+    if (j < 0)
+    {
         return j;
     }
 
     int error = 0;
-    morphism* synt = dfa_to_morphism(objects[j].obj_dfa, order, &error, NULL);
+    morphism *synt = dfa_to_morphism(objects[j].obj_dfa, &error, NULL);
 
     // if (interrupt_flag) {
     //     interrupt_flag = false;
     // }
 
-    if (!synt) {
+    if (!synt)
+    {
         // The morphism could not be built, return immediately the error code.
         return error;
     }
 
-
     int k = object_add_morphism(NULL, synt);
-    if (k < 0) {
+    if (k < 0)
+    {
         delete_morphism(synt);
         return k;
     }
@@ -580,37 +660,43 @@ int shell_compute_syntac(int i, bool order) {
     return k;
 }
 
-void shell_compute_mult(int i) {
-    if (i < 0 || i > nb_objects - 1 || objects[i].type != MORPHISM) {
+void shell_compute_mult(int i)
+{
+    if (i < 0 || i > nb_objects - 1 || objects[i].type != MORPHISM)
+    {
         fprintf(stderr, "Error: invalid object.\n");
         return;
     }
     mor_compute_mult(objects[i].mor->obj);
 }
 
-void shell_compute_order(int i) {
-    if (i < 0 || i > nb_objects - 1 || objects[i].type != MORPHISM) {
+void shell_compute_order(int i)
+{
+    if (i < 0 || i > nb_objects - 1 || objects[i].type != MORPHISM)
+    {
         fprintf(stderr, "Error: invalid object.\n");
         return;
     }
     mor_compute_order(objects[i].mor->obj);
 }
 
-
-subsemi* shell_compute_ker(int i, kernel_type type, sub_level level) {
-    if (i < 0 || i > nb_objects - 1 || objects[i].type != MORPHISM) {
+subsemi *shell_compute_ker(int i, kernel_type type, sub_level level)
+{
+    if (i < 0 || i > nb_objects - 1 || objects[i].type != MORPHISM)
+    {
         fprintf(stderr, "Error: invalid object.\n");
         return NULL;
     }
 
-
     // If part of the kernel has already been computed and we now want more, we delete the old kernel.
-    if (objects[i].mor->kers[type] && objects[i].mor->kers[type]->level < level) {
+    if (objects[i].mor->kers[type] && objects[i].mor->kers[type]->level < level)
+    {
         delete_subsemi(objects[i].mor->kers[type]);
         objects[i].mor->kers[type] = NULL;
     }
 
-    if (!objects[i].mor->kers[type]) {
+    if (!objects[i].mor->kers[type])
+    {
         switch (type)
         {
         case KER_MOD:
@@ -629,19 +715,23 @@ subsemi* shell_compute_ker(int i, kernel_type type, sub_level level) {
     return objects[i].mor->kers[type];
 }
 
-orbits* shell_compute_orbits(int i, orbits_type type, sub_level level) {
-    if (i < 0 || i > nb_objects - 1 || objects[i].type != MORPHISM) {
+orbits *shell_compute_orbits(int i, orbits_type type, sub_level level)
+{
+    if (i < 0 || i > nb_objects - 1 || objects[i].type != MORPHISM)
+    {
         fprintf(stderr, "Error: invalid object.\n");
         return NULL;
     }
 
     // If part of the orbits have already been computed and we now want more, we delete the old orbits.
-    if (objects[i].mor->orbs[type] && objects[i].mor->orbs[type]->level < level) {
+    if (objects[i].mor->orbs[type] && objects[i].mor->orbs[type]->level < level)
+    {
         delete_orbits(objects[i].mor->orbs[type]);
         objects[i].mor->orbs[type] = NULL;
     }
 
-    if (!objects[i].mor->orbs[type]) {
+    if (!objects[i].mor->orbs[type])
+    {
         switch (type)
         {
         case ORB_DD:
@@ -688,26 +778,32 @@ orbits* shell_compute_orbits(int i, orbits_type type, sub_level level) {
     return objects[i].mor->orbs[type];
 }
 
-
 /*************/
 /* Recursion */
 /*************/
 
-uchar shell_rec_getnum(ob_recursion* obj, char* name) {
+uchar shell_rec_getnum(ob_recursion *obj, char *name)
+{
     uchar j = 0;
-    while (j < obj->num && strcmp(name, obj->names[j]) != 0) {
+    while (j < obj->num && strcmp(name, obj->names[j]) != 0)
+    {
         j++;
     }
     return j;
 }
 
-static bool shell_check_defined(ob_recursion* obj) {
-    for (uint j = 0; j < obj->num; j++) {
-        if (!obj->def[j]) {
+static bool shell_check_defined(ob_recursion *obj)
+{
+    for (uint j = 0; j < obj->num; j++)
+    {
+        if (!obj->def[j])
+        {
             return false;
         }
-        for (ushort x = 0; x < obj->init; x++) {
-            if (!obj->regexps[j][x]) {
+        for (ushort x = 0; x < obj->init; x++)
+        {
+            if (!obj->regexps[j][x])
+            {
                 return false;
             }
         }
@@ -715,45 +811,57 @@ static bool shell_check_defined(ob_recursion* obj) {
     return true;
 }
 
-bool shell_check_recursion(int i) {
-    if (objects[i].type != RECDEF) {
+bool shell_check_recursion(int i)
+{
+    if (objects[i].type != RECDEF)
+    {
         return false;
     }
-    if (!shell_check_defined(objects[i].rec)) {
+    if (!shell_check_defined(objects[i].rec))
+    {
         return false;
     }
-    ob_recursion* obj = objects[i].rec;
+    ob_recursion *obj = objects[i].rec;
 
     // Checking that there are no loops in the recursion scheme.
     bool trans[obj->num][obj->num];
-    for (uint j = 0; j < obj->num; j++) {
-        for (uint h = 0; h < obj->num; h++) {
+    for (uint j = 0; j < obj->num; j++)
+    {
+        for (uint h = 0; h < obj->num; h++)
+        {
             trans[j][h] = false;
         }
-        if (!reg_symbolic_loops(obj->def[j], obj->init, obj->num, trans[j])) {
+        if (!reg_symbolic_loops(obj->def[j], obj->init, obj->num, trans[j]))
+        {
             return false;
         }
-        if (trans[j][j]) {
+        if (trans[j][j])
+        {
             return false;
         }
     }
 
-    graph* G = create_graph_noedges(obj->num);
-    for (uint j = 0; j < obj->num; j++) {
-        for (uint h = 0; h < obj->num; h++) {
-            if (trans[j][h]) {
-                rigins_dequeue(h, G->edges[j]);
-            }
+    dyn_edge_pair *edges = create_dyn_edge_pair();
+    for (uint j = 0; j < obj->num; j++)
+    {
+        for (uint h = 0; h < obj->num; h++)
+        {
+            dyn_edge_pair_add(edges, j, h);
         }
     }
 
-    parti* part = tarjan(G);
+    graph *G = edge_list_to_graph(edges->array, edges->size, obj->num);
+    delete_dyn_edge_pair(edges);
+
+    parti *part = tarjan(G);
     delete_graph(G);
-    if (part->size_par != part->size_set) {
+    if (part->size_par != part->size_set)
+    {
         delete_parti(part);
         return false;
     }
-    for (uint j = 0; j < obj->num; j++) {
+    for (uint j = 0; j < obj->num; j++)
+    {
         obj->evalseq[j] = part->numcl[obj->num - 1 - j];
     }
 
@@ -762,11 +870,14 @@ bool shell_check_recursion(int i) {
     return true;
 }
 
-int shell_rec_defadd(int i, uchar j, regexp* exp) {
-    if (objects[i].type != RECDEF) {
+int shell_rec_defadd(int i, uchar j, regexp *exp)
+{
+    if (objects[i].type != RECDEF)
+    {
         return -1;
     }
-    if (j >= objects[i].rec->num) {
+    if (j >= objects[i].rec->num)
+    {
         return -1;
     }
     // Release of the previous recursion
@@ -776,19 +887,24 @@ int shell_rec_defadd(int i, uchar j, regexp* exp) {
     return i;
 }
 
-int shell_rec_iniadd(int i, uchar j, ushort ind, regexp* exp) {
-    if (objects[i].type != RECDEF) {
+int shell_rec_iniadd(int i, uchar j, ushort ind, regexp *exp)
+{
+    if (objects[i].type != RECDEF)
+    {
         return -1;
     }
-    if (ind >= objects[i].rec->init) {
+    if (ind >= objects[i].rec->init)
+    {
         return -1;
     }
 
-    if (j >= objects[i].rec->num) {
+    if (j >= objects[i].rec->num)
+    {
         return -1;
     }
 
-    if (!objects[i].rec->regexps[j][ind]) {
+    if (!objects[i].rec->regexps[j][ind])
+    {
         reg_free(objects[i].rec->regexps[j][ind]);
     }
     objects[i].rec->regexps[j][ind] = exp;
@@ -796,11 +912,14 @@ int shell_rec_iniadd(int i, uchar j, ushort ind, regexp* exp) {
     return i;
 }
 
-static regexp* shell_makerec(regexp* exp, ushort ind, regexp** new, dequeue_gen* old) {
-    if (!exp) {
+static regexp *shell_makerec(regexp *exp, ushort ind, regexp **new, dequeue_gen *old)
+{
+    if (!exp)
+    {
         return NULL;
     }
-    switch (exp->op) {
+    switch (exp->op)
+    {
     case EPSILON:
     case EMPTY:
     case WORD:
@@ -811,11 +930,13 @@ static regexp* shell_makerec(regexp* exp, ushort ind, regexp** new, dequeue_gen*
         return reg_letter_numbered(exp->sylet.lab, ind - exp->sylet.dec);
         break;
     case SYVAR:
-        if (exp->syvar.dec == 0) {
+        if (exp->syvar.dec == 0)
+        {
             return reg_copy(new[exp->syvar.ind]);
         }
-        else {
-            regexp** row = rigread_dequeue_gen(old, exp->syvar.dec - 1);
+        else
+        {
+            regexp **row = rigread_dequeue_gen(old, exp->syvar.dec - 1);
             return reg_copy(row[exp->syvar.ind]);
         }
         break;
@@ -838,50 +959,61 @@ static regexp* shell_makerec(regexp* exp, ushort ind, regexp** new, dequeue_gen*
     return NULL;
 }
 
-regexp** shell_rec_compute(ob_recursion* obj, ushort ind) {
-    if (!obj->full) {
+regexp **shell_rec_compute(ob_recursion *obj, ushort ind)
+{
+    if (!obj->full)
+    {
         return NULL;
     }
-    if (ind < obj->init) {
-        regexp** ret;
+    if (ind < obj->init)
+    {
+        regexp **ret;
         MALLOC(ret, obj->num);
-        for (uchar i = 0; i < obj->num; i++) {
+        for (uchar i = 0; i < obj->num; i++)
+        {
             ret[i] = reg_copy(obj->regexps[i][ind]);
         }
         return ret;
     }
 
-    dequeue_gen* thequeue = create_dequeue_gen();
-    for (ushort j = 0; j < obj->init; j++) {
-        regexp** row;
+    dequeue_gen *thequeue = create_dequeue_gen();
+    for (ushort j = 0; j < obj->init; j++)
+    {
+        regexp **row;
         MALLOC(row, obj->num);
-        for (uchar i = 0; i < obj->num; i++) {
+        for (uchar i = 0; i < obj->num; i++)
+        {
             row[i] = reg_copy(obj->regexps[i][j]);
         }
         rigins_dequeue_gen(row, thequeue);
     }
 
     ushort c = obj->init;
-    while (ind >= c) {
-        regexp** nrow;
+    while (ind >= c)
+    {
+        regexp **nrow;
         MALLOC(nrow, obj->num);
-        for (uchar h = 0; h < obj->num; h++) {
+        for (uchar h = 0; h < obj->num; h++)
+        {
             uchar g = obj->evalseq[h];
             nrow[g] = shell_makerec(obj->def[g], c, nrow, thequeue);
         }
         rigins_dequeue_gen(nrow, thequeue);
-        regexp** old = lefpull_dequeue_gen(thequeue);
-        for (uchar h = 0; h < obj->num; h++) {
+        regexp **old = lefpull_dequeue_gen(thequeue);
+        for (uchar h = 0; h < obj->num; h++)
+        {
             reg_free(old[h]);
         }
         free(old);
         c++;
     }
 
-    regexp** ret = rigpull_dequeue_gen(thequeue);
-    while (!isempty_dequeue_gen(thequeue)) {
-        regexp** old = lefpull_dequeue_gen(thequeue);
-        for (uchar h = 0; h < obj->num; h++) {
+    regexp **ret = rigpull_dequeue_gen(thequeue);
+    while (!isempty_dequeue_gen(thequeue))
+    {
+        regexp **old = lefpull_dequeue_gen(thequeue);
+        for (uchar h = 0; h < obj->num; h++)
+        {
             reg_free(old[h]);
         }
         free(old);
@@ -889,27 +1021,34 @@ regexp** shell_rec_compute(ob_recursion* obj, ushort ind) {
     return ret;
 }
 
-regexp* shell_rec_getexp(int i, char* name, ushort ind) {
-    if (objects[i].type != RECDEF) {
+regexp *shell_rec_getexp(int i, char *name, ushort ind)
+{
+    if (objects[i].type != RECDEF)
+    {
         return NULL;
     }
 
-    if (!objects[i].rec->full) {
+    if (!objects[i].rec->full)
+    {
         return NULL;
     }
 
     uchar j = shell_rec_getnum(objects[i].rec, name);
 
-    if (j >= objects[i].rec->num) {
+    if (j >= objects[i].rec->num)
+    {
         return NULL;
     }
-    regexp** array = shell_rec_compute(objects[i].rec, ind);
-    if (!array) {
+    regexp **array = shell_rec_compute(objects[i].rec, ind);
+    if (!array)
+    {
         return NULL;
     }
-    regexp* ret = array[j];
-    for (uchar h = 0; h < objects[i].rec->num; h++) {
-        if (h != j) {
+    regexp *ret = array[j];
+    for (uchar h = 0; h < objects[i].rec->num; h++)
+    {
+        if (h != j)
+        {
             reg_free(array[h]);
         }
     }
@@ -927,33 +1066,41 @@ regexp* shell_rec_getexp(int i, char* name, ushort ind) {
  */
 }
 
-void shell_rec_display(ob_recursion* obj, FILE* out) {
+void shell_rec_display(ob_recursion *obj, FILE *out)
+{
     symbolic_count = obj->num;
     symbolic_names = obj->names;
-    for (uint i = 0; i < obj->num; i++) {
+    for (uint i = 0; i < obj->num; i++)
+    {
         fprintf(out, "#### Recursion relation %sᵢ : ", obj->names[i]);
 
-        if (obj->def[i]) {
+        if (obj->def[i])
+        {
             reg_print(obj->def[i]);
         }
-        else {
+        else
+        {
             fprintf(out, "not yet defined.\n");
         }
-        for (uint j = 0; j < obj->init; j++) {
+        for (uint j = 0; j < obj->init; j++)
+        {
             fprintf(out, "#### Initial case %s", obj->names[i]);
             fprint_subsc_utf8(j, out);
             fprintf(out, " : ");
-            if (obj->regexps[i][j]) {
+            if (obj->regexps[i][j])
+            {
                 reg_print(obj->regexps[i][j]);
             }
-            else {
+            else
+            {
                 fprintf(out, "not yet defined.\n");
             }
         }
         fprintf(out, "\n");
     }
 
-    if (shell_check_defined(obj) && !obj->full) {
+    if (shell_check_defined(obj) && !obj->full)
+    {
         fprintf(out, "#### Warning: Error found in the recursion scheme.\n\n");
     }
 
@@ -961,48 +1108,53 @@ void shell_rec_display(ob_recursion* obj, FILE* out) {
     symbolic_names = NULL;
 }
 
-
 /***********/
 /* Display */
 /***********/
 
-
-
-void shell_view_object(object* ob, bool title) {
-    if (!ob) {
+void shell_view_object(object *ob, bool title)
+{
+    if (!ob)
+    {
         return;
     }
-    switch (ob->type) {
+    switch (ob->type)
+    {
     case REGEXP:
-        if (title) {
+        if (title)
+        {
             print_title_box(100, true, stdout, 1, "Regular expression");
         }
         reg_print(ob->exp);
         return;
         break;
     case NAUTOMATON:
-        if (title) {
+        if (title)
+        {
             print_title_box(100, true, stdout, 1, "Automaton");
         }
         view_nfa(ob->obj_nfa);
         return;
         break;
     case DAUTOMATON:
-        if (title) {
+        if (title)
+        {
             print_title_box(100, true, stdout, 1, "Automaton");
         }
         view_dfa(ob->obj_dfa);
         return;
         break;
     case MORPHISM:
-        if (title) {
+        if (title)
+        {
             print_title_box(100, true, stdout, 1, "Morphism");
         }
         view_morphism(ob->mor->obj, stdout);
         return;
         break;
     case RECDEF:
-        if (title) {
+        if (title)
+        {
             print_title_box(100, true, stdout, 1, "Recursive definition of regular expressions");
             shell_rec_display(ob->rec, stdout);
         }

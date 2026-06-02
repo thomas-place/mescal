@@ -10,7 +10,6 @@
 #include "shell_languages.h"
 #include "shell_sclass.h"
 #include "tools.h"
-#include "nfa_patterns.h"
 #include <stdio.h>
 
 #define DIMEN 3
@@ -18,8 +17,15 @@
 
 extern uint slice_test, width_test;
 
-void test(void) {
+void test(void)
+{
 
+    regexp *exp = parse_string_regexp("(ab)*");
+    nfa *A = reg_glushkov(exp);
+    dfa *D = nfa_brzozowski(A);
+    view_dfa(D);
+    graph *tclos = compute_tclos_dgraph(D->trans, NULL, false);
+    view_graph(tclos);
 
     // word* W = create_empty_word();
     // letter la = { 'a', -1 };
@@ -44,7 +50,6 @@ void test(void) {
     //     printf("The automaton is not a nosimple counter.\n");
     // }
 
-
     shell_exall_dfatest();
 
     // dfa_enum* E = dfa_enum_init(7, 2);
@@ -67,7 +72,6 @@ void test(void) {
     //     }
     //     delete_subsemi(S);
     //     delete_morphism(M);
-
 
     //     //size = max(size, dfa_to_morphism_size(MINI));
     //     if (count % 100000 == 0) {
@@ -167,6 +171,4 @@ void test(void) {
     printf("final size: %lu\n", size);
     nfa_enum_free(E);
 #endif
-
-
 }

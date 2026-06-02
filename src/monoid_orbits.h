@@ -11,14 +11,13 @@
 #include "monoid_sub.h"
 #include "sep_group.h"
 
- /*  __  __                   _     _          ___       _     _ _        */
- /* |  \/  | ___  _ __   ___ (_) __| |___ _   / _ \ _ __| |__ (_) |_ ___  */
- /* | |\/| |/ _ \| '_ \ / _ \| |/ _` / __(_) | | | | '__| '_ \| | __/ __| */
- /* | |  | | (_) | | | | (_) | | (_| \__ \_  | |_| | |  | |_) | | |_\__ \ */
- /* |_|  |_|\___/|_| |_|\___/|_|\__,_|___(_)  \___/|_|  |_.__/|_|\__|___/ */
+/*  __  __                   _     _          ___       _     _ _        */
+/* |  \/  | ___  _ __   ___ (_) __| |___ _   / _ \ _ __| |__ (_) |_ ___  */
+/* | |\/| |/ _ \| '_ \ / _ \| |/ _` / __(_) | | | | '__| '_ \| | __/ __| */
+/* | |  | | (_) | | | | (_) | | (_| \__ \_  | |_| | |  | |_) | | |_\__ \ */
+/* |_|  |_|\___/|_| |_|\___/|_|\__,_|___(_)  \___/|_|  |_.__/|_|\__|___/ */
 
-
-//#define DEBUG_ORBITS
+// #define DEBUG_ORBITS
 
 /**
  * @brief
@@ -28,11 +27,12 @@
  * Depending on the class C, it may not be required to compute all orbits.
  * If an orbit is not computed, the corresponding cell in the array is NULL.
  */
-typedef struct {
-    morphism* original;  //!< The original morphism.
-    subsemi** orbits;    //!< Array of orbits indexed by the regular J-classes. A cell has the NULL value if the orbit of the corresponding idempotent has not been computed.
-    uint nb_computed;    //!< The number of computed orbits (only those required for tests are computed, this depends on the class C). This is the size of the array.
-    sub_level level;     //!< The computation level used for the orbits.
+typedef struct
+{
+    morphism *original; //!< The original morphism.
+    subsemi **orbits;   //!< Array of orbits indexed by the regular J-classes. A cell has the NULL value if the orbit of the corresponding idempotent has not been computed.
+    uint nb_computed;   //!< The number of computed orbits (only those required for tests are computed, this depends on the class C). This is the size of the array.
+    sub_level level;    //!< The computation level used for the orbits.
 } orbits;
 
 /*********************/
@@ -46,7 +46,7 @@ typedef struct {
  * @return
  * The orbits set.
  */
-orbits* init_orbits(morphism* //!< The morphism.
+orbits *init_orbits(morphism * //!< The morphism.
 );
 
 /**
@@ -56,10 +56,8 @@ orbits* init_orbits(morphism* //!< The morphism.
  * @attention
  * The original morphism and its Green relations are not released.
  */
-void delete_orbits(orbits* //!< The orbits set.
+void delete_orbits(orbits * //!< The orbits set.
 );
-
-
 
 /*************/
 /* DD-orbits */
@@ -75,8 +73,8 @@ void delete_orbits(orbits* //!< The orbits set.
  * @return
  * The DD-orbit.
  */
-subsemi* compute_one_ddorb(morphism*, //!< The morphism.
-    uint //!< The idempotent.
+subsemi *compute_one_ddorb(morphism *, //!< The morphism.
+                           uint        //!< The idempotent.
 );
 
 /**
@@ -92,10 +90,8 @@ subsemi* compute_one_ddorb(morphism*, //!< The morphism.
  * @return
  * The (partial) set of DD-orbits.
  */
-orbits* compute_ddorbits(morphism* //!< The morphism.
+orbits *compute_ddorbits(morphism * //!< The morphism.
 );
-
-
 
 /*************/
 /* G⁺-orbits */
@@ -112,8 +108,8 @@ orbits* compute_ddorbits(morphism* //!< The morphism.
  * @return
  * The G⁺-orbit.
  */
-subsemi* compute_one_gplusorb(subsemi*, //!< The G-kernel.
-    uint //!< The idempotent.
+subsemi *compute_one_gplusorb(subsemi *, //!< The G-kernel.
+                              uint       //!< The idempotent.
 );
 
 /**
@@ -129,15 +125,12 @@ subsemi* compute_one_gplusorb(subsemi*, //!< The G-kernel.
  * @return
  * The set of G⁺-orbits.
  */
-orbits* compute_gplusorbits(subsemi* //!< The G-kernel.
+orbits *compute_gplusorbits(subsemi * //!< The G-kernel.
 );
-
-
 
 /********************************************/
 /* PT-orbits (which are also the AT-orbits) */
 /********************************************/
-
 
 /**
  * @brief
@@ -149,9 +142,9 @@ orbits* compute_gplusorbits(subsemi* //!< The G-kernel.
  * @return
  * The PT-orbit.
  */
-subsemi* compute_one_ptorb(morphism*, //!< The morphism.
-    uint, //!< The idempotent.
-    sub_level //!< Desired computation level.
+subsemi *compute_one_ptorb(morphism *, //!< The morphism.
+                           uint,       //!< The idempotent.
+                           sub_level   //!< Desired computation level.
 );
 
 /**
@@ -167,17 +160,13 @@ subsemi* compute_one_ptorb(morphism*, //!< The morphism.
  * @return
  * The (partial) set of PT-orbits.
  */
-orbits* compute_ptorbits(morphism*, //!< The morphism.
-    sub_level //!< Desired computation level.
+orbits *compute_ptorbits(morphism *, //!< The morphism.
+                         sub_level   //!< Desired computation level.
 );
-
-
 
 /******************/
 /* BPol(G)-orbits */
 /******************/
-
-
 
 /**
  * @brief
@@ -194,9 +183,9 @@ orbits* compute_ptorbits(morphism*, //!< The morphism.
  * @return
  * The multiplication table.
  */
-uint** compute_jmult(morphism*, //!< The morphism.
-    dequeue*, //!< The subset.
-    dequeue* //!< The J-class that contains the subset.
+uint **compute_jmult(morphism *, //!< The morphism.
+                     dequeue *,  //!< The subset.
+                     dequeue *   //!< The J-class that contains the subset.
 );
 
 /**
@@ -212,14 +201,10 @@ uint** compute_jmult(morphism*, //!< The morphism.
  * A two-dimensional array of Booleans indexed by the indices of the right ideal (first) and the
  * indices of the R-class (second). It marks the Pol(G)-pairs.
  */
-bool** compute_polgpairs(subsemi*, //!< The G-kernel.
-    dequeue*, //!< The right ideal associated to the R-class.
-    uint //!< The index of the R-class.
+bool **compute_polgpairs(subsemi *, //!< The G-kernel.
+                         dequeue *, //!< The right ideal associated to the R-class.
+                         uint       //!< The index of the R-class.
 );
-
-
-
-
 
 /**
  * @brief
@@ -233,10 +218,10 @@ bool** compute_polgpairs(subsemi*, //!< The G-kernel.
  * @return
  * The BPol(G)-orbit.
  */
-subsemi* compute_one_bpgorb(morphism* M, //!< The morphism.
-    uint, //!< The idempotent.
-    sub_level, //!< Desired computation level.
-    basis //!< Type of the BPol(G)-orbit to compute (MOD, AMT or GR).
+subsemi *compute_one_bpgorb(morphism *M, //!< The morphism.
+                            uint,        //!< The idempotent.
+                            sub_level,   //!< Desired computation level.
+                            basis        //!< Type of the BPol(G)-orbit to compute (MOD, AMT or GR).
 );
 
 /**
@@ -253,12 +238,10 @@ subsemi* compute_one_bpgorb(morphism* M, //!< The morphism.
  * @return
  * The (partial) set of BPol(G)-orbits.
  */
-orbits* compute_bpgorbits(morphism* M, //!< The G-kernel.
-    sub_level, //!< Desired computation level.
-    basis //!< Type of the BPol(G)-orbit to compute (MOD, AMT or GR).
+orbits *compute_bpgorbits(morphism *M, //!< The G-kernel.
+                          sub_level,   //!< Desired computation level.
+                          basis        //!< Type of the BPol(G)-orbit to compute (MOD, AMT or GR).
 );
-
-
 
 /*******************/
 /* BPol(G⁺)-orbits */
@@ -285,13 +268,12 @@ orbits* compute_bpgorbits(morphism* M, //!< The G-kernel.
  * @return
  * The BPol(C)-orbit.
  */
-subsemi* compute_one_orbit_from_pairs(morphism*, //!< The morphism.
-    uint, //!< The index of the idempotent e.
-    dequeue*, //!< The right ideal eM associated to e.
-    bool**, //!< Two-dimensional array indicating the Pol(C)-pairs.
-    sub_level //!< Desired computation level.
+subsemi *compute_one_orbit_from_pairs(morphism *, //!< The morphism.
+                                      uint,       //!< The index of the idempotent e.
+                                      dequeue *,  //!< The right ideal eM associated to e.
+                                      bool **,    //!< Two-dimensional array indicating the Pol(C)-pairs.
+                                      sub_level   //!< Desired computation level.
 );
-
 
 /**
  * @brief
@@ -308,11 +290,10 @@ subsemi* compute_one_orbit_from_pairs(morphism*, //!< The morphism.
  * @return
  * The BPol(DD)-orbit.
  */
-subsemi* compute_one_bpddorb(morphism* M, //!< The morphism.
-    uint e, //!< The idempotent.
-    sub_level level //!< Desired computation level.
+subsemi *compute_one_bpddorb(morphism *M,    //!< The morphism.
+                             uint e,         //!< The idempotent.
+                             sub_level level //!< Desired computation level.
 );
-
 
 /**
  * @brief
@@ -332,10 +313,10 @@ subsemi* compute_one_bpddorb(morphism* M, //!< The morphism.
  * @return
  * The BPol(G⁺)-orbit.
  */
-subsemi* compute_one_bpgplusorb(morphism*, //!< The morphism.
-    uint, //!< The idempotent.
-    sub_level, //!< Desired computation level.
-    basis //!< Type of the BPol(G⁺)-orbit to compute (ST, MOD, AMT or GR).
+subsemi *compute_one_bpgplusorb(morphism *, //!< The morphism.
+                                uint,       //!< The idempotent.
+                                sub_level,  //!< Desired computation level.
+                                basis       //!< Type of the BPol(G⁺)-orbit to compute (ST, MOD, AMT or GR).
 );
 
 /**
@@ -352,10 +333,9 @@ subsemi* compute_one_bpgplusorb(morphism*, //!< The morphism.
  * @return
  * The set of BPol(G⁺)-orbits.
  */
-orbits* compute_bpgplusorbits(morphism*, //!< The morphism.
-    sub_level, //!< Desired computation level.
-    basis //!< Type of the BPol(G⁺)-orbit to compute (ST, MOD, AMT or GR).
+orbits *compute_bpgplusorbits(morphism *, //!< The morphism.
+                              sub_level,  //!< Desired computation level.
+                              basis       //!< Type of the BPol(G⁺)-orbit to compute (ST, MOD, AMT or GR).
 );
-
 
 #endif
