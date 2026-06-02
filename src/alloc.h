@@ -27,6 +27,40 @@
 #include <stdlib.h>
 
 /**
+ * @brief Macro for copying memory using the memcpy() function.
+ * @param destp Destination pointer.
+ * @param srcp Source pointer.
+ * @param num_objects Number of objects to allocate.
+ *
+ * @details
+ * Copies `num_objects` in destp, each of type `*srcp`.
+ */
+
+#define MEMCPY(destp, srcp, num_objects)                             \
+    do                                                               \
+    {                                                                \
+        DEBUG("Copying %lu objects.", (unsigned long)(num_objects)); \
+        memcpy((destp), (srcp), sizeof *(srcp) * (num_objects));     \
+    } while (0)
+
+/**
+ * @brief Macro for writing memory using the memset() function.
+ * @param destp Destination pointer.
+ * @param val Value to set.
+ * @param num_objects Number of objects to allocate.
+ *
+ * @details
+ * Copies `num_objects` in destp, each of type `*srcp`.
+ */
+
+#define MEMSET(destp, val, num_objects)                              \
+    do                                                               \
+    {                                                                \
+        DEBUG("Setting %lu objects.", (unsigned long)(num_objects)); \
+        memset((destp), (val), sizeof *(destp) * (num_objects));     \
+    } while (0)
+
+/**
  * @brief Macro for allocating memory using the malloc() function.
  * @param p Pointer to be allocated.
  * @param num_objects Number of objects to allocate.
@@ -50,13 +84,14 @@
  * @see REALLOC()
  */
 
-#define MALLOC(p, num_objects)                                                 \
-    do {                                                                       \
-        DEBUG("Allocating  %lu objects.", (unsigned long)(num_objects));       \
-        void *tmp = malloc(sizeof *(p) * (num_objects));                       \
-        if (!tmp)                                                              \
-            FATAL("Malloc error.");                                            \
-        (p) = tmp;                                                             \
+#define MALLOC(p, num_objects)                                           \
+    do                                                                   \
+    {                                                                    \
+        DEBUG("Allocating  %lu objects.", (unsigned long)(num_objects)); \
+        void *tmp = malloc(sizeof *(p) * (num_objects));                 \
+        if (!tmp)                                                        \
+            FATAL("Malloc error.");                                      \
+        (p) = tmp;                                                       \
     } while (0)
 
 /**
@@ -82,13 +117,14 @@
  *
  * @sa REALLOC().
  */
-#define CALLOC(p, num_objects)                                                 \
-    do {                                                                       \
-        DEBUG("Callocating  %lu objects.", (unsigned long)(num_objects));      \
-        void *tmp = calloc((num_objects), sizeof *(p));                        \
-        if (!tmp)                                                              \
-            FATAL("Calloc error.");                                            \
-        (p) = tmp;                                                             \
+#define CALLOC(p, num_objects)                                            \
+    do                                                                    \
+    {                                                                     \
+        DEBUG("Callocating  %lu objects.", (unsigned long)(num_objects)); \
+        void *tmp = calloc((num_objects), sizeof *(p));                   \
+        if (!tmp)                                                         \
+            FATAL("Calloc error.");                                       \
+        (p) = tmp;                                                        \
     } while (0)
 
 /**
@@ -119,14 +155,16 @@
  * dynamically allocated zone.
  * @sa MALLOC(), CALLOC()
  */
-#define REALLOC(p, num_objects)                                                \
-    do {                                                                       \
-        DEBUG("Reallocating  %lu objects.", (unsigned long)(num_objects));     \
-        void *tmp = realloc((p), sizeof *(p) * (num_objects));                 \
-        if (!tmp) {                                                            \
-            FATAL("Realloc error.");                                           \
-        }                                                                      \
-        (p) = tmp;                                                             \
+#define REALLOC(p, num_objects)                                            \
+    do                                                                     \
+    {                                                                      \
+        DEBUG("Reallocating  %lu objects.", (unsigned long)(num_objects)); \
+        void *tmp = realloc((p), sizeof *(p) * (num_objects));             \
+        if (!tmp)                                                          \
+        {                                                                  \
+            FATAL("Realloc error.");                                       \
+        }                                                                  \
+        (p) = tmp;                                                         \
     } while (0)
 
 /**
@@ -162,7 +200,7 @@ void check_null(const char *function, char *file, int line, int n, ...);
  * @sa check_null()
  */
 
-#define CHECK_NULL(n, ...)                                                     \
+#define CHECK_NULL(n, ...) \
     check_null(__func__, __FILE__, __LINE__, n __VA_OPT__(, ) __VA_ARGS__)
 
 /**
