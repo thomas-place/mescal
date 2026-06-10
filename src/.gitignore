@@ -4,6 +4,15 @@
 html/
 latex/
 .mescal_history
+./mescal
+./parse_regexp.output
+./parse_regexp.tab.c
+./parse_regexp.tab.h
+./parser.output
+./parser.tab.c
+./parser.tab.h
+./scan.c
+./scan_regexp.c
 tmp/
 ../doc/
 src/.mescal_history
