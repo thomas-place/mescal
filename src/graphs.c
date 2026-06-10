@@ -1047,9 +1047,9 @@ bool dgraph_getloop_alpha(dgraph *g, parti *sccs, bool *alph, uint s, uint **the
     }
     length += i;
 
-    uint *word;
-    MALLOC(word, length + 1);
-    word[length] = UINT_MAX; // End of the word
+    uint *new_word;
+    MALLOC(new_word, length + 1);
+    new_word[length] = UINT_MAX; // End of the word
     uint j = 0;
     for (uint a = 0; a < g->size_alpha; a++)
     {
@@ -1060,18 +1060,18 @@ bool dgraph_getloop_alpha(dgraph *g, parti *sccs, bool *alph, uint s, uint **the
         i = 0;
         while (words[a][i] != UINT_MAX)
         {
-            word[j] = words[a][i];
+            new_word[j] = words[a][i];
             i++;
             j++;
         }
-        word[j] = a; // Add the letter
+        new_word[j] = a; // Add the letter
         j++;
         free(words[a]);
     }
     i = 0;
     while (end[i] != UINT_MAX)
     {
-        word[j] = end[i];
+        new_word[j] = end[i];
         i++;
         j++;
     }
@@ -1081,11 +1081,11 @@ bool dgraph_getloop_alpha(dgraph *g, parti *sccs, bool *alph, uint s, uint **the
     delete_dgraph(local);
     if (theword != NULL)
     {
-        *theword = word;
+        *theword = new_word;
     }
     else
     {
-        free(word);
+        free(new_word);
     }
     return true;
 }

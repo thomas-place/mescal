@@ -391,6 +391,7 @@ void view_pattern_polgp(basis mode) {
     switch (mode) {
     case BA_ST:
         view_image(" ./patterns/ppt.png");
+        break;
     case BA_MOD:
         view_image(" ./patterns/polmod.png");
         break;

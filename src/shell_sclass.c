@@ -2738,66 +2738,66 @@ void info_ptl2_st(FILE *out)
 {
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of PL(ST) : PL₂(ST).");
     print_dline_box(0, out, " Characterizations :");
-    print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis AT (PL(AT)).");
-    print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(ST) (PL(BPol(ST))).");
-    print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis ST (PL₂(ST)).");
+    print_dline_box(0, out, "  - Level one in the past nested temporal hierarchy of basis AT (PL(AT)).");
+    print_dline_box(0, out, "  - Level one in the past nested temporal hierarchy of basis BPol(ST) (PL(BPol(ST))).");
+    print_dline_box(0, out, "  - Level two in the past nested temporal hierarchy of basis ST (PL₂(ST)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(ST)-orbits are R-trivial.");
 }
 void info_ptl2_mod(FILE *out)
 {
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of PL(MOD) : PL₂(MOD).");
     print_dline_box(0, out, " Characterizations :");
-    print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(MOD) (PL(BPol(MOD))).");
-    print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis MOD (PL₂(MOD)).");
+    print_dline_box(0, out, "  - Level one in the past nested temporal hierarchy of basis BPol(MOD) (PL(BPol(MOD))).");
+    print_dline_box(0, out, "  - Level two in the past nested temporal hierarchy of basis MOD (PL₂(MOD)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(MOD)-orbits are R-trivial.");
 }
 void info_ptl2_amt(FILE *out)
 {
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of PL(AMT) : PL₂(AMT).");
     print_dline_box(0, out, " Characterizations :");
-    print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(AMT) (PL(BPol(AMT))).");
-    print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis AMT (PL₂(AMT)).");
+    print_dline_box(0, out, "  - Level one in the past nested temporal hierarchy of basis BPol(AMT) (PL(BPol(AMT))).");
+    print_dline_box(0, out, "  - Level two in the past nested temporal hierarchy of basis AMT (PL₂(AMT)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(AMT)-orbits are R-trivial.");
 }
 void info_ptl2_gr(FILE *out)
 {
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of PL(GR) : PL₂(GR).");
     print_dline_box(0, out, " Characterizations :");
-    print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(GR) (PL(BPol(GR))).");
-    print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis GR (PL₂(GR)).");
+    print_dline_box(0, out, "  - Level one in the past nested temporal hierarchy of basis BPol(GR) (PL(BPol(GR))).");
+    print_dline_box(0, out, "  - Level two in the past nested temporal hierarchy of basis GR (PL₂(GR)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(GR)-orbits are R-trivial.");
 }
 void info_ptl2_dd(FILE *out)
 {
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of PL(DD) : PL₂(DD).");
     print_dline_box(0, out, " Characterizations :");
-    print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis LT (PL(LT)).");
-    print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(DD) (PL(BPol(DD))).");
-    print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis DD (PL₂(DD)).");
+    print_dline_box(0, out, "  - Level one in the past nested temporal hierarchy of basis LT (PL(LT)).");
+    print_dline_box(0, out, "  - Level one in the past nested temporal hierarchy of basis BPol(DD) (PL(BPol(DD))).");
+    print_dline_box(0, out, "  - Level two in the past nested temporal hierarchy of basis DD (PL₂(DD)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(DD)-orbits are R-trivial.");
 }
 void info_ptl2_modp(FILE *out)
 {
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of PL(MOD⁺) : PL₂(MOD⁺).");
     print_dline_box(0, out, " Characterizations :");
-    print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(MOD⁺) (PL(BPol(MOD⁺))).");
-    print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis MOD⁺ (PL₂(MOD⁺)).");
+    print_dline_box(0, out, "  - Level one in the past nested temporal hierarchy of basis BPol(MOD⁺) (PL(BPol(MOD⁺))).");
+    print_dline_box(0, out, "  - Level two in the past nested temporal hierarchy of basis MOD⁺ (PL₂(MOD⁺)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(MOD⁺)-orbits are R-trivial.");
 }
 void info_ptl2_amtp(FILE *out)
 {
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of PL(AMT⁺) : PL₂(AMT⁺).");
     print_dline_box(0, out, " Characterizations :");
-    print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(AMT⁺) (PL(BPol(AMT⁺))).");
-    print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis AMT⁺ (PL₂(AMT⁺)).");
+    print_dline_box(0, out, "  - Level one in the past nested temporal hierarchy of basis BPol(AMT⁺) (PL(BPol(AMT⁺))).");
+    print_dline_box(0, out, "  - Level two in the past nested temporal hierarchy of basis AMT⁺ (PL₂(AMT⁺)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(AMT⁺)-orbits are R-trivial.");
 }
 void info_ptl2_grp(FILE *out)
 {
     print_dtitle_box(10, false, out, 1, "Past temporal logic closure of PL(GR⁺) : PL₂(GR⁺).");
     print_dline_box(0, out, " Characterizations :");
-    print_dline_box(0, out, "  - Level one in the future nested temporal hierarchy of basis BPol(GR⁺) (PL(BPol(GR⁺))).");
-    print_dline_box(0, out, "  - Level two in the future nested temporal hierarchy of basis GR⁺ (PL₂(GR⁺)).");
+    print_dline_box(0, out, "  - Level one in the past nested temporal hierarchy of basis BPol(GR⁺) (PL(BPol(GR⁺))).");
+    print_dline_box(0, out, "  - Level two in the past nested temporal hierarchy of basis GR⁺ (PL₂(GR⁺)).");
     print_dline_box(0, out, "  - Languages with a syntactic morphism whose BPol(GR⁺)-orbits are R-trivial.");
 }
 
